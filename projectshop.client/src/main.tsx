@@ -9,6 +9,7 @@ import ProductContainer from './components/product-container';
 import LoginForm from './pages/login-page';
 import SignupForm from './pages/signup-page';
 import Cart from './pages/cart-page';
+import UserPage from './pages/user-page';
 
 createRoot(document.getElementById('header')!).render(
   <StrictMode>
@@ -49,6 +50,7 @@ createRoot(document.getElementById('root')!).render(
     <LoginForm />
     <SignupForm />
     <Cart />
+    <UserPage></UserPage>
   </StrictMode>,
 );
 

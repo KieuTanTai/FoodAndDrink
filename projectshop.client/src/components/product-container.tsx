@@ -24,7 +24,7 @@ interface ProductContainerProps {
 const ProductContainer: React.FC<ProductContainerProps> = ({ id, title, products, link }) => {
      return (
           <section className="mx-auto flex max-w-[75rem] flex-col items-center justify-center p-4 lg:px-0" id={`container-${id}`}>
-               <div className="bg-white p-4 shadow-sm rounded-lg">
+               <div className="bg-white p-4 shadow-md rounded-lg">
                     <div className="flex items-center mb-6 border-b pb-2">
                          {/* Icon sẽ thay đổi tùy theo yêu cầu, ở đây dùng tạm một icon */}
                          <FontAwesomeIcon icon={faBolt} className="text-red-500 mr-2" />
@@ -38,7 +38,7 @@ const ProductContainer: React.FC<ProductContainerProps> = ({ id, title, products
                     </div>
 
                     <div className="flex justify-center items-center font-bold capitalize mt-6">
-                         <a href={link} className="bg-main-color text-gray-800 font-bold py-2 px-8 rounded-full transition-colors duration-200">
+                         <a href={link} className="bg-main-color bg-main-hover font-bold py-2 px-8 rounded-full transition-colors duration-200">
                               <p className='text-black'>Xem thêm</p>
                          </a>
                     </div>

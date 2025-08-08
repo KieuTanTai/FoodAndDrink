@@ -5,11 +5,16 @@ import { faCircleUser } from '@fortawesome/free-regular-svg-icons';
 
 function Header() {
      const [query, setQuery] = useState('');
+     const [cartCount, setCartCount] = useState(0); // State for cart count
 
      const handleSearch = (e: React.FormEvent) => {
           e.preventDefault();
           // Handle search logic here
           console.log('Searching for:', query);
+     };
+
+     const handleAddToCart = () => {
+          setCartCount(prevCount => prevCount + 1); // For demo purposes
      };
 
      return (
@@ -27,10 +32,10 @@ function Header() {
                                    <img src="./src/assets/images/icons/web_logo/light-novel-world.png" alt="Light Novel World Logo" className="h-10" />
                               </div>
                               {/* Cart */}
-                              <div className="relative">
+                              <div className="relative cursor-pointer" onClick={handleAddToCart}>
                                    <FontAwesomeIcon icon={faCartShopping} size="xl" className="main-color" />
-                                   <div className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                                        0
+                                   <div className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center transition-all duration-300">
+                                        {cartCount}
                                    </div>
                               </div>
                          </div>
@@ -44,7 +49,7 @@ function Header() {
 
                               {/* Search Bar */}
                               <div className="w-auto px-2 lg:w-5/12">
-                                   <form onSubmit={handleSearch} className="flex border border-blue-400 rounded-lg overflow-hidden">
+                                   <form onSubmit={handleSearch} className="flex border border-blue-300 rounded-lg overflow-hidden">
                                         <input
                                              type="text"
                                              name="query"
@@ -54,7 +59,7 @@ function Header() {
                                              onChange={(e) => setQuery(e.target.value)}
                                         />
                                         <button type="submit" className="px-5 transition-colors">
-                                             <FontAwesomeIcon icon={faMagnifyingGlass} className="force-white main-color" />
+                                             <FontAwesomeIcon icon={faMagnifyingGlass} className="!text-black main-color" />
                                         </button>
                                    </form>
                               </div>
@@ -80,12 +85,12 @@ function Header() {
                                    </div>
 
                                    {/* Cart */}
-                                   <div className="relative flex items-center px-3">
+                                   <div className="relative flex items-center space-x-2 cursor-pointer" onClick={handleAddToCart}>
                                         <FontAwesomeIcon icon={faCartShopping} size="xl" className="main-color" />
-                                        <div className="absolute top-0 right-0 transform -translate-x-3.5 -translate-y-3.5 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                                             0
+                                        <div className="absolute -top-2 left-0 transform translate-x-1 -translate-y-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center transition-all duration-300">
+                                             {cartCount}
                                         </div>
-                                        <span className="pl-2">Giỏ hàng</span>
+                                        <span>Giỏ hàng</span>
                                    </div>
 
                                    {/* Account */}

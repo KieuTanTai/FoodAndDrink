@@ -9,8 +9,8 @@ const SubHeader = () => {
                     <div className="grid grid-cols-5 h-10">
                          {/* Cột 1: Danh mục sản phẩm */}
                          <div className="relative group col-span-1 h-full">
-                              <div className="flex justify-center items-center h-10 w-full bg-main-color rounded-t-md text-white cursor-pointer">
-                                   <FontAwesomeIcon icon={faList} />
+                              <div className="flex justify-center items-center h-10 w-full bg-main-color rounded-t-md cursor-pointer">
+                                   <FontAwesomeIcon icon={faList} className='!text-white' />
                                    <p className="ml-2 font-bold text-sm">Danh mục sản phẩm</p>
                               </div>
                               {/* Nav content */}
