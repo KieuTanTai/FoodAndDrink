@@ -1,4 +1,8 @@
-export default function Footer() {
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMapLocationDot, faPhone, faShield } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
+
+const Footer = () => {
      return (
           <footer className="bg-gray-200 py-8 border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.1),_0_-2px_4px_-2px_rgb(0,0,0,0.1)] ">
                <section className="container mx-auto max-w-[75rem]">
@@ -12,21 +16,21 @@ export default function Footer() {
                               </div>
                               <div className="text-gray-600">
                                    <div className="flex items-start mb-4">
-                                        <i className="fa-solid fa-map-location-dot fa-xl mt-1"></i>
+                                        <FontAwesomeIcon icon={faMapLocationDot} size="xl" className="mt-1 main-color" />
                                         <div className="text-sm leading-relaxed pl-4">
                                              <p>Số 110 Nguyễn Ngọc Nại, Khương Mai, Thanh Xuân, Hà Nội</p>
                                         </div>
                                    </div>
                                    <div className="flex items-center mb-4">
-                                        <i className="fa-solid fa-phone fa-xl"></i>
+                                        <FontAwesomeIcon icon={faPhone} size="xl" className='main-color'/>
                                         <p className="pl-4 text-sm">Hotline: 03 2838 xxxx</p>
                                    </div>
                                    <div className="flex items-center mb-4">
-                                        <i className="fa-regular fa-envelope fa-xl"></i>
+                                        <FontAwesomeIcon icon={faEnvelope} size="xl" className='main-color'/>
                                         <p className="pl-4 text-sm">tanthi***la**@gmail.com</p>
                                    </div>
                                    <div className="flex items-center">
-                                        <i className="fa-solid fa-shield fa-xl"></i>
+                                        <FontAwesomeIcon icon={faShield} size="xl" className='main-color'/>
                                         <p className="pl-4 text-sm">
                                              Giấy phép DKKD số xxxxxx, cấp lần thứ x năm 2024
                                         </p>
@@ -77,7 +81,7 @@ export default function Footer() {
                               <div className="flex flex-col md:flex-row items-center mb-6">
                                    <div>
                                         <img src="./src/assets/images/icons/web_logo/bct_img.jpg" alt="bo cong thuong" className="mt-4 md:mt-0 w-40 mb-2" />
-                                        <form method="post" className="flex-1 w-full md:mr-4">
+                                        <form method="post" className="flex-1 w-full md:mr-4" id='newsletter-form'>
                                              <div className="flex">
                                                   <input
                                                        type="email"
@@ -86,17 +90,18 @@ export default function Footer() {
                                                        placeholder="đăng ký email"
                                                        autoComplete="on"
                                                        required
-                                                       className="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                       className="flex-1 px-4 py-2 border bg-white border-gray-300 rounded-l-lg outline-none focus:border-transparent"
                                                   />
                                                   <button
                                                        type="submit"
-                                                       className="uppercase px-4 py-2 bg-blue-500 text-white font-semibold rounded-r-lg hover:bg-blue-600 transition-colors"
+                                                       className="uppercase px-4 py-2 font-semibold rounded-r-lg transition-colors"
                                                        name="subscribe"
                                                        id="subscribe"
                                                   >
                                                        đăng ký
                                                   </button>
                                              </div>
+                                             <div className="mt-1 h-4 text-xs text-red-500" id="footer-newsletter-error-msg"></div>
                                         </form>
                                    </div>
                               </div>
@@ -123,4 +128,6 @@ export default function Footer() {
                </section>
           </footer>
      );
-}
+};
+
+export default Footer;

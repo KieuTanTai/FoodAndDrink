@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBars, faCartShopping, faMagnifyingGlass, faPhoneVolume, faTruckFast } from '@fortawesome/free-solid-svg-icons';
+import { faCircleUser } from '@fortawesome/free-regular-svg-icons';
 
 function Header() {
      const [query, setQuery] = useState('');
@@ -10,14 +13,14 @@ function Header() {
      };
 
      return (
-          <header className="bg-white py-4 border-b border-gray-200 shadow-md">
+          <header className="bg-white py-2 border-b border-gray-200 shadow-md">
                <section className="container mx-auto px-4 lg:px-0 max-w-[75rem]">
                     <section className="flex flex-wrap justify-between items-center -mx-2 md:-mx-3">
                          {/* Mobile Header - hidden on md+ */}
                          <div className="w-full px-2 md:px-3 flex justify-between items-center md:hidden">
                               {/* Menu button */}
                               <div>
-                                   <i className="fa-solid fa-bars fa-xl"></i>
+                                   <FontAwesomeIcon icon={faBars} size="xl" className="main-color" />
                               </div>
                               {/* Logo */}
                               <div>
@@ -25,7 +28,7 @@ function Header() {
                               </div>
                               {/* Cart */}
                               <div className="relative">
-                                   <i className="fa-solid fa-cart-shopping fa-xl"></i>
+                                   <FontAwesomeIcon icon={faCartShopping} size="xl" className="main-color" />
                                    <div className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
                                         0
                                    </div>
@@ -40,7 +43,7 @@ function Header() {
                               </div>
 
                               {/* Search Bar */}
-                              <div className="w-full px-2 lg:w-5/12">
+                              <div className="w-auto px-2 lg:w-5/12">
                                    <form onSubmit={handleSearch} className="flex border border-blue-400 rounded-lg overflow-hidden">
                                         <input
                                              type="text"
@@ -50,8 +53,8 @@ function Header() {
                                              value={query}
                                              onChange={(e) => setQuery(e.target.value)}
                                         />
-                                        <button type="submit" className="px-5 bg-blue-400 hover:bg-blue-500 transition-colors">
-                                             <i className="fa-solid fa-magnifying-glass force-white"></i>
+                                        <button type="submit" className="px-5 transition-colors">
+                                             <FontAwesomeIcon icon={faMagnifyingGlass} className="force-white main-color" />
                                         </button>
                                    </form>
                               </div>
@@ -60,7 +63,7 @@ function Header() {
                               <div className="hidden lg:flex w-5/12 items-center text-sm px-2">
                                    {/* Hotline */}
                                    <div className="flex items-center px-3">
-                                        <i className="fa-solid fa-phone-volume fa-xl"></i>
+                                        <FontAwesomeIcon icon={faPhoneVolume} size="xl" className="main-color" />
                                         <div className="flex flex-col pl-2">
                                              <span>Hotline</span>
                                              <span className="font-bold main-color">032838xxxx</span>
@@ -69,7 +72,7 @@ function Header() {
 
                                    {/* Order Tracking */}
                                    <div className="flex items-center px-3">
-                                        <i className="fa-solid fa-truck-fast fa-xl"></i>
+                                        <FontAwesomeIcon icon={faTruckFast} size="xl" className="main-color" />
                                         <div className="flex flex-col pl-2">
                                              <span>Tra cứu</span>
                                              <span>đơn hàng</span>
@@ -78,24 +81,36 @@ function Header() {
 
                                    {/* Cart */}
                                    <div className="relative flex items-center px-3">
-                                        <i className="fa-solid fa-cart-shopping fa-xl"></i>
-                                        <div className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                                        <FontAwesomeIcon icon={faCartShopping} size="xl" className="main-color" />
+                                        <div className="absolute top-0 right-0 transform -translate-x-3.5 -translate-y-3.5 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
                                              0
                                         </div>
                                         <span className="pl-2">Giỏ hàng</span>
                                    </div>
 
                                    {/* Account */}
-                                   <div className="flex items-center pl-3">
-                                        <i className="fa-regular fa-circle-user fa-xl"></i>
-                                        <span className="pl-2">Tài khoản</span>
+                                   <div className="relative group pb-1">
+                                        {/* Icon và text */}
+                                        <div className="flex items-center pl-3 cursor-pointer">
+                                             <FontAwesomeIcon icon={faCircleUser} size="xl" className="main-color" />
+                                             <span className="pl-2">Tài khoản</span>
+                                        </div>
+
+                                        {/* Menu con */}
+                                        <div className="absolute top-full right-0 mt-0 w-48 bg-white border border-gray-200 rounded-md shadow-lg hidden group-hover:block z-50">
+                                             <div className="flex flex-col p-2">
+                                                  <button className="py-2 px-4 flex items-center justify-center mb-2 text-left rounded-md font-medium">Đăng nhập</button>
+                                                  <button className="py-2 px-4 flex items-center justify-center mb-2 text-left rounded-md font-medium">Đăng kí</button>
+                                                  <button className="py-2 px-4 items-center justify-center text-left rounded-md hidden font-medium">Đăng xuất</button>
+                                             </div>
+                                        </div>
                                    </div>
                               </div>
-                         </div>
+                         </div>    
                     </section>
                </section>
           </header>
      );
-}
+};
 
 export default Header;

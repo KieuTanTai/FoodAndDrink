@@ -8,6 +8,7 @@
   color-scheme: light dark;
   color: rgba(0, 0, 0, 0.87);
   --main-color: #81baea;
+  --main-hover: #45a5ff;
   background-color: #eeeeee;
 
   font-synthesis: none;
@@ -18,6 +19,10 @@
 
 .main-color {
   color: var(--main-color);
+}
+
+.bg-main-color {
+  background-color: var(--main-color);
 }
 
 .force-white {
@@ -76,12 +81,13 @@ button {
 
 
 button:hover {
-  border-color: #646cff;
+  background-color: var(--main-hover);
 }
-button:focus,
+
+/* button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
+} */
 
 @media (prefers-color-scheme: light) {
   :root {
@@ -92,6 +98,6 @@ button:focus-visible {
     color: #747bff;
   }
   button {
-    background-color: #f9f9f9;
+    background-color: var(--main-color);
   }
 }
