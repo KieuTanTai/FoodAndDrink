@@ -1,83 +1,48 @@
 ﻿using Dapper;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using ProjectShop.Server.Core.Entities;
-using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
+using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class BankDAO : BaseDAO<BankModel>, IGetRelativeAsync<BankModel>, IGetDataByEnumAsync<BankModel>
+    public class BankDAO : BaseDAO<BankModel>, IGetRelativeAsync<BankModel>, IGetByStatusAsync<BankModel>
     {
         public BankDAO(
             IDbConnectionFactory connectionFactory,
             IColumnService colService,
             IStringConverter converter,
             IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "banks", "bank_id", string.Empty)
+            : base(connectionFactory, colService, converter, checker, "bank", "bank_id", string.Empty)
         {
         }
 
         protected override string GetInsertQuery()
         {
-            return $"INSERT INTO {TableName} (bank_name, status) VALUES(@BankName, @Status); SELECT LAST_INSERT_ID();";
+            return $@"INSERT INTO {TableName} (bank_name, bank_status) 
+                      VALUES (@BankName, @BankStatus); SELECT LAST_INSERT_ID();";
         }
 
         protected override string GetUpdateQuery()
         {
-            return $@"UPDATE {TableName}
-                            SET bank_name = @BankName, status = @Status     
-                            WHERE {ColumnIdName} = @{Converter.SnakeCaseToPascalCase(ColumnIdName)}";
+            string colIdName = Converter.SnakeCaseToPascalCase(ColumnIdName);
+            return $@"UPDATE {TableName} 
+                      SET bank_name = @BankName, bank_status = @BankStatus 
+                      WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        protected override string DeleteByIdQuery(string colIdName)
+        private string RelativeQuery(string colName)
         {
-            return ""; // Soft delete is handled in DeleteAsync
-        }
-        public string GetQueryDataString(string colName)
-        {
-            if (!ColService.IsValidColumn(TableName, colName))
-                return "";
-            return $"SELECT * FROM {TableName} WHERE {colName} LIKE @Input";
-        }
-
-        public async override Task<int> DeleteAsync(string id)
-        {
-            BankModel bank = await GetByIdAsync(id);
-            if (bank == null)
-                return -1;
-            bank.SetStatus(EActiveStatus.INACTIVE);
-            return await UpdateAsync(bank);
-        }
-
-        public override async Task<int> DeleteManyAsync(IEnumerable<string> ids)
-        {
-            if (ids == null || !ids.Any())
-                return -1;
-
-            List<BankModel> banksToUpdate = new List<BankModel>();
-
-            foreach (string id in ids)
-            {
-                BankModel bank = await GetByIdAsync(id);
-                if (bank == null)
-                    return -1;
-                bank.SetStatus(EActiveStatus.INACTIVE);
-                banksToUpdate.Add(bank);
-            }
-            return await UpdateManyAsync(banksToUpdate);
+            CheckColumnName(colName); // It'll throw an exception if the column name is invalid
+            return $"SELECT * FROM {TableName} WHERE {colName} LIKE @input";
         }
 
         public async Task<List<BankModel>> GetRelativeAsync(string input, string colName)
         {
             try
             {
-                string query = GetQueryDataString(colName);
+                string query = RelativeQuery(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 if (!input.Contains('%'))
                     input = $"%{input}%";
@@ -86,30 +51,23 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return new();
+                throw new Exception($"Error retrieving banks by relative search: {ex.Message}", ex);
             }
         }
 
-        // search by enum
-        public async Task<List<BankModel>> GetAllByEnumAsync<TEnum>(TEnum value, string colName) where TEnum : Enum
+        public async Task<List<BankModel>> GetAllByStatusAsync(bool status)
         {
-            if (value is EActiveStatus)
+            try
             {
-                try
-                {
-                    string query = GetByIdQuery(colName);
-                    using IDbConnection connection = ConnectionFactory.CreateConnection();
-                    IEnumerable<BankModel> result = await connection.QueryAsync<BankModel>(query, new { Id = value });
-                    return result.AsList();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.StackTrace);
-                    return new();
-                }
+                string query = $"SELECT * FROM {TableName} WHERE bank_status = @Status";
+                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                IEnumerable<BankModel> result = await connection.QueryAsync<BankModel>(query, new { Status = status });
+                return result.AsList();
             }
-            return new();
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving banks by status: {ex.Message}", ex);
+            }
         }
     }
 }

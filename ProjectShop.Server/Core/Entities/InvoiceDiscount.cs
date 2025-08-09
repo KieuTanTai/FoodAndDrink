@@ -9,23 +9,23 @@ namespace ProjectShop.Server.Core.Entities
     {
         public uint InvoiceId { get; }
         public uint SaleEventId { get; }
-
         public InvoiceDiscountKey(uint invoiceId, uint saleEventId)
         {
             InvoiceId = invoiceId;
             SaleEventId = saleEventId;
         }
     }
-
     public class InvoiceDiscount : IGetIdEntity<InvoiceDiscountKey>
     {
         // Corresponds to 'invoice_id' (INT UNSIGNED)
         public uint InvoiceId { get; private set; }
-        public Invoice Invoice { get; private set; } = null!;
 
         // Corresponds to 'sale_event_id' (INT UNSIGNED)
         public uint SaleEventId { get; private set; }
-        public SaleEvent SaleEvent { get; private set; } = null!;
+
+        // Navigation property
+        public SaleEventModel SaleEvent { get; private set; } = null!;
+        public InvoiceModel Invoice { get; private set; } = null!;
 
         public InvoiceDiscount(uint invoiceId, uint saleEventId)
         {

@@ -17,11 +17,11 @@ namespace ProjectShop.Server.Core.Entities
         public bool LocationCityStatus { get; private set; }
 
         // Navigation properties
-        public ICollection<Location> Locations { get; private set; } = new List<Location>();
-        public ICollection<Supplier> CompanySuppliers { get; private set; } = new List<Supplier>();
-        public ICollection<Supplier> StoreSuppliers { get; private set; } = new List<Supplier>();
-        public ICollection<Customer> Customers { get; private set; } = new List<Customer>();
-        public ICollection<Employee> Employees { get; private set; } = new List<Employee>();
+        public ICollection<LocationModel> Locations { get; private set; } = new List<LocationModel>();
+        public ICollection<SupplierModel> CompanySuppliers { get; private set; } = new List<SupplierModel>();
+        public ICollection<SupplierModel> StoreSuppliers { get; private set; } = new List<SupplierModel>();
+        public ICollection<CustomerModel> Customers { get; private set; } = new List<CustomerModel>();
+        public ICollection<EmployeeModel> Employees { get; private set; } = new List<EmployeeModel>();
 
         public LocationCity(uint locationCityId, string locationCityName, bool locationCityStatus)
         {

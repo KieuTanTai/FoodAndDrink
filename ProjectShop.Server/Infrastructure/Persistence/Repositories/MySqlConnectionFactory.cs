@@ -25,7 +25,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
             return new MySqlConnection(_connectionString);
         }
 
-        public void ExecuteQuery(string query) { }
+        //public void ExecuteQuery(string query) { }
 
     }
 }

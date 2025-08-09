@@ -11,10 +11,12 @@ namespace ProjectShop.Server.Core.Entities
 
         // Corresponds to 'news_id' (INT UNSIGNED)
         public uint NewsId { get; private set; }
-        public News News { get; private set; } = null!;
 
         // Corresponds to 'news_image_url' (VARCHAR(255))
         public string NewsImageUrl { get; private set; }
+
+        // Navigation property
+        public NewsModel News { get; private set; } = null!;
 
         public NewsImage(uint newsImageId, uint newsId, string newsImageUrl)
         {

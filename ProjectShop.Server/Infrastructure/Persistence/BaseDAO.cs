@@ -12,7 +12,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence
         IStringChecker checker,
         string tableName,
         string columnIdName,
-        string secondColumnIdName = "") : IDAO<T>, ICrudOperationsAsync<T>, IQueryOperationsAsync, IExecuteOperationsAsync where T : class
+        string secondColumnIdName = "") : IDAO<T>, IDbOperationAsync<T>, IQueryOperationsAsync, IExecuteOperationsAsync where T : class
     {
         protected IDbConnectionFactory ConnectionFactory { get; } = connectionFactory;
         protected IColumnService ColService { get; } = colService;
@@ -28,7 +28,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence
         {
             try
             {
-                string query = $"SELECT * FROM {TableName}";
+                string query = GetAllQuery();
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<T> result = await connection.QueryAsync<T>(query);
                 return result.AsList();
@@ -187,61 +187,61 @@ namespace ProjectShop.Server.Infrastructure.Persistence
         }
 
         //DELETE ENTITY
-        public virtual async Task<int> DeleteAsync(string id)
-        {
-            try
-            {
-                string query = DeleteByIdQuery(ColumnIdName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                using IDbTransaction transaction = connection.BeginTransaction();
-                try
-                {
-                    int affectedRows = await connection.ExecuteAsync(query, new { Id = id }, transaction);
-                    transaction.Commit();
-                    return affectedRows;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error Commit!\n{ex.StackTrace}");
-                    transaction.Rollback();
-                    return -1;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return -1;
-            }
-        }
+        //public virtual async Task<int> DeleteAsync(string id)
+        //{
+        //    try
+        //    {
+        //        string query = DeleteByIdQuery(ColumnIdName);
+        //        using IDbConnection connection = ConnectionFactory.CreateConnection();
+        //        using IDbTransaction transaction = connection.BeginTransaction();
+        //        try
+        //        {
+        //            int affectedRows = await connection.ExecuteAsync(query, new { Id = id }, transaction);
+        //            transaction.Commit();
+        //            return affectedRows;
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            Console.WriteLine($"Error Commit!\n{ex.StackTrace}");
+        //            transaction.Rollback();
+        //            return -1;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex.StackTrace);
+        //        return -1;
+        //    }
+        //}
 
-        public virtual async Task<int> DeleteManyAsync(IEnumerable<string> ids)
-        {
-            try
-            {
-                string query = DeleteByIdQuery(ColumnIdName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                using IDbTransaction transaction = connection.BeginTransaction();
-                try
-                {
-                    int affectedRows = 0;
-                    foreach (string id in ids)
-                        affectedRows += await connection.ExecuteAsync(query, new { Id = id }, transaction);
-                    transaction.Commit();
-                    return affectedRows;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error Commit!\n{ex.StackTrace}");
-                    transaction.Rollback();
-                    return -1;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return -1;
-            }
-        }
+        //public virtual async Task<int> DeleteManyAsync(IEnumerable<string> ids)
+        //{
+        //    try
+        //    {
+        //        string query = DeleteByIdQuery(ColumnIdName);
+        //        using IDbConnection connection = ConnectionFactory.CreateConnection();
+        //        using IDbTransaction transaction = connection.BeginTransaction();
+        //        try
+        //        {
+        //            int affectedRows = 0;
+        //            foreach (string id in ids)
+        //                affectedRows += await connection.ExecuteAsync(query, new { Id = id }, transaction);
+        //            transaction.Commit();
+        //            return affectedRows;
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            Console.WriteLine($"Error Commit!\n{ex.StackTrace}");
+        //            transaction.Rollback();
+        //            return -1;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex.StackTrace);
+        //        return -1;
+        //    }
+        //}
 
 #nullable enable
         public virtual async Task<List<TResult>?> QueryAsync<TResult>(string query, object? parameters = null)
@@ -309,34 +309,27 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             }
         }
 
-        public virtual async Task<bool> IsExistObjectAsync(T entity)
+        protected virtual string GetAllQuery()
         {
-            using IDbConnection connection = ConnectionFactory.CreateConnection();
-            string query = GetByIdQuery(ColumnIdName);
-            try
-            {
-                T? existingObject = await connection.QueryFirstOrDefaultAsync<T>(query, entity);
-                return existingObject != null;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return false;
-            }
+            return $"SELECT * FROM {TableName}";
         }
 
         protected virtual string GetByIdQuery(string colIdName)
-        {
-            if (!ColService.IsValidColumn(TableName, colIdName))
-                return "";
+        {   
+            CheckColumnName(colIdName);
             return $"SELECT * FROM {TableName} WHERE {colIdName} = @Id";
         }
 
         protected virtual string DeleteByIdQuery(string colIdName)
         {
-            if (!ColService.IsValidColumn(TableName, colIdName))
-                return "";
+            CheckColumnName(colIdName);
             return $"DELETE FROM {TableName} WHERE {colIdName} = @Id";
+        }
+
+        protected void CheckColumnName(string colName)
+        {
+            if (!ColService.IsValidColumn(TableName, colName))
+                throw new ArgumentException($"Invalid column name: {colName}");
         }
 
 #nullable disable

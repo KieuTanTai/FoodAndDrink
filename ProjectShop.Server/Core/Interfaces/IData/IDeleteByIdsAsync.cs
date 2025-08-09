@@ -2,9 +2,9 @@
 
 namespace ProjectShop.Server.Core.Interfaces.IData
 {
-    public interface IDeleteByIdsAsync
+    public interface IDeleteByIdsAsync<TKey> where TKey : struct
     {
-        public string GetDeleteQuery();
-        Task<int> DeleteByIdsAsync(object keys);
+        //public string GetDeleteQuery();
+        Task<int> DeleteByIdsAsync(TKey keys);
     }
 }

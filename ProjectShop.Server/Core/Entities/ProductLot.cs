@@ -12,7 +12,6 @@ namespace ProjectShop.Server.Core.Entities
 
         // Corresponds to 'product_barcode' (VARCHAR(20))
         public string ProductBarcode { get; private set; }
-        public Product Product { get; private set; } = null!;
 
         // Corresponds to 'product_lot_mfg_date' (DATETIME)
         public DateTime ProductLotMfgDate { get; private set; }
@@ -24,8 +23,9 @@ namespace ProjectShop.Server.Core.Entities
         public int ProductLotInitialQuantity { get; private set; }
 
         // Navigation properties
-        public ICollection<Inventory> Inventories { get; private set; } = new List<Inventory>();
-        public ICollection<DisposeProduct> DisposeProducts { get; private set; } = new List<DisposeProduct>();
+        public ProductModel Product { get; private set; } = null!;
+        public ICollection<InventoryModel> Inventories { get; private set; } = new List<InventoryModel>();
+        public ICollection<DisposeProductModel> DisposeProducts { get; private set; } = new List<DisposeProductModel>();
 
         public ProductLot(uint productLotId, string productBarcode, DateTime productLotMfgDate, DateTime productLotExpDate, int productLotInitialQuantity)
         {

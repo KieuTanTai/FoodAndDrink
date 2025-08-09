@@ -17,7 +17,7 @@ namespace ProjectShop.Server.Core.Entities
         public bool NewsCategoryStatus { get; private set; }
 
         // Navigation property
-        public ICollection<News> News { get; private set; } = new List<News>();
+        public ICollection<NewsModel> News { get; private set; } = new List<NewsModel>();
 
         public NewsCategory(uint newsCategoryId, string newsCategoryName, bool newsCategoryStatus)
         {

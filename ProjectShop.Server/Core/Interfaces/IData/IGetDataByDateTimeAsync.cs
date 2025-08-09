@@ -6,13 +6,9 @@ namespace ProjectShop.Server.Core.Interfaces.IData
 {
     public interface IGetDataByDateTimeAsync<T> where T : class
     {
-        string GetByMonth(string colName);
-        string GetByYear(string colName);
-        string GetByDateTime(string colName);
-        string GetByDateTimeRange(string colName);
-        string GetByMonthAndYear(string colName);
-#nullable enable
-        Task<List<T>?> GetAllByTimeAsync<TEnum>(string time, string colName, TEnum timeType) where TEnum : Enum;
-        Task<List<T>?> GetAllByTimeRangeAsync<TEnum>(string timeStart, string timeEnd, string colName, TEnum timeType) where TEnum : Enum;
+        Task<List<T>?> GetAllByMonthAndYearAsync(int year, int month);
+        Task<List<T>?> GetAllByYearAsync(int year);
+        Task<List<T>?> GetAllByDateRangeAsync(DateTime startDate, DateTime endDate);
+        Task<List<T>?> GetAllByDateAsync(DateTime date);
     }
 }

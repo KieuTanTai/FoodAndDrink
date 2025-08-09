@@ -21,11 +21,13 @@ namespace ProjectShop.Server.Core.Entities
     {
         // Corresponds to 'category_id' (INT UNSIGNED)
         public uint CategoryId { get; private set; }
-        public Category Category { get; private set; } = null!;
 
         // Corresponds to 'product_barcode' (VARCHAR(20))
         public string ProductBarcode { get; private set; }
-        public Product Product { get; private set; } = null!;
+
+        // Navigation properties
+        public CategoryModel Category { get; private set; } = null!;
+        public ProductModel Product { get; private set; } = null!;
 
         public ProductCategories(uint categoryId, string productBarcode)
         {
