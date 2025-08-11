@@ -15,26 +15,26 @@ namespace ProjectShop.Server.Core.Entities
         public string ProductBarcode { get; private set; }
 
         // Corresponds to 'cart_add_date' (DATETIME)
-        public DateTime CartAddedDate { get; private set; }
+        public DateTime DetailCartAddedDate { get; private set; }
 
         // Corresponds to 'cart_price' (DECIMAL(10, 2))
-        public decimal CartPrice { get; private set; }
+        public decimal DetailCartPrice { get; private set; }
 
         // Corresponds to 'cart_quantity' (INT UNSIGNED)
-        public uint CartQuantity { get; private set; }
+        public uint DetailCartQuantity { get; private set; }
 
         // Navigation property
         public CartModel Cart { get; private set; } = null!;
         public ProductModel Product { get; private set; } = null!;
 
-        public DetailCartModel(uint detailCartId, uint cartId, string productBarcode, DateTime cartAddedDate, decimal cartPrice, uint cartQuantity)
+        public DetailCartModel(uint detailCartId, uint cartId, string productBarcode, DateTime detailCartAddedDate, decimal detailCartPrice, uint detailCartQuantity)
         {
             DetailCartId = detailCartId;
             CartId = cartId;
             ProductBarcode = productBarcode;
-            CartAddedDate = cartAddedDate;
-            CartPrice = cartPrice;
-            CartQuantity = cartQuantity;
+            DetailCartAddedDate = detailCartAddedDate;
+            DetailCartPrice = detailCartPrice;
+            DetailCartQuantity = detailCartQuantity;
         }
 
         public uint GetIdEntity() => DetailCartId;

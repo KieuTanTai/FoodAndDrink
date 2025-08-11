@@ -1,4 +1,5 @@
 // File: InventoryMovement.cs
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IEntities;
 
 namespace ProjectShop.Server.Core.Entities
@@ -21,13 +22,13 @@ namespace ProjectShop.Server.Core.Entities
         public DateTime InventoryMovementDate { get; private set; }
 
         // Corresponds to 'inventory_movement_reason' (TEXT)
-        public string InventoryMovementReason { get; private set; }
+        public EInventoryMovementReason InventoryMovementReason { get; private set; }
 
         // Navigation properties
         public LocationModel SourceLocation { get; private set; } = null!;
         public LocationModel DestinationLocation { get; private set; } = null!;
 
-        public InventoryMovementModel(uint inventoryMovementId, uint sourceLocationId, uint destinationLocationId, uint inventoryMovementQuantity, DateTime inventoryMovementDate, string inventoryMovementReason)
+        public InventoryMovementModel(uint inventoryMovementId, uint sourceLocationId, uint destinationLocationId, uint inventoryMovementQuantity, DateTime inventoryMovementDate, EInventoryMovementReason inventoryMovementReason)
         {
             InventoryMovementId = inventoryMovementId;
             SourceLocationId = sourceLocationId;

@@ -60,7 +60,7 @@ namespace ProjectShop.Server.Infrastructure.Data
                 throw new Exception("Error retrieving categories by status", ex);
             }
         }
-        
+
         public async Task<List<CategoryModel>> GetRelativeAsync(string input, string colName)
         {
             try

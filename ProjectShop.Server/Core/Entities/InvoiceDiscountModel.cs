@@ -1,6 +1,5 @@
 // File: InvoiceDiscount.cs
 using ProjectShop.Server.Core.Interfaces.IEntities;
-using System;
 
 namespace ProjectShop.Server.Core.Entities
 {
@@ -15,7 +14,7 @@ namespace ProjectShop.Server.Core.Entities
             SaleEventId = saleEventId;
         }
     }
-    public class InvoiceDiscount : IGetIdEntity<InvoiceDiscountKey>
+    public class InvoiceDiscountModel : IGetIdEntity<InvoiceDiscountKey>
     {
         // Corresponds to 'invoice_id' (INT UNSIGNED)
         public uint InvoiceId { get; private set; }
@@ -27,7 +26,7 @@ namespace ProjectShop.Server.Core.Entities
         public SaleEventModel SaleEvent { get; private set; } = null!;
         public InvoiceModel Invoice { get; private set; } = null!;
 
-        public InvoiceDiscount(uint invoiceId, uint saleEventId)
+        public InvoiceDiscountModel(uint invoiceId, uint saleEventId)
         {
             InvoiceId = invoiceId;
             SaleEventId = saleEventId;

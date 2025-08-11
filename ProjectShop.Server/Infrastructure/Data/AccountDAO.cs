@@ -20,15 +20,15 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         protected override string GetInsertQuery()
         {
-            return $@"INSERT INTO {TableName} (user_name, password, account_create_date, account_status) 
-                      VALUES (@UserName, @Password, @AccountCreateDate, @AccountStatus); SELECT LAST_INSERT_ID();";
+            return $@"INSERT INTO {TableName} (user_name, password, account_created_date, account_last_updated_date, account_status) 
+                      VALUES (@UserName, @Password, @AccountCreatedDate, @AccountLastUpdatedDate, @AccountStatus); SELECT LAST_INSERT_ID();";
         }
 
         protected override string GetUpdateQuery()
         {
             string colIdName = Converter.SnakeCaseToPascalCase(ColumnIdName);
             return $@"UPDATE {TableName} 
-                      SET password = @Password, account_status = @AccountStatus 
+                      SET password = @Password, account_status = @AccountStatus
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
@@ -56,11 +56,11 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $"SELECT * FROM {TableName} WHERE {colName} = DATE_ADD(@Input, INTERVAL 1 DAY)";
         }
 
-        public async Task<List<AccountModel>?> GetAllByMonthAndYearAsync(int year, int month)
+        public async Task<List<AccountModel>> GetAllByMonthAndYearAsync(int year, int month, string colName = "account_created_date")
         {
             try
             {
-                string query = GetByMonthAndYear("account_create_date");
+                string query = GetByMonthAndYear(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<AccountModel> accounts = await connection.QueryAsync<AccountModel>(query, new { FirstTime = year, SecondTime = month });
                 return accounts.AsList();
@@ -72,11 +72,11 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<AccountModel>?> GetAllByYearAsync(int year)
+        public async Task<List<AccountModel>> GetAllByYearAsync(int year, string colName = "account_created_date")
         {
             try
             {
-                string query = GetByYear("account_create_date");
+                string query = GetByYear(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<AccountModel> accounts = await connection.QueryAsync<AccountModel>(query, new { Input = year });
                 return accounts.AsList();
@@ -88,11 +88,11 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<AccountModel>?> GetAllByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<List<AccountModel>> GetAllByDateTimeRangeAsync(DateTime startDate, DateTime endDate, string colName = "account_created_date")
         {
             try
             {
-                string query = GetByDateTimeRange("account_create_date");
+                string query = GetByDateTimeRange(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<AccountModel> accounts = await connection.QueryAsync<AccountModel>(query, new { FirstTime = startDate, SecondTime = endDate });
                 return accounts.AsList();
@@ -104,13 +104,13 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<AccountModel>?> GetAllByDateAsync(DateTime date)
+        public async Task<List<AccountModel>> GetAllByDateTimeAsync(DateTime dateTime, string colName = "account_created_date")
         {
             try
             {
-                string query = GetByDateTime("account_create_date");
+                string query = GetByDateTime(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<AccountModel> accounts = await connection.QueryAsync<AccountModel>(query, new { Input = date });
+                IEnumerable<AccountModel> accounts = await connection.QueryAsync<AccountModel>(query, new { Input = dateTime });
                 return accounts.AsList();
             }
             catch (Exception ex)
@@ -124,9 +124,9 @@ namespace ProjectShop.Server.Infrastructure.Data
         {
             try
             {
-                string query = $"SELECT * FROM {TableName} WHERE account_status = @Status";
+                string query = GetDataQuery("account_status");
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<AccountModel> accounts = await connection.QueryAsync<AccountModel>(query, new { Status = status });
+                IEnumerable<AccountModel> accounts = await connection.QueryAsync<AccountModel>(query, new { Input = status });
                 return accounts.AsList();
             }
             catch (Exception ex)

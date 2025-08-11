@@ -27,8 +27,8 @@ namespace ProjectShop.Server.Core.Entities
         // Navigation properties
         public AccountModel Account { get; private set; } = null!;
         public LocationWardModel? Ward { get; private set; }
-        public LocationDistrict? District { get; private set; }
-        public LocationCity? City { get; private set; }
+        public LocationDistrictModel? District { get; private set; }
+        public LocationCityModel? City { get; private set; }
 
         // Constructor cho lớp cơ sở.
         public PersonModel(uint accountId, DateTime birthday, string phone, string name, string houseNumber, string street, uint? wardId, uint? districtId, uint? cityId, string avatarUrl, bool gender, bool status)

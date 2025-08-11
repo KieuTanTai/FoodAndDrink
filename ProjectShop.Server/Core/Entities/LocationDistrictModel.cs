@@ -1,11 +1,9 @@
 // File: LocationDistrict.cs
 using ProjectShop.Server.Core.Interfaces.IEntities;
-using System;
-using System.Collections.Generic;
 
 namespace ProjectShop.Server.Core.Entities
 {
-    public class LocationDistrict : IGetIdEntity<uint>
+    public class LocationDistrictModel : IGetIdEntity<uint>
     {
         // Corresponds to 'location_district_id' (INT UNSIGNED AUTO_INCREMENT)
         public uint LocationDistrictId { get; private set; }
@@ -23,7 +21,7 @@ namespace ProjectShop.Server.Core.Entities
         public ICollection<CustomerModel> Customers { get; private set; } = new List<CustomerModel>();
         public ICollection<EmployeeModel> Employees { get; private set; } = new List<EmployeeModel>();
 
-        public LocationDistrict(uint locationDistrictId, string locationDistrictName, bool locationDistrictStatus)
+        public LocationDistrictModel(uint locationDistrictId, string locationDistrictName, bool locationDistrictStatus)
         {
             LocationDistrictId = locationDistrictId;
             LocationDistrictName = locationDistrictName;

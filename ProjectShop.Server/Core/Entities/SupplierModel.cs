@@ -50,16 +50,20 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'supplier_status' (TINYINT(1))
         public bool SupplierStatus { get; private set; }
 
+        // Corresponds to 'cooperationDate' (DATETIME)
+        public DateTime SupplierCooperationDate { get; private set; } = DateTime.UtcNow;
+
         // Navigation properties
         public LocationWardModel? SupplierCompanyWard { get; private set; }
-        public LocationDistrict? SupplierCompanyDistrict { get; private set; }
-        public LocationCity? SupplierCompanyCity { get; private set; }
+        public LocationDistrictModel? SupplierCompanyDistrict { get; private set; }
+        public LocationCityModel? SupplierCompanyCity { get; private set; }
         public LocationWardModel? SupplierStoreWard { get; private set; }
-        public LocationDistrict? SupplierStoreDistrict { get; private set; }
-        public LocationCity? SupplierStoreCity { get; private set; }
+        public LocationDistrictModel? SupplierStoreDistrict { get; private set; }
+        public LocationCityModel? SupplierStoreCity { get; private set; }
         public ICollection<ProductModel> Products { get; private set; } = new List<ProductModel>();
 
-        public SupplierModel(uint supplierId, string supplierName, string supplierPhone, string supplierEmail, string supplierCompanyHouseNumber, string supplierCompanyStreet, uint? supplierCompanyWardId, uint? supplierCompanyDistrictId, uint? supplierCompanyCityId, string supplierStoreHouseNumber, string supplierStoreStreet, uint? supplierStoreWardId, uint? supplierStoreDistrictId, uint? supplierStoreCityId, bool supplierStatus)
+        public SupplierModel(uint supplierId, string supplierName, string supplierPhone, string supplierEmail, string supplierCompanyHouseNumber, string supplierCompanyStreet, uint? supplierCompanyWardId, uint? supplierCompanyDistrictId, 
+            uint? supplierCompanyCityId, string supplierStoreHouseNumber, string supplierStoreStreet, uint? supplierStoreWardId, uint? supplierStoreDistrictId, uint? supplierStoreCityId, bool supplierStatus, DateTime supplierCooperationDate)
         {
             SupplierId = supplierId;
             SupplierName = supplierName;
@@ -76,6 +80,7 @@ namespace ProjectShop.Server.Core.Entities
             SupplierStoreDistrictId = supplierStoreDistrictId;
             SupplierStoreCityId = supplierStoreCityId;
             SupplierStatus = supplierStatus;
+            SupplierCooperationDate = supplierCooperationDate;
         }
 
         public uint GetIdEntity() => SupplierId;

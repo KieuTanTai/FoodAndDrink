@@ -1,4 +1,5 @@
 // File: Product.cs
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IEntities;
 
 namespace ProjectShop.Server.Core.Entities
@@ -21,7 +22,7 @@ namespace ProjectShop.Server.Core.Entities
         public string ProductWeightRange { get; private set; }
 
         // Corresponds to 'product_unit' (ENUM)
-        public string ProductUnit { get; private set; }
+        public EProductUnit ProductUnit { get; private set; }
 
         // Corresponds to 'product_base_price' (DECIMAL(10, 2))
         public decimal ProductBasePrice { get; private set; }
@@ -31,18 +32,23 @@ namespace ProjectShop.Server.Core.Entities
 
         // Corresponds to 'product_status' (TINYINT(1))
         public bool ProductStatus { get; private set; }
+        // Corresponds to 'product_created_at' (DATETIME) - Automatically set to current time
+        public DateTime ProductAddedDate { get; private set; } = DateTime.UtcNow;
+
+        // Corresponds to 'product_last_updated_date' (DATETIME) - Automatically set to current time
+        public DateTime ProductLastUpdatedDate { get; private set; } = DateTime.UtcNow;
 
         // Navigation properties
         public SupplierModel Supplier { get; private set; } = null!;
         public ICollection<DetailCartModel> DetailCarts { get; private set; } = new List<DetailCartModel>();
-        public ICollection<ProductLot> ProductLots { get; private set; } = new List<ProductLot>();
-        public ICollection<ProductCategories> ProductCategories { get; private set; } = new List<ProductCategories>();
-        public ICollection<ProductImage> ProductImages { get; private set; } = new List<ProductImage>();
+        public ICollection<ProductLotModel> ProductLots { get; private set; } = new List<ProductLotModel>();
+        public ICollection<ProductCategoriesModel> ProductCategories { get; private set; } = new List<ProductCategoriesModel>();
+        public ICollection<ProductImageModel> ProductImages { get; private set; } = new List<ProductImageModel>();
         public ICollection<DetailSaleEventModel> DetailSaleEvents { get; private set; } = new List<DetailSaleEventModel>();
-        public ICollection<NewsModel> News { get; private set; } = new List<NewsModel>();
         public ICollection<DetailInvoiceModel> DetailInvoices { get; private set; } = new List<DetailInvoiceModel>();
 
-        public ProductModel(string productBarcode, uint supplierId, string productName, decimal productNetWeight, string productWeightRange, string productUnit, decimal productBasePrice, string productRatingAge, bool productStatus)
+        public ProductModel(string productBarcode, uint supplierId, string productName, decimal productNetWeight, string productWeightRange, EProductUnit productUnit, decimal productBasePrice, 
+                string productRatingAge, bool productStatus, DateTime productAddedDate, DateTime productLastUpdatedDate)
         {
             ProductBarcode = productBarcode;
             SupplierId = supplierId;
@@ -53,6 +59,8 @@ namespace ProjectShop.Server.Core.Entities
             ProductBasePrice = productBasePrice;
             ProductRatingAge = productRatingAge;
             ProductStatus = productStatus;
+            ProductAddedDate = productAddedDate;
+            ProductLastUpdatedDate = productLastUpdatedDate;
         }
 
         public string GetIdEntity() => ProductBarcode;

@@ -1,11 +1,19 @@
-// File: ProductLot.cs
-using ProjectShop.Server.Core.Interfaces.IEntities;
-using System;
-using System.Collections.Generic;
+﻿using ProjectShop.Server.Core.Interfaces.IEntities;
 
 namespace ProjectShop.Server.Core.Entities
 {
-    public class ProductLot : IGetIdEntity<uint>
+    public readonly struct DetailProductLotKey
+    {
+        public uint ProductLotId { get; }
+        public string ProductBarcode { get; }
+        public DetailProductLotKey(uint productLotId, string productBarcode)
+        {
+            ProductLotId = productLotId;
+            ProductBarcode = productBarcode;
+        }
+    }
+
+    public class DetailProductLotModel : IGetIdEntity<DetailProductLotKey>
     {
         // Corresponds to 'product_lot_id' (INT UNSIGNED AUTO_INCREMENT)
         public uint ProductLotId { get; private set; }
@@ -24,10 +32,9 @@ namespace ProjectShop.Server.Core.Entities
 
         // Navigation properties
         public ProductModel Product { get; private set; } = null!;
-        public ICollection<InventoryModel> Inventories { get; private set; } = new List<InventoryModel>();
-        public ICollection<DisposeProductModel> DisposeProducts { get; private set; } = new List<DisposeProductModel>();
+        public ProductLotModel ProductLot { get; private set; } = null!;
 
-        public ProductLot(uint productLotId, string productBarcode, DateTime productLotMfgDate, DateTime productLotExpDate, int productLotInitialQuantity)
+        public DetailProductLotModel(uint productLotId, string productBarcode, DateTime productLotMfgDate, DateTime productLotExpDate, int productLotInitialQuantity)
         {
             ProductLotId = productLotId;
             ProductBarcode = productBarcode;
@@ -36,7 +43,6 @@ namespace ProjectShop.Server.Core.Entities
             ProductLotInitialQuantity = productLotInitialQuantity;
         }
 
-        public uint GetIdEntity() => ProductLotId;
+        public DetailProductLotKey GetIdEntity() => new DetailProductLotKey(ProductLotId, ProductBarcode);
     }
 }
-

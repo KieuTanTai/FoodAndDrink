@@ -15,18 +15,18 @@ namespace ProjectShop.Server.Core.Entities
         public decimal BalancePoint { get; private set; }
 
         // Corresponds to 'last_update_balance_date' (DATETIME)
-        public DateTime LastUpdateBalanceDate { get; private set; }
+        public DateTime LastUpdatedBalanceDate { get; private set; }
 
         // Navigation property
         public CustomerModel Customer { get; private set; } = null!;
         public ICollection<TransactionModel> Transactions { get; private set; } = new List<TransactionModel>();
 
-        public PointWalletModel(uint pointWalletId, uint customerId, decimal balancePoint, DateTime lastUpdateBalanceDate)
+        public PointWalletModel(uint pointWalletId, uint customerId, decimal balancePoint, DateTime lastUpdatedBalanceDate)
         {
             PointWalletId = pointWalletId;
             CustomerId = customerId;
             BalancePoint = balancePoint;
-            LastUpdateBalanceDate = lastUpdateBalanceDate;
+            LastUpdatedBalanceDate = lastUpdatedBalanceDate;
         }
 
         public uint GetIdEntity() => PointWalletId;

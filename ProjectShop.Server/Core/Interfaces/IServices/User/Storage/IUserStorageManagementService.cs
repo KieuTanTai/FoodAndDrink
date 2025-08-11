@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ProjectShop.Server.Core.Interfaces.IServices.User.Storage
+﻿namespace ProjectShop.Server.Core.Interfaces.IServices.User.Storage
 {
     internal interface IUserStorageManagementService<T> where T : class
     {

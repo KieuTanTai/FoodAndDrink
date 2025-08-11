@@ -15,7 +15,10 @@ namespace ProjectShop.Server.Core.Entities
         public string Password { get; private set; }
 
         // Corresponds to 'account_create_date' (DATETIME)
-        public DateTime AccountCreateDate { get; private set; }
+        public DateTime AccountCreatedDate { get; private set; }
+
+        // corresponds to 'account_update_date' (DATETIME)
+        public DateTime AccountLastUpdatedDate { get; private set; } = DateTime.UtcNow;
 
         // Corresponds to 'account_status' (TINYINT(1))
         public bool AccountStatus { get; private set; }
@@ -25,12 +28,13 @@ namespace ProjectShop.Server.Core.Entities
         public EmployeeModel Employee { get; private set; } = null!;
         public ICollection<RolesOfUserModel> RolesOfUsers { get; private set; } = new List<RolesOfUserModel>();
 
-        public AccountModel(uint accountId, string userName, string password, DateTime accountCreateDate, bool accountStatus)
+        public AccountModel(uint accountId, string userName, string password, DateTime accountCreatedDate, DateTime accountLastUpdatedDate, bool accountStatus)
         {
             AccountId = accountId;
             UserName = userName;
             Password = password;
-            AccountCreateDate = accountCreateDate;
+            AccountCreatedDate = accountCreatedDate;
+            AccountLastUpdatedDate = accountLastUpdatedDate;
             AccountStatus = accountStatus;
         }
 

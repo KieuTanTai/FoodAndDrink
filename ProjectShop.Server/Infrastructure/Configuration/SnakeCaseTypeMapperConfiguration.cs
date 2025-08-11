@@ -9,7 +9,7 @@ public class SnakeCaseTypeMapperConfiguration<T> : FallbackTypeMapper
     public SnakeCaseTypeMapperConfiguration() : base(
     [
         // Use a lambda to match the expected delegate signature (PropertyInfo, not PropertyInfo?)
-        new CustomPropertyTypeMap(typeof(T), (type, columnName) => SelectProperty(type, columnName) ?? 
+        new CustomPropertyTypeMap(typeof(T), (type, columnName) => SelectProperty(type, columnName) ??
             throw new InvalidOperationException($"No matching property for column '{columnName}' in type '{type.FullName}'.")),
         new DefaultTypeMap(typeof(T))
     ])

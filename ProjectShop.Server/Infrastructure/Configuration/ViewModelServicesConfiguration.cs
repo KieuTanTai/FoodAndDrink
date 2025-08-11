@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using ProjectShop.Server.Core.Interfaces.IServices.ICategory;
-
-namespace ProjectShop.Server.Infrastructure.Configuration
+﻿namespace ProjectShop.Server.Infrastructure.Configuration
 {
     public static class ViewModelServicesConfiguration
     {

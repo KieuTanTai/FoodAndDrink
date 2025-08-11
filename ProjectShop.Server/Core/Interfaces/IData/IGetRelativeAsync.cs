@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace ProjectShop.Server.Core.Interfaces.IData
+﻿namespace ProjectShop.Server.Core.Interfaces.IData
 {
     public interface IGetRelativeAsync<T> where T : class
     {

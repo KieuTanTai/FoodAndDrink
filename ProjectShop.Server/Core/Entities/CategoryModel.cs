@@ -15,7 +15,7 @@ namespace ProjectShop.Server.Core.Entities
         public bool CategoryStatus { get; private set; }
 
         // Navigation property
-        public ICollection<ProductCategories> ProductCategories { get; private set; } = new List<ProductCategories>();
+        public ICollection<ProductCategoriesModel> ProductCategories { get; private set; } = new List<ProductCategoriesModel>();
 
         public CategoryModel(uint categoryId, string categoryName, bool categoryStatus)
         {

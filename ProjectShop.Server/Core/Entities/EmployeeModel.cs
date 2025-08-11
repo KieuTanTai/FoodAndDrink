@@ -1,6 +1,4 @@
 // File: Employee.cs
-using ProjectShop.Server.Core.Interfaces.IEntities;
-
 namespace ProjectShop.Server.Core.Entities
 {
     public class EmployeeModel : PersonModel
@@ -12,7 +10,7 @@ namespace ProjectShop.Server.Core.Entities
         public ICollection<NewsModel> News { get; private set; } = new List<NewsModel>();
 
         // Constructor s? d?ng `base(...)` ?? g?i constructor c?a l?p cha.
-        public EmployeeModel(uint employeeId, uint accountId, DateTime employeeBirthday, string employeePhone, string employeeName, string employeeHouseNumber, string employeeStreet, 
+        public EmployeeModel(uint employeeId, uint accountId, DateTime employeeBirthday, string employeePhone, string employeeName, string employeeHouseNumber, string employeeStreet,
             uint? employeeWardId, uint? employeeDistrictId, uint? employeeCityId, string employeeAvatarUrl, bool employeeGender, bool employeeStatus)
             : base(accountId, employeeBirthday, employeePhone, employeeName, employeeHouseNumber, employeeStreet, employeeWardId, employeeDistrictId, employeeCityId, employeeAvatarUrl, employeeGender, employeeStatus)
         {

@@ -8,8 +8,8 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'dispose_product_id' (INT UNSIGNED AUTO_INCREMENT)
         public uint DisposeProductId { get; private set; }
 
-        // Corresponds to 'product_lot_id' (INT UNSIGNED)
-        public uint ProductLotId { get; private set; }
+        // Corresponds to 'product_barcode' (INT UNSIGNED)
+        public uint ProductBarcode { get; private set; }
 
         // Corresponds to 'location_id' (INT UNSIGNED)
         public uint LocationId { get; private set; }
@@ -21,22 +21,27 @@ namespace ProjectShop.Server.Core.Entities
         public uint DisposeReasonId { get; private set; }
 
         // Corresponds to 'dispose_quantity' (INT UNSIGNED)
-        public uint DisposeQuantity { get; private set; }
+        public int DisposeQuantity { get; private set; }
+
+        // Corresponds to 'dispose_date' (DATETIME)
+        public DateTime DisposedDate { get; private set; } = DateTime.UtcNow;
 
         // Navigation properties
-        public ProductLot ProductLot { get; private set; } = null!;
+        public ProductModel Product { get; private set; } = null!;
         public LocationModel Location { get; private set; } = null!;
         public EmployeeModel DisposeByEmployee { get; private set; } = null!;
         public DisposeReasonModel DisposeReason { get; private set; } = null!;
 
-        public DisposeProductModel(uint disposeProductId, uint productLotId, uint locationId, uint disposeByEmployeeId, uint disposeReasonId, uint disposeQuantity)
+        public DisposeProductModel(uint disposeProductId, uint productBarcode, uint locationId, uint disposeByEmployeeId,
+                            uint disposeReasonId, int disposeQuantity, DateTime disposedDate)
         {
             DisposeProductId = disposeProductId;
-            ProductLotId = productLotId;
+            ProductBarcode = productBarcode;
             LocationId = locationId;
             DisposeByEmployeeId = disposeByEmployeeId;
             DisposeReasonId = disposeReasonId;
             DisposeQuantity = disposeQuantity;
+            DisposedDate = disposedDate;
         }
 
         public uint GetIdEntity() => DisposeProductId;

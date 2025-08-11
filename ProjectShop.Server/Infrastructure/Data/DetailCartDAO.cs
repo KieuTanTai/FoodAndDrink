@@ -20,15 +20,16 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         protected override string GetInsertQuery()
         {
-            return $@"INSERT INTO {TableName} (cart_id, product_barcode, cart_quantity, cart_price, cart_added_date) 
-                      VALUES (@CartId, @ProductBarcode, @CartQuantity, @CartPrice, @CartAddedDate); SELECT LAST_INSERT_ID();";
+            return $@"INSERT INTO {TableName} (cart_id, product_barcode, detail_cart_quantity, detail_cart_price, detail_cart_added_date) 
+                      VALUES (@CartId, @ProductBarcode, @DetailCartQuantity, @DetailCartPrice, @DetailCartAddedDate); SELECT LAST_INSERT_ID();";
         }
 
         protected override string GetUpdateQuery()
         {
             string colIdName = Converter.SnakeCaseToPascalCase(ColumnIdName);
             return $@"UPDATE {TableName} 
-                      SET cart_quantity = @CartQuantity, cart_price = @CartPrice, cart_added_date = @CartAddedDate 
+                      SET detail_cart_quantity = @DetailCartQuantity, detail_cart_price = @DetailCartPrice, 
+                        detail_cart_added_date = @DetailCartAddedDate 
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
@@ -62,11 +63,11 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $"SELECT * FROM {TableName} WHERE {colIdName} = @Input";
         }
 
-        public async Task<List<DetailCartModel>?> GetAllByMonthAndYearAsync(int year, int month)
+        public async Task<List<DetailCartModel>> GetAllByMonthAndYearAsync(int year, int month, string colName = "detail_cart_added_date")
         {
             try
             {
-                string query = GetByMonthAndYear("cart_added_date");
+                string query = GetByMonthAndYear(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<DetailCartModel> accounts = await connection.QueryAsync<DetailCartModel>(query, new { FirstTime = year, SecondTime = month });
                 return accounts.AsList();
@@ -78,11 +79,11 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<DetailCartModel>?> GetAllByYearAsync(int year)
+        public async Task<List<DetailCartModel>> GetAllByYearAsync(int year, string colName = "detail_cart_added_date")
         {
             try
             {
-                string query = GetByYear("cart_added_date");
+                string query = GetByYear(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<DetailCartModel> accounts = await connection.QueryAsync<DetailCartModel>(query, new { Input = year });
                 return accounts.AsList();
@@ -94,11 +95,11 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<DetailCartModel>?> GetAllByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<List<DetailCartModel>> GetAllByDateTimeRangeAsync(DateTime startDate, DateTime endDate, string colName = "detail_cart_added_date")
         {
             try
             {
-                string query = GetByDateTimeRange("cart_added_date");
+                string query = GetByDateTimeRange(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<DetailCartModel> accounts = await connection.QueryAsync<DetailCartModel>(query, new { FirstTime = startDate, SecondTime = endDate });
                 return accounts.AsList();
@@ -110,13 +111,13 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<DetailCartModel>?> GetAllByDateAsync(DateTime date)
+        public async Task<List<DetailCartModel>> GetAllByDateTimeAsync(DateTime dateTime, string colName = "detail_cart_added_date")
         {
             try
             {
-                string query = GetByDateTime("cart_added_date");
+                string query = GetByDateTime(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<DetailCartModel> accounts = await connection.QueryAsync<DetailCartModel>(query, new { Input = date });
+                IEnumerable<DetailCartModel> accounts = await connection.QueryAsync<DetailCartModel>(query, new { Input = dateTime });
                 return accounts.AsList();
             }
             catch (Exception ex)
@@ -126,11 +127,12 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<DetailCartModel>> GetByRangePrice(decimal minPrice, decimal maxPrice)
+        public async Task<List<DetailCartModel>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice, string colName = "detail_cart_price")
         {
             try
             {
-                string query = $"SELECT * FROM {TableName} WHERE price BETWEEN @MinPrice AND @MaxPrice";
+                CheckColumnName(colName);
+                string query = $"SELECT * FROM {TableName} WHERE {colName} BETWEEN @MinPrice AND @MaxPrice";
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<DetailCartModel> detailCarts = await connection.QueryAsync<DetailCartModel>(query, new { MinPrice = minPrice, MaxPrice = maxPrice });
                 return detailCarts.AsList();
@@ -142,11 +144,11 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<DetailCartModel>> GetByCartQuantity(int quantity)
+        public async Task<List<DetailCartModel>> GetByCartQuantityAsync(int quantity)
         {
             try
             {
-                string query = $"SELECT * FROM {TableName} WHERE cart_quantity = @Quantity;";
+                string query = $"SELECT * FROM {TableName} WHERE detail_cart_quantity = @Quantity;";
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<DetailCartModel> detailCarts = await connection.QueryAsync<DetailCartModel>(query, new { Quantity = quantity });
                 return detailCarts.AsList();
@@ -158,7 +160,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<DetailCartModel>?> GetAllByIdAsync(string id, string colIdName)
+        public async Task<List<DetailCartModel>> GetAllByIdAsync(string id, string colIdName)
         {
             try
             {

@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using ProjectShop.Server.Infrastructure.Data;
-
-namespace ProjectShop.Server.Core.Interfaces.IServices.ICategory
+﻿namespace ProjectShop.Server.Core.Interfaces.IServices.ICategory
 {
     public interface IProductCategoryManagementService<T, TKeys> : IBaseLinkingDataService<T, TKeys> where T : class where TKeys : class
     {

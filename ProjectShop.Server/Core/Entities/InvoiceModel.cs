@@ -11,6 +11,9 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'customer_id' (INT UNSIGNED)
         public uint CustomerId { get; private set; }
 
+        // Corresponds to 'employee_id' (INT UNSIGNED)
+        public uint EmployeeId { get; private set; }
+
         // Corresponds to 'payment_method_id' (INT UNSIGNED)
         public uint PaymentMethodId { get; private set; }
 
@@ -25,15 +28,17 @@ namespace ProjectShop.Server.Core.Entities
 
         // Navigation properties
         public CustomerModel Customer { get; private set; } = null!;
+        public EmployeeModel Employee { get; private set; } = null!;
         public UserPaymentMethodModel UserPaymentMethod { get; private set; } = null!;
         public ICollection<DetailInvoiceModel> DetailInvoices { get; private set; } = new List<DetailInvoiceModel>();
-        public ICollection<InvoiceDiscount> InvoiceDiscounts { get; private set; } = new List<InvoiceDiscount>();
+        public ICollection<InvoiceDiscountModel> InvoiceDiscounts { get; private set; } = new List<InvoiceDiscountModel>();
         public ICollection<TransactionModel> Transactions { get; private set; } = new List<TransactionModel>();
 
-        public InvoiceModel(uint invoiceId, uint customerId, uint paymentMethodId, decimal invoiceTotalPrice, DateTime invoiceDate, bool invoiceStatus)
+        public InvoiceModel(uint invoiceId, uint customerId, uint employeeId, uint paymentMethodId, decimal invoiceTotalPrice, DateTime invoiceDate, bool invoiceStatus)
         {
             InvoiceId = invoiceId;
             CustomerId = customerId;
+            EmployeeId = employeeId;
             PaymentMethodId = paymentMethodId;
             InvoiceTotalPrice = invoiceTotalPrice;
             InvoiceDate = invoiceDate;

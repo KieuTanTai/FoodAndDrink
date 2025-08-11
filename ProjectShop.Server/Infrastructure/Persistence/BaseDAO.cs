@@ -12,7 +12,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence
         IStringChecker checker,
         string tableName,
         string columnIdName,
-        string secondColumnIdName = "") : IDAO<T>, IDbOperationAsync<T>, IQueryOperationsAsync, IExecuteOperationsAsync where T : class
+        string secondColumnIdName = "") : IDAO<T> where T : class
     {
         protected IDbConnectionFactory ConnectionFactory { get; } = connectionFactory;
         protected IColumnService ColService { get; } = colService;
@@ -41,11 +41,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence
         }
 
         // GET SINGLE BY ID
-        public virtual async Task<T?> GetByIdAsync(string id)
+        public virtual async Task<T?> GetSingleDataAsync(string input, string colName)
         {
             try
             {
-                string query = GetByIdQuery(ColumnIdName);
+                if (string.IsNullOrEmpty(input))
+                    throw new ArgumentException("Input cannot be null or empty.", nameof(input));
+                string query = GetDataQuery(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 T? result = await connection.QueryFirstOrDefaultAsync(query);
                 return result;
@@ -57,15 +59,18 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             }
         }
 
-        public virtual async Task<List<T>> GetByIdsAsync(IEnumerable<string> ids)
+        public virtual async Task<List<T>> GetByInputsAsync(IEnumerable<string> inputs, string colName)
         {
             try
             {
-                if (ids == null || !ids.Any())
+                if (string.IsNullOrEmpty(colName))
+                    throw new ArgumentException("Column name cannot be null or empty.", nameof(colName));
+                if (inputs == null || !inputs.Any())
                     return new List<T>();
-                string query = $"SELECT * FROM {TableName} WHERE {ColumnIdName} IN @Ids";
+                CheckColumnName(colName);
+                string query = $"SELECT * FROM {TableName} WHERE {colName} IN @Inputs";
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<T> result = await connection.QueryAsync<T>(query, new { Ids = ids });
+                IEnumerable<T> result = await connection.QueryAsync<T>(query, new { Inputs = inputs });
                 return result.AsList();
             }
             catch (Exception ex)
@@ -106,59 +111,35 @@ namespace ProjectShop.Server.Infrastructure.Persistence
         {
             try
             {
+                if (entities == null || !entities.Any())
+                    return 0; // Trả về 0 nếu không có đối tượng nào.
+
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 using IDbTransaction transaction = connection.BeginTransaction();
                 try
                 {
-                    int result = 0;
-                    foreach (T entity in entities)
-                        result += await connection.ExecuteAsync(GetInsertQuery(), entity, transaction);
+                    string insertQuery = GetInsertQuery();
+                    int affectedRows = await connection.ExecuteAsync(insertQuery, entities, transaction);
+
                     transaction.Commit();
-                    return result;
+                    return affectedRows;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error Commit!\n{ex.StackTrace}");
+                    Console.WriteLine($"Error during transaction: {ex.StackTrace}");
                     transaction.Rollback();
                     return -1;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                Console.WriteLine($"Error creating connection or transaction: {ex.StackTrace}");
                 return -1;
             }
         }
 
         // 2. Usage in UpdateAsync
-        public virtual async Task<int> UpdateAsync(T entity)
-        {
-            try
-            {
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                using IDbTransaction transaction = connection.BeginTransaction();
-                try
-                {
-                    int affectedRows = await connection.ExecuteAsync(GetUpdateQuery(), entity, transaction);
-                    transaction.Commit();
-                    return affectedRows;
-
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error Commit!\n{ex.StackTrace}");
-                    transaction.Rollback();
-                    return -1;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return -1;
-            }
-        }
-
-        public virtual async Task<int> UpdateManyAsync(IEnumerable<T> entities)
+        public virtual async Task<int> UpdateAsync(T entity, string? oldId = "")
         {
             try
             {
@@ -167,10 +148,26 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 try
                 {
                     int affectedRows = 0;
-                    foreach (T entity in entities)
-                        affectedRows += await connection.ExecuteAsync(GetUpdateQuery(), entity, transaction);
-                    transaction.Commit();
-                    return affectedRows;
+                    if (!string.IsNullOrEmpty(oldId))
+                    {
+                        if (string.IsNullOrEmpty(SecondColumnIdName))
+                            throw new ArgumentException("Second column ID name cannot be null or empty when oldId is provided.");
+                        // Update with oldId
+                        var parameters = new DynamicParameters(entity);
+                        parameters.Add("OldId", oldId);
+                        affectedRows = await connection.ExecuteAsync(GetUpdateQuery(), parameters, transaction);
+                        return affectedRows;
+                    }
+                    else
+                    {
+                        // Update without oldId
+                        affectedRows = await connection.ExecuteAsync(GetUpdateQuery(), entity, transaction);
+
+                        affectedRows = await connection.ExecuteAsync(GetUpdateQuery(), entity, transaction);
+                        transaction.Commit();
+                        return affectedRows;
+                    }
+
                 }
                 catch (Exception ex)
                 {
@@ -186,62 +183,53 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             }
         }
 
-        //DELETE ENTITY
-        //public virtual async Task<int> DeleteAsync(string id)
-        //{
-        //    try
-        //    {
-        //        string query = DeleteByIdQuery(ColumnIdName);
-        //        using IDbConnection connection = ConnectionFactory.CreateConnection();
-        //        using IDbTransaction transaction = connection.BeginTransaction();
-        //        try
-        //        {
-        //            int affectedRows = await connection.ExecuteAsync(query, new { Id = id }, transaction);
-        //            transaction.Commit();
-        //            return affectedRows;
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            Console.WriteLine($"Error Commit!\n{ex.StackTrace}");
-        //            transaction.Rollback();
-        //            return -1;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine(ex.StackTrace);
-        //        return -1;
-        //    }
-        //}
+        public virtual async Task<int> UpdateManyAsync(IEnumerable<T> entities, IEnumerable<string>? oldIds)
+        {
+            try
+            {
+                // Kiểm tra tính hợp lệ của dữ liệu đầu vào.
+                // Số lượng entities phải khớp với số lượng oldIds.
+                if (entities == null || !entities.Any() || oldIds == null || entities.Count() != oldIds.Count())
+                    return 0; // Trả về 0 nếu không có gì để cập nhật hoặc dữ liệu không hợp lệ.
 
-        //public virtual async Task<int> DeleteManyAsync(IEnumerable<string> ids)
-        //{
-        //    try
-        //    {
-        //        string query = DeleteByIdQuery(ColumnIdName);
-        //        using IDbConnection connection = ConnectionFactory.CreateConnection();
-        //        using IDbTransaction transaction = connection.BeginTransaction();
-        //        try
-        //        {
-        //            int affectedRows = 0;
-        //            foreach (string id in ids)
-        //                affectedRows += await connection.ExecuteAsync(query, new { Id = id }, transaction);
-        //            transaction.Commit();
-        //            return affectedRows;
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            Console.WriteLine($"Error Commit!\n{ex.StackTrace}");
-        //            transaction.Rollback();
-        //            return -1;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine(ex.StackTrace);
-        //        return -1;
-        //    }
-        //}
+                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbTransaction transaction = connection.BeginTransaction();
+                try
+                {
+                    // Sử dụng Enumerable.Zip để kết hợp entities và oldIds thành một tập hợp duy nhất.
+                    // Sau đó, tạo một đối tượng ẩn danh cho mỗi cặp, chứa tất cả các thuộc tính.
+                    var parameters = entities.Zip(oldIds, (entity, oldId) =>
+                    {
+                        var entityAsDynamic = (dynamic)entity; // Ép kiểu entity thành dynamic
+                        var combinedParams = new Dapper.DynamicParameters();
+                        combinedParams.AddDynamicParams(entityAsDynamic);
+                        combinedParams.Add("OldId", oldId); // Thêm oldId vào làm tham số mới
+                        return combinedParams;
+                    });
+
+                    // Chuỗi truy vấn cập nhật phải sử dụng cả ID và OldId
+                    string updateQuery = GetUpdateQuery();
+
+                    // Gọi Dapper ExecuteAsync một lần duy nhất với toàn bộ tập hợp tham số.
+                    // Dapper sẽ tự động lặp qua và thực thi truy vấn cho mỗi phần tử.
+                    int affectedRows = await connection.ExecuteAsync(updateQuery, parameters, transaction);
+
+                    transaction.Commit();
+                    return affectedRows;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error during transaction: {ex.StackTrace}");
+                    transaction.Rollback();
+                    return -1;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating connection or transaction: {ex.StackTrace}");
+                return -1;
+            }
+        }
 
 #nullable enable
         public virtual async Task<List<TResult>?> QueryAsync<TResult>(string query, object? parameters = null)
@@ -314,16 +302,10 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             return $"SELECT * FROM {TableName}";
         }
 
-        protected virtual string GetByIdQuery(string colIdName)
-        {   
-            CheckColumnName(colIdName);
-            return $"SELECT * FROM {TableName} WHERE {colIdName} = @Id";
-        }
-
-        protected virtual string DeleteByIdQuery(string colIdName)
+        protected virtual string GetDataQuery(string colIdName)
         {
             CheckColumnName(colIdName);
-            return $"DELETE FROM {TableName} WHERE {colIdName} = @Id";
+            return $"SELECT * FROM {TableName} WHERE {colIdName} = @Input";
         }
 
         protected void CheckColumnName(string colName)

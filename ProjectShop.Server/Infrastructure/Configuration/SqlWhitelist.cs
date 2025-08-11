@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace ProjectShop.Server.Infrastructure.Configuration
 {
@@ -23,7 +21,7 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             "supplier_company_district_id", "supplier_company_city_id",
             "supplier_store_house_number", "supplier_store_street", "supplier_store_ward_id",
             "supplier_store_district_id", "supplier_store_city_id", "supplier_status",
-            "account_id", "user_name", "password", "account_create_date", "account_status",
+            "account_id", "user_name", "password", "account_created_date", "account_status",
             "role_id", "role_name", "role_status",
             "customer_id", "customer_birthday", "customer_phone", "customer_name",
             "customer_house_number", "customer_street", "customer_ward_id", "customer_district_id",
@@ -31,9 +29,9 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             "employee_id", "employee_birthday", "employee_phone", "employee_name",
             "employee_house_number", "employee_street", "employee_ward_id", "employee_district_id",
             "employee_city_id", "employee_avatar_url", "employee_gender", "employee_status",
-            "id", "create_date",
-            "cart_id", "cart_total_price",
-            "point_wallet_id", "customer_id", "balance_point", "last_update_balance_date",
+            "id", "added_date", "supplier_cooperation_date",
+            "cart_id", "cart_total_price", "role_updated_date", "role_created_date",
+            "point_wallet_id", "customer_id", "balance_point", "last_updated_balance_date", "account_updated_date",
 
             // PRODUCTS
             "product_barcode", "supplier_id", "product_name", "product_net_weight",
@@ -43,9 +41,9 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             "cart_price", "cart_quantity",
             "product_lot_id", "product_barcode", "product_lot_mfg_date",
             "product_lot_exp_date", "product_lot_initial_quantity",
-            "dispose_reason_id", "dispose_reason_name",
+            "dispose_reason_id", "dispose_reason_name", "disposed_date",
             "category_id", "category_name", "category_status",
-            "product_image_id", "image_url", "product_image_priority",
+            "product_image_id", "image_url", "product_image_priority", "product_image_created_date", "product_add_at",
             
             // SALE EVENTS
             "sale_event_id", "sale_event_start_date", "sale_event_end_date",
@@ -60,7 +58,7 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             "news_id", "employee_id", "news_category_id",
             "news_related_product_barcode", "news_title", "news_published_date",
             "news_content", "news_status",
-            "news_image_id", "news_id", "news_image_url",
+            "news_image_id", "news_id", "news_image_url", "news_image_priority", "news_image_created_date",
 
             // PAYMENT & INVOICES
             "bank_id", "bank_name", "bank_status",

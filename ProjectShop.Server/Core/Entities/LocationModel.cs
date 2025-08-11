@@ -39,10 +39,10 @@ namespace ProjectShop.Server.Core.Entities
         public bool LocationStatus { get; private set; }
 
         // Navigation properties
-        public LocationDistrict LocationDistrict { get; private set; } = null!;
+        public LocationDistrictModel LocationDistrict { get; private set; } = null!;
         public LocationWardModel LocationWard { get; private set; } = null!;
         public LocationTypeModel LocationType { get; private set; } = null!;
-        public LocationCity LocationCity { get; private set; } = null!;
+        public LocationCityModel LocationCity { get; private set; } = null!;
         public ICollection<InventoryModel> Inventories { get; private set; } = new List<InventoryModel>();
         public ICollection<InventoryMovementModel> SourceInventoryMovements { get; private set; } = new List<InventoryMovementModel>();
         public ICollection<InventoryMovementModel> DestinationInventoryMovements { get; private set; } = new List<InventoryMovementModel>();

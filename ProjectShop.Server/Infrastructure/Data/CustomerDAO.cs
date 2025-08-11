@@ -79,7 +79,7 @@ namespace ProjectShop.Server.Infrastructure.Data
                 FROM {TableName} WHERE {colName} LIKE @Input";
         }
 
-        protected override string GetByIdQuery(string colIdName)
+        protected override string GetDataQuery(string colIdName)
         {
             CheckColumnName(colIdName);
             string colIdNamePascal = Converter.SnakeCaseToPascalCase(colIdName);
@@ -159,11 +159,11 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<CustomerModel>?> GetAllByMonthAndYearAsync(int year, int month)
+        public async Task<List<CustomerModel>> GetAllByMonthAndYearAsync(int year, int month, string colName = "customer_birthday")
         {
             try
             {
-                string query = GetByMonthAndYear("customer_birthday");
+                string query = GetByMonthAndYear(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<CustomerModel> accounts = await connection.QueryAsync<CustomerModel>(query, new { FirstTime = year, SecondTime = month });
                 return accounts.AsList();
@@ -175,11 +175,11 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<CustomerModel>?> GetAllByYearAsync(int year)
+        public async Task<List<CustomerModel>> GetAllByYearAsync(int year, string colName = "customer_birthday")
         {
             try
             {
-                string query = GetByYear("customer_birthday");
+                string query = GetByYear(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<CustomerModel> accounts = await connection.QueryAsync<CustomerModel>(query, new { Input = year });
                 return accounts.AsList();
@@ -191,11 +191,11 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<CustomerModel>?> GetAllByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<List<CustomerModel>> GetAllByDateTimeRangeAsync(DateTime startDate, DateTime endDate, string colName = "customer_birthday")
         {
             try
             {
-                string query = GetByDateTimeRange("customer_birthday");
+                string query = GetByDateTimeRange(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<CustomerModel> accounts = await connection.QueryAsync<CustomerModel>(query, new { FirstTime = startDate, SecondTime = endDate });
                 return accounts.AsList();
@@ -207,13 +207,13 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<CustomerModel>?> GetAllByDateAsync(DateTime date)
+        public async Task<List<CustomerModel>> GetAllByDateTimeAsync(DateTime dateTime, string colName = "customer_birthday")
         {
             try
             {
-                string query = GetByDateTime("customer_birthday");
+                string query = GetByDateTime(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<CustomerModel> accounts = await connection.QueryAsync<CustomerModel>(query, new { Input = date });
+                IEnumerable<CustomerModel> accounts = await connection.QueryAsync<CustomerModel>(query, new { Input = dateTime });
                 return accounts.AsList();
             }
             catch (Exception ex)

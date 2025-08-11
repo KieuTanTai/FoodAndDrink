@@ -1,7 +1,7 @@
-﻿using ProjectShop.Server.Infrastructure.Persistence.Repositories;
-using ProjectShop.Server.Core.Interfaces.IData;
+﻿using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
+using ProjectShop.Server.Infrastructure.Persistence.Repositories;
 using ProjectShop.Server.Infrastructure.Services;
 
 namespace ProjectShop.Server.Infrastructure.Configuration

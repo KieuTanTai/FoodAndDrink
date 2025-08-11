@@ -30,6 +30,21 @@ namespace ProjectShop.Server.Infrastructure.Data
                 FROM {TableName}";
         }
 
+        protected override string GetDataQuery(string colIdName)
+        {
+            CheckColumnName(colIdName);
+            string colIdNamePascal = Converter.SnakeCaseToPascalCase(colIdName);
+            return $@"
+                SELECT
+                    employee_id AS EmployeeId, account_id AS AccountId, employee_name AS Name,
+                    employee_birthday AS Birthday, employee_phone AS Phone, employee_house_number AS HouseNumber,
+                    employee_street AS Street, employee_ward_id AS WardId, employee_district_id AS DistrictId,
+                    employee_city_id AS CityId, employee_avatar_url AS AvatarUrl, employee_gender AS Gender,
+                    employee_status AS Status
+                FROM {TableName}
+                WHERE {colIdName} = @Input";
+        }
+
         protected override string GetInsertQuery()
         {
             return $@"
@@ -77,21 +92,6 @@ namespace ProjectShop.Server.Infrastructure.Data
                     employee_city_id AS CityId, employee_avatar_url AS AvatarUrl, employee_gender AS Gender,
                     employee_status AS Status
                 FROM {TableName} WHERE {colName} LIKE @Input";
-        }
-
-        protected override string GetByIdQuery(string colIdName)
-        {
-            CheckColumnName(colIdName);
-            string colIdNamePascal = Converter.SnakeCaseToPascalCase(colIdName);
-            return $@"
-                SELECT
-                    employee_id AS EmployeeId, account_id AS AccountId, employee_name AS Name,
-                    employee_birthday AS Birthday, employee_phone AS Phone, employee_house_number AS HouseNumber,
-                    employee_street AS Street, employee_ward_id AS WardId, employee_district_id AS DistrictId,
-                    employee_city_id AS CityId, employee_avatar_url AS AvatarUrl, employee_gender AS Gender,
-                    employee_status AS Status
-                FROM {TableName}
-                WHERE {colIdName} = @{colIdNamePascal}";
         }
 
         private string GetByMonthAndYear(string colName)
@@ -142,7 +142,7 @@ namespace ProjectShop.Server.Infrastructure.Data
                     FROM {TableName} WHERE {colName} = DATE_ADD(@Input, INTERVAL 1 DAY)";
         }
 
-        public async Task<List<EmployeeModel>> GetRelativeAsync(string input, string colName)
+        public async Task<List<EmployeeModel>> GetRelativeAsync(string input, string colName = "employee_name")
         {
             try
             {
@@ -159,11 +159,11 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<EmployeeModel>?> GetAllByMonthAndYearAsync(int year, int month)
+        public async Task<List<EmployeeModel>> GetAllByMonthAndYearAsync(int year, int month, string colName = "employee_birthday")
         {
             try
             {
-                string query = GetByMonthAndYear("employee_birthday");
+                string query = GetByMonthAndYear(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<EmployeeModel> accounts = await connection.QueryAsync<EmployeeModel>(query, new { FirstTime = year, SecondTime = month });
                 return accounts.AsList();
@@ -175,11 +175,11 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<EmployeeModel>?> GetAllByYearAsync(int year)
+        public async Task<List<EmployeeModel>> GetAllByYearAsync(int year, string colName = "employee_birthday")
         {
             try
             {
-                string query = GetByYear("employee_birthday");
+                string query = GetByYear(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<EmployeeModel> accounts = await connection.QueryAsync<EmployeeModel>(query, new { Input = year });
                 return accounts.AsList();
@@ -191,11 +191,11 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<EmployeeModel>?> GetAllByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<List<EmployeeModel>> GetAllByDateTimeRangeAsync(DateTime startDate, DateTime endDate, string colName = "employee_birthday")
         {
             try
             {
-                string query = GetByDateTimeRange("employee_birthday");
+                string query = GetByDateTimeRange(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<EmployeeModel> accounts = await connection.QueryAsync<EmployeeModel>(query, new { FirstTime = startDate, SecondTime = endDate });
                 return accounts.AsList();
@@ -207,13 +207,13 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<EmployeeModel>?> GetAllByDateAsync(DateTime date)
+        public async Task<List<EmployeeModel>> GetAllByDateTimeAsync(DateTime dateTime, string colName = "employee_birthday")
         {
             try
             {
-                string query = GetByDateTime("employee_birthday");
+                string query = GetByDateTime(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<EmployeeModel> accounts = await connection.QueryAsync<EmployeeModel>(query, new { Input = date });
+                IEnumerable<EmployeeModel> accounts = await connection.QueryAsync<EmployeeModel>(query, new { Input = dateTime });
                 return accounts.AsList();
             }
             catch (Exception ex)
@@ -227,15 +227,9 @@ namespace ProjectShop.Server.Infrastructure.Data
         {
             try
             {
-                string query = $@"
-                    SELECT
-                        employee_id AS EmployeeId, account_id AS AccountId, employee_name AS Name,
-                        employee_birthday AS Birthday, employee_phone AS Phone, employee_house_number AS HouseNumber,
-                        employee_street AS Street, employee_ward_id AS WardId, employee_district_id AS DistrictId,
-                        employee_city_id AS CityId, employee_avatar_url AS AvatarUrl, employee_gender AS Gender, employee_status AS Status
-                    FROM {TableName} WHERE employee_status = @Status";
+                string query = GetDataQuery("employee_status");
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<EmployeeModel> employees = await connection.QueryAsync<EmployeeModel>(query, new { Status = status });
+                IEnumerable<EmployeeModel> employees = await connection.QueryAsync<EmployeeModel>(query, new { Input = status });
                 return employees.AsList();
             }
             catch (Exception ex)
@@ -248,15 +242,9 @@ namespace ProjectShop.Server.Infrastructure.Data
         {
             try
             {
-                string query = $@"
-                    SELECT
-                        employee_id AS EmployeeId, account_id AS AccountId, employee_name AS Name,
-                        employee_birthday AS Birthday, employee_phone AS Phone, employee_house_number AS HouseNumber,
-                        employee_street AS Street, employee_ward_id AS WardId, employee_district_id AS DistrictId,
-                        employee_city_id AS CityId, employee_avatar_url AS AvatarUrl, employee_gender AS Gender, employee_status AS Status
-                    FROM {TableName} WHERE employee_gender = @Gender";
+                string query = GetDataQuery("employee_gender");
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<EmployeeModel> employees = await connection.QueryAsync<EmployeeModel>(query, new { Gender = gender });
+                IEnumerable<EmployeeModel> employees = await connection.QueryAsync<EmployeeModel>(query, new { Input = gender });
                 return employees.AsList();
             }
             catch (Exception ex)

@@ -8,25 +8,24 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'inventory_id' (INT UNSIGNED AUTO_INCREMENT)
         public uint InventoryId { get; private set; }
 
-        // Corresponds to 'product_lot_id' (INT UNSIGNED)
-        public uint ProductLotId { get; private set; }
-
         // Corresponds to 'location_id' (INT UNSIGNED)
         public uint LocationId { get; private set; }
 
-        // Corresponds to 'inventory_current_quantity' (INT UNSIGNED)
-        public uint InventoryCurrentQuantity { get; private set; }
+        // Corresponds to 'inventory_status' (TINYINT)
+        public byte InventoryStatus { get; private set; }
+
+        // Corressponds to 'inventory_last_updated_date' (DATETIME)
+        public DateTime InventoryLastUpdatedDate { get; private set; }
 
         // Navigation properties
-        public ProductLot ProductLot { get; private set; } = null!;
         public LocationModel Location { get; private set; } = null!;
 
-        public InventoryModel(uint inventoryId, uint productLotId, uint locationId, uint inventoryCurrentQuantity)
+        public InventoryModel(uint inventoryId, uint locationId, byte inventoryStatus, DateTime inventoryLastUpdatedDate)
         {
             InventoryId = inventoryId;
-            ProductLotId = productLotId;
             LocationId = locationId;
-            InventoryCurrentQuantity = inventoryCurrentQuantity;
+            InventoryStatus = inventoryStatus;
+            InventoryLastUpdatedDate = inventoryLastUpdatedDate;
         }
 
         public uint GetIdEntity() => InventoryId;

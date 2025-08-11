@@ -1,11 +1,9 @@
 // File: LocationCity.cs
 using ProjectShop.Server.Core.Interfaces.IEntities;
-using System;
-using System.Collections.Generic;
 
 namespace ProjectShop.Server.Core.Entities
 {
-    public class LocationCity : IGetIdEntity<uint>
+    public class LocationCityModel : IGetIdEntity<uint>
     {
         // Corresponds to 'location_city_id' (INT UNSIGNED AUTO_INCREMENT)
         public uint LocationCityId { get; private set; }
@@ -23,7 +21,7 @@ namespace ProjectShop.Server.Core.Entities
         public ICollection<CustomerModel> Customers { get; private set; } = new List<CustomerModel>();
         public ICollection<EmployeeModel> Employees { get; private set; } = new List<EmployeeModel>();
 
-        public LocationCity(uint locationCityId, string locationCityName, bool locationCityStatus)
+        public LocationCityModel(uint locationCityId, string locationCityName, bool locationCityStatus)
         {
             LocationCityId = locationCityId;
             LocationCityName = locationCityName;

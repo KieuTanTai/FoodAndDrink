@@ -1,7 +1,7 @@
 ﻿using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Infrastructure.Configuration;
 using System.Data;
 using System.Data.Common;
-using ProjectShop.Server.Infrastructure.Configuration;
 
 namespace ProjectShop.Server.Infrastructure.Services
 {

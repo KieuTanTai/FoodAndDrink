@@ -7,7 +7,7 @@ using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class DetailInvoiceDAO : BaseDAO<DetailInvoiceModel>, IGetByStatusAsync<DetailInvoiceModel>, IGetAllByIdAsync<DetailInvoiceModel>, IGetByRangePriceAsync<DetailInvoiceModel>
+    public class DetailInvoiceDAO : BaseNoneUpdateDAO<DetailInvoiceModel>, IGetByStatusAsync<DetailInvoiceModel>, IGetAllByIdAsync<DetailInvoiceModel>, IGetByRangePriceAsync<DetailInvoiceModel>
     {
         public DetailInvoiceDAO(
             IDbConnectionFactory connectionFactory,
@@ -22,13 +22,6 @@ namespace ProjectShop.Server.Infrastructure.Data
         {
             return $@"INSERT INTO {TableName} (invoice_id, product_barcode, detail_invoice_quantity, detail_invoice_price, detail_invoice_status) 
                       VALUES (@InvoiceId, @ProductBarcode, @DetailInvoiceQuantity, @DetailInvoicePrice, @DetailInvoiceStatus); SELECT LAST_INSERT_ID();";
-        }
-        protected override string GetUpdateQuery()
-        {
-            string colIdName = Converter.SnakeCaseToPascalCase(ColumnIdName);
-            return $@"UPDATE {TableName} 
-                      SET detail_invoice_status = @DetailInvoiceStatus 
-                      WHERE {ColumnIdName} = @{colIdName}";
         }
 
         private string GetAllByIdQuery(string colIdName)
@@ -53,12 +46,12 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<DetailInvoiceModel>> GetByRangePrice(decimal minPrice, decimal maxPrice)
+        public async Task<List<DetailInvoiceModel>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice, string colName = "detail_invoice_price")
         {
             try
             {
-                string query = $@"SELECT * FROM {TableName} 
-                                 WHERE detail_invoice_price BETWEEN @MinPrice AND @MaxPrice";
+                CheckColumnName(colName);
+                string query = $@"SELECT * FROM {TableName} WHERE {colName} BETWEEN @MinPrice AND @MaxPrice";
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<DetailInvoiceModel> result = await connection.QueryAsync<DetailInvoiceModel>(query, new { MinPrice = minPrice, MaxPrice = maxPrice });
                 return result.AsList();
@@ -69,7 +62,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<DetailInvoiceModel>?> GetAllByIdAsync(string id, string colIdName)
+        public async Task<List<DetailInvoiceModel>> GetAllByIdAsync(string id, string colIdName)
         {
             try
             {

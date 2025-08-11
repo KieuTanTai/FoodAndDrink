@@ -1,6 +1,5 @@
 // File: ProductCategories.cs
 using ProjectShop.Server.Core.Interfaces.IEntities;
-using System;
 
 namespace ProjectShop.Server.Core.Entities
 {
@@ -17,7 +16,7 @@ namespace ProjectShop.Server.Core.Entities
         }
     }
 
-    public class ProductCategories : IGetIdEntity<ProductCategoriesKey>
+    public class ProductCategoriesModel : IGetIdEntity<ProductCategoriesKey>
     {
         // Corresponds to 'category_id' (INT UNSIGNED)
         public uint CategoryId { get; private set; }
@@ -29,7 +28,7 @@ namespace ProjectShop.Server.Core.Entities
         public CategoryModel Category { get; private set; } = null!;
         public ProductModel Product { get; private set; } = null!;
 
-        public ProductCategories(uint categoryId, string productBarcode)
+        public ProductCategoriesModel(uint categoryId, string productBarcode)
         {
             CategoryId = categoryId;
             ProductBarcode = productBarcode;

@@ -7,7 +7,7 @@ using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class DetailSaleEventDAO : BaseDAO<DetailSaleEventModel>, IGetAllByIdAsync<DetailSaleEventModel>, IGetByRangePriceAsync<DetailSaleEventModel>
+    public class DetailSaleEventDAO : BaseNoneUpdateDAO<DetailSaleEventModel>, IGetAllByIdAsync<DetailSaleEventModel>, IGetByRangePriceAsync<DetailSaleEventModel>
     {
         public DetailSaleEventDAO(
             IDbConnectionFactory connectionFactory,
@@ -24,23 +24,13 @@ namespace ProjectShop.Server.Infrastructure.Data
                             VALUES (@SaleEventId, @ProductBarcode, @DiscountType, @DiscountPercent, @DiscountAmount, @MaxDiscountPrice, @MinPriceToUse;";
         }
 
-        protected override string GetUpdateQuery()
-        {
-            string colIdName = Converter.SnakeCaseToPascalCase(ColumnIdName);
-            string secondColIdName = Converter.SnakeCaseToPascalCase(SecondColumnIdName);
-            return $@"SET discount_percent = @DiscountPercent, 
-                        discount_amount = @DiscountAmount, max_discount_price = @MaxDiscountPrice, min_price_to_use = @MinPriceToUse
-                        WHERE {ColumnIdName} = @{colIdName} 
-                        AND {SecondColumnIdName} = @{secondColIdName}";
-        }
-
         private string GetAllByIdQuery(string colIdName)
         {
             CheckColumnName(colIdName);
             return $@"SELECT * FROM {TableName} WHERE {colIdName} = @Input";
         }
 
-        public async Task<List<DetailSaleEventModel>?> GetAllByIdAsync(string id, string colIdName)
+        public async Task<List<DetailSaleEventModel>> GetAllByIdAsync(string id, string colIdName)
         {
             try
             {
@@ -55,29 +45,29 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<DetailSaleEventModel>> GetByRangePrice(decimal minPrice, decimal maxPrice)
-        {
-            try
-            {
-                string query = $@"SELECT * FROM {TableName} 
-                                  WHERE min_price_to_use >= @MinPrice AND max_discount_price <= @MaxPrice";
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<DetailSaleEventModel> result = await connection.QueryAsync<DetailSaleEventModel>(query, new { MinPrice = minPrice, MaxPrice = maxPrice });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving DetailSaleEventModels by price range: {ex.Message}", ex);
-            }
-        }
+        //public async Task<List<DetailSaleEventModel>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice)
+        //{
+        //    try
+        //    {
+        //        string query = $@"SELECT * FROM {TableName} 
+        //                          WHERE min_price_to_use >= @MinPrice AND max_discount_price <= @MaxPrice";
+        //        using IDbConnection connection = ConnectionFactory.CreateConnection();
+        //        IEnumerable<DetailSaleEventModel> result = await connection.QueryAsync<DetailSaleEventModel>(query, new { MinPrice = minPrice, MaxPrice = maxPrice });
+        //        return result.AsList();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception($"Error retrieving DetailSaleEventModels by price range: {ex.Message}", ex);
+        //    }
+        //}
 
-        public async Task<List<DetailSaleEventModel>> GetByRangePrice(decimal minPrice, decimal maxPrice, string colPrice)
+        //overloading
+        public async Task<List<DetailSaleEventModel>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice, string colPrice = "min_price_to_use")
         {
             try
             {
                 CheckColumnName(colPrice);
-                string query = $@"SELECT * FROM {TableName} 
-                                  WHERE {colPrice} >= @MinPrice AND {colPrice} <= @MaxPrice";
+                string query = $@"SELECT * FROM {TableName} WHERE {colPrice} BETWEEN @MinPrice AND @MaxPrice";
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<DetailSaleEventModel> result = await connection.QueryAsync<DetailSaleEventModel>(query, new { MinPrice = minPrice, MaxPrice = maxPrice });
                 return result.AsList();

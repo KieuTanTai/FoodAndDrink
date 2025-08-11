@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using ProjectShop.Server.Core.Interfaces.IValidate;
+﻿using ProjectShop.Server.Core.Interfaces.IValidate;
 
 namespace ProjectShop.Server.Infrastructure.Services
 {

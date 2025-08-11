@@ -18,7 +18,7 @@ namespace ProjectShop.Server.Core.Entities
         public DateTime TransactionDate { get; private set; }
 
         // Corresponds to 'transaction_type' (ENUM)
-        public string TransactionType { get; private set; }
+        public bool TransactionType { get; private set; }
 
         // Corresponds to 'transaction_current_balance' (DECIMAL(10, 2))
         public decimal TransactionCurrentBalance { get; private set; }
@@ -30,7 +30,7 @@ namespace ProjectShop.Server.Core.Entities
         public PointWalletModel PointWallet { get; private set; } = null!;
         public InvoiceModel Invoice { get; private set; } = null!;
 
-        public TransactionModel(uint transactionId, uint pointWalletId, uint invoiceId, DateTime transactionDate, string transactionType, decimal transactionCurrentBalance, bool transactionStatus)
+        public TransactionModel(uint transactionId, uint pointWalletId, uint invoiceId, DateTime transactionDate, bool transactionType, decimal transactionCurrentBalance, bool transactionStatus)
         {
             TransactionId = transactionId;
             PointWalletId = pointWalletId;

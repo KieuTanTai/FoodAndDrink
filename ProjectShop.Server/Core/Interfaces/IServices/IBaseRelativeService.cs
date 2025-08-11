@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace ProjectShop.Server.Core.Interfaces.IServices
+﻿namespace ProjectShop.Server.Core.Interfaces.IServices
 {
     public interface IBaseRelativeService<T> where T : class
     {
