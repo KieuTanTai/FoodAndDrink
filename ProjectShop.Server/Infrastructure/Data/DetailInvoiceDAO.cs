@@ -24,12 +24,6 @@ namespace ProjectShop.Server.Infrastructure.Data
                       VALUES (@InvoiceId, @ProductBarcode, @DetailInvoiceQuantity, @DetailInvoicePrice, @DetailInvoiceStatus); SELECT LAST_INSERT_ID();";
         }
 
-        private string GetAllByIdQuery(string colIdName)
-        {
-            CheckColumnName(colIdName);
-            return $"SELECT * FROM {TableName} WHERE {colIdName} = @Input";
-        }
-
         public async Task<List<DetailInvoiceModel>> GetAllByStatusAsync(bool status)
         {
             try
@@ -66,7 +60,7 @@ namespace ProjectShop.Server.Infrastructure.Data
         {
             try
             {
-                string query = GetAllByIdQuery(colIdName);
+                string query = GetDataQuery(colIdName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<DetailInvoiceModel> result = await connection.QueryAsync<DetailInvoiceModel>(query, new { Input = id });
                 return result.AsList();

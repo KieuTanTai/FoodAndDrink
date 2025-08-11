@@ -57,12 +57,6 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $"SELECT * FROM {TableName} WHERE {colName} = DATE_ADD(@Input, INTERVAL 1 DAY)";
         }
 
-        private string GetAllByIdQuery(string colIdName)
-        {
-            CheckColumnName(colIdName);
-            return $"SELECT * FROM {TableName} WHERE {colIdName} = @Input";
-        }
-
         public async Task<List<DetailCartModel>> GetAllByMonthAndYearAsync(int year, int month, string colName = "detail_cart_added_date")
         {
             try
@@ -144,27 +138,27 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<List<DetailCartModel>> GetByCartQuantityAsync(int quantity)
-        {
-            try
-            {
-                string query = $"SELECT * FROM {TableName} WHERE detail_cart_quantity = @Quantity;";
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<DetailCartModel> detailCarts = await connection.QueryAsync<DetailCartModel>(query, new { Quantity = quantity });
-                return detailCarts.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving detail carts by quantity: {ex.Message}", ex);
-            }
-        }
+        //public async Task<List<DetailCartModel>> GetByCartQuantityAsync(int quantity)
+        //{
+        //    try
+        //    {
+        //        string query = GetDataQuery("detail_cart_quantity");
+        //        using IDbConnection connection = ConnectionFactory.CreateConnection();
+        //        IEnumerable<DetailCartModel> detailCarts = await connection.QueryAsync<DetailCartModel>(query, new { Input = quantity });
+        //        return detailCarts.AsList();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Handle exception (log it, rethrow it, etc.)
+        //        throw new Exception($"Error retrieving detail carts by quantity: {ex.Message}", ex);
+        //    }
+        //}
 
         public async Task<List<DetailCartModel>> GetAllByIdAsync(string id, string colIdName)
         {
             try
             {
-                string query = GetAllByIdQuery(colIdName);
+                string query = GetDataQuery(colIdName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<DetailCartModel> detailCarts = await connection.QueryAsync<DetailCartModel>(query, new { Input = id });
                 return detailCarts.AsList();

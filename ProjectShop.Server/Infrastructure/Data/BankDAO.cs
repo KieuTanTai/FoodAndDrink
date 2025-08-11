@@ -59,9 +59,9 @@ namespace ProjectShop.Server.Infrastructure.Data
         {
             try
             {
-                string query = $"SELECT * FROM {TableName} WHERE bank_status = @Status";
+                string query = GetDataQuery("bank_status");
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<BankModel> result = await connection.QueryAsync<BankModel>(query, new { Status = status });
+                IEnumerable<BankModel> result = await connection.QueryAsync<BankModel>(query, new { Input = status });
                 return result.AsList();
             }
             catch (Exception ex)

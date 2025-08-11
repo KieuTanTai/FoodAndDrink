@@ -48,11 +48,9 @@ namespace ProjectShop.Server.Infrastructure.Data
         {
             try
             {
-                string query = $@"
-                    SELECT * FROM {TableName}
-                    WHERE category_status = @Status";
+                string query = GetDataQuery("category_status");
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<CategoryModel> categories = await connection.QueryAsync<CategoryModel>(query, new { Status = status });
+                IEnumerable<CategoryModel> categories = await connection.QueryAsync<CategoryModel>(query, new { Input = status });
                 return categories.AsList();
             }
             catch (Exception ex)

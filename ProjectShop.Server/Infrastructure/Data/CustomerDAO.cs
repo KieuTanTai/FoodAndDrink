@@ -30,6 +30,20 @@ namespace ProjectShop.Server.Infrastructure.Data
                 FROM {TableName}";
         }
 
+        protected override string GetDataQuery(string colIdName)
+        {
+            CheckColumnName(colIdName);
+            return $@"
+                SELECT
+                    customer_id AS CustomerId, account_id AS AccountId, customer_name AS Name,
+                    customer_birthday AS Birthday, customer_phone AS Phone, customer_house_number AS HouseNumber,
+                    customer_street AS Street, customer_ward_id AS WardId, customer_district_id AS DistrictId,
+                    customer_city_id AS CityId, customer_avatar_url AS AvatarUrl, customer_gender AS Gender,
+                    customer_status AS Status
+                FROM {TableName}
+                WHERE {colIdName} = @Input";
+        }
+
         protected override string GetInsertQuery()
         {
             return $@"
@@ -77,21 +91,6 @@ namespace ProjectShop.Server.Infrastructure.Data
                     customer_city_id AS CityId, customer_avatar_url AS AvatarUrl, customer_gender AS Gender,
                     customer_status AS Status
                 FROM {TableName} WHERE {colName} LIKE @Input";
-        }
-
-        protected override string GetDataQuery(string colIdName)
-        {
-            CheckColumnName(colIdName);
-            string colIdNamePascal = Converter.SnakeCaseToPascalCase(colIdName);
-            return $@"
-                SELECT
-                    customer_id AS CustomerId, account_id AS AccountId, customer_name AS Name,
-                    customer_birthday AS Birthday, customer_phone AS Phone, customer_house_number AS HouseNumber,
-                    customer_street AS Street, customer_ward_id AS WardId, customer_district_id AS DistrictId,
-                    customer_city_id AS CityId, customer_avatar_url AS AvatarUrl, customer_gender AS Gender,
-                    customer_status AS Status
-                FROM {TableName}
-                WHERE {colIdName} = @{colIdNamePascal}";
         }
 
         private string GetByMonthAndYear(string colName)
@@ -227,15 +226,9 @@ namespace ProjectShop.Server.Infrastructure.Data
         {
             try
             {
-                string query = $@"
-                    SELECT
-                        customer_id AS CustomerId, account_id AS AccountId, customer_name AS Name,
-                        customer_birthday AS Birthday, customer_phone AS Phone, customer_house_number AS HouseNumber,
-                        customer_street AS Street, customer_ward_id AS WardId, customer_district_id AS DistrictId,
-                        customer_city_id AS CityId, customer_avatar_url AS AvatarUrl, customer_gender AS Gender, customer_status AS Status
-                    FROM {TableName} WHERE customer_status = @Status";
+                string query = GetDataQuery("customer_status");
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<CustomerModel> customers = await connection.QueryAsync<CustomerModel>(query, new { Status = status });
+                IEnumerable<CustomerModel> customers = await connection.QueryAsync<CustomerModel>(query, new { Input = status });
                 return customers.AsList();
             }
             catch (Exception ex)
@@ -248,15 +241,9 @@ namespace ProjectShop.Server.Infrastructure.Data
         {
             try
             {
-                string query = $@"
-                    SELECT
-                        customer_id AS CustomerId, account_id AS AccountId, customer_name AS Name,
-                        customer_birthday AS Birthday, customer_phone AS Phone, customer_house_number AS HouseNumber,
-                        customer_street AS Street, customer_ward_id AS WardId, customer_district_id AS DistrictId,
-                        customer_city_id AS CityId, customer_avatar_url AS AvatarUrl, customer_gender AS Gender, customer_status AS Status
-                    FROM {TableName} WHERE customer_gender = @Gender";
+                string query = GetDataQuery("customer_gender");
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<CustomerModel> customers = await connection.QueryAsync<CustomerModel>(query, new { Gender = gender });
+                IEnumerable<CustomerModel> customers = await connection.QueryAsync<CustomerModel>(query, new { Input = gender });
                 return customers.AsList();
             }
             catch (Exception ex)
