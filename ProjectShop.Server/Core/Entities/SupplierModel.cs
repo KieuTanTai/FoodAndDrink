@@ -1,4 +1,4 @@
-// File: Supplier.cs
+﻿// File: Supplier.cs
 using ProjectShop.Server.Core.Interfaces.IEntities;
 
 namespace ProjectShop.Server.Core.Entities
@@ -17,68 +17,38 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'supplier_email' (VARCHAR(100))
         public string SupplierEmail { get; private set; }
 
-        // Corresponds to 'supplier_company_house_number' (VARCHAR(20))
-        public string SupplierCompanyHouseNumber { get; private set; }
+        // Corresponds to 'company_location_id' (INT UNSIGNED)
+        public uint? CompanyLocationId { get; private set; }
+        public LocationModel CompanyLocation { get; private set; } = null!;
 
-        // Corresponds to 'supplier_company_street' (NVARCHAR(40))
-        public string SupplierCompanyStreet { get; private set; }
-
-        // Corresponds to 'supplier_company_ward_id' (INT UNSIGNED)
-        public uint? SupplierCompanyWardId { get; private set; }
-
-        // Corresponds to 'supplier_company_district_id' (INT UNSIGNED)
-        public uint? SupplierCompanyDistrictId { get; private set; }
-
-        // Corresponds to 'supplier_company_city_id' (INT UNSIGNED)
-        public uint? SupplierCompanyCityId { get; private set; }
-
-        // Corresponds to 'supplier_store_house_number' (VARCHAR(20))
-        public string SupplierStoreHouseNumber { get; private set; }
-
-        // Corresponds to 'supplier_store_street' (NVARCHAR(40))
-        public string SupplierStoreStreet { get; private set; }
-
-        // Corresponds to 'supplier_store_ward_id' (INT UNSIGNED)
-        public uint? SupplierStoreWardId { get; private set; }
-
-        // Corresponds to 'supplier_store_district_id' (INT UNSIGNED)
-        public uint? SupplierStoreDistrictId { get; private set; }
-
-        // Corresponds to 'supplier_store_city_id' (INT UNSIGNED)
-        public uint? SupplierStoreCityId { get; private set; }
+        // Corresponds to 'store_location_id' (INT UNSIGNED)
+        public uint? StoreLocationId { get; private set; }
+        public LocationModel StoreLocation { get; private set; } = null!;
 
         // Corresponds to 'supplier_status' (TINYINT(1))
         public bool SupplierStatus { get; private set; }
 
-        // Corresponds to 'cooperationDate' (DATETIME)
-        public DateTime SupplierCooperationDate { get; private set; } = DateTime.UtcNow;
+        // Corresponds to 'supplier_cooperation_date' (DATETIME)
+        public DateTime SupplierCooperationDate { get; private set; }
 
-        // Navigation properties
-        public LocationWardModel? SupplierCompanyWard { get; private set; }
-        public LocationDistrictModel? SupplierCompanyDistrict { get; private set; }
-        public LocationCityModel? SupplierCompanyCity { get; private set; }
-        public LocationWardModel? SupplierStoreWard { get; private set; }
-        public LocationDistrictModel? SupplierStoreDistrict { get; private set; }
-        public LocationCityModel? SupplierStoreCity { get; private set; }
+        // Navigation property: Một supplier có thể cung cấp nhiều sản phẩm
         public ICollection<ProductModel> Products { get; private set; } = new List<ProductModel>();
 
-        public SupplierModel(uint supplierId, string supplierName, string supplierPhone, string supplierEmail, string supplierCompanyHouseNumber, string supplierCompanyStreet, uint? supplierCompanyWardId, uint? supplierCompanyDistrictId, 
-            uint? supplierCompanyCityId, string supplierStoreHouseNumber, string supplierStoreStreet, uint? supplierStoreWardId, uint? supplierStoreDistrictId, uint? supplierStoreCityId, bool supplierStatus, DateTime supplierCooperationDate)
+        public SupplierModel(uint supplierId,
+                        string supplierName,
+                        string supplierPhone,
+                        string supplierEmail,
+                        uint? companyLocationId,
+                        uint? storeLocationId,
+                        bool supplierStatus,
+                        DateTime supplierCooperationDate)
         {
             SupplierId = supplierId;
             SupplierName = supplierName;
             SupplierPhone = supplierPhone;
             SupplierEmail = supplierEmail;
-            SupplierCompanyHouseNumber = supplierCompanyHouseNumber;
-            SupplierCompanyStreet = supplierCompanyStreet;
-            SupplierCompanyWardId = supplierCompanyWardId;
-            SupplierCompanyDistrictId = supplierCompanyDistrictId;
-            SupplierCompanyCityId = supplierCompanyCityId;
-            SupplierStoreHouseNumber = supplierStoreHouseNumber;
-            SupplierStoreStreet = supplierStoreStreet;
-            SupplierStoreWardId = supplierStoreWardId;
-            SupplierStoreDistrictId = supplierStoreDistrictId;
-            SupplierStoreCityId = supplierStoreCityId;
+            CompanyLocationId = companyLocationId;
+            StoreLocationId = storeLocationId;
             SupplierStatus = supplierStatus;
             SupplierCooperationDate = supplierCooperationDate;
         }
@@ -86,4 +56,3 @@ namespace ProjectShop.Server.Core.Entities
         public uint GetIdEntity() => SupplierId;
     }
 }
-

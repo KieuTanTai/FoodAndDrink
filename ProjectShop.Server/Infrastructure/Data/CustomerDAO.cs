@@ -23,9 +23,8 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"
                 SELECT
                     customer_id AS CustomerId, account_id AS AccountId, customer_name AS Name,
-                    customer_birthday AS Birthday, customer_phone AS Phone, customer_house_number AS HouseNumber,
-                    customer_street AS Street, customer_ward_id AS WardId, customer_district_id AS DistrictId,
-                    customer_city_id AS CityId, customer_avatar_url AS AvatarUrl, customer_gender AS Gender,
+                    customer_birthday AS Birthday, customer_phone AS Phone, customer_email AS Email,
+                    customer_avatar_url AS AvatarUrl, customer_gender AS Gender,
                     customer_status AS Status
                 FROM {TableName}";
         }
@@ -36,9 +35,8 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"
                 SELECT
                     customer_id AS CustomerId, account_id AS AccountId, customer_name AS Name,
-                    customer_birthday AS Birthday, customer_phone AS Phone, customer_house_number AS HouseNumber,
-                    customer_street AS Street, customer_ward_id AS WardId, customer_district_id AS DistrictId,
-                    customer_city_id AS CityId, customer_avatar_url AS AvatarUrl, customer_gender AS Gender,
+                    customer_birthday AS Birthday, customer_phone AS Phone, customer_email AS Email,
+                    customer_avatar_url AS AvatarUrl, customer_gender AS Gender,
                     customer_status AS Status
                 FROM {TableName}
                 WHERE {colIdName} = @Input";
@@ -49,14 +47,12 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"
                 INSERT INTO {TableName} (
                     account_id, customer_name, customer_birthday, customer_phone,
-                    customer_house_number, customer_street, customer_ward_id,
-                    customer_district_id, customer_city_id, customer_avatar_url,
+                    customer_email, customer_avatar_url,
                     customer_gender, customer_status
                 )
                 VALUES (
                     @AccountId, @Name, @Birthday, @Phone,
-                    @HouseNumber, @Street, @WardId,
-                    @DistrictId, @CityId, @AvatarUrl,
+                    @Email, @AvatarUrl,
                     @Gender, @Status
                 ); SELECT LAST_INSERT_ID();";
         }
@@ -69,11 +65,7 @@ namespace ProjectShop.Server.Infrastructure.Data
                     customer_name = @Name,
                     customer_birthday = @Birthday,
                     customer_phone = @Phone,
-                    customer_house_number = @HouseNumber,
-                    customer_street = @Street,
-                    customer_ward_id = @WardId,
-                    customer_district_id = @DistrictId,
-                    customer_city_id = @CityId,
+                    customer_email = @Email,
                     customer_avatar_url = @AvatarUrl,
                     customer_gender = @Gender,
                     customer_status = @Status
@@ -86,9 +78,8 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"
                 SELECT
                     customer_id AS CustomerId, account_id AS AccountId, customer_name AS Name,
-                    customer_birthday AS Birthday, customer_phone AS Phone, customer_house_number AS HouseNumber,
-                    customer_street AS Street, customer_ward_id AS WardId, customer_district_id AS DistrictId,
-                    customer_city_id AS CityId, customer_avatar_url AS AvatarUrl, customer_gender AS Gender,
+                    customer_birthday AS Birthday, customer_phone AS Phone, 
+                    customer_email AS Email, customer_avatar_url AS AvatarUrl, customer_gender AS Gender,
                     customer_status AS Status
                 FROM {TableName} WHERE {colName} LIKE @Input";
         }
@@ -99,9 +90,9 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"
                     SELECT
                         customer_id AS CustomerId, account_id AS AccountId, customer_name AS Name,
-                        customer_birthday AS Birthday, customer_phone AS Phone, customer_house_number AS HouseNumber,
-                        customer_street AS Street, customer_ward_id AS WardId, customer_district_id AS DistrictId,
-                        customer_city_id AS CityId, customer_avatar_url AS AvatarUrl, customer_gender AS Gender, customer_status AS Status
+                        customer_birthday AS Birthday, customer_phone AS Phone, 
+                        customer_email AS Email, customer_avatar_url AS AvatarUrl, customer_gender AS Gender,
+                        customer_status AS Status
                     FROM {TableName} WHERE YEAR({colName}) = @FirstTime AND MONTH({colName}) = @SecondTime";
         }
 
@@ -111,9 +102,9 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"
                     SELECT
                         customer_id AS CustomerId, account_id AS AccountId, customer_name AS Name,
-                        customer_birthday AS Birthday, customer_phone AS Phone, customer_house_number AS HouseNumber,
-                        customer_street AS Street, customer_ward_id AS WardId, customer_district_id AS DistrictId,
-                        customer_city_id AS CityId, customer_avatar_url AS AvatarUrl, customer_gender AS Gender, customer_status AS Status
+                        customer_birthday AS Birthday, customer_phone AS Phone, 
+                        customer_email AS Email, customer_avatar_url AS AvatarUrl, customer_gender AS Gender,
+                        customer_status AS Status
                     FROM {TableName} WHERE Year({colName}) = @Input";
         }
 
@@ -123,9 +114,9 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"
                     SELECT
                         customer_id AS CustomerId, account_id AS AccountId, customer_name AS Name,
-                        customer_birthday AS Birthday, customer_phone AS Phone, customer_house_number AS HouseNumber,
-                        customer_street AS Street, customer_ward_id AS WardId, customer_district_id AS DistrictId,
-                        customer_city_id AS CityId, customer_avatar_url AS AvatarUrl, customer_gender AS Gender, customer_status AS Status
+                        customer_birthday AS Birthday, customer_phone AS Phone, 
+                        customer_email AS Email, customer_avatar_url AS AvatarUrl, customer_gender AS Gender,
+                        customer_status AS Status
                     FROM {TableName} WHERE {colName} >= @FirstTime AND {colName} < DATE_ADD(@SecondTime, INTERVAL 1 DAY)";
         }
 
@@ -135,9 +126,9 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"
                     SELECT
                         customer_id AS CustomerId, account_id AS AccountId, customer_name AS Name,
-                        customer_birthday AS Birthday, customer_phone AS Phone, customer_house_number AS HouseNumber,
-                        customer_street AS Street, customer_ward_id AS WardId, customer_district_id AS DistrictId,
-                        customer_city_id AS CityId, customer_avatar_url AS AvatarUrl, customer_gender AS Gender, customer_status AS Status
+                        customer_birthday AS Birthday, customer_phone AS Phone, 
+                        customer_email AS Email, customer_avatar_url AS AvatarUrl, customer_gender AS Gender,
+                        customer_status AS Status
                     FROM {TableName} WHERE {colName} = DATE_ADD(@Input, INTERVAL 1 DAY)";
         }
 

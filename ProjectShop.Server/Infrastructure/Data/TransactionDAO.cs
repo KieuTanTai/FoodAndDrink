@@ -23,12 +23,6 @@ namespace ProjectShop.Server.Infrastructure.Data
                       VALUES (@PointWalletId, @InvoiceId, @TransactionDate, @TransactionType, @TransactionCurrentBalance, @TransactionStatus); SELECT LAST_INSERT_ID();";
         }
 
-        private string GetByStatusQuery()
-        {
-            return $@"SELECT * FROM {TableName} 
-                      WHERE transaction_status = @TransactionStatus";
-        }
-
         private string GetByDateTime(string colName)
         {
             CheckColumnName(colName);
@@ -58,9 +52,9 @@ namespace ProjectShop.Server.Infrastructure.Data
         {
             try
             {
-                string query = GetByStatusQuery();
+                string query = GetDataQuery("transaction_status");
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<TransactionModel> result = await connection.QueryAsync<TransactionModel>(query, new { TransactionStatus = status });
+                IEnumerable<TransactionModel> result = await connection.QueryAsync<TransactionModel>(query, new { Input = status });
                 return result.AsList();
             }
             catch (Exception ex)

@@ -10,15 +10,9 @@ namespace ProjectShop.Server.Core.Entities
 
         public DateTime Birthday { get; private set; }
         public string Phone { get; private set; }
+
+        public string Email { get; private set; } = string.Empty; // Email có thể để trống nếu không cần thiết.
         public string Name { get; private set; }
-
-        public string HouseNumber { get; private set; }
-        public string Street { get; private set; }
-
-        // Các khóa ngoại và đối tượng điều hướng cho địa chỉ
-        public uint? WardId { get; private set; }
-        public uint? DistrictId { get; private set; }
-        public uint? CityId { get; private set; }
 
         public string AvatarUrl { get; private set; }
         public bool Gender { get; private set; }
@@ -31,20 +25,16 @@ namespace ProjectShop.Server.Core.Entities
         public LocationCityModel? City { get; private set; }
 
         // Constructor cho lớp cơ sở.
-        public PersonModel(uint accountId, DateTime birthday, string phone, string name, string houseNumber, string street, uint? wardId, uint? districtId, uint? cityId, string avatarUrl, bool gender, bool status)
+        public PersonModel(uint accountId, DateTime birthday, string phone, string name, string email, string avatarUrl, bool gender, bool status)
         {
             AccountId = accountId;
             Birthday = birthday;
             Phone = phone;
             Name = name;
-            HouseNumber = houseNumber;
-            Street = street;
-            WardId = wardId;
-            DistrictId = districtId;
-            CityId = cityId;
             AvatarUrl = avatarUrl;
             Gender = gender;
             Status = status;
+            Email = email;
         }
 
         // Phương thức trừu tượng phải được triển khai bởi các lớp con.

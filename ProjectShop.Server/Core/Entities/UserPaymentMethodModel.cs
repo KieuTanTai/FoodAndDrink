@@ -17,49 +17,50 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'account_id' (INT UNSIGNED)
         public uint CustomerId { get; private set; }
 
-        // Corresponds to 'added_date' (DATETIME)
-        public DateTime AddedDate { get; private set; }
+        // Corresponds to 'payment_method_added_date' (DATETIME)
+        public DateTime PaymentMethodAddedDate { get; private set; }
 
-        // Corresponds to 'last_updated_date' (DATETIME)
-        public DateTime LastUpdatedDate { get; private set; }
+        // Corresponds to 'payment_method_last_updated_date' (DATETIME)
+        public DateTime PaymentMethodLastUpdatedDate { get; private set; }
 
-        // Corresponds to 'status' (ENUM)
-        public string Status { get; private set; }
+        // Corresponds to 'payment_method_status' (TINYINT)
+        public int PaymentMethodStatus { get; private set; }
 
-        // Corresponds to 'display_name' (VARCHAR(50))
-        public string DisplayName { get; private set; }
+        // Corresponds to 'payment_method_display_name' (VARCHAR(50))
+        public string PaymentMethodDisplayName { get; private set; }
 
-        // Corresponds to 'last_four_digit' (VARCHAR(4))
-        public string LastFourDigit { get; private set; }
+        // Corresponds to 'payment_method_last_four_digit' (VARCHAR(4))
+        public string PaymentMethodLastFourDigit { get; private set; }
 
-        // Corresponds to 'expiry_year' (INT)
-        public int ExpiryYear { get; private set; }
+        // Corresponds to 'payment_method_expiry_year' (INT)
+        public int PaymentMethodExpiryYear { get; private set; }
 
-        // Corresponds to 'expiry_month' (INT)
-        public int ExpiryMonth { get; private set; }
+        // Corresponds to 'payment_method_expiry_month' (INT)
+        public int PaymentMethod_ExpiryMonth { get; private set; }
 
-        // Corresponds to 'token' (VARCHAR(255))
-        public string Token { get; private set; }
+        // Corresponds to 'payment_method_token' (VARCHAR(255))
+        public string PaymentMethodToken { get; private set; }
 
         // Navigation property
         public BankModel? Bank { get; private set; }
         public CustomerModel Customer { get; private set; } = null!;
         public ICollection<InvoiceModel> Invoices { get; private set; } = new List<InvoiceModel>();
 
-        public UserPaymentMethodModel(uint userPaymentMethodId, string paymentMethodType, uint? bankId, uint customerId, DateTime addedDate, DateTime lastUpdatedDate, string status, string displayName, string lastFourDigit, int expiryYear, int expiryMonth, string token)
+        public UserPaymentMethodModel(uint userPaymentMethodId, string paymentMethodType, uint? bankId, uint customerId, DateTime paymentMethodAddedDate, DateTime paymentMethodLastUpdatedDate, int paymentMethodStatus,
+            string paymentMethodDisplayName, string paymentMethodLastFourDigit, int paymentMethodExpiryYear, int paymentMethod_ExpiryMonth, string paymentMethodToken)
         {
             UserPaymentMethodId = userPaymentMethodId;
             PaymentMethodType = paymentMethodType;
             BankId = bankId;
             CustomerId = customerId;
-            AddedDate = addedDate;
-            LastUpdatedDate = lastUpdatedDate;
-            Status = status;
-            DisplayName = displayName;
-            LastFourDigit = lastFourDigit;
-            ExpiryYear = expiryYear;
-            ExpiryMonth = expiryMonth;
-            Token = token;
+            PaymentMethodAddedDate = paymentMethodAddedDate;
+            PaymentMethodLastUpdatedDate = paymentMethodLastUpdatedDate;
+            PaymentMethodStatus = paymentMethodStatus;
+            PaymentMethodDisplayName = paymentMethodDisplayName;
+            PaymentMethodLastFourDigit = paymentMethodLastFourDigit;
+            PaymentMethodExpiryYear = paymentMethodExpiryYear;
+            PaymentMethod_ExpiryMonth = paymentMethod_ExpiryMonth;
+            PaymentMethodToken = paymentMethodToken;
         }
 
         public uint GetIdEntity() => UserPaymentMethodId;

@@ -23,9 +23,9 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"
                 SELECT
                     employee_id AS EmployeeId, account_id AS AccountId, employee_name AS Name,
-                    employee_birthday AS Birthday, employee_phone AS Phone, employee_house_number AS HouseNumber,
-                    employee_street AS Street, employee_ward_id AS WardId, employee_district_id AS DistrictId,
-                    employee_city_id AS CityId, employee_avatar_url AS AvatarUrl, employee_gender AS Gender,
+                    employee_birthday AS Birthday, employee_phone AS Phone, employee_email AS Email, employee_house_number,
+                    employee_street, employee_ward_id, employee_district_id, location_id,
+                    employee_city_id, employee_avatar_url AS AvatarUrl, employee_gender AS Gender,
                     employee_status AS Status
                 FROM {TableName}";
         }
@@ -37,9 +37,9 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"
                 SELECT
                     employee_id AS EmployeeId, account_id AS AccountId, employee_name AS Name,
-                    employee_birthday AS Birthday, employee_phone AS Phone, employee_house_number AS HouseNumber,
-                    employee_street AS Street, employee_ward_id AS WardId, employee_district_id AS DistrictId,
-                    employee_city_id AS CityId, employee_avatar_url AS AvatarUrl, employee_gender AS Gender,
+                    employee_birthday AS Birthday, employee_phone AS Phone, employee_email AS Email, employee_house_number,
+                    employee_street, employee_ward_id, employee_district_id, location_id,
+                    employee_city_id, employee_avatar_url AS AvatarUrl, employee_gender AS Gender,
                     employee_status AS Status
                 FROM {TableName}
                 WHERE {colIdName} = @Input";
@@ -52,13 +52,13 @@ namespace ProjectShop.Server.Infrastructure.Data
                     account_id, employee_name, employee_birthday, employee_phone,
                     employee_house_number, employee_street, employee_ward_id,
                     employee_district_id, employee_city_id, employee_avatar_url,
-                    employee_gender, employee_status
+                    employee_gender, employee_status, location_id
                 )
                 VALUES (
                     @AccountId, @Name, @Birthday, @Phone,
                     @HouseNumber, @Street, @WardId,
                     @DistrictId, @CityId, @AvatarUrl,
-                    @Gender, @Status
+                    @Gender, @Status, @LocationId
                 ); SELECT LAST_INSERT_ID();";
         }
         protected override string GetUpdateQuery()
@@ -70,14 +70,16 @@ namespace ProjectShop.Server.Infrastructure.Data
                     employee_name = @Name,
                     employee_birthday = @Birthday,
                     employee_phone = @Phone,
-                    employee_house_number = @HouseNumber,
-                    employee_street = @Street,
-                    employee_ward_id = @WardId,
-                    employee_district_id = @DistrictId,
-                    employee_city_id = @CityId,
+                    employee_house_number = @EmployeeHouseNumber,
+                    employee_street = @EmployeeStreet,
+                    employee_ward_id = @EmployeeWardId,
+                    employee_district_id = @DEmployeeistrictId,
+                    employee_city_id = @EmployeeCityId,
                     employee_avatar_url = @AvatarUrl,
                     employee_gender = @Gender,
-                    employee_status = @Status
+                    employee_status = @Status,
+                    employee_email = @Email,
+                    location_id = @LocationId   
                 WHERE {ColumnIdName} = @{colIdName}";
         }
 
@@ -87,9 +89,9 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"
                 SELECT
                     employee_id AS EmployeeId, account_id AS AccountId, employee_name AS Name,
-                    employee_birthday AS Birthday, employee_phone AS Phone, employee_house_number AS HouseNumber,
-                    employee_street AS Street, employee_ward_id AS WardId, employee_district_id AS DistrictId,
-                    employee_city_id AS CityId, employee_avatar_url AS AvatarUrl, employee_gender AS Gender,
+                    employee_birthday AS Birthday, employee_phone AS Phone, employee_email AS Email, employee_house_number,
+                    employee_street, employee_ward_id, employee_district_id, location_id,
+                    employee_city_id, employee_avatar_url AS AvatarUrl, employee_gender AS Gender,
                     employee_status AS Status
                 FROM {TableName} WHERE {colName} LIKE @Input";
         }
@@ -100,9 +102,9 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"
                     SELECT
                         employee_id AS EmployeeId, account_id AS AccountId, employee_name AS Name,
-                        employee_birthday AS Birthday, employee_phone AS Phone, employee_house_number AS HouseNumber,
-                        employee_street AS Street, employee_ward_id AS WardId, employee_district_id AS DistrictId,
-                        employee_city_id AS CityId, employee_avatar_url AS AvatarUrl, employee_gender AS Gender, employee_status AS Status
+                        employee_birthday AS Birthday, employee_phone AS Phone, employee_email AS Email,
+                        employee_house_number, employee_street, employee_ward_id, employee_district_id, location_id,
+                        employee_city_id, employee_avatar_url AS AvatarUrl, employee_gender AS Gender, employee_status AS Status
                     FROM {TableName} WHERE YEAR({colName}) = @FirstTime AND MONTH({colName}) = @SecondTime";
         }
 
@@ -112,9 +114,9 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"
                     SELECT
                         employee_id AS EmployeeId, account_id AS AccountId, employee_name AS Name,
-                        employee_birthday AS Birthday, employee_phone AS Phone, employee_house_number AS HouseNumber,
-                        employee_street AS Street, employee_ward_id AS WardId, employee_district_id AS DistrictId,
-                        employee_city_id AS CityId, employee_avatar_url AS AvatarUrl, employee_gender AS Gender, employee_status AS Status
+                        employee_birthday AS Birthday, employee_phone AS Phone, employee_email AS Email, employee_house_number,
+                        employee_street, employee_ward_id, employee_district_id, location_id,
+                        employee_city_id, employee_avatar_url AS AvatarUrl, employee_gender AS Gender, employee_status AS Status
                     FROM {TableName} WHERE Year({colName}) = @Input";
         }
 
@@ -124,9 +126,9 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"
                     SELECT
                         employee_id AS EmployeeId, account_id AS AccountId, employee_name AS Name,
-                        employee_birthday AS Birthday, employee_phone AS Phone, employee_house_number AS HouseNumber,
-                        employee_street AS Street, employee_ward_id AS WardId, employee_district_id AS DistrictId,
-                        employee_city_id AS CityId, employee_avatar_url AS AvatarUrl, employee_gender AS Gender, employee_status AS Status
+                        employee_birthday AS Birthday, employee_phone AS Phone, employee_email AS Email, employee_house_number,
+                        employee_street, employee_ward_id, employee_district_id, location_id,
+                        employee_city_id, employee_avatar_url AS AvatarUrl, employee_gender AS Gender, employee_status AS Status
                     FROM {TableName} WHERE {colName} >= @FirstTime AND {colName} < DATE_ADD(@SecondTime, INTERVAL 1 DAY)";
         }
 
@@ -136,9 +138,9 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"
                     SELECT
                         employee_id AS EmployeeId, account_id AS AccountId, employee_name AS Name,
-                        employee_birthday AS Birthday, employee_phone AS Phone, employee_house_number AS HouseNumber,
-                        employee_street AS Street, employee_ward_id AS WardId, employee_district_id AS DistrictId,
-                        employee_city_id AS CityId, employee_avatar_url AS AvatarUrl, employee_gender AS Gender, employee_status AS Status
+                        employee_birthday AS Birthday, employee_phone AS Phone, employee_email AS Email, employee_house_number,
+                        employee_street, employee_ward_id, employee_district_id, location_id,
+                        employee_city_id, employee_avatar_url AS AvatarUrl, employee_gender AS Gender, employee_status AS Status
                     FROM {TableName} WHERE {colName} = DATE_ADD(@Input, INTERVAL 1 DAY)";
         }
 

@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Configuration;
@@ -134,6 +135,8 @@ namespace ProjectShop.Server.Infrastructure.Data
         {
             try
             {
+                if (tEnum is not EInventoryMovementReason)
+                    throw new ArgumentException($"Enum type {typeof(TEnum).Name} is not a valid inventory movement reason.");
                 string query = GetDataQuery(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<InventoryMovementModel> movements = await connection.QueryAsync<InventoryMovementModel>(query, new { Input = tEnum.ToDbValue() });
@@ -150,6 +153,8 @@ namespace ProjectShop.Server.Infrastructure.Data
         {
             try
             {
+                if (tEnum is not EInventoryMovementReason)
+                    throw new ArgumentException($"Enum type {typeof(TEnum).Name} is not a valid inventory movement reason.");
                 string query = GetDataQuery(colName);
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 InventoryMovementModel? movement = await connection.QueryFirstOrDefaultAsync<InventoryMovementModel>(query, new { Input = tEnum.ToDbValue() });

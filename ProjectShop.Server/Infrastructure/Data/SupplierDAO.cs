@@ -21,37 +21,23 @@ namespace ProjectShop.Server.Infrastructure.Data
         protected override string GetInsertQuery()
         {
             // add field `supplier_cooperation_date` if needed
-            return $@"INSERT INTO {TableName} (
-                `supplier_name`,
-                `supplier_phone`,
-                `supplier_email`,
-                `supplier_company_house_number`,
-                `supplier_company_street`,
-                `supplier_company_ward_id`,
-                `supplier_company_district_id`,
-                `supplier_company_city_id`,
-                `supplier_store_house_number`,
-                `supplier_store_street`,
-                `supplier_store_ward_id`,
-                `supplier_store_district_id`,
-                `supplier_store_city_id`,
-                `supplier_status`
-            ) VALUES (
-                @SupplierName,
-                @SupplierPhone,
-                @SupplierEmail,
-                @SupplierCompanyHouseNumber,
-                @SupplierCompanyStreet,
-                @SupplierCompanyWardId,
-                @SupplierCompanyDistrictId,
-                @SupplierCompanyCityId,
-                @SupplierStoreHouseNumber,
-                @SupplierStoreStreet,
-                @SupplierStoreWardId,
-                @SupplierStoreDistrictId,
-                @SupplierStoreCityId,
-                @SupplierStatus
-            ); SELECT LAST_INSERT_ID();";
+            return $@"
+                INSERT INTO {TableName} (
+                    `supplier_name`,
+                    `supplier_phone`,
+                    `supplier_email`,
+                    `company_location_id`,
+                    `store_location_id`,
+                    `supplier_status`
+                ) VALUES (
+                    @SupplierName,
+                    @SupplierPhone,
+                    @SupplierEmail,
+                    @CompanyLocationId,
+                    @StoreLocationId,
+                    @SupplierStatus
+                );
+                SELECT LAST_INSERT_ID();";
         }
 
         private string GetByStatusQuery()
