@@ -1,13 +1,13 @@
-﻿using Dapper;
-using ProjectShop.Server.Core.Entities;
+﻿using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
-using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class SaleEventImageDAO : BaseDAO<SaleEventImageModel>, IGetAllByIdAsync<SaleEventImageModel>, IGetDataByDateTimeAsync<SaleEventImageModel>
+    public class SaleEventImageDAO : BaseDAO<SaleEventImageModel>, ISaleEventImageDAO<SaleEventImageModel>
     {
         public SaleEventImageDAO(
             IDbConnectionFactory connectionFactory,
@@ -17,6 +17,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             : base(connectionFactory, colService, converter, checker, "sale_event_image", "sale_event_image_id", string.Empty)
         {
         }
+
         protected override string GetInsertQuery()
         {
             return $@"INSERT INTO {TableName} (sale_event_id, sale_event_image_url, sale_event_image_priority) 
@@ -26,110 +27,56 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         protected override string GetUpdateQuery()
         {
-            string colIdName = Converter.SnakeCaseToPascalCase(ColumnIdName); 
+            string colIdName = Converter.SnakeCaseToPascalCase(ColumnIdName);
             return $@"UPDATE {TableName} 
                       SET sale_event_image_url = @SaleEventImageUrl, 
                           sale_event_image_priority = @SaleEventImagePriority 
                       WHERE {ColumnIdName} = @{colIdName};";
         }
 
-        private string GetDataByDateTime(string colName)
+        public async Task<IEnumerable<SaleEventImageModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} = DATE_ADD(@Input, INTERVAL 1 DAY)";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("sale_event_image_created_date", EQueryTimeType.DATE_TIME, ct, dateTime);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        private string GetDataByYear(string colName)
+        public async Task<IEnumerable<SaleEventImageModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate)
+            => await GetByDateTimeAsync("sale_event_image_created_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate));
+
+        public async Task<IEnumerable<SaleEventImageModel>> GetByMonthAndYearAsync(int year, int month)
+            => await GetByDateTimeAsync("sale_event_image_created_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+
+        public async Task<IEnumerable<SaleEventImageModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE Year({colName}) = @Input";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("sale_event_image_created_date", EQueryTimeType.YEAR, ct, year);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        private string GetDataByMonthAndYear(string colName)
+        // ----------- LastUpdatedDate -----------
+        public async Task<IEnumerable<SaleEventImageModel>> GetByLastUpdatedDateAsync<TCompareType>(DateTime lastUpdated, TCompareType compareType) where TCompareType : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE YEAR({colName}) = @FirstTime AND MONTH({colName}) = @SecondTime";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("sale_event_image_last_updated_date", EQueryTimeType.DATE_TIME, ct, lastUpdated);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        private string GetDataByDateTimeRange(string colName)
+        public async Task<IEnumerable<SaleEventImageModel>> GetByLastUpdatedDateTimeRangeAsync(DateTime start, DateTime end)
+            => await GetByDateTimeAsync("sale_event_image_last_updated_date", EQueryTimeType.DATE_TIME_RANGE, (start, end));
+
+        public async Task<IEnumerable<SaleEventImageModel>> GetByLastUpdatedMonthAndYearAsync(int month, int year)
+            => await GetByDateTimeAsync("sale_event_image_last_updated_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+
+        public async Task<IEnumerable<SaleEventImageModel>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType) where TCompareType : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} >= @FirstTime AND {colName} < DATE_ADD(@SecondTime, INTERVAL 1 DAY)";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("sale_event_image_last_updated_date", EQueryTimeType.YEAR, ct, year);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<List<SaleEventImageModel>> GetAllByIdAsync(string id, string colIdName = "sale_event_id")
-        {
-            try
-            {
-                string query = GetDataQuery(colIdName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<SaleEventImageModel> saleEventImages = await connection.QueryAsync<SaleEventImageModel>(query, new { Input = id });
-                return saleEventImages.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error fetching Sale Event Images by ID: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<SaleEventImageModel>> GetAllByDateTimeAsync(DateTime input, string colName = "sale_event_image_created_date")
-        {
-            try
-            {
-                string query = GetDataByDateTime(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<SaleEventImageModel> saleEventImages = await connection.QueryAsync<SaleEventImageModel>(query, new { Input = input });
-                return saleEventImages.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error fetching Sale Event Images by DateTime: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<SaleEventImageModel>> GetAllByYearAsync(int year, string colName = "sale_event_image_created_date")
-        {
-            try
-            {
-                string query = GetDataByYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<SaleEventImageModel> saleEventImages = await connection.QueryAsync<SaleEventImageModel>(query, new { Input = year });
-                return saleEventImages.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error fetching Sale Event Images by Year: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<SaleEventImageModel>> GetAllByMonthAndYearAsync(int year, int month, string colName = "sale_event_image_created_date")
-        {
-            try
-            {
-                string query = GetDataByMonthAndYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<SaleEventImageModel> saleEventImages = await connection.QueryAsync<SaleEventImageModel>(query, new { FirstTime = year, SecondTime = month });
-                return saleEventImages.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error fetching Sale Event Images by Month and Year: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<SaleEventImageModel>> GetAllByDateTimeRangeAsync(DateTime startDate, DateTime endDate, string colName = "sale_event_image_created_date")
-        {
-            try
-            {
-                string query = GetDataByDateTimeRange(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<SaleEventImageModel> saleEventImages = await connection.QueryAsync<SaleEventImageModel>(query, new { FirstTime = startDate, SecondTime = endDate });
-                return saleEventImages.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error fetching Sale Event Images by DateTime Range: {ex.Message}", ex);
-            }
-        }
+        // ----------- SaleEventId -----------
+        public async Task<IEnumerable<SaleEventImageModel>> GetBySaleEventIdAsync(uint saleEventId)
+            => await GetByInputAsync(saleEventId.ToString(), "sale_event_id");
     }
 }

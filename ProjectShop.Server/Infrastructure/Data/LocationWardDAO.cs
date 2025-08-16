@@ -32,42 +32,8 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{locationWardIdName}";
         }
 
-        private string GetRelativeQuery(string colName)
-        {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} LIKE @Input";
-        }
+        public async Task<IEnumerable<LocationWardModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "location_ward_status");
 
-        public async Task<List<LocationWardModel>> GetAllByStatusAsync(bool status)
-        {
-            try
-            {
-                string query = GetDataQuery("location_ward_status");
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<LocationWardModel> wards = await connection.QueryAsync<LocationWardModel>(query, new { Input = status });
-                return wards.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving location wards by status: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<LocationWardModel>> GetRelativeAsync(string input, string colName)
-        {
-            try
-            {
-                string query = GetRelativeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<LocationWardModel> wards = await connection.QueryAsync<LocationWardModel>(query, new { Input = $"%{input}%" });
-                return wards.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving relative location wards: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<LocationWardModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "location_ward_name");
     }
 }

@@ -6,27 +6,29 @@ namespace ProjectShop.Server.Core.Entities
     public class AccountModel : IGetIdEntity<uint>
     {
         // Corresponds to 'account_id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint AccountId { get; private set; }
+        public uint AccountId { get; set; }
 
         // Corresponds to 'user_name' (VARCHAR(20) UNIQUE)
-        public string UserName { get; private set; }
+        public string UserName { get; set; } = string.Empty;
 
         // Corresponds to 'password' (VARCHAR(25))
-        public string Password { get; private set; }
+        public string Password { get; set; } = string.Empty;
 
         // Corresponds to 'account_create_date' (DATETIME)
-        public DateTime AccountCreatedDate { get; private set; }
+        public DateTime AccountCreatedDate { get; set; }
 
         // corresponds to 'account_update_date' (DATETIME)
-        public DateTime AccountLastUpdatedDate { get; private set; } = DateTime.UtcNow;
+        public DateTime AccountLastUpdatedDate { get; set; } = DateTime.UtcNow;
 
         // Corresponds to 'account_status' (TINYINT(1))
-        public bool AccountStatus { get; private set; }
+        public bool AccountStatus { get; set; }
 
         // Navigation properties
-        public CustomerModel Customer { get; private set; } = null!;
-        public EmployeeModel Employee { get; private set; } = null!;
-        public ICollection<RolesOfUserModel> RolesOfUsers { get; private set; } = new List<RolesOfUserModel>();
+        public CustomerModel Customer { get; set; } = null!;
+        public EmployeeModel Employee { get; set; } = null!;
+        public ICollection<RolesOfUserModel> RolesOfUsers { get; set; } = new List<RolesOfUserModel>();
+
+        public AccountModel() { }
 
         public AccountModel(uint accountId, string userName, string password, DateTime accountCreatedDate, DateTime accountLastUpdatedDate, bool accountStatus)
         {

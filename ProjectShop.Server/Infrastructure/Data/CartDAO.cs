@@ -1,11 +1,15 @@
-﻿using ProjectShop.Server.Core.Entities;
+﻿using Dapper;
+using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
+using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class CartDAO : BaseDAO<CartModel>
+    public class CartDAO : BaseDAO<CartModel>, ICartDAO<CartModel>
     {
         public CartDAO(
             IDbConnectionFactory connectionFactory,
@@ -31,5 +35,15 @@ namespace ProjectShop.Server.Infrastructure.Data
                 SET cart_total_price = @CartTotalPrice
                 WHERE {ColumnIdName} = @{colIdName}";
         }
+
+        public async Task<IEnumerable<CartModel>> GetByTotalPriceAsync(decimal minPrice, decimal maxPrice) => await GetByRangeDecimalAsync(minPrice, maxPrice, "cart_total_price");
+
+        public async Task<IEnumerable<CartModel>> GetByTotalPriceAsync<TEnum>(decimal price, TEnum compareType) where TEnum : Enum
+        {
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid comparison type provided.");
+            return await GetByTotalPriceAsync(price, type);
+        }
+
     }
 }

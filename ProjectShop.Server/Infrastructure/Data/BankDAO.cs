@@ -32,42 +32,8 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        private string RelativeQuery(string colName)
-        {
-            CheckColumnName(colName); // It'll throw an exception if the column name is invalid
-            return $"SELECT * FROM {TableName} WHERE {colName} LIKE @input";
-        }
+        public async Task<IEnumerable<BankModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "bank_name");
 
-        public async Task<List<BankModel>> GetRelativeAsync(string input, string colName)
-        {
-            try
-            {
-                string query = RelativeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                if (!input.Contains('%'))
-                    input = $"%{input}%";
-                IEnumerable<BankModel> result = await connection.QueryAsync<BankModel>(query, new { Input = input });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving banks by relative search: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<BankModel>> GetAllByStatusAsync(bool status)
-        {
-            try
-            {
-                string query = GetDataQuery("bank_status");
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<BankModel> result = await connection.QueryAsync<BankModel>(query, new { Input = status });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving banks by status: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<BankModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "bank_status");
     }
 }

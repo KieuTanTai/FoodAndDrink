@@ -6,22 +6,26 @@ namespace ProjectShop.Server.Core.Entities
     public class ProductLotModel : IGetIdEntity<uint>
     {
         // Corresponds to 'product_lot_id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint ProductLotId { get; private set; }
+        public uint ProductLotId { get; set; }
 
         // Corresponds to 'inventory_id' (INT UNSIGNED)
-        public uint InventoryId { get; private set; }
+        public uint InventoryId { get; set; }
 
         // Corresponds to 'product_lot_create_date' (DATETIME)
-        public DateTime ProductLotCreateDate { get; private set; } = DateTime.UtcNow;
+        public DateTime ProductLotCreatedDate { get; set; } = DateTime.UtcNow;
 
         // Navigation properties
-        public ICollection<InventoryModel> Inventories { get; private set; } = new List<InventoryModel>();
+        public ICollection<InventoryModel> Inventories { get; set; } = new List<InventoryModel>();
 
-        public ProductLotModel(uint productLotId, uint inventoryId, DateTime productLotCreateDate)
+        public ProductLotModel(uint productLotId, uint inventoryId, DateTime productLotCreatedDate)
         {
             ProductLotId = productLotId;
             InventoryId = inventoryId;
-            ProductLotCreateDate = productLotCreateDate;
+            ProductLotCreatedDate = productLotCreatedDate;
+        }
+
+        public ProductLotModel()
+        {
         }
 
         public uint GetIdEntity() => ProductLotId;

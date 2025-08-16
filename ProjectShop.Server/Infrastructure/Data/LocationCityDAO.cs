@@ -32,42 +32,8 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        private string GetRelativeQuery(string colName)
-        {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} LIKE @Input;";
-        }
+        public async Task<IEnumerable<LocationCityModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "location_city_name");
 
-        public async Task<List<LocationCityModel>> GetRelativeAsync(string input, string colName)
-        {
-            try
-            {
-                string query = GetRelativeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                if (!input.Contains('%'))
-                    input = $"%{input}%"; // Ensure input is wrapped in wildcards
-                IEnumerable<LocationCityModel> locationCities = await connection.QueryAsync<LocationCityModel>(query, new { Input = input });
-                return locationCities.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(LocationCityDAO)}.{nameof(GetRelativeAsync)}: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<LocationCityModel>> GetAllByStatusAsync(bool status)
-        {
-            try
-            {
-                string query = GetDataQuery("location_city_status");
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<LocationCityModel> result = await connection.QueryAsync<LocationCityModel>(query, new { Input = status });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving LocationCityModels by status: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<LocationCityModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "location_city_status");
     }
 }

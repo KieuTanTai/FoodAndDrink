@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faUserCircle, faLock } from '@fortawesome/free-solid-svg-icons';
 import { faFacebook as faFacebookBrand, faGoogle as faGoogleBrand } from '@fortawesome/free-brands-svg-icons';
 
 const LoginForm: React.FC = () => {
      // State to manage form inputs
-     const [email, setEmail] = useState('');
+     const [username, setUserName] = useState('');
      const [password, setPassword] = useState('');
      const [rememberMe, setRememberMe] = useState(false);
 
@@ -13,7 +13,7 @@ const LoginForm: React.FC = () => {
      const handleSubmit = (e: React.FormEvent) => {
           e.preventDefault();
           // Logic to handle user login
-          console.log('Email:', email);
+          console.log('Username:', username);
           console.log('Mật khẩu:', password);
           console.log('Ghi nhớ tôi:', rememberMe);
           // In a real app, you would send this data to an API
@@ -29,22 +29,22 @@ const LoginForm: React.FC = () => {
                     </div>
 
                     <form className="space-y-4" onSubmit={handleSubmit} id="login-form">
-                         {/* Email input */}
+                         {/* Username input */}
                          <div>
-                              <label htmlFor="login-email" className="sr-only">Email</label>
+                              <label htmlFor="login-username" className="sr-only">Username</label>
                               <div className="relative">
                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <FontAwesomeIcon icon={faEnvelope} className="text-gray-400" />
+                                        <FontAwesomeIcon icon={faUserCircle} className="text-gray-400" />
                                    </div>
                                    <input
-                                        id="login-email"
-                                        name="login_email"
-                                        type="email"
-                                        autoComplete="email"
+                                        id="login-username"
+                                        name="login_username"
+                                        type="text"
+                                        autoComplete="username"
                                         required
-                                        placeholder="Email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="Tài khoản"
+                                        value={username}
+                                        onChange={(e) => setUserName(e.target.value)}
                                         className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none"
                                    />
                               </div>

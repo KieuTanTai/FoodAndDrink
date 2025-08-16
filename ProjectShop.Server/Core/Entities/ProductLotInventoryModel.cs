@@ -17,20 +17,20 @@ namespace ProjectShop.Server.Core.Entities
     public class ProductLotInventoryModel : IGetIdEntity<ProductLotInventoryKey>
     {
         // Corresponds to 'product_lot_id' (UINT)
-        public uint ProductLotId { get; private set; }
+        public uint ProductLotId { get; set; }
 
         // Corresponds to 'inventory_id' (INT UNSIGNED)
-        public uint InventoryId { get; private set; }
+        public uint InventoryId { get; set; }
 
         // Corresponds to 'product_lot_inventory_quantity' (UINT)
-        public uint ProductLotInventoryQuantity { get; private set; }
+        public uint ProductLotInventoryQuantity { get; set; }
 
         // Corresponds to 'product_lot_inventory_added_date' (DATETIME)
-        public DateTime ProductLotInventoryAddedDate { get; private set; }
+        public DateTime ProductLotInventoryAddedDate { get; set; }
 
         // Navigation properties
-        public InventoryModel Inventory { get; private set; } = null!;
-        public ICollection<ProductLotModel> ProductLots { get; private set; } = new List<ProductLotModel>();
+        public InventoryModel Inventory { get; set; } = null!;
+        public ICollection<ProductLotModel> ProductLots { get; set; } = new List<ProductLotModel>();
 
         public ProductLotInventoryModel(uint inventoryId, uint productLotId, uint productLotInventoryQuantity, DateTime productLotInventoryAddedDate)
         {
@@ -39,6 +39,8 @@ namespace ProjectShop.Server.Core.Entities
             ProductLotInventoryQuantity = productLotInventoryQuantity;
             ProductLotInventoryAddedDate = productLotInventoryAddedDate;
         }
+
+        public ProductLotInventoryModel() { }
 
         public ProductLotInventoryKey GetIdEntity() => new ProductLotInventoryKey(InventoryId, ProductLotId);
     }

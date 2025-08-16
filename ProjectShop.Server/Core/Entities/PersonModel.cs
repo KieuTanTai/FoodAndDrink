@@ -6,23 +6,23 @@ namespace ProjectShop.Server.Core.Entities
     {
         // Các thuộc tính chung cho cả nhân viên và khách hàng.
         // Tên thuộc tính được đặt chung để dễ quản lý.
-        public uint AccountId { get; private set; }
+        public uint AccountId { get; set; }
 
-        public DateTime Birthday { get; private set; }
-        public string Phone { get; private set; }
+        public DateTime Birthday { get; set; }
+        public string Phone { get; set; } = string.Empty; // Số điện thoại có thể để trống nếu không cần thiết.
 
-        public string Email { get; private set; } = string.Empty; // Email có thể để trống nếu không cần thiết.
-        public string Name { get; private set; }
+        public string Email { get; set; } = string.Empty; // Email có thể để trống nếu không cần thiết.
+        public string Name { get; set; } = string.Empty; // Tên có thể để trống nếu không cần thiết.
 
-        public string AvatarUrl { get; private set; }
-        public bool Gender { get; private set; }
-        public bool Status { get; private set; }
+        public string AvatarUrl { get; set; } = string.Empty; // Đường dẫn đến ảnh đại diện, có thể để trống nếu không có.
+        public bool Gender { get; set; }
+        public bool Status { get; set; }
 
         // Navigation properties
-        public AccountModel Account { get; private set; } = null!;
-        public LocationWardModel? Ward { get; private set; }
-        public LocationDistrictModel? District { get; private set; }
-        public LocationCityModel? City { get; private set; }
+        public AccountModel Account { get; set; } = null!;
+        public LocationWardModel? Ward { get; set; }
+        public LocationDistrictModel? District { get; set; }
+        public LocationCityModel? City { get; set; }
 
         // Constructor cho lớp cơ sở.
         public PersonModel(uint accountId, DateTime birthday, string phone, string name, string email, string avatarUrl, bool gender, bool status)
@@ -35,6 +35,10 @@ namespace ProjectShop.Server.Core.Entities
             Gender = gender;
             Status = status;
             Email = email;
+        }
+
+        public PersonModel()
+        {
         }
 
         // Phương thức trừu tượng phải được triển khai bởi các lớp con.

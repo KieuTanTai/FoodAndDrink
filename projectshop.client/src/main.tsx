@@ -7,6 +7,7 @@ import Footer from './components/footer';
 import SubHeader from './components/sub-header';
 import ProductContainer from './components/product-container';
 import LoginForm from './pages/login-page';
+import ForgotPasswordForm from './pages/forgot-password-page';
 import SignupForm from './pages/signup-page';
 import Cart from './pages/cart-page';
 import UserPage from './pages/user-page';
@@ -48,6 +49,7 @@ createRoot(document.getElementById('root')!).render(
       ]}
     />
     <LoginForm />
+    <ForgotPasswordForm/>
     <SignupForm />
     <Cart />
     <UserPage></UserPage>

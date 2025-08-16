@@ -18,20 +18,20 @@ namespace ProjectShop.Server.Core.Entities
     public class RolesOfUserModel : IGetIdEntity<uint>
     {
         // Corresponds to 'id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint Id { get; private set; }
+        public uint Id { get; set; }
 
         // Corresponds to 'account_id' (INT UNSIGNED)
-        public uint AccountId { get; private set; }
+        public uint AccountId { get; set; }
 
         // Corresponds to 'role_id' (INT UNSIGNED)
-        public uint RoleId { get; private set; }
+        public uint RoleId { get; set; }
 
         // Corresponds to 'added_date' (DATETIME)
-        public DateTime AddedDate { get; private set; }
+        public DateTime AddedDate { get; set; }
 
         // Navigation properties
-        public AccountModel Account { get; private set; } = null!;
-        public RoleModel Role { get; private set; } = null!;
+        public AccountModel Account { get; set; } = null!;
+        public RoleModel Role { get; set; } = null!;
 
         public RolesOfUserModel(uint id, uint accountId, uint roleId, DateTime addedDate)
         {
@@ -39,6 +39,10 @@ namespace ProjectShop.Server.Core.Entities
             AccountId = accountId;
             RoleId = roleId;
             AddedDate = addedDate;
+        }
+
+        public RolesOfUserModel()
+        {
         }
 
         public uint GetIdEntity() => Id;

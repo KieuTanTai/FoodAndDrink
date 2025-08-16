@@ -6,33 +6,33 @@ namespace ProjectShop.Server.Core.Entities
     public class SupplierModel : IGetIdEntity<uint>
     {
         // Corresponds to 'supplier_id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint SupplierId { get; private set; }
+        public uint SupplierId { get; set; }
 
         // Corresponds to 'supplier_name' (NVARCHAR(100))
-        public string SupplierName { get; private set; }
+        public string SupplierName { get; set; } = string.Empty;
 
         // Corresponds to 'supplier_phone' (VARCHAR(12))
-        public string SupplierPhone { get; private set; }
+        public string SupplierPhone { get; set; } = string.Empty;
 
         // Corresponds to 'supplier_email' (VARCHAR(100))
-        public string SupplierEmail { get; private set; }
+        public string SupplierEmail { get; set; } = string.Empty;
 
         // Corresponds to 'company_location_id' (INT UNSIGNED)
-        public uint? CompanyLocationId { get; private set; }
-        public LocationModel CompanyLocation { get; private set; } = null!;
+        public uint? CompanyLocationId { get; set; }
+        public LocationModel CompanyLocation { get; set; } = null!;
 
         // Corresponds to 'store_location_id' (INT UNSIGNED)
-        public uint? StoreLocationId { get; private set; }
-        public LocationModel StoreLocation { get; private set; } = null!;
+        public uint? StoreLocationId { get; set; }
+        public LocationModel StoreLocation { get; set; } = null!;
 
         // Corresponds to 'supplier_status' (TINYINT(1))
-        public bool SupplierStatus { get; private set; }
+        public bool SupplierStatus { get; set; }
 
         // Corresponds to 'supplier_cooperation_date' (DATETIME)
-        public DateTime SupplierCooperationDate { get; private set; }
+        public DateTime SupplierCooperationDate { get; set; }
 
         // Navigation property: Một supplier có thể cung cấp nhiều sản phẩm
-        public ICollection<ProductModel> Products { get; private set; } = new List<ProductModel>();
+        public ICollection<ProductModel> Products { get; set; } = new List<ProductModel>();
 
         public SupplierModel(uint supplierId,
                         string supplierName,
@@ -51,6 +51,10 @@ namespace ProjectShop.Server.Core.Entities
             StoreLocationId = storeLocationId;
             SupplierStatus = supplierStatus;
             SupplierCooperationDate = supplierCooperationDate;
+        }
+
+        public SupplierModel()
+        {
         }
 
         public uint GetIdEntity() => SupplierId;

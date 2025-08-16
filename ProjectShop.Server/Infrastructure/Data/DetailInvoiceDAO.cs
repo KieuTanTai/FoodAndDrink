@@ -1,13 +1,13 @@
-﻿using Dapper;
-using ProjectShop.Server.Core.Entities;
+﻿using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
-using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class DetailInvoiceDAO : BaseNoneUpdateDAO<DetailInvoiceModel>, IGetByStatusAsync<DetailInvoiceModel>, IGetAllByIdAsync<DetailInvoiceModel>, IGetByRangePriceAsync<DetailInvoiceModel>
+    public class DetailInvoiceDAO : BaseNoneUpdateDAO<DetailInvoiceModel>, IDetailInvoiceDAO<DetailInvoiceModel>
     {
         public DetailInvoiceDAO(
             IDbConnectionFactory connectionFactory,
@@ -24,51 +24,26 @@ namespace ProjectShop.Server.Infrastructure.Data
                       VALUES (@InvoiceId, @ProductBarcode, @DetailInvoiceQuantity, @DetailInvoicePrice, @DetailInvoiceStatus); SELECT LAST_INSERT_ID();";
         }
 
-        public async Task<List<DetailInvoiceModel>> GetAllByStatusAsync(bool status)
+        public async Task<IEnumerable<DetailInvoiceModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "detail_invoice_status");
+
+        public async Task<IEnumerable<DetailInvoiceModel>> GetByInputPriceAsync<TEnum>(decimal price, TEnum compareType) where TEnum : Enum
         {
-            try
-            {
-                string query = $@"SELECT * FROM {TableName} 
-                                 WHERE detail_invoice_status = @Status";
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<DetailInvoiceModel> result = await connection.QueryAsync<DetailInvoiceModel>(query, new { Status = status });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving DetailInvoiceModels by status: {ex.Message}", ex);
-            }
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid compare type provided.");
+            return await GetByDecimalAsync(price, type, "detail_invoice_price");
         }
 
-        public async Task<List<DetailInvoiceModel>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice, string colName = "detail_invoice_price")
-        {
-            try
-            {
-                CheckColumnName(colName);
-                string query = $@"SELECT * FROM {TableName} WHERE {colName} BETWEEN @MinPrice AND @MaxPrice";
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<DetailInvoiceModel> result = await connection.QueryAsync<DetailInvoiceModel>(query, new { MinPrice = minPrice, MaxPrice = maxPrice });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving DetailInvoiceModels by price range: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<DetailInvoiceModel>> GetByInvoiceIdAsync(uint invoiceId) => await GetByInputAsync(invoiceId.ToString(), "invoice_id");
 
-        public async Task<List<DetailInvoiceModel>> GetAllByIdAsync(string id, string colIdName)
+        public async Task<IEnumerable<DetailInvoiceModel>> GetByProductBarcodeAsync(string barcode) => await GetByInputAsync(barcode, "product_barcode");
+
+        public async Task<IEnumerable<DetailInvoiceModel>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice) => await GetByRangeDecimalAsync(minPrice, maxPrice, "detail_invoice_price");
+
+        public async Task<IEnumerable<DetailInvoiceModel>> GetByQuantityAsync<TEnum>(int quantity, TEnum compareType) where TEnum : Enum
         {
-            try
-            {
-                string query = GetDataQuery(colIdName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<DetailInvoiceModel> result = await connection.QueryAsync<DetailInvoiceModel>(query, new { Input = id });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving DetailInvoiceModels by ID: {ex.Message}", ex);
-            }
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid compare type provided.");
+            return await GetByInputAsync(quantity.ToString(), type, "detail_invoice_quantity");
         }
     }
 }

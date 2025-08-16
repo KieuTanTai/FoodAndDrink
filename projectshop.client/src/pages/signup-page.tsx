@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faLock, faUser, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { faFacebook as faFacebookBrand, faGoogle as faGoogleBrand } from '@fortawesome/free-brands-svg-icons';
 
 const SignupForm: React.FC = () => {
      const [name, setName] = useState('');
-     const [email, setEmail] = useState('');
+     const [username, setUserName] = useState('');
      const [password, setPassword] = useState('');
      const [confirmPassword, setConfirmPassword] = useState('');
      const [message, setMessage] = useState('');
@@ -17,7 +17,7 @@ const SignupForm: React.FC = () => {
           setIsError(false);
 
           console.log('Tên:', name);
-          console.log('Email:', email);
+          console.log('Username:', username);
           console.log('Mật khẩu:', password);
           console.log('Nhập lại mật khẩu:', confirmPassword);
 
@@ -63,26 +63,26 @@ const SignupForm: React.FC = () => {
                               <div className="mt-1 h-4 text-xs text-red-500" id="signup-name-error-msg"></div>
                          </div>
 
-                         {/* Email */}
+                         {/* Username */}
                          <div>
-                              <label htmlFor="signup-email" className="sr-only">Email</label>
+                              <label htmlFor="signup-username" className="sr-only">Username</label>
                               <div className="relative">
                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <FontAwesomeIcon icon={faEnvelope} className="text-gray-400" />
+                                        <FontAwesomeIcon icon={faUserCircle} className="text-gray-400" />
                                    </div>
                                    <input
-                                        id="signup-email"
-                                        name="signup_email"
-                                        type="email"
-                                        autoComplete="email"
+                                        id="signup-username"
+                                        name="signup_username"
+                                        type="text"
+                                        autoComplete="username"
                                         required
-                                        placeholder="Email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="Tài khoản"
+                                        value={username}
+                                        onChange={(e) => setUserName(e.target.value)}
                                         className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none"
                                    />
                               </div>
-                              <div className="mt-1 h-4 text-xs text-red-500" id="signup-email-error-msg"></div>
+                              <div className="mt-1 h-4 text-xs text-red-500" id="signup-username-error-msg"></div>
                          </div>
 
                          {/* Mật khẩu */}

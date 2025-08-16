@@ -7,26 +7,26 @@ namespace ProjectShop.Server.Core.Entities
     public class InventoryMovementModel : IGetIdEntity<uint>
     {
         // Corresponds to 'inventory_movement_id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint InventoryMovementId { get; private set; }
+        public uint InventoryMovementId { get; set; }
 
         // Corresponds to 'source_location_id' (INT UNSIGNED)
-        public uint SourceLocationId { get; private set; }
+        public uint SourceLocationId { get; set; }
 
         // Corresponds to 'destination_location_id' (INT UNSIGNED)
-        public uint DestinationLocationId { get; private set; }
+        public uint DestinationLocationId { get; set; }
 
         // Corresponds to 'inventory_movement_quantity' (INT UNSIGNED)
-        public uint InventoryMovementQuantity { get; private set; }
+        public uint InventoryMovementQuantity { get; set; }
 
         // Corresponds to 'inventory_movement_date' (DATETIME)
-        public DateTime InventoryMovementDate { get; private set; }
+        public DateTime InventoryMovementDate { get; set; }
 
         // Corresponds to 'inventory_movement_reason' (TEXT)
-        public EInventoryMovementReason InventoryMovementReason { get; private set; }
+        public EInventoryMovementReason InventoryMovementReason { get; set; }
 
         // Navigation properties
-        public LocationModel SourceLocation { get; private set; } = null!;
-        public LocationModel DestinationLocation { get; private set; } = null!;
+        public LocationModel SourceLocation { get; set; } = null!;
+        public LocationModel DestinationLocation { get; set; } = null!;
 
         public InventoryMovementModel(uint inventoryMovementId, uint sourceLocationId, uint destinationLocationId, uint inventoryMovementQuantity, DateTime inventoryMovementDate, EInventoryMovementReason inventoryMovementReason)
         {
@@ -37,6 +37,8 @@ namespace ProjectShop.Server.Core.Entities
             InventoryMovementDate = inventoryMovementDate;
             InventoryMovementReason = inventoryMovementReason;
         }
+
+        public InventoryMovementModel() { }
 
         public uint GetIdEntity() => InventoryMovementId;
     }

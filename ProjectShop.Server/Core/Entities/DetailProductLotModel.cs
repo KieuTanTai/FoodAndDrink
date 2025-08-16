@@ -16,23 +16,23 @@ namespace ProjectShop.Server.Core.Entities
     public class DetailProductLotModel : IGetIdEntity<DetailProductLotKey>
     {
         // Corresponds to 'product_lot_id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint ProductLotId { get; private set; }
+        public uint ProductLotId { get; set; }
 
         // Corresponds to 'product_barcode' (VARCHAR(20))
-        public string ProductBarcode { get; private set; }
+        public string ProductBarcode { get; set; } = string.Empty;
 
         // Corresponds to 'product_lot_mfg_date' (DATETIME)
-        public DateTime ProductLotMfgDate { get; private set; }
+        public DateTime ProductLotMfgDate { get; set; }
 
         // Corresponds to 'product_lot_exp_date' (DATETIME)
-        public DateTime ProductLotExpDate { get; private set; }
+        public DateTime ProductLotExpDate { get; set; }
 
         // Corresponds to 'product_lot_initial_quantity' (INT)
-        public int ProductLotInitialQuantity { get; private set; }
+        public int ProductLotInitialQuantity { get; set; }
 
         // Navigation properties
-        public ProductModel Product { get; private set; } = null!;
-        public ProductLotModel ProductLot { get; private set; } = null!;
+        public ProductModel Product { get; set; } = null!;
+        public ProductLotModel ProductLot { get; set; } = null!;
 
         public DetailProductLotModel(uint productLotId, string productBarcode, DateTime productLotMfgDate, DateTime productLotExpDate, int productLotInitialQuantity)
         {
@@ -42,6 +42,8 @@ namespace ProjectShop.Server.Core.Entities
             ProductLotExpDate = productLotExpDate;
             ProductLotInitialQuantity = productLotInitialQuantity;
         }
+
+        public DetailProductLotModel() { }
 
         public DetailProductLotKey GetIdEntity() => new DetailProductLotKey(ProductLotId, ProductBarcode);
     }

@@ -1,13 +1,13 @@
-﻿using Dapper;
-using ProjectShop.Server.Core.Entities;
+﻿using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
-using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class RoleDAO : BaseDAO<RoleModel>, IGetRelativeAsync<RoleModel>, IGetByStatusAsync<RoleModel>, IGetDataByDateTimeAsync<RoleModel>
+    public class RoleDAO : BaseDAO<RoleModel>, IRoleDAO<RoleModel>
     {
         public RoleDAO(
             IDbConnectionFactory connectionFactory,
@@ -32,137 +32,54 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        private string GetQueryByDateTime(string colName)
+        public async Task<IEnumerable<RoleModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} 
-                      WHERE {colName} = DATE_ADD(@Input, INTERVAL 1 DAY)";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("role_created_date", EQueryTimeType.DATE_TIME, ct, dateTime);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        private string GetQueryByYear(string colName)
+        public async Task<IEnumerable<RoleModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate)
+            => await GetByDateTimeAsync("role_created_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate));
+
+        public async Task<IEnumerable<RoleModel>> GetByMonthAndYearAsync(int year, int month)
+            => await GetByDateTimeAsync("role_created_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+
+        public async Task<IEnumerable<RoleModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} 
-                      WHERE YEAR({colName}) = @Year";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("role_created_date", EQueryTimeType.YEAR, ct, year);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        private string GetQueryByMonthAndYear(string colName)
+        // ----------- LastUpdatedDate -----------
+        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedDateAsync<TCompareType>(DateTime dateTime, TCompareType compareType) where TCompareType : Enum
         {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} 
-                      WHERE MONTH({colName}) = @Month AND YEAR({colName}) = @Year";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("role_last_updated_date", EQueryTimeType.DATE_TIME, ct, dateTime);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        private string GetQueryByDateTimeRange(string colName)
+        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedDateTimeRangeAsync(DateTime startDate, DateTime endDate)
+            => await GetByDateTimeAsync("role_last_updated_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate));
+
+        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedMonthAndYearAsync(int month, int year)
+            => await GetByDateTimeAsync("role_last_updated_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+
+        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType) where TCompareType : Enum
         {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} 
-                      WHERE {colName} >= @StartDate AND {colName} < DATE_ADD(@EndDate, INTERVAL 1 DAY)";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("role_last_updated_date", EQueryTimeType.YEAR, ct, year);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        private string GetRelativeQuery(string colName)
-        {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} 
-                      WHERE {colName} LIKE @Input";
-        }
+        // ----------- LIKE String -----------
+        public async Task<IEnumerable<RoleModel>> GetByLikeStringAsync(string input)
+            => await GetByLikeStringAsync(input, "role_name");
 
-        public async Task<List<RoleModel>> GetAllByDateTimeAsync(DateTime dateTime, string colName = "role_created_date")
-        {
-            try
-            {
-                string query = GetQueryByDateTime(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<RoleModel> roles = await connection.QueryAsync<RoleModel>(query, new { Input = dateTime });
-                return roles.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving roles by date time: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<RoleModel>> GetAllByYearAsync(int year, string colName = "role_created_date")
-        {
-            try
-            {
-                string query = GetQueryByYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<RoleModel> roles = await connection.QueryAsync<RoleModel>(query, new { Year = year });
-                return roles.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving roles by year: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<RoleModel>> GetAllByMonthAndYearAsync(int year, int month, string colName = "role_created_date")
-        {
-            try
-            {
-                string query = GetQueryByMonthAndYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<RoleModel> roles = await connection.QueryAsync<RoleModel>(query, new { Year = year, Month = month });
-                return roles.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving roles by month and year: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<RoleModel>> GetAllByDateTimeRangeAsync(DateTime startDate, DateTime endDate, string colName = "role_created_date")
-        {
-            try
-            {
-                string query = GetQueryByDateTimeRange(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<RoleModel> roles = await connection.QueryAsync<RoleModel>(query, new { StartDate = startDate, EndDate = endDate });
-                return roles.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving roles by date range: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<RoleModel>> GetAllByStatusAsync(bool status)
-        {
-            try
-            {
-                string query = GetDataQuery("role_status");
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<RoleModel> roles = await connection.QueryAsync<RoleModel>(query, new { Status = status });
-                return roles.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving roles by status: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<RoleModel>> GetRelativeAsync(string input, string colName = "role_name")
-        {
-            try
-            {
-                string query = GetRelativeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                if (!input.Contains('%'))
-                    input = $"%{input}%"; // Ensure input is a wildcard search
-                IEnumerable<RoleModel> roles = await connection.QueryAsync<RoleModel>(query, new { Input = input });
-                return roles.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving roles relative to input: {ex.Message}", ex);
-            }
-        }
+        public async Task<RoleModel?> GetByRoleNameAsync(string roleName) => await GetSingleDataAsync(roleName, "role_name");
+        // ----------- Status -----------
+        public async Task<IEnumerable<RoleModel>> GetByStatusAsync(bool status)
+            => await GetByInputAsync(GetTinyIntString(status), "role_status");
     }
 }

@@ -7,45 +7,45 @@ namespace ProjectShop.Server.Core.Entities
     public class ProductModel : IGetIdEntity<string>
     {
         // Corresponds to 'product_barcode' (VARCHAR(20)) - Primary Key
-        public string ProductBarcode { get; private set; }
+        public string ProductBarcode { get; set; } = string.Empty;
 
         // Corresponds to 'supplier_id' (INT UNSIGNED)
-        public uint SupplierId { get; private set; }
+        public uint SupplierId { get; set; }
 
         // Corresponds to 'product_name' (NVARCHAR(255))
-        public string ProductName { get; private set; }
+        public string ProductName { get; set; } = string.Empty;
 
         // Corresponds to 'product_net_weight' (DECIMAL(10, 2))
-        public decimal ProductNetWeight { get; private set; }
+        public decimal ProductNetWeight { get; set; }
 
         // Corresponds to 'product_weight_range' (VARCHAR(50))
-        public string ProductWeightRange { get; private set; }
+        public string ProductWeightRange { get; set; } = string.Empty;
 
         // Corresponds to 'product_unit' (ENUM)
-        public EProductUnit ProductUnit { get; private set; }
+        public EProductUnit ProductUnit { get; set; }
 
         // Corresponds to 'product_base_price' (DECIMAL(10, 2))
-        public decimal ProductBasePrice { get; private set; }
+        public decimal ProductBasePrice { get; set; }
 
         // Corresponds to 'product_rating_age' (VARCHAR(3))
-        public string ProductRatingAge { get; private set; }
+        public string ProductRatingAge { get; set; } = string.Empty;
 
         // Corresponds to 'product_status' (TINYINT(1))
-        public bool ProductStatus { get; private set; }
+        public bool ProductStatus { get; set; }
         // Corresponds to 'product_created_at' (DATETIME) - Automatically set to current time
-        public DateTime ProductAddedDate { get; private set; } = DateTime.UtcNow;
+        public DateTime ProductAddedDate { get; set; } = DateTime.UtcNow;
 
         // Corresponds to 'product_last_updated_date' (DATETIME) - Automatically set to current time
-        public DateTime ProductLastUpdatedDate { get; private set; } = DateTime.UtcNow;
+        public DateTime ProductLastUpdatedDate { get; set; } = DateTime.UtcNow;
 
         // Navigation properties
-        public SupplierModel Supplier { get; private set; } = null!;
-        public ICollection<DetailCartModel> DetailCarts { get; private set; } = new List<DetailCartModel>();
-        public ICollection<ProductLotModel> ProductLots { get; private set; } = new List<ProductLotModel>();
-        public ICollection<ProductCategoriesModel> ProductCategories { get; private set; } = new List<ProductCategoriesModel>();
-        public ICollection<ProductImageModel> ProductImages { get; private set; } = new List<ProductImageModel>();
-        public ICollection<DetailSaleEventModel> DetailSaleEvents { get; private set; } = new List<DetailSaleEventModel>();
-        public ICollection<DetailInvoiceModel> DetailInvoices { get; private set; } = new List<DetailInvoiceModel>();
+        public SupplierModel Supplier { get; set; } = null!;
+        public ICollection<DetailCartModel> DetailCarts { get; set; } = new List<DetailCartModel>();
+        public ICollection<ProductLotModel> ProductLots { get; set; } = new List<ProductLotModel>();
+        public ICollection<ProductCategoriesModel> ProductCategories { get; set; } = new List<ProductCategoriesModel>();
+        public ICollection<ProductImageModel> ProductImages { get; set; } = new List<ProductImageModel>();
+        public ICollection<DetailSaleEventModel> DetailSaleEvents { get; set; } = new List<DetailSaleEventModel>();
+        public ICollection<DetailInvoiceModel> DetailInvoices { get; set; } = new List<DetailInvoiceModel>();
 
         public ProductModel(string productBarcode, uint supplierId, string productName, decimal productNetWeight, string productWeightRange, EProductUnit productUnit, decimal productBasePrice, 
                 string productRatingAge, bool productStatus, DateTime productAddedDate, DateTime productLastUpdatedDate)
@@ -61,6 +61,10 @@ namespace ProjectShop.Server.Core.Entities
             ProductStatus = productStatus;
             ProductAddedDate = productAddedDate;
             ProductLastUpdatedDate = productLastUpdatedDate;
+        }
+
+        public ProductModel()
+        {
         }
 
         public string GetIdEntity() => ProductBarcode;

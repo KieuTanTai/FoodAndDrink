@@ -1,4 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Infrastructure.Services;
 
 namespace ProjectShop.Server.WebAPI.Controllers
 {
@@ -13,7 +15,9 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        // Inject service qua constructor
+        public WeatherForecastController(
+            ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
         }

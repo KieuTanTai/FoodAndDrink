@@ -6,26 +6,26 @@ namespace ProjectShop.Server.Core.Entities
     public class DetailCartModel : IGetIdEntity<uint>
     {
         // Corresponds to 'detail_cart_id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint DetailCartId { get; private set; }
+        public uint DetailCartId { get; set; }
 
         // Corresponds to 'cart_id' (INT UNSIGNED)
-        public uint CartId { get; private set; }
+        public uint CartId { get; set; }
 
         // Corresponds to 'product_barcode' (VARCHAR(20))
-        public string ProductBarcode { get; private set; }
+        public string ProductBarcode { get; set; } = string.Empty;
 
         // Corresponds to 'cart_add_date' (DATETIME)
-        public DateTime DetailCartAddedDate { get; private set; }
+        public DateTime DetailCartAddedDate { get; set; }
 
         // Corresponds to 'cart_price' (DECIMAL(10, 2))
-        public decimal DetailCartPrice { get; private set; }
+        public decimal DetailCartPrice { get; set; }
 
         // Corresponds to 'cart_quantity' (INT UNSIGNED)
-        public uint DetailCartQuantity { get; private set; }
+        public uint DetailCartQuantity { get; set; }
 
         // Navigation property
-        public CartModel Cart { get; private set; } = null!;
-        public ProductModel Product { get; private set; } = null!;
+        public CartModel Cart { get; set; } = null!;
+        public ProductModel Product { get; set; } = null!;
 
         public DetailCartModel(uint detailCartId, uint cartId, string productBarcode, DateTime detailCartAddedDate, decimal detailCartPrice, uint detailCartQuantity)
         {
@@ -35,6 +35,10 @@ namespace ProjectShop.Server.Core.Entities
             DetailCartAddedDate = detailCartAddedDate;
             DetailCartPrice = detailCartPrice;
             DetailCartQuantity = detailCartQuantity;
+        }
+
+        public DetailCartModel()
+        {
         }
 
         public uint GetIdEntity() => DetailCartId;

@@ -5,26 +5,26 @@ namespace ProjectShop.Server.Core.Entities
     public class DetailInventoryModel : IGetIdEntity<uint>
     {
         // Corresponds to 'inventory_detail_id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint DetailInventoryId { get; private set; }
+        public uint DetailInventoryId { get; set; }
 
         // Corresponds to 'inventory_id' (INT UNSIGNED)
-        public uint InventoryId { get; private set; }
+        public uint InventoryId { get; set; }
 
         // Corresponds to 'product_barcode' (VARCHAR(20))
-        public string ProductBarcode { get; private set; }
+        public string ProductBarcode { get; set; } = string.Empty;
 
         // Corresponds to 'inventory_detail_quantity' (INT UNSIGNED)
-        public uint DetailInventoryQuantity { get; private set; }
+        public uint DetailInventoryQuantity { get; set; }
 
         // Corresponds to 'inventory_detail_added_date' (DATETIME)
-        public DateTime DetailInventoryAddedDate { get; private set; }
+        public DateTime DetailInventoryAddedDate { get; set; }
 
         // Corresponds to 'inventory_detail_last_updated_date' (DATETIME)
-        public DateTime DetailInventoryLastUpdatedDate { get; private set; }
+        public DateTime DetailInventoryLastUpdatedDate { get; set; }
 
         // Navigation property
-        public ProductModel Product { get; private set; } = null!;
-        public InventoryModel Inventory { get; private set; } = null!;
+        public ProductModel Product { get; set; } = null!;
+        public InventoryModel Inventory { get; set; } = null!;
 
         public DetailInventoryModel(uint detailInventoryId, uint inventoryId, string productBarcode, uint detailInventoryQuantity, DateTime detailInventoryAddedDate, DateTime detailInventoryLastUpdatedDate)
         {
@@ -34,6 +34,10 @@ namespace ProjectShop.Server.Core.Entities
             DetailInventoryQuantity = detailInventoryQuantity;
             DetailInventoryAddedDate = detailInventoryAddedDate;
             DetailInventoryLastUpdatedDate = detailInventoryLastUpdatedDate;
+        }
+
+        public DetailInventoryModel()
+        {
         }
 
         public uint GetIdEntity() => DetailInventoryId;

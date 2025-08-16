@@ -7,8 +7,7 @@ using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class LocationDistrictDAO : BaseDAO<LocationDistrictModel>, IGetRelativeAsync<LocationDistrictModel>,
-                    IGetByStatusAsync<LocationDistrictModel>
+    public class LocationDistrictDAO : BaseDAO<LocationDistrictModel>, IGetRelativeAsync<LocationDistrictModel>, IGetByStatusAsync<LocationDistrictModel>
     {
         public LocationDistrictDAO(
             IDbConnectionFactory connectionFactory,
@@ -33,42 +32,8 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        private string GetRelativeQuery(string colName)
-        {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} LIKE @Input;";
-        }
+        public async Task<IEnumerable<LocationDistrictModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "location_district_name");
 
-        public async Task<List<LocationDistrictModel>> GetRelativeAsync(string input, string colName)
-        {
-            try
-            {
-                string query = GetRelativeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                if (!input.Contains('%'))
-                    input = $"%{input}%"; // Ensure input is wrapped in wildcards
-                IEnumerable<LocationDistrictModel> locationDistricts = await connection.QueryAsync<LocationDistrictModel>(query, new { Input = input });
-                return locationDistricts.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(LocationDistrictDAO)}.{nameof(GetRelativeAsync)}: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<LocationDistrictModel>> GetAllByStatusAsync(bool status)
-        {
-            try
-            {
-                string query = GetDataQuery("location_district_status");
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<LocationDistrictModel> locationDistricts = await connection.QueryAsync<LocationDistrictModel>(query, new { Input = status });
-                return locationDistricts.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(LocationDistrictDAO)}.{nameof(GetAllByStatusAsync)}: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<LocationDistrictModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "location_district_status");
     }
 }

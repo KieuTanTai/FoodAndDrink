@@ -1,13 +1,13 @@
-﻿using Dapper;
-using ProjectShop.Server.Core.Entities;
+﻿using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
-using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class SupplierDAO : BaseNoneUpdateDAO<SupplierModel>, IGetRelativeAsync<SupplierModel>, IGetByStatusAsync<SupplierModel>, IGetDataByDateTimeAsync<SupplierModel>
+    public class SupplierDAO : BaseDAO<SupplierModel>, ISupplierDAO<SupplierModel>
     {
         public SupplierDAO(
             IDbConnectionFactory connectionFactory,
@@ -40,135 +40,76 @@ namespace ProjectShop.Server.Infrastructure.Data
                 SELECT LAST_INSERT_ID();";
         }
 
-        private string GetByStatusQuery()
+        protected override string GetUpdateQuery()
         {
-            return $@"SELECT * FROM {TableName} 
-                      WHERE supplier_status = @SupplierStatus";
+            return $@"
+                UPDATE {TableName} SET
+                    `supplier_name` = @SupplierName,
+                    `supplier_phone` = @SupplierPhone,
+                    `supplier_email` = @SupplierEmail,
+                    `company_location_id` = @CompanyLocationId,
+                    `store_location_id` = @StoreLocationId,
+                    `supplier_status` = @SupplierStatus
+                WHERE {ColumnIdName} = @{ColumnIdName};";
         }
 
-        private string GetRelativeQuery(string colName)
+        public async Task<IEnumerable<SupplierModel>> GetAllByCompanyLocationIdAsync(uint locationId)
+    => await GetByInputAsync(locationId.ToString(), "company_location_id");
+
+        public async Task<IEnumerable<SupplierModel>> GetAllByStoreLocationIdAsync(uint locationId)
+            => await GetByInputAsync(locationId.ToString(), "store_location_id");
+
+        public async Task<SupplierModel?> GetByCompanyLocationIdAsync(uint locationId)
+            => await GetSingleDataAsync(locationId.ToString(), "company_location_id");
+
+        public async Task<IEnumerable<SupplierModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} 
-                      WHERE {colName} LIKE @Input";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("supplier_cooperation_date", EQueryTimeType.DATE_TIME, ct, dateTime);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        private string GetByDateTimeRange(string colName)
-        {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} 
-                      WHERE {colName} >= @FirstTime AND {colName} < DATE_ADD(@SecondTime, INTERVAL 1 DAY)";
-        }
+        public async Task<IEnumerable<SupplierModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate)
+            => await GetByDateTimeAsync("supplier_cooperation_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate));
 
-        private string GetByDateTime(string colName)
-        {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} 
-                      WHERE {colName} = DATE_ADD(@Input, INTERVAL 1 DAY)";
-        }
+        public async Task<SupplierModel?> GetByEmailAsync(string email)
+            => await GetSingleDataAsync(email, "supplier_email");
 
-        private string GetByYear(string colName)
-        {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} 
-                      WHERE YEAR({colName}) = @Input";
-        }
+        public async Task<IEnumerable<SupplierModel>> GetByEmailsAsync(IEnumerable<string> emails)
+            => await GetByInputsAsync(emails, "supplier_email");
 
-        private string GetByMonthAndYear(string colName)
-        {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} 
-                      WHERE YEAR({colName}) = @Year AND MONTH({colName}) = @Month";
-        }
+        public async Task<IEnumerable<SupplierModel>> GetByLikeStringAsync(string input)
+            => await GetByLikeStringAsync(input, "supplier_name");
 
-        public async Task<List<SupplierModel>> GetAllByDateTimeAsync(DateTime input, string colName = "supplier_cooperation_date")
-        {
-            try
-            {
-                string query = GetByDateTime(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<SupplierModel> result = await connection.QueryAsync<SupplierModel>(query, new { Input = input });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving SupplierModels by date: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<SupplierModel>> GetByMonthAndYearAsync(int year, int month)
+            => await GetByDateTimeAsync("supplier_cooperation_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
 
-        public async Task<List<SupplierModel>> GetAllByDateTimeRangeAsync(DateTime firstTime, DateTime secondTime, string colName = "supplier_cooperation_date")
-        {
-            try
-            {
-                string query = GetByDateTimeRange(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<SupplierModel> result = await connection.QueryAsync<SupplierModel>(query, new { FirstTime = firstTime, SecondTime = secondTime });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving SupplierModels by date range: {ex.Message}", ex);
-            }
-        }
+        public async Task<SupplierModel?> GetByNameAsync(string name)
+            => await GetSingleDataAsync(name, "supplier_name");
 
-        public async Task<List<SupplierModel>> GetAllByYearAsync(int year, string colName = "supplier_cooperation_date")
-        {
-            try
-            {
-                string query = GetByYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<SupplierModel> result = await connection.QueryAsync<SupplierModel>(query, new { Input = year });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving SupplierModels by year: {ex.Message}", ex);
-            }
-        }
+        public async Task<SupplierModel?> GetByPhoneAsync(string phone)
+            => await GetSingleDataAsync(phone, "supplier_phone");
 
-        public async Task<List<SupplierModel>> GetAllByMonthAndYearAsync(int year, int month, string colName = "supplier_cooperation_date")
-        {
-            try
-            {
-                string query = GetByMonthAndYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<SupplierModel> result = await connection.QueryAsync<SupplierModel>(query, new { Year = year, Month = month });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving SupplierModels by month and year: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<SupplierModel>> GetByPhonesAsync(IEnumerable<string> phones)
+            => await GetByInputsAsync(phones, "supplier_phone");
 
-        public async Task<List<SupplierModel>> GetAllByStatusAsync(bool status)
-        {
-            try
-            {
-                string query = GetByStatusQuery();
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<SupplierModel> result = await connection.QueryAsync<SupplierModel>(query, new { SupplierStatus = status });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving SupplierModels by status: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<SupplierModel>> GetByRelativeEmailAsync(string email)
+            => await GetByLikeStringAsync(email, "supplier_email");
 
-        public async Task<List<SupplierModel>> GetRelativeAsync(string input, string colName = "supplier_name")
+        public async Task<IEnumerable<SupplierModel>> GetByRelativePhoneAsync(string phone)
+            => await GetByLikeStringAsync(phone, "supplier_phone");
+
+        public async Task<IEnumerable<SupplierModel>> GetByStatusAsync(bool status)
+            => await GetByInputAsync(GetTinyIntString(status), "supplier_status");
+
+        public async Task<SupplierModel?> GetByStoreLocationIdAsync(uint locationId)
+            => await GetSingleDataAsync(locationId.ToString(), "store_location_id");
+
+        public async Task<IEnumerable<SupplierModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
         {
-            try
-            {
-                string query = GetRelativeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<SupplierModel> result = await connection.QueryAsync<SupplierModel>(query, new { Input = $"%{input}%" });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving SupplierModels by relative input: {ex.Message}", ex);
-            }
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("supplier_cooperation_date", EQueryTimeType.YEAR, ct, year);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
     }
 }

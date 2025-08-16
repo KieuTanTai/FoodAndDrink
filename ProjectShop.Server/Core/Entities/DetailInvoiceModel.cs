@@ -5,26 +5,26 @@ namespace ProjectShop.Server.Core.Entities
 {
     public class DetailInvoiceModel : IGetIdEntity<uint>
     {
-        public uint DetailInvoiceId { get; private set; }
+        public uint DetailInvoiceId { get; set; }
 
         // Corresponds to 'invoice_id' (INT UNSIGNED)
-        public uint InvoiceId { get; private set; }
+        public uint InvoiceId { get; set; }
 
         // Corresponds to 'product_barcode' (VARCHAR(20))
-        public string ProductBarcode { get; private set; }
+        public string ProductBarcode { get; set; } = string.Empty;
 
         // Corresponds to 'detail_invoice_quantity' (INT UNSIGNED)
-        public uint DetailInvoiceQuantity { get; private set; }
+        public uint DetailInvoiceQuantity { get; set; }
 
         // Corresponds to 'detail_invoice_price' (DECIMAL(10, 2))
-        public decimal DetailInvoicePrice { get; private set; }
+        public decimal DetailInvoicePrice { get; set; }
 
         // Corresponds to 'detail_invoice_status' (TINYINT(1))
-        public bool DetailInvoiceStatus { get; private set; }
+        public bool DetailInvoiceStatus { get; set; }
 
         // Navigation property
-        public InvoiceModel Invoice { get; private set; } = null!;
-        public ProductModel Product { get; private set; } = null!;
+        public InvoiceModel Invoice { get; set; } = null!;
+        public ProductModel Product { get; set; } = null!;
 
         public DetailInvoiceModel(uint detailInvoiceId, uint invoiceId, string productBarcode, uint detailInvoiceQuantity, decimal detailInvoicePrice, bool detailInvoiceStatus)
         {
@@ -35,6 +35,8 @@ namespace ProjectShop.Server.Core.Entities
             DetailInvoicePrice = detailInvoicePrice;
             DetailInvoiceStatus = detailInvoiceStatus;
         }
+
+        public DetailInvoiceModel() { }
 
         // We use the single primary key for this entity
         public uint GetIdEntity() => DetailInvoiceId;

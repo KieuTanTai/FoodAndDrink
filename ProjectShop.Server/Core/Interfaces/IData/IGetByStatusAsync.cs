@@ -2,6 +2,6 @@
 {
     public interface IGetByStatusAsync<T> where T : class
     {
-        Task<List<T>> GetAllByStatusAsync(bool status);
+        Task<IEnumerable<T>> GetByStatusAsync(bool status);
     }
 }

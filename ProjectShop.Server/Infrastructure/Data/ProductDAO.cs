@@ -1,14 +1,14 @@
-﻿using Dapper;
-using ProjectShop.Server.Core.Entities;
+﻿using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
-using System.Data;
+using System.Globalization;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class ProductDAO : BaseDAO<ProductModel>, IGetByStatusAsync<ProductModel>, IGetAllByIdAsync<ProductModel>, IGetByEnumAsync<ProductModel>, IGetRelativeAsync<ProductModel>, IGetDataByDateTimeAsync<ProductModel>
+    public class ProductDAO : BaseDAO<ProductModel>, IProductDAO<ProductModel>
     {
         public ProductDAO(
             IDbConnectionFactory connectionFactory,
@@ -59,177 +59,87 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        private string GetRelativeQuery(string colName)
+        public async Task<IEnumerable<ProductModel>> GetAllByEnumAsync<TEnum>(TEnum tEnum) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} LIKE @Input";
+            if (tEnum is not EProductUnit unit)
+                throw new ArgumentException("Invalid enum type for GetAllByEnumAsync");
+            return await GetByInputAsync(unit.ToString(), "product_unit");
         }
 
-        private string GetByDateTimeRange(string colName)
+        public async Task<IEnumerable<ProductModel>> GetByCategoryIdAsync(uint categoryId) => await GetByInputAsync(categoryId.ToString(), "category_id");
+
+        public async Task<IEnumerable<ProductModel>> GetByCategoryIdsAsync(IEnumerable<uint> categoryIds) => await GetByInputsAsync(categoryIds.Select(categoryId => categoryId.ToString()), "category_id");
+
+        public async Task<IEnumerable<ProductModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} >= @FirstTime AND {colName} < DATE_ADD(@SecondTime, INTERVAL 1 DAY)";
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid enum type for GetByDateTimeAsync");
+            return await GetByDateTimeAsync("product_added_date", EQueryTimeType.DATE_TIME, type, dateTime);
         }
 
-        private string GetByDateTime(string colName)
+        public async Task<IEnumerable<ProductModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate) => await GetByDateTimeAsync("product_added_date", EQueryTimeType.DATE_TIME, new Tuple<DateTime, DateTime>(startDate, endDate));
+
+        public async Task<ProductModel?> GetByEnumAsync<TEnum>(TEnum tEnum) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} = DATE_ADD(@Input, INTERVAL 1 DAY)";
+            if (tEnum is not EProductUnit unit)
+                throw new ArgumentException("Invalid enum type for GetByEnumAsync");
+            return await GetSingleDataAsync(unit.ToString(), "product_unit");
         }
 
-        private string GetByYear(string colName)
+        public async Task<IEnumerable<ProductModel>> GetByInputPriceAsync<TEnum>(decimal price, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE YEAR({colName}) = @Input";
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid enum type for GetByInputPriceAsync");
+            return await GetByDecimalAsync(price, type, "product_base_price");
         }
 
-        private string GetByMonthAndYear(string colName)
+        public async Task<IEnumerable<ProductModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "product_name");
+
+        public async Task<IEnumerable<ProductModel>> GetByMonthAndYearAsync(int year, int month) => await GetByDateTimeAsync("product_added_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month));
+
+        public async Task<IEnumerable<ProductModel>> GetByNetWeightAsync<TCompareType>(decimal netWeight, TCompareType compareType) where TCompareType : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE YEAR({colName}) = @Year AND MONTH({colName}) = @Month";
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid enum type for GetByNetWeightAsync");
+            return await GetByDecimalAsync(netWeight, type, "product_net_weight");
         }
 
-        public async Task<List<ProductModel>> GetAllByDateTimeRangeAsync(DateTime firstTime, DateTime secondTime, string colName = "product_added_date")
+        public async Task<ProductModel?> GetByProductNameAsync(string productName) => await GetSingleDataAsync(productName, "product_name");
+
+        public async Task<IEnumerable<ProductModel>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice) => await GetByRangeDecimalAsync(minPrice, maxPrice, "product_base_price");
+
+        public async Task<IEnumerable<ProductModel>> GetByRatingAgeAsync(string ratingAge) => await GetByInputAsync(ratingAge, "product_rating_age");
+
+        public async Task<IEnumerable<ProductModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "product_status");
+
+        public async Task<IEnumerable<ProductModel>> GetBySupplierIdAsync(uint supplierId) => await GetByInputAsync(supplierId.ToString(), "supplier_id");
+
+        public async Task<IEnumerable<ProductModel>> GetBySupplierIdsAsync(IEnumerable<uint> supplierIds) => await GetByInputsAsync(supplierIds.Select(supplierId => supplierId.ToString()), "supplier_id");
+
+        public async Task<IEnumerable<ProductModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
         {
-            try
-            {
-                string query = GetByDateTimeRange(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<ProductModel> products = await connection.QueryAsync<ProductModel>(query, new { FirstTime = firstTime, SecondTime = secondTime });
-                return products.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(ProductDAO)}.{nameof(GetAllByDateTimeRangeAsync)}: {ex.Message}", ex);
-            }
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid enum type for GetByYearAsync");
+            return await GetByDateTimeAsync("product_added_date", EQueryTimeType.YEAR, type, year);
         }
 
-        public async Task<List<ProductModel>> GetAllByDateTimeAsync(DateTime input, string colName = "product_added_date")
+        public Task<IEnumerable<ProductModel>> GetByLastUpdatedDateAsync<TCompareType>(DateTime lastUpdatedDate, TCompareType compareType) where TCompareType : Enum
         {
-            try
-            {
-                string query = GetByDateTime(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<ProductModel> products = await connection.QueryAsync<ProductModel>(query, new { Input = input });
-                return products.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(ProductDAO)}.{nameof(GetAllByDateTimeAsync)}: {ex.Message}", ex);
-            }
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid enum type for GetByLastUpdatedDateAsync");
+            return GetByDateTimeAsync("product_last_updated_date", EQueryTimeType.DATE_TIME, type, lastUpdatedDate);
         }
 
-        public async Task<List<ProductModel>> GetAllByYearAsync(int year, string colName = "product_added_date")
+        public async Task<IEnumerable<ProductModel>> GetByLastUpdatedDateRangeAsync(DateTime startDate, DateTime endDate) => await GetByDateTimeAsync("product_last_updated_date", EQueryTimeType.DATE_TIME, new Tuple<DateTime, DateTime>(startDate, endDate));
+
+        public Task<IEnumerable<ProductModel>> GetByLastUpdateYearAsync<TCompareType>(int year, TCompareType compareType) where TCompareType : Enum
         {
-            try
-            {
-                string query = GetByYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<ProductModel> products = await connection.QueryAsync<ProductModel>(query, new { Input = year });
-                return products.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(ProductDAO)}.{nameof(GetAllByYearAsync)}: {ex.Message}", ex);
-            }
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid enum type for GetByLastUpdateYearAsync");
+            return GetByDateTimeAsync("product_last_updated_date", EQueryTimeType.YEAR, type, year);
         }
 
-        public async Task<List<ProductModel>> GetAllByMonthAndYearAsync(int year, int month, string colName = "product_added_date")
-        {
-            try
-            {
-                string query = GetByMonthAndYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<ProductModel> products = await connection.QueryAsync<ProductModel>(query, new { Year = year, Month = month });
-                return products.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(ProductDAO)}.{nameof(GetAllByMonthAndYearAsync)}: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<ProductModel>> GetAllByEnumAsync<TEnum>(TEnum tEnum, string colName) where TEnum : Enum
-        {
-            try
-            {
-                if (tEnum is not EProductUnit)
-                    throw new ArgumentException($"Invalid enum type: {typeof(TEnum).Name}. Expected EProductUnit.");
-                string query = GetDataQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<ProductModel> products = await connection.QueryAsync<ProductModel>(query, new { Input = tEnum });
-                return products.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(ProductDAO)}.{nameof(GetAllByEnumAsync)}: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<ProductModel> GetByEnumAsync<TEnum>(TEnum tEnum, string colName) where TEnum : Enum
-        {
-            try
-            {
-                if (tEnum is not EProductUnit)
-                    throw new ArgumentException($"Invalid enum type: {typeof(TEnum).Name}. Expected EProductUnit.");
-                string query = GetDataQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                ProductModel? product = await connection.QueryFirstOrDefaultAsync<ProductModel>(query, new { Input = tEnum });
-                if (product == null)
-                    throw new KeyNotFoundException($"No product found with {colName} = {tEnum}");
-                return product;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(ProductDAO)}.{nameof(GetByEnumAsync)}: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<ProductModel>> GetAllByStatusAsync(bool status)
-        {
-            try
-            {
-                string query = GetDataQuery("product_status");
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<ProductModel> products = await connection.QueryAsync<ProductModel>(query, new { Input = status });
-                return products.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(ProductDAO)}.{nameof(GetAllByStatusAsync)}: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<ProductModel>> GetAllByIdAsync(string id, string colName = "supplier_id")
-        {
-            try
-            {
-                string query = GetDataQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<ProductModel> products = await connection.QueryAsync<ProductModel>(query, new { Input = id });
-                return products.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(ProductDAO)}.{nameof(GetAllByIdAsync)}: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<ProductModel>> GetRelativeAsync(string input, string colName = "product_name")
-        {
-            try
-            {
-                string query = GetRelativeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                if (!input.Contains('%'))
-                    input = $"%{input}%"; // Ensure input is formatted for LIKE query
-                IEnumerable<ProductModel> products = await connection.QueryAsync<ProductModel>(query, new { Input = input });
-                return products.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(ProductDAO)}.{nameof(GetRelativeAsync)}: {ex.Message}", ex);
-            }
-        }
+        public Task<IEnumerable<ProductModel>> GetByLastUpdateMonthAndYearAsync(int year, int month)
+            => GetByDateTimeAsync("product_last_updated_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month));
     }
 }

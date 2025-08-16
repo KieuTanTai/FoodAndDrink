@@ -2,7 +2,8 @@
 {
     public interface IGetByRangePriceAsync<T> where T : class
     {
-        //Task<List<T>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice);
-        Task<List<T>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice, string colName);
+        //Task<IEnumerable<T>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice);
+        Task<IEnumerable<T>> GetByInputPriceAsync<TEnum>(decimal price, TEnum compareType) where TEnum : Enum;
+        Task<IEnumerable<T>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice);
     }
 }

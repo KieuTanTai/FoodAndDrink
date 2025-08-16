@@ -6,20 +6,20 @@ namespace ProjectShop.Server.Core.Entities
     public class LocationWardModel : IGetIdEntity<uint>
     {
         // Corresponds to 'location_ward_id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint LocationWardId { get; private set; }
+        public uint LocationWardId { get; set; }
 
         // Corresponds to 'location_ward_name' (NVARCHAR(50))
-        public string LocationWardName { get; private set; }
+        public string LocationWardName { get; set; } = string.Empty;
 
         // Corresponds to 'location_ward_status' (TINYINT(1))
-        public bool LocationWardStatus { get; private set; }
+        public bool LocationWardStatus { get; set; }
 
         // Navigation properties
-        public ICollection<LocationModel> Locations { get; private set; } = new List<LocationModel>();
-        public ICollection<SupplierModel> CompanySuppliers { get; private set; } = new List<SupplierModel>();
-        public ICollection<SupplierModel> StoreSuppliers { get; private set; } = new List<SupplierModel>();
-        public ICollection<CustomerModel> Customers { get; private set; } = new List<CustomerModel>();
-        public ICollection<EmployeeModel> Employees { get; private set; } = new List<EmployeeModel>();
+        public ICollection<LocationModel> Locations { get; set; } = new List<LocationModel>();
+        public ICollection<SupplierModel> CompanySuppliers { get; set; } = new List<SupplierModel>();
+        public ICollection<SupplierModel> StoreSuppliers { get; set; } = new List<SupplierModel>();
+        public ICollection<CustomerModel> Customers { get; set; } = new List<CustomerModel>();
+        public ICollection<EmployeeModel> Employees { get; set; } = new List<EmployeeModel>();
 
         public LocationWardModel(uint locationWardId, string locationWardName, bool locationWardStatus)
         {
@@ -27,6 +27,8 @@ namespace ProjectShop.Server.Core.Entities
             LocationWardName = locationWardName;
             LocationWardStatus = locationWardStatus;
         }
+
+        public LocationWardModel() { }
 
         public uint GetIdEntity() => LocationWardId;
     }

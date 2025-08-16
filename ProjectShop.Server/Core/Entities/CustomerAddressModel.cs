@@ -4,20 +4,20 @@ namespace ProjectShop.Server.Core.Entities
 {
     public class CustomerAddressModel : IGetIdEntity<uint>
     {
-        public uint CustomerAddressId { get; private set; }
-        public uint CustomerCityId { get; private set; }
-        public uint CustomerDistrictId { get; private set; }
-        public uint CustomerWardId { get; private set; }
-        public uint CustomerId { get; private set; }
-        public string CustomerStreet { get; private set; } = string.Empty;
-        public string CustomerAddressNumber { get; private set; } = string.Empty;
-        public bool CustomerAddressStatus { get; private set; } = true;
+        public uint CustomerAddressId { get; set; }
+        public uint CustomerCityId { get; set; }
+        public uint CustomerDistrictId { get; set; }
+        public uint CustomerWardId { get; set; }
+        public uint CustomerId { get; set; }
+        public string CustomerStreet { get; set; } = string.Empty;
+        public string CustomerAddressNumber { get; set; } = string.Empty;
+        public bool CustomerAddressStatus { get; set; } = true;
 
         // Navigation properties (nullable if not always loaded)
-        public LocationCityModel? City { get; private set; }
-        public LocationDistrictModel? District { get; private set; }
-        public LocationWardModel? Ward { get; private set; }
-        public CustomerModel? Customer { get; private set; }
+        public LocationCityModel? City { get; set; }
+        public LocationDistrictModel? District { get; set; }
+        public LocationWardModel? Ward { get; set; }
+        public CustomerModel? Customer { get; set; }
 
         public CustomerAddressModel(
             uint customerAddressId,
@@ -47,6 +47,8 @@ namespace ProjectShop.Server.Core.Entities
             Ward = ward;
             Customer = customer;
         }
+
+        public CustomerAddressModel() { }
 
         public uint GetIdEntity() => CustomerAddressId;
     }

@@ -36,44 +36,8 @@ namespace ProjectShop.Server.Infrastructure.Data
                 WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        private string RelativeQuery(string colName)
-        {
-            CheckColumnName(colName);
-            return $@"
-                SELECT * FROM {TableName}
-                WHERE {colName} LIKE @Input";
-        }
+        public async Task<IEnumerable<CategoryModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "category_status");
 
-        public async Task<List<CategoryModel>> GetAllByStatusAsync(bool status)
-        {
-            try
-            {
-                string query = GetDataQuery("category_status");
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<CategoryModel> categories = await connection.QueryAsync<CategoryModel>(query, new { Input = status });
-                return categories.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error retrieving categories by status", ex);
-            }
-        }
-
-        public async Task<List<CategoryModel>> GetRelativeAsync(string input, string colName)
-        {
-            try
-            {
-                string query = RelativeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                if (!input.Contains('%'))
-                    input = $"%{input}%";
-                IEnumerable<CategoryModel> categories = await connection.QueryAsync<CategoryModel>(query, new { Input = input });
-                return categories.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error retrieving relative categories", ex);
-            }
-        }
+        public async Task<IEnumerable<CategoryModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "category_name");
     }
 }

@@ -1,13 +1,13 @@
-﻿using Dapper;
-using ProjectShop.Server.Core.Entities;
+﻿using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
-using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class DetailCartDAO : BaseDAO<DetailCartModel>, IGetDataByDateTimeAsync<DetailCartModel>, IGetAllByIdAsync<DetailCartModel>, IGetByRangePriceAsync<DetailCartModel>
+    public class DetailCartDAO : BaseDAO<DetailCartModel>, IDetailCartDAO<DetailCartModel>
     {
         public DetailCartDAO(
             IDbConnectionFactory connectionFactory,
@@ -33,141 +33,37 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        private string GetByMonthAndYear(string colName)
+        public async Task<IEnumerable<DetailCartModel>> GetByMonthAndYearAsync(int year, int month)
+                    => await GetByDateTimeAsync("detail_cart_added_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month));
+
+        public async Task<IEnumerable<DetailCartModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE YEAR({colName}) = @FirstTime AND MONTH({colName}) = @SecondTime";
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid compare type provided.");
+            return await GetByDateTimeAsync("detail_cart_added_date", EQueryTimeType.YEAR, type, year);
         }
 
-        private string GetByYear(string colName)
+        public async Task<IEnumerable<DetailCartModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate)
+            => await GetByDateTimeAsync("detail_cart_added_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate));
+
+        public async Task<IEnumerable<DetailCartModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE Year({colName}) = @Input";
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid compare type provided.");
+            return await GetByDateTimeAsync("detail_cart_added_date", EQueryTimeType.DATE_TIME, type, dateTime);
         }
 
-        private string GetByDateTimeRange(string colName)
+        public async Task<IEnumerable<DetailCartModel>> GetByInputPriceAsync<TEnum>(decimal price, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} >= @FirstTime AND {colName} < DATE_ADD(@SecondTime, INTERVAL 1 DAY)";
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid compare type provided.");
+            return await GetByDecimalAsync(price, compareType, "detail_cart_price");
         }
 
-        private string GetByDateTime(string colName)
-        {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} = DATE_ADD(@Input, INTERVAL 1 DAY)";
-        }
+        public async Task<IEnumerable<DetailCartModel>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice) => await GetByRangeDecimalAsync(minPrice, maxPrice, "detail_cart_price");
 
-        public async Task<List<DetailCartModel>> GetAllByMonthAndYearAsync(int year, int month, string colName = "detail_cart_added_date")
-        {
-            try
-            {
-                string query = GetByMonthAndYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<DetailCartModel> accounts = await connection.QueryAsync<DetailCartModel>(query, new { FirstTime = year, SecondTime = month });
-                return accounts.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving detail carts by month and year: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<DetailCartModel>> GetByCartId(uint cartId) => await GetByInputAsync(cartId.ToString(), "cart_id");
 
-        public async Task<List<DetailCartModel>> GetAllByYearAsync(int year, string colName = "detail_cart_added_date")
-        {
-            try
-            {
-                string query = GetByYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<DetailCartModel> accounts = await connection.QueryAsync<DetailCartModel>(query, new { Input = year });
-                return accounts.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving detail carts by year: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<DetailCartModel>> GetAllByDateTimeRangeAsync(DateTime startDate, DateTime endDate, string colName = "detail_cart_added_date")
-        {
-            try
-            {
-                string query = GetByDateTimeRange(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<DetailCartModel> accounts = await connection.QueryAsync<DetailCartModel>(query, new { FirstTime = startDate, SecondTime = endDate });
-                return accounts.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving detail carts by date range: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<DetailCartModel>> GetAllByDateTimeAsync(DateTime dateTime, string colName = "detail_cart_added_date")
-        {
-            try
-            {
-                string query = GetByDateTime(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<DetailCartModel> accounts = await connection.QueryAsync<DetailCartModel>(query, new { Input = dateTime });
-                return accounts.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving detail carts by date: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<DetailCartModel>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice, string colName = "detail_cart_price")
-        {
-            try
-            {
-                CheckColumnName(colName);
-                string query = $"SELECT * FROM {TableName} WHERE {colName} BETWEEN @MinPrice AND @MaxPrice";
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<DetailCartModel> detailCarts = await connection.QueryAsync<DetailCartModel>(query, new { MinPrice = minPrice, MaxPrice = maxPrice });
-                return detailCarts.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving detail carts by price range: {ex.Message}", ex);
-            }
-        }
-
-        //public async Task<List<DetailCartModel>> GetByCartQuantityAsync(int quantity)
-        //{
-        //    try
-        //    {
-        //        string query = GetDataQuery("detail_cart_quantity");
-        //        using IDbConnection connection = ConnectionFactory.CreateConnection();
-        //        IEnumerable<DetailCartModel> detailCarts = await connection.QueryAsync<DetailCartModel>(query, new { Input = quantity });
-        //        return detailCarts.AsList();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Handle exception (log it, rethrow it, etc.)
-        //        throw new Exception($"Error retrieving detail carts by quantity: {ex.Message}", ex);
-        //    }
-        //}
-
-        public async Task<List<DetailCartModel>> GetAllByIdAsync(string id, string colIdName)
-        {
-            try
-            {
-                string query = GetDataQuery(colIdName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<DetailCartModel> detailCarts = await connection.QueryAsync<DetailCartModel>(query, new { Input = id });
-                return detailCarts.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving detail carts by ID: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<DetailCartModel>> GetByProductBarcode(string barcode) => await GetByInputAsync(barcode, "product_barcode");
     }
 }

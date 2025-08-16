@@ -4,6 +4,5 @@
     {
         //public string GetDeleteQuery();
         Task<int> DeleteByKeysAsync(TKey keys);
-        Task<int> DeleteBySingleKeyAsync(string key, string colName);
     }
 }

@@ -2,9 +2,9 @@
 {
     public interface IGetDataByDateTimeAsync<T> where T : class
     {
-        Task<List<T>> GetAllByMonthAndYearAsync(int year, int month, string colName);
-        Task<List<T>> GetAllByYearAsync(int year, string colName);
-        Task<List<T>> GetAllByDateTimeRangeAsync(DateTime startDate, DateTime endDate, string colName);
-        Task<List<T>> GetAllByDateTimeAsync(DateTime dateTime, string colName);
+        Task<IEnumerable<T>> GetByMonthAndYearAsync(int year, int month);
+        Task<IEnumerable<T>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum;
+        Task<IEnumerable<T>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate);
+        Task<IEnumerable<T>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum;
     }
 }

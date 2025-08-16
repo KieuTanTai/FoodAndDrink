@@ -1,15 +1,13 @@
-﻿using Dapper;
-using ProjectShop.Server.Core.Entities;
+﻿using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
-using ProjectShop.Server.Infrastructure.Configuration;
 using ProjectShop.Server.Infrastructure.Persistence;
-using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class InventoryMovementDAO : BaseNoneUpdateDAO<InventoryMovementModel>, IGetAllByIdAsync<InventoryMovementModel>, IGetByEnumAsync<InventoryMovementModel>, IGetDataByDateTimeAsync<InventoryMovementModel>
+    public class InventoryMovementDAO : BaseNoneUpdateDAO<InventoryMovementModel>, IInventoryMovementDAO<InventoryMovementModel>
     {
         public InventoryMovementDAO(
             IDbConnectionFactory connectionFactory,
@@ -19,6 +17,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             : base(connectionFactory, colService, converter, checker, "inventory_movement", "inventory_movement_id", string.Empty)
         {
         }
+
         protected override string GetInsertQuery()
         {
             return $@"INSERT INTO {TableName} (source_location_id, destination_location_id, inventory_movement_quantity
@@ -27,146 +26,57 @@ namespace ProjectShop.Server.Infrastructure.Data
                         , @InventoryMovementDate, InventoryMovementReason); SELECT LAST_INSERT_ID();";
         }
 
-        private string GetByMonthAndYear(string colName)
+        public async Task<IEnumerable<InventoryMovementModel>> GetAllByEnumAsync<TEnum>(TEnum tEnum) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE YEAR({colName}) = @FirstTime AND MONTH({colName}) = @SecondTime";
+            if (tEnum is not EInventoryMovementReason reason)
+                throw new ArgumentException("Invalid enum type for InventoryMovementModel.");
+            return await GetByInputAsync(reason.ToString(), "inventory_movement_reason");
         }
 
-        private string GetByYear(string colName)
+        public async Task<IEnumerable<InventoryMovementModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE Year({colName}) = @Input";
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid enum type for InventoryMovementModel date comparison.");
+            return await GetByDateTimeAsync("inventory_movement_date", EQueryTimeType.DATE_TIME, type, dateTime);
         }
 
-        private string GetByDateTimeRange(string colName)
+        public async Task<IEnumerable<InventoryMovementModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate)
+            => await GetByDateTimeAsync("inventory_movement_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate));
+
+        public async Task<InventoryMovementModel?> GetByDestinationLocationId(uint locationId) 
+            => await GetSingleDataAsync(locationId.ToString(), "destination_location_id");
+
+        public async Task<IEnumerable<InventoryMovementModel>> GetByDestinationLocationIdsAsync(IEnumerable<uint> locationIds) => await GetByInputsAsync(locationIds.Select(locationId => locationId.ToString()), "destination_location_id");
+
+        public async Task<InventoryMovementModel?> GetByEnumAsync<TEnum>(TEnum tEnum) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} >= @FirstTime AND {colName} < DATE_ADD(@SecondTime, INTERVAL 1 DAY)";
+            if (tEnum is not EInventoryMovementReason reason)
+                throw new ArgumentException("Invalid enum type for InventoryMovementModel.");
+            return await GetSingleDataAsync(reason.ToString(), "inventory_movement_reason");
         }
 
-        private string GetByDateTime(string colName)
+        public async Task<InventoryMovementModel?> GetByInventoryIdAsync(uint inventoryId) => await GetSingleDataAsync(inventoryId.ToString(), "inventory_id");
+
+        public async Task<IEnumerable<InventoryMovementModel>> GetByInventoryIdsAsync(IEnumerable<uint> inventoryIds) => await GetByInputsAsync(inventoryIds.Select(id => id.ToString()), "inventory_id");
+
+        public async Task<IEnumerable<InventoryMovementModel>> GetByMonthAndYearAsync(int year, int month) => await GetByDateTimeAsync("inventory_movement_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month));
+
+        public async Task<IEnumerable<InventoryMovementModel>> GetByQuantityAsync<TCompareType>(int quantity, TCompareType compareType) where TCompareType : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} = DATE_ADD(@Input, INTERVAL 1 DAY)";
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid enum type for InventoryMovementModel quantity comparison.");
+            return await GetByInputAsync(quantity.ToString(), type, "inventory_movement_quantity");
         }
 
-        public async Task<List<InventoryMovementModel>> GetAllByIdAsync(string id, string colIdName = "source_location_id")
-        {
-            try
-            {
-                string query = GetDataQuery(colIdName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InventoryMovementModel> movements = await connection.QueryAsync<InventoryMovementModel>(query, new { Input = id });
-                return movements.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception
-                throw new Exception($"Error retrieving data by ID: {ex.Message}", ex);
-            }
-        }
+        public async Task<InventoryMovementModel?> GetBySourceLocationId(uint locationId) => await GetSingleDataAsync(locationId.ToString(), "source_location_id");
 
-        public async Task<List<InventoryMovementModel>> GetAllByDateTimeAsync(DateTime dateTime, string colName = "inventory_movement_date")
-        {
-            try
-            {
-                string query = GetByDateTime(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InventoryMovementModel> movements = await connection.QueryAsync<InventoryMovementModel>(query, new { Input = dateTime });
-                return movements.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception
-                throw new Exception($"Error retrieving movements by date: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<InventoryMovementModel>> GetBySourceLocationIdsAsync(IEnumerable<uint> locationIds) => await GetByInputsAsync(locationIds.Select(id => id.ToString()), "source_location_id");
 
-        public async Task<List<InventoryMovementModel>> GetAllByMonthAndYearAsync(int year, int month, string colName = "inventory_movement_date")
+        public async Task<IEnumerable<InventoryMovementModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
         {
-            try
-            {
-                string query = GetByMonthAndYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InventoryMovementModel> movements = await connection.QueryAsync<InventoryMovementModel>(query, new { FirstTime = year, SecondTime = month });
-                return movements.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception
-                throw new Exception($"Error retrieving movements by month and year: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<InventoryMovementModel>> GetAllByYearAsync(int year, string colName = "inventory_movement_date")
-        {
-            try
-            {
-                string query = GetByYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InventoryMovementModel> movements = await connection.QueryAsync<InventoryMovementModel>(query, new { Input = year });
-                return movements.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception
-                throw new Exception($"Error retrieving movements by year: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<InventoryMovementModel>> GetAllByDateTimeRangeAsync(DateTime startDate, DateTime endDate, string colName = "inventory_movement_date")
-        {
-            try
-            {
-                string query = GetByDateTimeRange(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InventoryMovementModel> movements = await connection.QueryAsync<InventoryMovementModel>(query, new { FirstTime = startDate, SecondTime = endDate });
-                return movements.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception
-                throw new Exception($"Error retrieving movements by date range: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<InventoryMovementModel>> GetAllByEnumAsync<TEnum>(TEnum tEnum, string colName = "inventory_movement_reason") where TEnum : Enum
-        {
-            try
-            {
-                if (tEnum is not EInventoryMovementReason)
-                    throw new ArgumentException($"Enum type {typeof(TEnum).Name} is not a valid inventory movement reason.");
-                string query = GetDataQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InventoryMovementModel> movements = await connection.QueryAsync<InventoryMovementModel>(query, new { Input = tEnum.ToDbValue() });
-                return movements.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception
-                throw new Exception($"Error retrieving movements by enum: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<InventoryMovementModel> GetByEnumAsync<TEnum>(TEnum tEnum, string colName = "inventory_movement_reason") where TEnum : Enum
-        {
-            try
-            {
-                if (tEnum is not EInventoryMovementReason)
-                    throw new ArgumentException($"Enum type {typeof(TEnum).Name} is not a valid inventory movement reason.");
-                string query = GetDataQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                InventoryMovementModel? movement = await connection.QueryFirstOrDefaultAsync<InventoryMovementModel>(query, new { Input = tEnum.ToDbValue() });
-                if (movement == null)
-                    throw new Exception($"No movement found for enum value: {tEnum}");
-                return movement;
-            }
-            catch (Exception ex)
-            {
-                // Handle exception
-                throw new Exception($"Error retrieving movement by enum: {ex.Message}", ex);
-            }
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid enum type for InventoryMovementModel year comparison.");
+            return await GetByDateTimeAsync("inventory_movement_date", EQueryTimeType.YEAR, type, year);
         }
     }
 }

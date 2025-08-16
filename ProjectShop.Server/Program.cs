@@ -1,16 +1,29 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using ProjectShop.Server.Infrastructure.Configuration;
+using ProjectShop.Server.Infrastructure.Persistence;
+using ProjectShop.Server.Infrastructure.Services;
+
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-var app = builder.Build();
 
-if (Directory.Exists(app.Environment.WebRootPath))
+try
 {
-    app.UseDefaultFiles();
-    //app.UseStaticFiles(); // nếu bạn không dùng .MapStaticAssets
+    builder.Services.AddInfrastructureServices();
+    builder.Services.AddApplicationServices();
+    SnakeCaseMapperInitializer.RegisterAllEntities();
 }
+catch (Exception ex)
+{
+    System.Console.WriteLine($"Application startup failed: {ex.Message}");
+    Environment.Exit(1);
+}
+
+var app = builder.Build();
+SqlTypeHandlerRegistration.Register();
+GetProviderService.SetServiceProvider(app.Services);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

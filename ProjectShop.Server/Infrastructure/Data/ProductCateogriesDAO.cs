@@ -1,14 +1,14 @@
 ﻿using Dapper;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
 using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class ProductCateogriesDAO : BaseDAO<ProductCategoriesModel>, IGetByKeysAsync<ProductCategoriesModel, ProductCategoriesKey>,
-        IDeleteByKeysAsync<ProductCategoriesKey>
+    public class ProductCateogriesDAO : BaseDAO<ProductCategoriesModel>, IProductCategoriesDAO<ProductCategoriesModel, ProductCategoriesKey>
     {
         public ProductCateogriesDAO(
             IDbConnectionFactory connectionFactory,
@@ -26,13 +26,7 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         protected override string GetUpdateQuery()
         {
-            return $@"UPDATE {TableName} SET category_id = @CategoryId WHERE product_barcode = @ProductBarcode AND 
-                        category_id = @OldCategoryId";
-        }
-
-        private string GetSelectByIdsQuery()
-        {
-            return $@"SELECT * FROM {TableName} WHERE category_id = @CategoryId AND product_barcode = @ProductBarcode";
+            return $@"UPDATE {TableName} SET category_id = @CategoryId WHERE id = ";
         }
 
         private string GetDeleteByKeysQuery()
@@ -42,60 +36,29 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         private string GetDeleteQuery(string colName)
         {
-            CheckColumnName(colName);
-            string column = Converter.SnakeCaseToPascalCase(colName);
-            return $@"DELETE FROM {TableName} WHERE {colName} = @{column}";
+            return $@"DELETE FROM {TableName} WHERE {colName} = @Input";
         }
 
-        public async Task<ProductCategoriesModel> GetByKeysAsync(ProductCategoriesKey keys)
+        public async Task<IEnumerable<ProductCategoriesModel>> GetByCategoryIdAsync(uint categoryId) => await GetByInputAsync(categoryId.ToString(), "category_id");
+
+        public async Task<IEnumerable<ProductCategoriesModel>> GetByProductBarcodeAsync(string productBarcode) => await GetByInputAsync(productBarcode, "product_barcode");
+
+        public async Task<ProductCategoriesModel> GetByKeysAsync(ProductCategoriesKey keys) => await GetSingleByTwoIdAsync(ColumnIdName, SecondColumnIdName, keys.CategoryId, keys.ProductBarcode);
+
+        public async Task<IEnumerable<ProductCategoriesModel>> GetByListKeysAsync(IEnumerable<ProductCategoriesKey> keys)
         {
             try
             {
-                string query = GetSelectByIdsQuery();
+                string query = $@"SELECT * FROM {TableName} WHERE ({ColumnIdName}, {SecondColumnIdName}) IN @Keys";
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
-                DynamicParameters dynamic = new DynamicParameters();
-                dynamic.Add("CategoryId", keys.CategoryId);
-                dynamic.Add("ProductBarcode", keys.ProductBarcode);
-                ProductCategoriesModel? result = await connection.QueryFirstOrDefaultAsync<ProductCategoriesModel>(query, dynamic);
-                if (result == null)
-                    throw new KeyNotFoundException($"No product category found with CategoryId: {keys.CategoryId} and ProductBarcode: {keys.ProductBarcode}");
-                return result;
+                IEnumerable<ProductCategoriesModel> results = await connection.QueryAsync<ProductCategoriesModel>(query, new { Keys = keys.Select(k => new { k.CategoryId, k.ProductBarcode }) });
+                if (results == null || !results.Any())
+                    throw new KeyNotFoundException($"No records found in {TableName} for the provided keys.");
+                return results;
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error in {nameof(GetByKeysAsync)}: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<ProductCategoriesModel>> GetByListKeysAsync(IEnumerable<ProductCategoriesKey> keys)
-        {
-            try
-            {
-                string query = GetSelectByIdsQuery();
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<ProductCategoriesModel> result = await connection.QueryAsync<ProductCategoriesModel>(query, keys);
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(GetByListKeysAsync)}: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<int> DeleteBySingleKeyAsync(string key, string colName)
-        {
-            try
-            {
-                string query = GetDeleteQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                DynamicParameters dynamic = new DynamicParameters();
-                dynamic.Add(colName, key);
-                int result = await connection.ExecuteAsync(query, dynamic);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(DeleteBySingleKeyAsync)}: {ex.Message}", ex);
+                throw new Exception($"Error retrieving data from {TableName} with keys: {ex.Message}", ex);
             }
         }
 
@@ -105,12 +68,28 @@ namespace ProjectShop.Server.Infrastructure.Data
             {
                 string query = GetDeleteByKeysQuery();
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
-                int result = await connection.ExecuteAsync(query, keys);
-                return result;
+                return await connection.ExecuteAsync(query, keys);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error in {nameof(DeleteByKeysAsync)}: {ex.Message}", ex);
+                throw new Exception($"Error deleting data from {TableName} with keys {keys}: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<int> DeleteByCategoryIdAsync(uint categoryId) => await DeleteBySingleKeyAsync(categoryId.ToString(), "category_id");
+        public async Task<int> DeleteByProductBarcodeAsync(string productBarcode) => await DeleteBySingleKeyAsync(productBarcode, "product_barcode");
+
+        private async Task<int> DeleteBySingleKeyAsync(string key, string colName)
+        {
+            try
+            {
+                string query = GetDeleteQuery(colName);
+                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                return await connection.ExecuteAsync(query, new { Input = key });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deleting data from {TableName} with key {key}: {ex.Message}", ex);
             }
         }
     }

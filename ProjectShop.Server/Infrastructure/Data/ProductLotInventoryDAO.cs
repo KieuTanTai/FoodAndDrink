@@ -1,13 +1,15 @@
 ﻿using Dapper;
 using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
 using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class ProductLotInventoryDAO : BaseNoneUpdateDAO<ProductLotInventoryModel>, IGetDataByDateTimeAsync<ProductLotInventoryModel>, IGetByKeysAsync<ProductLotInventoryModel, ProductLotInventoryKey>
+    public class ProductLotInventoryDAO : BaseNoneUpdateDAO<ProductLotInventoryModel>, IProductLotInventoryDAO<ProductLotInventoryModel, ProductLotInventoryKey>
     {
         public ProductLotInventoryDAO(
             IDbConnectionFactory connectionFactory,
@@ -17,129 +19,66 @@ namespace ProjectShop.Server.Infrastructure.Data
             : base(connectionFactory, colService, converter, checker, "product_lot_inventory", "product_lot_id", "inventory_id")
         {
         }
+
         protected override string GetInsertQuery()
         {
             return $@"INSERT INTO {TableName} (product_lot_id, inventory_id, product_lot_inventory_quantity, product_lot_inventory_added_date) 
                       VALUES (@ProductLotId, @InventoryId, @ProductLotInventoryId, @ProductLotInventoryAddedDate); SELECT LAST_INSERT_ID();";
         }
-
-        private string GetByDateTimeRangeQuery(string colName)
+        
+        private string GetSelectByKeysQuery()
         {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} 
-                      WHERE {colName} >= @FirstTime AND {colName} < DATE_ADD(@SecondTime, INTERVAL 1 DAY)";
+            return $@"SELECT * FROM {TableName} WHERE {ColumnIdName} = @ProductLotId AND {SecondColumnIdName} = @InventoryId;";
         }
 
-        private string GetByDateTimeQuery(string colName)
+        public async Task<IEnumerable<ProductLotInventoryModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} WHERE {colName} = DATE_ADD(@Input, INTERVAL 1 DAY)";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("product_lot_inventory_added_date", EQueryTimeType.DATE_TIME, ct, dateTime);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        private string GetByMonthAndYearQuery(string colName)
+        public async Task<IEnumerable<ProductLotInventoryModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate) => await GetByDateTimeAsync("product_lot_inventory_added_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate));
+
+        public async Task<IEnumerable<ProductLotInventoryModel>> GetByMonthAndYearAsync(int year, int month) => await GetByDateTimeAsync("product_lot_inventory_added_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+
+        public async Task<IEnumerable<ProductLotInventoryModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} 
-                      WHERE YEAR({colName}) = @FirstTime AND MONTH({colName}) = @SecondTime";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("product_lot_inventory_added_date", EQueryTimeType.YEAR, ct, year);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        private string GetByYearQuery(string colName)
+        // ----------- InventoryId -----------
+        public async Task<IEnumerable<ProductLotInventoryModel>> GetByInventoryIdAsync(uint inventoryId) => await GetByInputAsync(inventoryId.ToString(), "inventory_id");
+
+        // ----------- InventoryQuantity -----------
+        public async Task<IEnumerable<ProductLotInventoryModel>> GetByInventoryQuantityAsync<TCompareType>(int quantity, TCompareType compareType) where TCompareType : Enum
         {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} WHERE YEAR({colName}) = @Input";
+            if (compareType is ECompareType ct)
+                return await GetByDecimalAsync(quantity, ct, "product_lot_inventory_quantity");
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<List<ProductLotInventoryModel>> GetByListKeysAsync(IEnumerable<ProductLotInventoryKey> keys)
+        // ----------- ProductLotId -----------
+        public async Task<IEnumerable<ProductLotInventoryModel>> GetByProductLotIdAsync(uint productLotId) => await GetByInputAsync(productLotId.ToString(), "product_lot_id");
+
+        // ----------- Keys -----------
+        public async Task<ProductLotInventoryModel> GetByKeysAsync(ProductLotInventoryKey keys) => await GetSingleByTwoIdAsync(ColumnIdName, SecondColumnIdName, keys.ProductLotId, keys.InventoryId);
+
+        // ----------- ListKeys (giữ nguyên) -----------
+        public async Task<IEnumerable<ProductLotInventoryModel>> GetByListKeysAsync(IEnumerable<ProductLotInventoryKey> keys)
         {
             try
             {
-                string query = $@"SELECT * FROM {TableName} 
-                                  WHERE product_lot_id = @ProductLotId AND inventory_id = @InventoryId";
+                string query = GetSelectByKeysQuery();
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
                 IEnumerable<ProductLotInventoryModel> results = await connection.QueryAsync<ProductLotInventoryModel>(query, keys);
-                return results.AsList();
+                return results;
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error getting ProductLotInventory by keys: {ex.Message}", ex);
-            }   
-        }
-
-        public async Task<ProductLotInventoryModel> GetByKeysAsync(ProductLotInventoryKey keys)
-        {
-            try
-            {
-                string query = $@"SELECT * FROM {TableName} 
-                                  WHERE product_lot_id = @ProductLotId AND inventory_id = @InventoryId";
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                ProductLotInventoryModel? result = await connection.QueryFirstOrDefaultAsync<ProductLotInventoryModel>(query, keys);
-                if (result == null)
-                    throw new KeyNotFoundException($"ProductLotInventory with key {keys.ProductLotId}, {keys.InventoryId} not found.");
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving ProductLotInventory by key: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<ProductLotInventoryModel>> GetAllByMonthAndYearAsync(int year, int month, string colName = "product_lot_inventory_added_date")
-        {
-            try
-            {
-                string query = GetByMonthAndYearQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<ProductLotInventoryModel> result = await connection.QueryAsync<ProductLotInventoryModel>(query, new { FirstTime = year, SecondTime = month });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving ProductLotInventoryModels by month and year: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<ProductLotInventoryModel>> GetAllByYearAsync(int year, string colName = "product_lot_inventory_added_date")
-        {
-            try
-            {
-                string query = GetByYearQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<ProductLotInventoryModel> result = await connection.QueryAsync<ProductLotInventoryModel>(query, new { Input = year });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving ProductLotInventoryModels by year: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<ProductLotInventoryModel>> GetAllByDateTimeRangeAsync(DateTime startDate, DateTime endDate, string colName = "product_lot_inventory_added_date")
-        {
-            try
-            {
-                string query = GetByDateTimeRangeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<ProductLotInventoryModel> result = await connection.QueryAsync<ProductLotInventoryModel>(query, new { FirstTime = startDate, SecondTime = endDate });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving ProductLotInventoryModels by date range: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<ProductLotInventoryModel>> GetAllByDateTimeAsync(DateTime dateTime, string colName = "product_lot_inventory_added_date")
-        {
-            try
-            {
-                string query = GetByDateTimeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<ProductLotInventoryModel> result = await connection.QueryAsync<ProductLotInventoryModel>(query, new { Input = dateTime });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving ProductLotInventoryModels by date: {ex.Message}", ex);
+                throw new Exception($"Error getting data by list keys in {TableName}: {ex.Message}", ex);
             }
         }
     }

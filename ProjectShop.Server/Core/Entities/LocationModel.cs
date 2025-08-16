@@ -6,53 +6,53 @@ namespace ProjectShop.Server.Core.Entities
     public class LocationModel : IGetIdEntity<uint>
     {
         // Corresponds to 'location_id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint LocationId { get; private set; }
+        public uint LocationId { get; set; }
 
         // Corresponds to 'location_type_id' (INT UNSIGNED)
-        public uint LocationTypeId { get; private set; }
+        public uint LocationTypeId { get; set; }
 
         // Corresponds to 'house_number' (VARCHAR(20))
-        public string HouseNumber { get; private set; }
+        public string LocationHouseNumber { get; set; } = string.Empty;
 
         // Corresponds to 'location_street' (NVARCHAR(40))
-        public string LocationStreet { get; private set; }
+        public string LocationStreet { get; set; } = string.Empty;
 
         // Corresponds to 'location_ward_id' (INT UNSIGNED)
-        public uint LocationWardId { get; private set; }
+        public uint LocationWardId { get; set; }
 
         // Corresponds to 'location_district_id' (INT UNSIGNED)
-        public uint LocationDistrictId { get; private set; }
+        public uint LocationDistrictId { get; set; }
 
         // Corresponds to 'location_city_id' (INT UNSIGNED)
-        public uint LocationCityId { get; private set; }
+        public uint LocationCityId { get; set; }
 
         // Corresponds to 'location_phone' (VARCHAR(12))
-        public string LocationPhone { get; private set; }
+        public string LocationPhone { get; set; } = string.Empty;
 
         // Corresponds to 'location_email' (VARCHAR(60))
-        public string LocationEmail { get; private set; }
+        public string LocationEmail { get; set; } = string.Empty;
 
         // Corresponds to 'location_name' (VARCHAR(50))
-        public string LocationName { get; private set; }
+        public string LocationName { get; set; } = string.Empty;
 
         // Corresponds to 'location_status' (TINYINT(1))
-        public bool LocationStatus { get; private set; }
+        public bool LocationStatus { get; set; }
 
         // Navigation properties
-        public LocationDistrictModel LocationDistrict { get; private set; } = null!;
-        public LocationWardModel LocationWard { get; private set; } = null!;
-        public LocationTypeModel LocationType { get; private set; } = null!;
-        public LocationCityModel LocationCity { get; private set; } = null!;
-        public ICollection<InventoryModel> Inventories { get; private set; } = new List<InventoryModel>();
-        public ICollection<InventoryMovementModel> SourceInventoryMovements { get; private set; } = new List<InventoryMovementModel>();
-        public ICollection<InventoryMovementModel> DestinationInventoryMovements { get; private set; } = new List<InventoryMovementModel>();
-        public ICollection<DisposeProductModel> DisposeProducts { get; private set; } = new List<DisposeProductModel>();
+        public LocationDistrictModel LocationDistrict { get; set; } = null!;
+        public LocationWardModel LocationWard { get; set; } = null!;
+        public LocationTypeModel LocationType { get; set; } = null!;
+        public LocationCityModel LocationCity { get; set; } = null!;
+        public ICollection<InventoryModel> Inventories { get; set; } = new List<InventoryModel>();
+        public ICollection<InventoryMovementModel> SourceInventoryMovements { get; set; } = new List<InventoryMovementModel>();
+        public ICollection<InventoryMovementModel> DestinationInventoryMovements { get; set; } = new List<InventoryMovementModel>();
+        public ICollection<DisposeProductModel> DisposeProducts { get; set; } = new List<DisposeProductModel>();
 
-        public LocationModel(uint locationId, uint locationTypeId, string houseNumber, string locationStreet, uint locationWardId, uint locationDistrictId, uint locationCityId, string locationPhone, string locationEmail, string locationName, bool locationStatus)
+        public LocationModel(uint locationId, uint locationTypeId, string locationHouseNumber, string locationStreet, uint locationWardId, uint locationDistrictId, uint locationCityId, string locationPhone, string locationEmail, string locationName, bool locationStatus)
         {
             LocationId = locationId;
             LocationTypeId = locationTypeId;
-            HouseNumber = houseNumber;
+            LocationHouseNumber = locationHouseNumber;
             LocationStreet = locationStreet;
             LocationWardId = locationWardId;
             LocationDistrictId = locationDistrictId;
@@ -62,6 +62,8 @@ namespace ProjectShop.Server.Core.Entities
             LocationName = locationName;
             LocationStatus = locationStatus;
         }
+
+        public LocationModel() { }
 
         public uint GetIdEntity() => LocationId;
     }

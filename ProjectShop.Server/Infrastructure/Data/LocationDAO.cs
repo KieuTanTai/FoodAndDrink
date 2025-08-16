@@ -1,14 +1,12 @@
-﻿using Dapper;
-using ProjectShop.Server.Core.Entities;
+﻿using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
-using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class LocationDAO : BaseDAO<LocationModel>, IGetAllByIdAsync<LocationModel>, IGetByStatusAsync<LocationModel>,
-                IGetRelativeAsync<LocationModel>
+    public class LocationDAO : BaseDAO<LocationModel>, ILocationDAO<LocationModel>
     {
         public LocationDAO(
             IDbConnectionFactory connectionFactory,
@@ -21,9 +19,9 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         protected override string GetInsertQuery()
         {
-            return $@"INSERT INTO {TableName} (location_type_id, house_number, location_street, location_ward_id, location_district_id,
+            return $@"INSERT INTO {TableName} (location_type_id, location_house_number, location_street, location_ward_id, location_district_id,
                      location_city_id, location_phone, location_email, location_name, location_status)
-                    VALUES (@LocationTypeId, @HouseNumber, @LocationStreet, @LocationWardId,
+                    VALUES (@LocationTypeId, @LocationHouseNumber, @LocationStreet, @LocationWardId,
                      @LocationDistrictId, @LocationCityId, @LocationPhone, @LocationEmail, @LocationName, @LocationStatus); SELECT LAST_INSERT_ID();";
         }
 
@@ -32,7 +30,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             string colIdName = Converter.SnakeCaseToPascalCase(ColumnIdName);
             return $@"UPDATE {TableName} SET 
                 location_type_id = @LocationTypeId,
-                house_number = @HouseNumber,
+                location_house_number = @LocationHouseNumber,
                 location_street = @LocationStreet,
                 location_ward_id = @LocationWardId,
                 location_district_id = @LocationDistrictId,
@@ -44,57 +42,40 @@ namespace ProjectShop.Server.Infrastructure.Data
               WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        private string GetRelativeQuery(string colName)
-        {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} LIKE @Input;";
-        }
+        public async Task<LocationModel?> GetByLocationNameAsync(string locationName) => await GetSingleDataAsync(locationName, "location_name");
 
-        public async Task<List<LocationModel>> GetRelativeAsync(string input, string colName)
-        {
-            try
-            {
-                string query = GetRelativeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                if (!input.Contains('%'))
-                    input = $"%{input}%"; // Ensure input is wrapped in wildcards
-                IEnumerable<LocationModel> locations = await connection.QueryAsync<LocationModel>(query, new { Input = input });
-                return locations.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(LocationDAO)}.{nameof(GetRelativeAsync)}: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<LocationModel>> GetByLocationNamesAsync(IEnumerable<string> locationNames) => await GetByInputsAsync(locationNames, "location_name");
 
-        public async Task<List<LocationModel>> GetAllByStatusAsync(bool status)
-        {
-            try
-            {
-                string query = GetDataQuery("location_status");
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<LocationModel> result = await connection.QueryAsync<LocationModel>(query, new { Input = status });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving LocationModels by status: {ex.Message}", ex);
-            }
-        }
+        public async Task<LocationModel?> GetByHouseNumberAsync(string houseNumber) => await GetSingleDataAsync(houseNumber, "location_house_number");
 
-        public async Task<List<LocationModel>> GetAllByIdAsync(string id, string colIdName)
-        {
-            try
-            {
-                string query = GetDataQuery(colIdName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<LocationModel> result = await connection.QueryAsync<LocationModel>(query, new { Input = id });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving LocationModels by ID: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<LocationModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "location_name");
+
+        public async Task<IEnumerable<LocationModel>> GetByLocationCitiesAsync(IEnumerable<uint> cityIds) => await GetByInputsAsync(cityIds.Select(locationCity => locationCity.ToString()), "location_city_id");
+
+        public async Task<IEnumerable<LocationModel>> GetByLocationCityAsync(uint cityId) => await GetByInputAsync(cityId.ToString(), "location_city_id");
+
+        public async Task<IEnumerable<LocationModel>> GetByLocationDistrictAsync(uint districtId) => await GetByInputAsync(districtId.ToString(), "location_district_id");
+
+        public async Task<IEnumerable<LocationModel>> GetByLocationDistrictsAsync(IEnumerable<uint> districtIds) => await GetByInputsAsync(districtIds.Select(locationDistrict => locationDistrict.ToString()), "location_district_id");
+
+        public async Task<LocationModel?> GetByLocationEmailAsync(string email) => await GetSingleDataAsync(email, "location_email");
+
+        public async Task<IEnumerable<LocationModel>> GetByLocationEmailsAsync(IEnumerable<string> emails) => await GetByInputsAsync(emails, "location_email");
+
+        public async Task<LocationModel?> GetByLocationPhoneAsync(string phone) => await GetSingleDataAsync(phone, "location_phone");
+
+        public async Task<IEnumerable<LocationModel>> GetByLocationPhonesAsync(IEnumerable<string> phones) => await GetByInputsAsync(phones, "location_phone");
+
+        public async Task<IEnumerable<LocationModel>> GetByLocationTypeIdAsync(uint typeId) => await GetByInputAsync(typeId.ToString(), "location_type_id");
+
+        public async Task<IEnumerable<LocationModel>> GetByLocationTypeIdsAsync(IEnumerable<uint> typeIds) => await GetByInputsAsync(typeIds.Select(locationType => locationType.ToString()), "location_type_id");
+
+        public async Task<IEnumerable<LocationModel>> GetByLocationWardIdAsync(uint wardId) => await GetByInputAsync(wardId.ToString(), "location_ward_id");
+
+        public async Task<IEnumerable<LocationModel>> GetByLocationWardIdsAsync(IEnumerable<uint> wardIds) => await GetByInputsAsync(wardIds.Select(locationWard => locationWard.ToString()), "location_ward_id");
+
+        public async Task<IEnumerable<LocationModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "location_status");
+
+        public async Task<IEnumerable<LocationModel>> GetByStreetAsync(string streetName) => await GetByInputAsync(streetName, "location_street");
     }
 }

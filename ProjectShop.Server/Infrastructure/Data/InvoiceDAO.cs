@@ -1,14 +1,13 @@
-﻿using Dapper;
-using ProjectShop.Server.Core.Entities;
+﻿using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
-using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class InvoiceDAO : BaseNoneUpdateDAO<InvoiceModel>, IGetDataByDateTimeAsync<InvoiceModel>, IGetByStatusAsync<InvoiceModel>,
-                    IGetAllByIdAsync<InvoiceModel>, IGetByRangePriceAsync<InvoiceModel>
+    public class InvoiceDAO : BaseNoneUpdateDAO<InvoiceModel>, IInvoiceDAO<InvoiceModel>
     {
         public InvoiceDAO(
             IDbConnectionFactory connectionFactory,
@@ -26,137 +25,46 @@ namespace ProjectShop.Server.Infrastructure.Data
                       VALUES (@CustomerId, @EmployeeId, @PaymentMethodId, @InvoiceTotalPrice, @InvoiceDate, @InvoiceStatus); SELECT LAST_INSERT_ID();";
         }
 
-        private string GetByDateTimeRangeQuery(string colName)
+        public async Task<IEnumerable<InvoiceModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} 
-                      WHERE {colName} >= @FirstTime AND {colName} < DATE_ADD(@SecondTime, INTERVAL 1 DAY)";
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid compare type provided.", nameof(compareType));
+            return await GetByDateTimeAsync("invoice_date", EQueryTimeType.DATE_TIME, type, dateTime);
         }
 
-        private string GetByDateTimeQuery(string colName)
+        public async Task<IEnumerable<InvoiceModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate) 
+            => await GetByDateTimeAsync("invoice_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate));
+
+        public async Task<IEnumerable<InvoiceModel>> GetByInputPriceAsync<TEnum>(decimal price, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} WHERE {colName} = DATE_ADD(@Input, INTERVAL 1 DAY)";
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid compare type provided.", nameof(compareType));
+            return await GetByDecimalAsync(price, type, "invoice_total_price");
         }
 
-        private string GetByMonthAndYearQuery(string colName)
+        public async Task<IEnumerable<InvoiceModel>> GetByMonthAndYearAsync(int year, int month) => await GetByDateTimeAsync("invoice_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month));
+
+        public async Task<IEnumerable<InvoiceModel>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice) => await GetByRangeDecimalAsync(minPrice, maxPrice, "invoice_total_price");
+
+        public async Task<IEnumerable<InvoiceModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "invoice_status");
+
+        public async Task<IEnumerable<InvoiceModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} 
-                      WHERE YEAR({colName}) = @FirstTime AND MONTH({colName}) = @SecondTime";
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid compare type provided.", nameof(compareType));
+            return await GetByDateTimeAsync("invoice_date", EQueryTimeType.YEAR, type, year);
         }
 
-        private string GetByYearQuery(string colName)
-        {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} WHERE YEAR({colName}) = @Input";
-        }
+        public async Task<IEnumerable<InvoiceModel>> GetByCustomerIdAsync(uint customerId) => await GetByInputAsync(customerId.ToString(), "customer_id");
 
+        public async Task<IEnumerable<InvoiceModel>> GetByCustomerIdsAsync(IEnumerable<uint> customerIds) => await GetByInputsAsync(customerIds.Select(customerId => customerId.ToString()), "customer_id");
 
-        public async Task<List<InvoiceModel>> GetAllByIdAsync(string id, string colIdName = "customer_id")
-        {
-            try
-            {
-                string query = GetDataQuery(colIdName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InvoiceModel> result = await connection.QueryAsync<InvoiceModel>(query, new { Input = id });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving InvoiceModels by ID: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<InvoiceModel>> GetByEmployeeIdAsync(uint employeeId) => await GetByInputAsync(employeeId.ToString(), "employee_id");
 
-        public async Task<List<InvoiceModel>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice, string colName = "invoice_total_price")
-        {
-            try
-            {
-                CheckColumnName(colName);
-                string query = $@"SELECT * FROM {TableName} WHERE {colName} BETWEEN @MinPrice AND @MaxPrice";
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InvoiceModel> result = await connection.QueryAsync<InvoiceModel>(query, new { MinPrice = minPrice, MaxPrice = maxPrice });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving InvoiceModels by price range: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<InvoiceModel>> GetByEmployeeIdsAsync(IEnumerable<uint> employeeIds) => await GetByInputsAsync(employeeIds.Select(employeeId => employeeId.ToString()), "employee_id");
 
-        public async Task<List<InvoiceModel>> GetAllByStatusAsync(bool status)
-        {
-            try
-            {
-                string query = GetDataQuery("invoice_status");
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InvoiceModel> result = await connection.QueryAsync<InvoiceModel>(query, new { Input = status });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving InvoiceModels by status: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<InvoiceModel>> GetByPaymentMethodIdAsync(uint paymentMethodId) => await GetByInputAsync(paymentMethodId.ToString(), "payment_method_id");
 
-        public async Task<List<InvoiceModel>> GetAllByMonthAndYearAsync(int year, int month, string colName = "invoice_date")
-        {
-            try
-            {
-                string query = GetByMonthAndYearQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InvoiceModel> result = await connection.QueryAsync<InvoiceModel>(query, new { FirstTime = year, SecondTime = month });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving InvoiceModels by month and year: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<InvoiceModel>> GetAllByYearAsync(int year, string colName = "invoice_date")
-        {
-            try
-            {
-                string query = GetByYearQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InvoiceModel> result = await connection.QueryAsync<InvoiceModel>(query, new { Input = year });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving InvoiceModels by year: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<InvoiceModel>> GetAllByDateTimeRangeAsync(DateTime startDate, DateTime endDate, string colName = "invoice_date")
-        {
-            try
-            {
-                string query = GetByDateTimeRangeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InvoiceModel> result = await connection.QueryAsync<InvoiceModel>(query, new { FirstTime = startDate, SecondTime = endDate });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving InvoiceModels by date range: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<InvoiceModel>> GetAllByDateTimeAsync(DateTime dateTime, string colName = "invoice_date")
-        {
-            try
-            {
-                string query = GetByDateTimeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InvoiceModel> result = await connection.QueryAsync<InvoiceModel>(query, new { Input = dateTime });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving InvoiceModels by date: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<InvoiceModel>> GetByPaymentMethodIdsAsync(IEnumerable<uint> paymentMethodIds) => await GetByInputsAsync(paymentMethodIds.Select(paymentMethodId => paymentMethodId.ToString()), "payment_method_id");
     }
 }

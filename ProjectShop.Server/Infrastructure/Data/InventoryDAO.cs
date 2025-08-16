@@ -1,13 +1,14 @@
-﻿using Dapper;
-using ProjectShop.Server.Core.Entities;
+﻿using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
 using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class InventoryDAO : BaseDAO<InventoryModel>, IGetAllByIdAsync<InventoryModel>, IGetByStatusAsync<InventoryModel>, IGetDataByDateTimeAsync<InventoryModel>
+    public class InventoryDAO : BaseDAO<InventoryModel>, IInventoryDAO<InventoryModel>
     {
         public InventoryDAO(
             IDbConnectionFactory connectionFactory,
@@ -32,127 +33,29 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        private string GetByDateTimeRangeQuery(string colName)
+        public async Task<IEnumerable<InventoryModel>> GetAllByLocationIdsAsync(IEnumerable<uint> locationIds) => await GetByInputsAsync(locationIds.Select(locationId => locationId.ToString()), "location_id");
+
+        public async Task<IEnumerable<InventoryModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} 
-                      WHERE {colName} >= @FirstTime AND {colName} < DATE_ADD(@SecondTime, INTERVAL 1 DAY)";
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid compare type provided.");
+            return await GetByDateTimeAsync("inventory_last_updated_date", EQueryTimeType.DATE_TIME, type, dateTime);
         }
 
-        private string GetByDateTimeQuery(string colName)
+        public async Task<IEnumerable<InventoryModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate) => await GetByDateTimeAsync("inventory_last_updated_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate));
+
+        public async Task<InventoryModel?> GetByLocationIdAsync(uint locationId) => await GetSingleDataAsync(locationId.ToString(), "location_id");
+
+        public async Task<IEnumerable<InventoryModel>> GetByMonthAndYearAsync(int year, int month) => await GetByDateTimeAsync("inventory_last_updated_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month));
+
+        public async Task<IEnumerable<InventoryModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "inventory_status");
+
+        public async Task<IEnumerable<InventoryModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} WHERE {colName} = DATE_ADD(@Input, INTERVAL 1 DAY)";
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid compare type provided.");
+            return await GetByDateTimeAsync("inventory_last_updated_date", EQueryTimeType.YEAR, type, year);
         }
 
-        private string GetByMonthAndYearQuery(string colName)
-        {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} 
-                      WHERE YEAR({colName}) = @FirstTime AND MONTH({colName}) = @SecondTime";
-        }
-
-        private string GetByYearQuery(string colName)
-        {
-            CheckColumnName(colName);
-            return $@"SELECT * FROM {TableName} WHERE YEAR({colName}) = @Input";
-        }
-
-        public async Task<List<InventoryModel>> GetAllByIdAsync(string id, string colIdName = "location_id")
-        {
-            try
-            {
-                string query = GetDataQuery(colIdName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InventoryModel> inventories = await connection.QueryAsync<InventoryModel>(query, new { Input = id });
-                return inventories.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exceptions as needed, such as logging
-                throw new InvalidOperationException($"Error retrieving inventory by ID: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<InventoryModel>> GetAllByStatusAsync(bool status)
-        {
-            try
-            {
-                string query = GetDataQuery("inventory_status");
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InventoryModel> inventories = await connection.QueryAsync<InventoryModel>(query, new { Input = status });
-                return inventories.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exceptions as needed, such as logging
-                throw new InvalidOperationException($"Error retrieving inventory by status: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<InventoryModel>> GetAllByDateTimeAsync(DateTime input ,string colName = "inventory_last_updated_date")
-        {
-            try
-            {
-                string query = GetByDateTimeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InventoryModel> inventories = await connection.QueryAsync<InventoryModel>(query, new { Input = input });
-                return inventories.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exceptions as needed, such as logging
-                throw new InvalidOperationException($"Error retrieving inventory by date: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<InventoryModel>> GetAllByDateTimeRangeAsync(DateTime firstTime, DateTime secondTime, string colName = "inventory_last_updated_date")
-        {
-            try
-            {
-                string query = GetByDateTimeRangeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InventoryModel> inventories = await connection.QueryAsync<InventoryModel>(query, new { FirstTime = firstTime, SecondTime = secondTime });
-                return inventories.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exceptions as needed, such as logging
-                throw new InvalidOperationException($"Error retrieving inventory by date range: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<InventoryModel>> GetAllByMonthAndYearAsync(int month, int year, string colName = "inventory_last_updated_date")
-        {
-            try
-            {
-                string query = GetByMonthAndYearQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InventoryModel> inventories = await connection.QueryAsync<InventoryModel>(query, new { FirstTime = year, SecondTime = month });
-                return inventories.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exceptions as needed, such as logging
-                throw new InvalidOperationException($"Error retrieving inventory by month and year: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<InventoryModel>> GetAllByYearAsync(int year, string colName = "inventory_last_updated_date")
-        {
-            try
-            {
-                string query = GetByYearQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<InventoryModel> inventories = await connection.QueryAsync<InventoryModel>(query, new { Input = year });
-                return inventories.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exceptions as needed, such as logging
-                throw new InvalidOperationException($"Error retrieving inventory by year: {ex.Message}", ex);
-            }
-
-        }
     }
 }

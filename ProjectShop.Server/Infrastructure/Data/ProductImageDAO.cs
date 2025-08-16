@@ -1,13 +1,13 @@
-﻿using Dapper;
-using ProjectShop.Server.Core.Entities;
+﻿using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
-using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class ProductImageDAO : BaseDAO<ProductImageModel>, IGetAllByIdAsync<ProductImageModel>, IGetDataByDateTimeAsync<ProductImageModel>
+    public class ProductImageDAO : BaseDAO<ProductImageModel>, IProductImageDAO<ProductImageModel>
     {
         public ProductImageDAO(
                     IDbConnectionFactory connectionFactory,
@@ -33,103 +33,54 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        private string GetByDateTime(string colName)
+        public async Task<IEnumerable<ProductImageModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} = DATE_ADD(@Input, INTERVAL 1 DAY)";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("product_image_created_date", EQueryTimeType.DATE_TIME, ct, dateTime);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        private string GetByDateTimeRange(string colName)
+        public async Task<IEnumerable<ProductImageModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate)
+            => await GetByDateTimeAsync("product_image_created_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate));
+
+        public async Task<IEnumerable<ProductImageModel>> GetByMonthAndYearAsync(int year, int month)
+            => await GetByDateTimeAsync("product_image_created_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+
+        public async Task<IEnumerable<ProductImageModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} >= @FirstTime AND {colName} < DATE_ADD(@SecondTime, INTERVAL 1 DAY)";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("product_image_created_date", EQueryTimeType.YEAR, ct, year);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        private string GetByYear(string colName)
+        // -------------------- LastUpdatedDate --------------------
+
+        public async Task<IEnumerable<ProductImageModel>> GetByLastUpdatedDateAsync<TCompareType>(DateTime dateTime, TCompareType compareType) where TCompareType : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE Year({colName}) = @Input";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("product_image_last_updated_date", EQueryTimeType.DATE_TIME, ct, dateTime);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        private string GetByMonthAndYear(string colName)
+        public async Task<IEnumerable<ProductImageModel>> GetByRangeLastUpdatedDateAsync<TCompareType>(DateTime firstTime, DateTime secondTime, TCompareType compareType) where TCompareType : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE YEAR({colName}) = @FirstTime AND MONTH({colName}) = @SecondTime";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("product_image_last_updated_date", EQueryTimeType.DATE_TIME_RANGE, ct, (firstTime, secondTime));
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<List<ProductImageModel>> GetAllByDateTimeAsync(DateTime dateTime, string colName = "product_image_created_date")
+        public async Task<IEnumerable<ProductImageModel>> GetByLastUpdatedMonthAndYearAsync(int month, int year)
+            => await GetByDateTimeAsync("product_image_last_updated_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+
+        public async Task<IEnumerable<ProductImageModel>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType) where TCompareType : Enum
         {
-            try
-            {
-                string query = GetByDateTime(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<ProductImageModel> productImages = await connection.QueryAsync<ProductImageModel>(query, new { Input = dateTime });
-                return productImages.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(ProductImageDAO)}.{nameof(GetAllByDateTimeAsync)}: {ex.Message}", ex);
-            }
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("product_image_last_updated_date", EQueryTimeType.YEAR, ct, year);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<List<ProductImageModel>> GetAllByDateTimeRangeAsync(DateTime firstTime, DateTime secondTime, string colName = "product_image_created_date")
-        {
-            try
-            {
-                string query = GetByDateTimeRange(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<ProductImageModel> productImages = await connection.QueryAsync<ProductImageModel>(query, new { FirstTime = firstTime, SecondTime = secondTime });
-                return productImages.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(ProductImageDAO)}.{nameof(GetAllByDateTimeRangeAsync)}: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<ProductImageModel>> GetAllByYearAsync(int year, string colName = "product_image_created_date")
-        {
-            try
-            {
-                string query = GetByYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<ProductImageModel> productImages = await connection.QueryAsync<ProductImageModel>(query, new { Input = year });
-                return productImages.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(ProductImageDAO)}.{nameof(GetAllByYearAsync)}: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<ProductImageModel>> GetAllByMonthAndYearAsync(int year, int month, string colName = "product_image_created_date")
-        {
-            try
-            {
-                string query = GetByMonthAndYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<ProductImageModel> productImages = await connection.QueryAsync<ProductImageModel>(query, new { FirstTime = year, SecondTime = month });
-                return productImages.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(ProductImageDAO)}.{nameof(GetAllByMonthAndYearAsync)}: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<ProductImageModel>> GetAllByIdAsync(string id, string colIdName)
-        {
-            try
-            {
-                string query = GetDataQuery(colIdName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<ProductImageModel> productImages = await connection.QueryAsync<ProductImageModel>(query, new { Input = id });
-                return productImages.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(ProductImageDAO)}.{nameof(GetAllByIdAsync)}: {ex.Message}", ex);
-            }
-        }
+        // -------------------- ProductBarcode --------------------
+        public async Task<IEnumerable<ProductImageModel>> GetByProductBarcodeAsync(string productBarcode)
+            => await GetByInputAsync(productBarcode, "product_barcode");
     }
 }

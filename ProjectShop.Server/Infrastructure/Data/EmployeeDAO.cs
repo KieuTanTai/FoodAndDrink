@@ -1,13 +1,15 @@
 ﻿using Dapper;
 using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
 using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class EmployeeDAO : BaseDAO<EmployeeModel>, IGetByStatusAsync<EmployeeModel>, IGetRelativeAsync<EmployeeModel>, IGetDataByDateTimeAsync<EmployeeModel>
+    public class EmployeeDAO : BaseDAO<EmployeeModel>, IEmployeeDAO<EmployeeModel>
     {
         public EmployeeDAO(
             IDbConnectionFactory connectionFactory,
@@ -32,7 +34,6 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         protected override string GetDataQuery(string colIdName)
         {
-            CheckColumnName(colIdName);
             string colIdNamePascal = Converter.SnakeCaseToPascalCase(colIdName);
             return $@"
                 SELECT
@@ -83,9 +84,8 @@ namespace ProjectShop.Server.Infrastructure.Data
                 WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        private string RelativeQuery(string colName)
+        protected override string RelativeQuery(string colName)
         {
-            CheckColumnName(colName);
             return $@"
                 SELECT
                     employee_id AS EmployeeId, account_id AS AccountId, employee_name AS Name,
@@ -96,9 +96,8 @@ namespace ProjectShop.Server.Infrastructure.Data
                 FROM {TableName} WHERE {colName} LIKE @Input";
         }
 
-        private string GetByMonthAndYear(string colName)
+        protected override string GetByMonthAndYear(string colName)
         {
-            CheckColumnName(colName);
             return $@"
                     SELECT
                         employee_id AS EmployeeId, account_id AS AccountId, employee_name AS Name,
@@ -108,21 +107,20 @@ namespace ProjectShop.Server.Infrastructure.Data
                     FROM {TableName} WHERE YEAR({colName}) = @FirstTime AND MONTH({colName}) = @SecondTime";
         }
 
-        private string GetByYear(string colName)
+        protected override string GetByYear(string colName, ECompareType compareType)
         {
-            CheckColumnName(colName);
+            string compareOperator = GetStringType(compareType);
             return $@"
                     SELECT
                         employee_id AS EmployeeId, account_id AS AccountId, employee_name AS Name,
                         employee_birthday AS Birthday, employee_phone AS Phone, employee_email AS Email, employee_house_number,
                         employee_street, employee_ward_id, employee_district_id, location_id,
                         employee_city_id, employee_avatar_url AS AvatarUrl, employee_gender AS Gender, employee_status AS Status
-                    FROM {TableName} WHERE Year({colName}) = @Input";
+                    FROM {TableName} WHERE Year({colName}) {compareOperator} @Input";
         }
 
-        private string GetByDateTimeRange(string colName)
+        protected override string GetByDateTimeRange(string colName)
         {
-            CheckColumnName(colName);
             return $@"
                     SELECT
                         employee_id AS EmployeeId, account_id AS AccountId, employee_name AS Name,
@@ -132,127 +130,80 @@ namespace ProjectShop.Server.Infrastructure.Data
                     FROM {TableName} WHERE {colName} >= @FirstTime AND {colName} < DATE_ADD(@SecondTime, INTERVAL 1 DAY)";
         }
 
-        private string GetByDateTime(string colName)
+        protected override string GetByDateTime(string colName, ECompareType compareType)
         {
-            CheckColumnName(colName);
+            string compareOperator = GetStringType(compareType);
             return $@"
                     SELECT
                         employee_id AS EmployeeId, account_id AS AccountId, employee_name AS Name,
                         employee_birthday AS Birthday, employee_phone AS Phone, employee_email AS Email, employee_house_number,
                         employee_street, employee_ward_id, employee_district_id, location_id,
                         employee_city_id, employee_avatar_url AS AvatarUrl, employee_gender AS Gender, employee_status AS Status
-                    FROM {TableName} WHERE {colName} = DATE_ADD(@Input, INTERVAL 1 DAY)";
+                    FROM {TableName} WHERE {colName} {compareOperator} DATE_ADD(@Input, INTERVAL 1 DAY)";
         }
 
-        public async Task<List<EmployeeModel>> GetRelativeAsync(string input, string colName = "employee_name")
+        public async Task<EmployeeModel?> GetByHouseNumberAsync(string houseNumber) => await GetSingleDataAsync(houseNumber, "employee_house_number");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByHouseNumbersAsync(IEnumerable<string> houseNumbers) => await GetByInputsAsync(houseNumbers, "employee_house_number");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByStreetAsync(string street) => await GetByInputAsync(street, "employee_street");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByStreetsAsync(IEnumerable<string> streets) => await GetByInputsAsync(streets, "employee_street");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByCityAsync(uint city) => await GetByInputAsync(city.ToString(), "employee_city_id");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByCitiesAsync(IEnumerable<uint> cities) => await GetByInputsAsync(cities.Select(city => city.ToString()), "employee_city_id");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByWardIdAsync(uint wardId) => await GetByInputAsync(wardId.ToString(), "employee_ward_id");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByWardIdsAsync(IEnumerable<uint> wardIds) => await GetByInputsAsync(wardIds.Select(wardId => wardId.ToString()), "employee_ward_id");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByDistrictIdAsync(uint districtId) => await GetByInputAsync(districtId.ToString(), "employee_district_id");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByDistrictIdsAsync(IEnumerable<uint> districtIds) => await GetByInputsAsync(districtIds.Select(districtId => districtId.ToString()), "employee_district_id");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByLocationIdAsync(uint locationId) => await GetByInputAsync(locationId.ToString(), "location_id");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByLocationIdsAsync(IEnumerable<uint> locationIds) => await GetByInputsAsync(locationIds.Select(locationId => locationId.ToString()), "location_id");
+
+        public async Task<EmployeeModel?> GetByAccountIdAsync(uint accountId) => await GetSingleDataAsync(accountId.ToString(), "account_id");
+
+        public async Task<EmployeeModel?> GetByPhoneAsync(string phone) => await GetSingleDataAsync(phone, "employee_phone");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByPhonesAsync(IEnumerable<string> phones) => await GetByInputsAsync(phones, "employee_phone");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByGenderAsync(bool isMale) => await GetByInputAsync(isMale.ToString(), "employee_gender");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByGendersAsync(IEnumerable<bool> isMales) => await GetByInputsAsync(isMales.Select(isMale => isMale.ToString()), "employee_gender");
+
+        public async Task<EmployeeModel?> GetByEmailAsync(string email) => await GetSingleDataAsync(email, "employee_email");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByEmailsAsync(IEnumerable<string> emails) => await GetByInputsAsync(emails, "employee_email");
+
+        public async Task<EmployeeModel?> GetByNameAsync(string name) => await GetSingleDataAsync(name, "employee_name");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByNamesAsync(IEnumerable<string> names) => await GetByInputsAsync(names, "employee_name");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "employee_status");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "employee_name");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByMonthAndYearAsync(int year, int month) => await GetByDateTimeAsync("employee_birthday", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month));
+
+        public async Task<IEnumerable<EmployeeModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
         {
-            try
-            {
-                string query = RelativeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                if (!input.Contains('%'))
-                    input = $"%{input}%"; // Ensure input is a relative search
-                IEnumerable<EmployeeModel> employees = await connection.QueryAsync<EmployeeModel>(query, new { Input = input });
-                return employees.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error while getting relative employees", ex);
-            }
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid compare type for year comparison.");
+            return await GetByDateTimeAsync("employee_birthday", EQueryTimeType.YEAR, type, year);
         }
 
-        public async Task<List<EmployeeModel>> GetAllByMonthAndYearAsync(int year, int month, string colName = "employee_birthday")
-        {
-            try
-            {
-                string query = GetByMonthAndYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<EmployeeModel> accounts = await connection.QueryAsync<EmployeeModel>(query, new { FirstTime = year, SecondTime = month });
-                return accounts.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving employees by month and year: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<EmployeeModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate) => await GetByDateTimeAsync("employee_birthday", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate));
 
-        public async Task<List<EmployeeModel>> GetAllByYearAsync(int year, string colName = "employee_birthday")
+        public async Task<IEnumerable<EmployeeModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
         {
-            try
-            {
-                string query = GetByYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<EmployeeModel> accounts = await connection.QueryAsync<EmployeeModel>(query, new { Input = year });
-                return accounts.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving employees by year: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<EmployeeModel>> GetAllByDateTimeRangeAsync(DateTime startDate, DateTime endDate, string colName = "employee_birthday")
-        {
-            try
-            {
-                string query = GetByDateTimeRange(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<EmployeeModel> accounts = await connection.QueryAsync<EmployeeModel>(query, new { FirstTime = startDate, SecondTime = endDate });
-                return accounts.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving employees by date range: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<EmployeeModel>> GetAllByDateTimeAsync(DateTime dateTime, string colName = "employee_birthday")
-        {
-            try
-            {
-                string query = GetByDateTime(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<EmployeeModel> accounts = await connection.QueryAsync<EmployeeModel>(query, new { Input = dateTime });
-                return accounts.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving employees by date: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<EmployeeModel>> GetAllByStatusAsync(bool status)
-        {
-            try
-            {
-                string query = GetDataQuery("employee_status");
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<EmployeeModel> employees = await connection.QueryAsync<EmployeeModel>(query, new { Input = status });
-                return employees.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error while getting employees by status", ex);
-            }
-        }
-
-        public async Task<List<EmployeeModel>> GetAllByGender(bool gender)
-        {
-            try
-            {
-                string query = GetDataQuery("employee_gender");
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<EmployeeModel> employees = await connection.QueryAsync<EmployeeModel>(query, new { Input = gender });
-                return employees.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error while getting employees by gender", ex);
-            }
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid compare type for date time comparison.");
+            return await GetByDateTimeAsync("employee_birthday", EQueryTimeType.DATE_TIME, type, dateTime);
         }
     }
 }

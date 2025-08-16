@@ -6,16 +6,16 @@ namespace ProjectShop.Server.Core.Entities
     public class CategoryModel : IGetIdEntity<uint>
     {
         // Corresponds to 'category_id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint CategoryId { get; private set; }
+        public uint CategoryId { get; set; }
 
         // Corresponds to 'category_name' (VARCHAR(255))
-        public string CategoryName { get; private set; }
+        public string CategoryName { get; set; } = string.Empty;
 
         // Corresponds to 'category_status' (TINYINT(1))
-        public bool CategoryStatus { get; private set; }
+        public bool CategoryStatus { get; set; }
 
         // Navigation property
-        public ICollection<ProductCategoriesModel> ProductCategories { get; private set; } = new List<ProductCategoriesModel>();
+        public ICollection<ProductCategoriesModel> ProductCategories { get; set; } = new List<ProductCategoriesModel>();
 
         public CategoryModel(uint categoryId, string categoryName, bool categoryStatus)
         {
@@ -24,6 +24,9 @@ namespace ProjectShop.Server.Core.Entities
             CategoryStatus = categoryStatus;
         }
 
+        public CategoryModel()
+        {
+        }
         public uint GetIdEntity() => CategoryId;
     }
 }

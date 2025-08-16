@@ -3,19 +3,19 @@ namespace ProjectShop.Server.Core.Entities
 {
     public class EmployeeModel : PersonModel
     {
-        public uint EmployeeId { get; private set; }
-        public string EmployeeHouseNumber { get; private set; }
-        public string EmployeeStreet { get; private set; }
-        public uint? EmployeeWardId { get; private set; }
-        public uint? EmployeeDistrictId { get; private set; }
-        public uint? EmployeeCityId { get; private set; }
-        public uint LocationId { get; private set; }
+        public uint EmployeeId { get; set; }
+        public string EmployeeHouseNumber { get; set; } = string.Empty;
+        public string EmployeeStreet { get; set; } = string.Empty;
+        public uint? EmployeeWardId { get; set; }
+        public uint? EmployeeDistrictId { get; set; }
+        public uint? EmployeeCityId { get; set; }
+        public uint LocationId { get; set; }
 
         // Navigation properties
-        public LocationWardModel? EmployeeWard { get; private set; }
-        public LocationDistrictModel? EmployeeDistrict { get; private set; }
-        public LocationCityModel? EmployeeCity { get; private set; }
-        public LocationModel Location { get; private set; } = null!;
+        public LocationWardModel? EmployeeWard { get; set; }
+        public LocationDistrictModel? EmployeeDistrict { get; set; }
+        public LocationCityModel? EmployeeCity { get; set; }
+        public LocationModel Location { get; set; } = null!;
 
         public EmployeeModel(
             uint employeeId,
@@ -42,6 +42,8 @@ namespace ProjectShop.Server.Core.Entities
             EmployeeDistrictId = employeeDistrictId;
             EmployeeCityId = employeeCityId;
         }
+
+        public EmployeeModel() : base() { }
 
         public override uint GetIdEntity() => EmployeeId;
     }

@@ -5,7 +5,7 @@ namespace ProjectShop.Server.Infrastructure.Services
 {
     static class GetConnectionFactoryService
     {
-        public static IDbConnectionFactory? ConnectionFactory { get; private set; }
+        public static IDbConnectionFactory? ConnectionFactory { get; set; }
 
         public static void GetConnectionFactory()
         {

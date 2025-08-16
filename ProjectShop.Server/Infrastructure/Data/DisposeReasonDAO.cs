@@ -30,27 +30,6 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        private string GetRelativeQuery(string colName)
-        {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} LIKE @Input;";
-        }
-
-        public async Task<List<DisposeReasonModel>> GetRelativeAsync(string input, string colName)
-        {
-            try
-            {
-                string query = GetRelativeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                if (!input.Contains('%'))
-                    input = $"%{input}%"; // Ensure input is wrapped in wildcards
-                IEnumerable<DisposeReasonModel> disposeReasons = await connection.QueryAsync<DisposeReasonModel>(query, new { Input = input });
-                return disposeReasons.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error in {nameof(DisposeReasonDAO)}.{nameof(GetRelativeAsync)}: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<DisposeReasonModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "dispose_reason_name");
     }
 }

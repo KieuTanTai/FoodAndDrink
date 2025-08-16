@@ -1,14 +1,15 @@
 ﻿using Dapper;
 using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
 using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class DisposeProductDAO : BaseNoneUpdateDAO<DisposeProductModel>, IGetAllByIdAsync<DisposeProductModel>,
-                    IGetDataByDateTimeAsync<DisposeProductModel>
+    public class DisposeProductDAO : BaseNoneUpdateDAO<DisposeProductModel>, IDisposeProductDAO<DisposeProductModel>
     {
         public DisposeProductDAO(
             IDbConnectionFactory connectionFactory,
@@ -18,6 +19,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             : base(connectionFactory, colService, converter, checker, "dispose_product", "dispose_product_id", string.Empty)
         {
         }
+
         protected override string GetInsertQuery()
         {
             return $@"INSERT INTO {TableName} (product_barcode, location_id, dispose_by_employee_id, 
@@ -26,105 +28,38 @@ namespace ProjectShop.Server.Infrastructure.Data
                               @DisposeQuantity, @DisposedDate); SELECT LAST_INSERT_ID();";
         }
 
-        private string GetByMonthAndYear(string colName)
+        public async Task<IEnumerable<DisposeProductModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE YEAR({colName}) = @FirstTime AND MONTH({colName}) = @SecondTime";
-        }
-        private string GetByYear(string colName)
-        {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE Year({colName}) = @Input";
-        }
-        private string GetByDateTimeRange(string colName)
-        {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} >= @FirstTime AND {colName} < DATE_ADD(@SecondTime, INTERVAL 1 DAY)";
-        }
-        private string GetByDateTime(string colName)
-        {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} = DATE_ADD(@Input, INTERVAL 1 DAY)";
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid compare type for date time comparison.");
+            return await GetByDateTimeAsync("disposed_date", EQueryTimeType.DATE_TIME, type, dateTime);
         }
 
-        public async Task<List<DisposeProductModel>> GetAllByIdAsync(string id, string colIdName = "product_lot_id")
+        public async Task<IEnumerable<DisposeProductModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate) 
+            => await GetByDateTimeAsync("disposed_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate));
+
+        public async Task<IEnumerable<DisposeProductModel>> GetByEmployeeIdAsync(uint employeeId) => await GetByInputAsync(employeeId.ToString(), "dispose_by_employee_id");
+
+        public async Task<IEnumerable<DisposeProductModel>> GetByLocationIdAsync(uint locationId) => await GetByInputAsync(locationId.ToString(), "location_id");
+
+        public async Task<IEnumerable<DisposeProductModel>> GetByMonthAndYearAsync(int year, int month) => await GetByDateTimeAsync("month_and_year", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month));
+
+        public async Task<IEnumerable<DisposeProductModel>> GetByProductBarcodeAsync(string barcode) => await GetByInputAsync(barcode, "product_barcode");
+
+        public async Task<IEnumerable<DisposeProductModel>> GetByQuantityIdAsync<TCompareType>(int quantity, TCompareType compareType) where TCompareType : Enum
         {
-            try
-            {
-                string query = GetDataQuery(colIdName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<DisposeProductModel> disposeProducts = await connection.QueryAsync<DisposeProductModel>(query, new { Input = id });
-                return disposeProducts.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Log the exception or handle it as needed
-                throw new Exception($"Error in GetAllByIdAsync: {ex.Message}", ex);
-            }
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid compare type for quantity comparison.");
+            return await GetByInputAsync(quantity.ToString(), type, "dispose_quantity");
         }
 
-        public async Task<List<DisposeProductModel>> GetAllByMonthAndYearAsync(int year, int month, string colName = "disposed_date")
-        {
-            try
-            {
-                string query = GetByMonthAndYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<DisposeProductModel> disposeProducts = await connection.QueryAsync<DisposeProductModel>(query, new { FirstTime = year, SecondTime = month });
-                return disposeProducts.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Log the exception or handle it as needed
-                throw new Exception($"Error retrieving dispose products by month and year: {ex.Message}", ex);
-            }
-        }
+        public async Task<IEnumerable<DisposeProductModel>> GetByReasonIdAsync(uint reasonId) => await GetByInputAsync(reasonId.ToString(), "dispose_reason_id");
 
-        public async Task<List<DisposeProductModel>> GetAllByYearAsync(int year, string colName = "disposed_date")
+        public async Task<IEnumerable<DisposeProductModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
         {
-            try
-            {
-                string query = GetByYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<DisposeProductModel> disposeProducts = await connection.QueryAsync<DisposeProductModel>(query, new { Input = year });
-                return disposeProducts.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Log the exception or handle it as needed
-                throw new Exception($"Error retrieving dispose products by year: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<DisposeProductModel>> GetAllByDateTimeRangeAsync(DateTime startDate, DateTime endDate, string colName = "disposed_date")
-        {
-            try
-            {
-                string query = GetByDateTimeRange(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<DisposeProductModel> disposeProducts = await connection.QueryAsync<DisposeProductModel>(query, new { FirstTime = startDate, SecondTime = endDate });
-                return disposeProducts.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Log the exception or handle it as needed
-                throw new Exception($"Error retrieving dispose products by date range: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<DisposeProductModel>> GetAllByDateTimeAsync(DateTime dateTime, string colName = "disposed_date")
-        {
-            try
-            {
-                string query = GetByDateTime(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<DisposeProductModel> disposeProducts = await connection.QueryAsync<DisposeProductModel>(query, new { Input = dateTime });
-                return disposeProducts.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Log the exception or handle it as needed
-                throw new Exception($"Error retrieving dispose products by date: {ex.Message}", ex);
-            }
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid compare type for year comparison.");
+            return await GetByDateTimeAsync("year", EQueryTimeType.YEAR, type, year);
         }
     }
 }

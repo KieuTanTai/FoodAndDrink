@@ -1,13 +1,14 @@
 ﻿using Dapper;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
 using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class CustomerAddressDAO : BaseDAO<CustomerAddressModel>, IGetRelativeAsync<CustomerAddressModel>, IGetByStatusAsync<CustomerAddressModel>
+    public class CustomerAddressDAO : BaseDAO<CustomerAddressModel>, ICustomerAddressDAO<CustomerAddressModel>
     {
         public CustomerAddressDAO(
             IDbConnectionFactory connectionFactory,
@@ -37,43 +38,38 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        private string GetRelativeQuery(string colName)
-        {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} LIKE @Input";
-        }
+        public async Task<IEnumerable<CustomerAddressModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "customer_address_status");
 
-        public async Task<List<CustomerAddressModel>> GetAllByStatusAsync(bool status)
+        public async Task<IEnumerable<CustomerAddressModel>> GetByStreetLikeAsync(string streetLike) => await GetByLikeStringAsync(streetLike, "customer_street");
+
+        public async Task<IEnumerable<CustomerAddressModel>> GetByCityIdAsync(uint cityId) => await GetByInputAsync(cityId.ToString(), "customer_city_id");
+
+        public async Task<IEnumerable<CustomerAddressModel>> GetByCustomerIdAsync(string customerId) => await GetByInputAsync(customerId, "customer_id");
+
+        public async Task<IEnumerable<CustomerAddressModel>> GetByDistrictIdAsync(uint districtId) => await GetByInputAsync(districtId.ToString(), "customer_district_id");
+
+        public async Task<IEnumerable<CustomerAddressModel>> GetByWardIdAsync(uint wardId) => await GetByInputAsync(wardId.ToString(), "customer_ward_id");
+
+        public async Task<IEnumerable<CustomerAddressModel>> GetByCityIdAndDistrictIdAsync(uint cityId, uint districtId) => await GetByColNamesAsync(cityId, districtId, "customer_city_id", "customer_district_id");
+
+        public async Task<IEnumerable<CustomerAddressModel>> GetByCityIdAndWardIdAsync(uint cityId, uint wardId) => await GetByColNamesAsync(cityId, wardId, "customer_city_id", "customer_ward_id");
+
+        public async Task<IEnumerable<CustomerAddressModel>> GetByDistrictIdAndWardIdAsync(uint districtId, uint wardId) => await GetByColNamesAsync(districtId, wardId, "customer_district_id", "customer_ward_id");
+
+        // DRY
+        private async Task<IEnumerable<CustomerAddressModel>> GetByColNamesAsync(uint firstInput, uint secondInput, string firstColName, string secondColName)
         {
             try
             {
-                string query = GetDataQuery("customer_address_status");
+                string query = $"SELECT * FROM {TableName} WHERE {firstColName} = @FirstInput AND {secondColName} = @SecondInput";
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<CustomerAddressModel> addresses = await connection.QueryAsync<CustomerAddressModel>(query, new { Input = status });
-                return addresses.AsList();
+                IEnumerable<CustomerAddressModel> addresses = await connection.QueryAsync<CustomerAddressModel>(query, new { FirstInput = firstInput, SecondInput = secondInput });
+                return addresses;
             }
             catch (Exception ex)
             {
                 // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving customer addresses by status: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<CustomerAddressModel>> GetRelativeAsync(string input, string colName = "customer_street")
-        {
-            try
-            {
-                string query = GetRelativeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                if (!input.Contains("%"))
-                    input = $"%{input}%"; // Ensure input is a relative search
-                IEnumerable<CustomerAddressModel> addresses = await connection.QueryAsync<CustomerAddressModel>(query, new { Input = input });
-                return addresses.AsList();
-            }
-            catch (Exception ex)
-            {
-                // Handle exception (log it, rethrow it, etc.)
-                throw new Exception($"Error retrieving customer addresses relative to {colName}: {ex.Message}", ex);
+                throw new Exception($"Error retrieving customer addresses by column names: {ex.Message}", ex);
             }
         }
     }

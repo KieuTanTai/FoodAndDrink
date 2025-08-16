@@ -1,13 +1,15 @@
 ﻿using Dapper;
 using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
 using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class SaleEventDAO : BaseDAO<SaleEventModel>, IGetRelativeAsync<SaleEventModel>, IGetDataByDateTimeAsync<SaleEventModel>, IGetByStatusAsync<SaleEventModel>
+    public class SaleEventDAO : BaseDAO<SaleEventModel>, ISaleEventDAO<SaleEventModel>
     {
         public SaleEventDAO(
             IDbConnectionFactory connectionFactory,
@@ -17,6 +19,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             : base(connectionFactory, colService, converter, checker, "sale_event", "sale_event_id", string.Empty)
         {
         }
+
         protected override string GetInsertQuery()
         {
             return $@"INSERT INTO {TableName} (sale_event_start_date, sale_event_end_date, sale_event_name, sale_event_status, sale_event_description, sale_event_discount_code) 
@@ -30,131 +33,83 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        private string GetByStatusQuery()
+        public async Task<SaleEventModel?> GetByDiscountCodeAsync(string discountCode)
+            => await GetSingleDataAsync(discountCode, "sale_event_discount_code");
+
+        public async Task<IEnumerable<SaleEventModel>> GetByEndDateMonthAndYearAsync(int month, int year)
+            => await GetByDateTimeAsync("sale_event_end_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+
+        public async Task<IEnumerable<SaleEventModel>> GetByEndDateRangeAsync(DateTime startDate, DateTime endDate)
+            => await GetByDateTimeAsync("sale_event_end_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate));
+
+        public async Task<IEnumerable<SaleEventModel>> GetByEndDateAsync<TCompareType>(DateTime endDate, TCompareType compareType) where TCompareType : Enum
         {
-            return $@"SELECT * FROM {TableName} 
-                      WHERE sale_event_status = @SaleEventStatus";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("sale_event_end_date", EQueryTimeType.DATE_TIME, ct, endDate);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        private string GetByDateTimeRange(string colName)
+        public async Task<IEnumerable<SaleEventModel>> GetByEndDateYearAsync<TCompareType>(int year, TCompareType compareType) where TCompareType : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} >= @FirstTime AND {colName} < DATE_ADD(@SecondTime, INTERVAL 1 DAY)";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("sale_event_end_date", EQueryTimeType.YEAR, ct, year);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        private string GetByDateTime(string colName)
+        public async Task<IEnumerable<SaleEventModel>> GetByLikeStringAsync(string input)
+            => await GetByLikeStringAsync(input, "sale_event_name");
+
+        public async Task<SaleEventModel?> GetByNameAsync(string name)
+            => await GetSingleDataAsync(name, "sale_event_name");
+
+        public async Task<IEnumerable<SaleEventModel>> GetByRelativeDiscountCodeAsync(string discountCode)
+            => await GetByLikeStringAsync(discountCode, "sale_event_discount_code");
+
+        public async Task<IEnumerable<SaleEventModel>> GetByStartAndEndDateRangeAsync(DateTime startDate, DateTime endDate)
+            => await GetByStartAndEndDateRangeCustomAsync(startDate, endDate); // Method riêng cho logic này
+
+        public async Task<IEnumerable<SaleEventModel>> GetByStartDateAsync<TCompareType>(DateTime startDate, TCompareType compareType) where TCompareType : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} = DATE_ADD(@Input, INTERVAL 1 DAY)";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("sale_event_start_date", EQueryTimeType.DATE_TIME, ct, startDate);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        private string GetByYear(string colName)
+        public async Task<IEnumerable<SaleEventModel>> GetByStartDateMonthAndYearAsync(int month, int year)
+            => await GetByDateTimeAsync("sale_event_start_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+
+        public async Task<IEnumerable<SaleEventModel>> GetByStartDateRangeAsync(DateTime startDate, DateTime endDate)
+            => await GetByDateTimeAsync("sale_event_start_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate));
+
+        public async Task<IEnumerable<SaleEventModel>> GetByStartDateYearAsync<TCompareType>(int year, TCompareType compareType) where TCompareType : Enum
         {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE YEAR({colName}) = @Input";
+            if (compareType is ECompareType ct)
+                return await GetByDateTimeAsync("sale_event_start_date", EQueryTimeType.YEAR, ct, year);
+            throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        private string GetByMonthAndYear(string colName)
-        {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE YEAR({colName}) = @Year AND MONTH({colName}) = @Month";
-        }
+        public async Task<IEnumerable<SaleEventModel>> GetByStatusAsync(bool status)
+            => await GetByInputAsync(GetTinyIntString(status), "sale_event_status");
 
-        private string GetRelativeQuery(string colName)
-        {
-            CheckColumnName(colName);
-            return $"SELECT * FROM {TableName} WHERE {colName} LIKE @Input";
-        }
+        public async Task<IEnumerable<SaleEventModel>> GetByTextAsync(string text)
+            => await GetByLikeStringAsync(text, "sale_event_name");
 
-        public async Task<List<SaleEventModel>> GetAllByMonthAndYearAsync(int year, int month, string colName = "sale_event_start_date")
+        // Method riêng cho logic lấy theo cả start và end date range
+        private async Task<IEnumerable<SaleEventModel>> GetByStartAndEndDateRangeCustomAsync(DateTime startDate, DateTime endDate)
         {
             try
             {
-                string query = GetByMonthAndYear(colName);
+                string query = $@" SELECT * FROM {TableName}
+                    WHERE sale_event_start_date >= @StartDate AND sale_event_end_date <= DATE_ADD(@EndDate, INTERVAL 1 DAY)";
                 using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<SaleEventModel> result = await connection.QueryAsync<SaleEventModel>(query, new { Year = year, Month = month });
-                return result.AsList();
+                IEnumerable<SaleEventModel> result = await connection.QueryAsync<SaleEventModel>(query, new { StartDate = startDate, EndDate = endDate });
+                if (result == null || !result.Any())
+                    throw new Exception("No SaleEvents found for the given date range.");
+                return result;
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error retrieving SaleEventModels by month and year: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<SaleEventModel>> GetAllByYearAsync(int year, string colName = "sale_event_start_date")
-        {
-            try
-            {
-                string query = GetByYear(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<SaleEventModel> result = await connection.QueryAsync<SaleEventModel>(query, new { Input = year });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving SaleEventModels by year: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<SaleEventModel>> GetAllByDateTimeRangeAsync(DateTime startDate, DateTime endDate, string colName = "sale_event_start_date")
-        {
-            try
-            {
-                string query = GetByDateTimeRange(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<SaleEventModel> result = await connection.QueryAsync<SaleEventModel>(query, new { FirstTime = startDate, SecondTime = endDate });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving SaleEventModels by date range: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<SaleEventModel>> GetAllByDateTimeAsync(DateTime dateTime, string colName = "sale_event_start_date")
-        {
-            try
-            {
-                string query = GetByDateTime(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<SaleEventModel> result = await connection.QueryAsync<SaleEventModel>(query, new { Input = dateTime });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving SaleEventModels by date: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<SaleEventModel>> GetAllByStatusAsync(bool status)
-        {
-            try
-            {
-                string query = GetByStatusQuery();
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<SaleEventModel> result = await connection.QueryAsync<SaleEventModel>(query, new { SaleEventStatus = status });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving SaleEventModels by status: {ex.Message}", ex);
-            }
-        }
-
-        public async Task<List<SaleEventModel>> GetRelativeAsync(string colName, string input)
-        {
-            try
-            {
-                string query = GetRelativeQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                if (!input.Contains('%'))
-                    input = $"%{input}%"; // Ensure input is a relative search
-                IEnumerable<SaleEventModel> result = await connection.QueryAsync<SaleEventModel>(query, new { Input = input });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving SaleEventModels by relative search: {ex.Message}", ex);
+                throw new Exception($"Error getting SaleEvents by start and end date range: {ex.Message}", ex);
             }
         }
     }

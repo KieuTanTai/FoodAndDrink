@@ -3,12 +3,11 @@ namespace ProjectShop.Server.Core.Entities
 {
     public class CustomerModel : PersonModel
     {
-        public uint CustomerId { get; private set; }
+        public uint CustomerId { get; set; }
 
         // Các navigation properties riêng của Customer
-        public CartModel Cart { get; private set; } = null!;
-        public PointWalletModel PointWallet { get; private set; } = null!;
-        public ICollection<InvoiceModel> Invoices { get; private set; } = new List<InvoiceModel>();
+        public CartModel Cart { get; set; } = null!;
+        public ICollection<InvoiceModel> Invoices { get; set; } = new List<InvoiceModel>();
 
         // Constructor sử dụng base(...) để gọi constructor của lớp cha PersonModel
         public CustomerModel(
@@ -25,6 +24,8 @@ namespace ProjectShop.Server.Core.Entities
         {
             CustomerId = customerId;
         }
+
+        public CustomerModel() : base() { } 
 
         // Triển khai phương thức trừu tượng từ lớp cha.
         public override uint GetIdEntity() => CustomerId;
