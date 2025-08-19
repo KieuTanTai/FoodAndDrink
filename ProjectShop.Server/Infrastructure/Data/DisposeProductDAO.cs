@@ -1,11 +1,9 @@
-﻿using Dapper;
-using ProjectShop.Server.Core.Entities;
+﻿using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
-using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
@@ -35,7 +33,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             return await GetByDateTimeAsync("disposed_date", EQueryTimeType.DATE_TIME, type, dateTime);
         }
 
-        public async Task<IEnumerable<DisposeProductModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate) 
+        public async Task<IEnumerable<DisposeProductModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate)
             => await GetByDateTimeAsync("disposed_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate));
 
         public async Task<IEnumerable<DisposeProductModel>> GetByEmployeeIdAsync(uint employeeId) => await GetByInputAsync(employeeId.ToString(), "dispose_by_employee_id");

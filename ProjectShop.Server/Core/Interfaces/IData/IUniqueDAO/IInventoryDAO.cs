@@ -2,9 +2,9 @@
 
 namespace ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO
 {
-    public interface IInventoryDAO<T> : IGetByStatusAsync<T>, IGetDataByDateTimeAsync<T> where T : InventoryModel
+    public interface IInventoryDAO<TEntity> : IGetByStatusAsync<TEntity>, IGetDataByDateTimeAsync<TEntity> where TEntity : InventoryModel
     {
-        Task<T?> GetByLocationIdAsync(uint locationId);
-        Task<IEnumerable<T>> GetAllByLocationIdsAsync(IEnumerable<uint> locationIds);
+        Task<TEntity?> GetByLocationIdAsync(uint locationId);
+        Task<IEnumerable<TEntity>> GetAllByLocationIdsAsync(IEnumerable<uint> locationIds);
     }
 }

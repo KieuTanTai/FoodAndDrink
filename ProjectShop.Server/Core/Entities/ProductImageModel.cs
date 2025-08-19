@@ -23,8 +23,9 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to `ProductImageLastUpdatedDate` (DATETIME)
         public DateTime ProductImageLastUpdatedDate { get; set; } = DateTime.UtcNow;
 
-        // Navigation property
+        // Navigation properties
         public ProductModel Product { get; set; } = null!;
+        // End of navigation properties
 
         public ProductImageModel(uint productImageId, string productBarcode, string productImageUrl, int productImagePriority, DateTime produtImageCreatedDate, DateTime productImageLastUpdatedDate)
         {

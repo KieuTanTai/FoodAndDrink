@@ -27,8 +27,18 @@ namespace ProjectShop.Server.Core.Entities
         public CustomerModel Customer { get; set; } = null!;
         public EmployeeModel Employee { get; set; } = null!;
         public ICollection<RolesOfUserModel> RolesOfUsers { get; set; } = new List<RolesOfUserModel>();
+        // End of navigation properties
 
         public AccountModel() { }
+
+        public AccountModel(string userName, string password)
+        {
+            UserName = userName;
+            Password = password;
+            AccountCreatedDate = DateTime.UtcNow;
+            AccountLastUpdatedDate = DateTime.UtcNow;
+            AccountStatus = true;
+        }
 
         public AccountModel(uint accountId, string userName, string password, DateTime accountCreatedDate, DateTime accountLastUpdatedDate, bool accountStatus)
         {

@@ -1,36 +1,33 @@
 ﻿using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Entities.GetNavigationPropertyOptions;
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
-using System.Diagnostics;
 using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services.Account
 {
-    public class SearchAccountService : ValidateService<AccountModel>, ISearchAccountService<AccountModel>
+    public class SearchAccountService : BaseReturnAccountService<AccountModel>, ISearchAccountService<AccountModel, AccountNavigationOptions>
     {
-        private readonly IDAO<AccountModel> _baseDAO;
-        private readonly IAccountDAO<AccountModel> _accountDAO;
+
 
         public SearchAccountService(
             IDAO<AccountModel> baseDAO,
-            IAccountDAO<AccountModel> accountDAO)
+            IAccountDAO<AccountModel> accountDAO,
+            IPersonDAO<CustomerModel> customerDAO,
+            IPersonDAO<EmployeeModel> employeeDAO,
+            IEmployeeDAO<EmployeeModel> specificEmpDAO,
+            IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> roleOfUserDAO) : base(baseDAO, accountDAO, customerDAO, employeeDAO, specificEmpDAO, roleOfUserDAO)
         {
-            _baseDAO = baseDAO ?? throw new ArgumentNullException(nameof(baseDAO), "Base DAO cannot be null.");
-            _accountDAO = accountDAO ?? throw new ArgumentNullException(nameof(accountDAO), "Account DAO cannot be null.");
         }
 
-        public async Task<IEnumerable<AccountModel>> GetAllAsync()
+        public async Task<IEnumerable<AccountModel>> GetAllAsync(AccountNavigationOptions? options)
         {
             try
             {
                 IEnumerable<AccountModel> accounts = await _baseDAO.GetAllAsync();
-                if (accounts == null || !accounts.Any())
-                    throw new InvalidOperationException("No accounts found.");
-                foreach (AccountModel account in accounts)
-                    account.Password = await hashPassword.HashPasswordAsync(account.Password);
-                int affectedRows = await _baseDAO.UpdateManyAsync(accounts);
-                Debug.WriteLine($"Updated {affectedRows} accounts after retrieving them.");
+                if (options != null)
+                    accounts = await GetNavigationPropertyByOptions(accounts, options);
                 return accounts;
             }
             catch (Exception ex)
@@ -39,13 +36,28 @@ namespace ProjectShop.Server.Application.Services.Account
             }
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByStatusAsync(bool status)
+        public async Task<IEnumerable<AccountModel>> GetAllAsync(int maxGetCount, AccountNavigationOptions? options)
+        {
+            try
+            {
+                IEnumerable<AccountModel> accounts = await _baseDAO.GetAllAsync(maxGetCount);
+                if (options != null)
+                    accounts = await GetNavigationPropertyByOptions(accounts, options);
+                return accounts;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("An error occurred while retrieving all accounts with a limit.", ex);
+            }
+        }
+
+        public async Task<IEnumerable<AccountModel>> GetByStatusAsync(bool status, AccountNavigationOptions? options)
         {
             try
             {
                 IEnumerable<AccountModel> accounts = await _accountDAO.GetByStatusAsync(status);
-                if (accounts == null || !accounts.Any())
-                    throw new InvalidOperationException($"No accounts found with status: {status}.");
+                if (options != null)
+                    accounts = await GetNavigationPropertyByOptions(accounts, options);
                 return accounts;
             }
             catch (Exception ex)
@@ -54,13 +66,30 @@ namespace ProjectShop.Server.Application.Services.Account
             }
         }
 
-        public async Task<AccountModel> GetByUserNameAsync(string userName)
+        public async Task<IEnumerable<AccountModel>> GetByStatusAsync(bool status, int maxGetCount, AccountNavigationOptions? options)
+        {
+            try
+            {
+                IEnumerable<AccountModel> accounts = await _accountDAO.GetByStatusAsync(status, maxGetCount);
+                if (options != null)
+                    accounts = await GetNavigationPropertyByOptions(accounts, options);
+                return accounts;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("An error occurred while retrieving accounts by status with a limit.", ex);
+            }
+        }
+
+        public async Task<AccountModel> GetByUserNameAsync(string userName, AccountNavigationOptions? options)
         {
             try
             {
                 AccountModel? account = await _accountDAO.GetByUserNameAsync(userName);
                 if (account == null)
                     throw new InvalidOperationException($"No account found with username: {userName}.");
+                if (options != null)
+                    account = await GetNavigationPropertyByOptions(account, options);
                 return account;
             }
             catch (Exception ex)
@@ -69,13 +98,15 @@ namespace ProjectShop.Server.Application.Services.Account
             }
         }
 
-        public async Task<AccountModel> GetByAccountIdAsync(int accountId)
+        public async Task<AccountModel> GetByAccountIdAsync(uint accountId, AccountNavigationOptions? options)
         {
             try
             {
                 AccountModel? account = await _baseDAO.GetSingleDataAsync(accountId.ToString());
                 if (account == null)
                     throw new InvalidOperationException($"No account found with ID: {accountId}.");
+                if (options != null)
+                    account = await GetNavigationPropertyByOptions(account, options);
                 return account;
             }
             catch (Exception ex)
@@ -84,60 +115,60 @@ namespace ProjectShop.Server.Application.Services.Account
             }
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByCreatedDateMonthAndYearAsync(int year, int month)
+        public async Task<IEnumerable<AccountModel>> GetByCreatedDateMonthAndYearAsync(int year, int month, AccountNavigationOptions? options)
         {
             return await GetByMonthAndYearGenericAsync(
-                _accountDAO.GetByCreatedDateAsync, year, month, $"No accounts found created in {month}/{year}.");
+                _accountDAO.GetByCreatedDateAsync, year, month, options, $"No accounts found created in {month}/{year}.");
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByCreatedYearAsync<TCompareType>(int year, TCompareType compareType) where TCompareType : Enum
+        public async Task<IEnumerable<AccountModel>> GetByCreatedYearAsync<TCompareType>(int year, TCompareType compareType, AccountNavigationOptions? options) where TCompareType : Enum
         {
             return await GetByDateTimeGenericAsync(
-                (ct) => _accountDAO.GetByCreatedDateAsync(year, ct), compareType, $"No accounts found created in year {year} with comparison type {compareType}.");
+                (ct) => _accountDAO.GetByCreatedDateAsync(year, ct), compareType, options, $"No accounts found created in year {year} with comparison type {compareType}.");
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByCreatedDateTimeRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<AccountModel>> GetByCreatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, AccountNavigationOptions? options)
         {
-            return await GetByDateTimeRangeGenericAsync(() => _accountDAO.GetByCreatedDateAsync(startDate, endDate), $"No accounts found created between {startDate} and {endDate}.");
+            return await GetByDateTimeRangeGenericAsync(() => _accountDAO.GetByCreatedDateAsync(startDate, endDate), options, $"No accounts found created between {startDate} and {endDate}.");
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByCreatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType) where TCompareType : Enum
+        public async Task<IEnumerable<AccountModel>> GetByCreatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, AccountNavigationOptions? options) where TCompareType : Enum
         {
             return await GetByDateTimeGenericAsync(
-                (ct) => _accountDAO.GetByCreatedDateAsync(dateTime, ct), compareType, $"No accounts found created at {dateTime} with comparison type {compareType}.");
+                (ct) => _accountDAO.GetByCreatedDateAsync(dateTime, ct), compareType, options, $"No accounts found created at {dateTime} with comparison type {compareType}.");
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateMonthAndYearAsync(int year, int month)
+        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateMonthAndYearAsync(int year, int month, AccountNavigationOptions? options)
         {
             return await GetByMonthAndYearGenericAsync(
-                _accountDAO.GetByLastUpdatedDateAsync, year, month, $"No accounts found last updated in {month}/{year}.");
+                _accountDAO.GetByLastUpdatedDateAsync, year, month, options, $"No accounts found last updated in {month}/{year}.");
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType) where TCompareType : Enum
+        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType, AccountNavigationOptions? options) where TCompareType : Enum
         {
             return await GetByDateTimeGenericAsync(
-                (ct) => _accountDAO.GetByLastUpdatedDateAsync(year, ct), compareType, $"No accounts found last updated in year {year} with comparison type {compareType}.");
+                (ct) => _accountDAO.GetByLastUpdatedDateAsync(year, ct), compareType, options, $"No accounts found last updated in year {year} with comparison type {compareType}.");
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateTimeRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, AccountNavigationOptions? options)
         {
-            return await GetByDateTimeRangeGenericAsync(() => _accountDAO.GetByLastUpdatedDateAsync(startDate, endDate), $"No accounts found last updated between {startDate} and {endDate}.");
+            return await GetByDateTimeRangeGenericAsync(() => _accountDAO.GetByLastUpdatedDateAsync(startDate, endDate), options, $"No accounts found last updated between {startDate} and {endDate}.");
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType) where TCompareType : Enum
+        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, AccountNavigationOptions? options) where TCompareType : Enum
         {
             return await GetByDateTimeGenericAsync(
-                (ct) => _accountDAO.GetByLastUpdatedDateAsync(dateTime, ct), compareType, $"No accounts found last updated at {dateTime} with comparison type {compareType}.");
+                (ct) => _accountDAO.GetByLastUpdatedDateAsync(dateTime, ct), compareType, options, $"No accounts found last updated at {dateTime} with comparison type {compareType}.");
         }
 
         // DRY
-        private async Task<IEnumerable<AccountModel>> GetByDateTimeGenericAsync<TCompareType>(Func<TCompareType, Task<IEnumerable<AccountModel>>> daoFunc, TCompareType compareType, string errorMsg) where TCompareType : Enum
+        private async Task<IEnumerable<AccountModel>> GetByDateTimeGenericAsync<TCompareType>(Func<TCompareType, Task<IEnumerable<AccountModel>>> daoFunc, TCompareType compareType, AccountNavigationOptions? options, string errorMsg) where TCompareType : Enum
         {
             try
             {
                 IEnumerable<AccountModel> results = await daoFunc(compareType);
-                if (results == null || !results.Any())
-                    throw new InvalidOperationException(errorMsg);
+                if (options != null)
+                    results = await GetNavigationPropertyByOptions(results, options);
                 return results;
             }
             catch (Exception ex)
@@ -146,13 +177,13 @@ namespace ProjectShop.Server.Application.Services.Account
             }
         }
 
-        private async Task<IEnumerable<AccountModel>> GetByDateTimeRangeGenericAsync(Func<Task<IEnumerable<AccountModel>>> daoFunc, string errorMsg)
+        private async Task<IEnumerable<AccountModel>> GetByDateTimeRangeGenericAsync(Func<Task<IEnumerable<AccountModel>>> daoFunc, AccountNavigationOptions? options, string errorMsg)
         {
             try
             {
                 IEnumerable<AccountModel> results = await daoFunc();
-                if (results == null || !results.Any())
-                    throw new InvalidOperationException(errorMsg);
+                if (options != null)
+                    results = await GetNavigationPropertyByOptions(results, options);
                 return results;
             }
             catch (Exception ex)
@@ -161,13 +192,13 @@ namespace ProjectShop.Server.Application.Services.Account
             }
         }
 
-        private async Task<IEnumerable<AccountModel>> GetByMonthAndYearGenericAsync(Func<int, int, Task<IEnumerable<AccountModel>>> daoFunc, int year, int month, string errorMsg)
+        private async Task<IEnumerable<AccountModel>> GetByMonthAndYearGenericAsync(Func<int, int, Task<IEnumerable<AccountModel>>> daoFunc, int year, int month, AccountNavigationOptions? options, string errorMsg)
         {
             try
             {
                 IEnumerable<AccountModel> results = await daoFunc(year, month);
-                if (results == null || !results.Any())
-                    throw new InvalidOperationException(errorMsg);
+                if (options != null)
+                    results = await GetNavigationPropertyByOptions(results, options);
                 return results;
             }
             catch (Exception ex)
@@ -175,6 +206,5 @@ namespace ProjectShop.Server.Application.Services.Account
                 throw new InvalidOperationException($"{errorMsg} (exception)", ex);
             }
         }
-
     }
 }

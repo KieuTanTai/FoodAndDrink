@@ -1,15 +1,15 @@
 ﻿namespace ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO
 {
-    public interface IPersonDAO<T> : IGetByStatusAsync<T>, IGetRelativeAsync<T>, IGetDataByDateTimeAsync<T> where T : class
+    public interface IPersonDAO<TEntity> : IGetByStatusAsync<TEntity>, IGetRelativeAsync<TEntity>, IGetDataByDateTimeAsync<TEntity> where TEntity : class
     {
-        Task<T?> GetByAccountIdAsync(uint accountId);
-        Task<T?> GetByPhoneAsync(string phone);
-        Task<IEnumerable<T>> GetByPhonesAsync(IEnumerable<string> phones);
-        Task<IEnumerable<T>> GetByGenderAsync(bool isMale);
-        Task<IEnumerable<T>> GetByGendersAsync(IEnumerable<bool> isMales);
-        Task<T?> GetByEmailAsync(string email);
-        Task<IEnumerable<T>> GetByEmailsAsync(IEnumerable<string> emails);
-        Task<T?> GetByNameAsync(string name);
-        Task<IEnumerable<T>> GetByNamesAsync(IEnumerable<string> names);
+        Task<TEntity?> GetByAccountIdAsync(uint accountId);
+        Task<TEntity?> GetByPhoneAsync(string phone);
+        Task<IEnumerable<TEntity>> GetByPhonesAsync(IEnumerable<string> phones);
+        Task<IEnumerable<TEntity>> GetByGenderAsync(bool isMale);
+        Task<IEnumerable<TEntity>> GetByGendersAsync(IEnumerable<bool> isMales);
+        Task<TEntity?> GetByEmailAsync(string email);
+        Task<IEnumerable<TEntity>> GetByEmailsAsync(IEnumerable<string> emails);
+        Task<TEntity?> GetByNameAsync(string name);
+        Task<IEnumerable<TEntity>> GetByNamesAsync(IEnumerable<string> names);
     }
 }

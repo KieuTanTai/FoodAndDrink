@@ -20,8 +20,9 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'role_update_date' (DATETIME)
         public DateTime RoleLastUpdatedDate { get; set; } = DateTime.UtcNow;
 
-        // Navigation property
+        // Navigation properties
         public ICollection<RolesOfUserModel> RolesOfUsers { get; set; } = new List<RolesOfUserModel>();
+        // End of navigation properties
 
         public RoleModel(uint roleId, string roleName, bool roleStatus, DateTime roleCreatedDate, DateTime roleLastUpdatedDate)
         {

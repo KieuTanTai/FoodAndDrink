@@ -31,6 +31,7 @@ namespace ProjectShop.Server.Core.Entities
         public LocationModel Location { get; set; } = null!;
         public EmployeeModel DisposeByEmployee { get; set; } = null!;
         public DisposeReasonModel DisposeReason { get; set; } = null!;
+        // End of navigation properties
 
         public DisposeProductModel(uint disposeProductId, uint productBarcode, uint locationId, uint disposeByEmployeeId,
                             uint disposeReasonId, int disposeQuantity, DateTime disposedDate)

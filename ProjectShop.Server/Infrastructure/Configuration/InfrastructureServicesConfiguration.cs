@@ -18,7 +18,6 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddSingleton<IStringConverter, StringConverter>();
             services.AddSingleton<IColumnService, ColumnService>();
             services.AddSingleton<IHashPassword, HashPaswordService>();
-            services.AddScoped<ICurrentAccountLogin<AccountModel, RolesOfUserModel>, CurrentAccountLoginService>();
 
             string connectionString = AppConfigConnection.GetConnectionString();
             if (string.IsNullOrEmpty(connectionString))
@@ -26,7 +25,7 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddSingleton<IDbConnectionFactory>(provider => new MySqlConnectionFactory(connectionString));
 
             // Registering DAOs
-            services.AddTransient<IDAO<AccountModel>, AccountDAO>();
+            services.AddScoped<IDAO<AccountModel>, AccountDAO>();
             services.AddTransient<IDAO<BankModel>, BankDAO>();
             services.AddTransient<IDAO<CartModel>, CartDAO>();
             services.AddTransient<IDAO<CategoryModel>, CategoryDAO>();
@@ -56,14 +55,14 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddTransient<INoneUpdateDAO<ProductLotModel>, ProductLotDAO>();
             services.AddTransient<INoneUpdateDAO<ProductLotInventoryModel>, ProductLotInventoryDAO>();
             services.AddTransient<IDAO<RoleModel>, RoleDAO>();
-            services.AddTransient<IDAO<RolesOfUserModel>, RoleOfUserDAO>();
+            services.AddScoped<IDAO<RolesOfUserModel>, RoleOfUserDAO>();
             services.AddTransient<IDAO<SaleEventModel>, SaleEventDAO>();
             services.AddTransient<IDAO<SaleEventImageModel>, SaleEventImageDAO>();
             services.AddTransient<IDAO<SupplierModel>, SupplierDAO>();
             services.AddTransient<IDAO<UserPaymentMethodModel>, UserPaymentMethodDAO>();
 
             // Registering unique DAOs
-            services.AddTransient<IAccountDAO<AccountModel>, AccountDAO>();
+            services.AddScoped<IAccountDAO<AccountModel>, AccountDAO>();
             services.AddTransient<IGetRelativeAsync<BankModel>, BankDAO>();
             services.AddTransient<IGetByStatusAsync<BankModel>, BankDAO>();
             services.AddTransient<ICartDAO<CartModel>, CartDAO>();
@@ -94,12 +93,14 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddTransient<IGetRelativeAsync<LocationWardModel>, LocationWardDAO>();
             services.AddTransient<IGetByStatusAsync<LocationWardModel>, LocationWardDAO>();
             services.AddTransient<IProductCategoriesDAO<ProductCategoriesModel, ProductCategoriesKey>, ProductCateogriesDAO>();
+            services.AddTransient<IPersonDAO<EmployeeModel>, EmployeeDAO>();
+            services.AddTransient<IPersonDAO<CustomerModel>, CustomerDAO>();
             services.AddTransient<IProductDAO<ProductModel>, ProductDAO>();
             services.AddTransient<IProductImageDAO<ProductImageModel>, ProductImageDAO>();
             services.AddTransient<IProductLotDAO<ProductLotModel>, ProductLotDAO>();
             services.AddTransient<IProductLotInventoryDAO<ProductLotInventoryModel, ProductLotInventoryKey>, ProductLotInventoryDAO>();
             services.AddTransient<IRoleDAO<RoleModel>, RoleDAO>();
-            services.AddTransient<IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey>, RoleOfUserDAO>();
+            services.AddScoped<IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey>, RoleOfUserDAO>();
             services.AddTransient<ISaleEventDAO<SaleEventModel>, SaleEventDAO>();
             services.AddTransient<ISaleEventImageDAO<SaleEventImageModel>, SaleEventImageDAO>();
             services.AddTransient<ISupplierDAO<SupplierModel>, SupplierDAO>();

@@ -14,8 +14,9 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'bank_status' (TINYINT(1))
         public bool BankStatus { get; set; }
 
-        // Navigation property
+        // Navigation properties
         public ICollection<UserPaymentMethodModel> UserPaymentMethods { get; set; } = new List<UserPaymentMethodModel>();
+        // End of navigation properties
 
         public BankModel(uint bankId, string bankName, bool bankStatus)
         {

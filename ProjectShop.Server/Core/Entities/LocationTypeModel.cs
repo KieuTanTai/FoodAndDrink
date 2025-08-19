@@ -14,8 +14,9 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'location_type_status' (TINYINT(1))
         public bool LocationTypeStatus { get; set; }
 
-        // Navigation property for 'Location'
+        // Navigation properties
         public ICollection<LocationModel> Locations { get; set; } = new List<LocationModel>();
+        // End of navigation properties
 
         public LocationTypeModel(uint locationTypeId, string locationTypeName, bool locationTypeStatus)
         {

@@ -61,10 +61,10 @@ namespace ProjectShop.Server.Infrastructure.Data
         {
             try
             {
-                if (keys == null || !keys.Any()) 
+                if (keys == null || !keys.Any())
                     throw new ArgumentException("Keys collection cannot be null or empty.");
                 string query = $@"SELECT * FROM {TableName} WHERE ({ColumnIdName}, {SecondColumnIdName}) IN @Keys";
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<DetailProductLotModel> results = await connection.QueryAsync<DetailProductLotModel>(query, new { Keys = keys });
 
                 if (results == null || !results.Any())

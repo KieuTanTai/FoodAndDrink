@@ -25,7 +25,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"INSERT INTO {TableName} (product_lot_id, inventory_id, product_lot_inventory_quantity, product_lot_inventory_added_date) 
                       VALUES (@ProductLotId, @InventoryId, @ProductLotInventoryId, @ProductLotInventoryAddedDate); SELECT LAST_INSERT_ID();";
         }
-        
+
         private string GetSelectByKeysQuery()
         {
             return $@"SELECT * FROM {TableName} WHERE {ColumnIdName} = @ProductLotId AND {SecondColumnIdName} = @InventoryId;";
@@ -72,7 +72,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             try
             {
                 string query = GetSelectByKeysQuery();
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<ProductLotInventoryModel> results = await connection.QueryAsync<ProductLotInventoryModel>(query, keys);
                 return results;
             }

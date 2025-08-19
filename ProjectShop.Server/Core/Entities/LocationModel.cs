@@ -47,6 +47,7 @@ namespace ProjectShop.Server.Core.Entities
         public ICollection<InventoryMovementModel> SourceInventoryMovements { get; set; } = new List<InventoryMovementModel>();
         public ICollection<InventoryMovementModel> DestinationInventoryMovements { get; set; } = new List<InventoryMovementModel>();
         public ICollection<DisposeProductModel> DisposeProducts { get; set; } = new List<DisposeProductModel>();
+        // End of navigation properties
 
         public LocationModel(uint locationId, uint locationTypeId, string locationHouseNumber, string locationStreet, uint locationWardId, uint locationDistrictId, uint locationCityId, string locationPhone, string locationEmail, string locationName, bool locationStatus)
         {

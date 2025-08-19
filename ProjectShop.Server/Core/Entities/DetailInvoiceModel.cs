@@ -22,9 +22,10 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'detail_invoice_status' (TINYINT(1))
         public bool DetailInvoiceStatus { get; set; }
 
-        // Navigation property
+        // Navigation properties
         public InvoiceModel Invoice { get; set; } = null!;
         public ProductModel Product { get; set; } = null!;
+        // End of navigation properties
 
         public DetailInvoiceModel(uint detailInvoiceId, uint invoiceId, string productBarcode, uint detailInvoiceQuantity, decimal detailInvoicePrice, bool detailInvoiceStatus)
         {

@@ -14,8 +14,9 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'category_status' (TINYINT(1))
         public bool CategoryStatus { get; set; }
 
-        // Navigation property
+        // Navigation properties
         public ICollection<ProductCategoriesModel> ProductCategories { get; set; } = new List<ProductCategoriesModel>();
+        // End of navigation properties
 
         public CategoryModel(uint categoryId, string categoryName, bool categoryStatus)
         {

@@ -1,13 +1,11 @@
-﻿using ProjectShop.Server.Core.Entities;
-
-namespace ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO
+﻿namespace ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO
 {
-    public interface ISaleEventImageDAO<T> : IGetDataByDateTimeAsync<T> where T : class
+    public interface ISaleEventImageDAO<TEntity> : IGetDataByDateTimeAsync<TEntity> where TEntity : class
     {
-        Task<IEnumerable<T>> GetBySaleEventIdAsync(uint saleEventId);
-        Task<IEnumerable<T>> GetByLastUpdatedDateAsync<TCompareType>(DateTime lastUpdated, TCompareType compareType) where TCompareType : Enum;
-        Task<IEnumerable<T>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType) where TCompareType : Enum;
-        Task<IEnumerable<T>> GetByLastUpdatedMonthAndYearAsync(int month, int year);
-        Task<IEnumerable<T>> GetByLastUpdatedDateTimeRangeAsync(DateTime start, DateTime end);
+        Task<IEnumerable<TEntity>> GetBySaleEventIdAsync(uint saleEventId);
+        Task<IEnumerable<TEntity>> GetByLastUpdatedDateAsync<TCompareType>(DateTime lastUpdated, TCompareType compareType) where TCompareType : Enum;
+        Task<IEnumerable<TEntity>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType) where TCompareType : Enum;
+        Task<IEnumerable<TEntity>> GetByLastUpdatedMonthAndYearAsync(int month, int year);
+        Task<IEnumerable<TEntity>> GetByLastUpdatedDateTimeRangeAsync(DateTime start, DateTime end);
     }
 }

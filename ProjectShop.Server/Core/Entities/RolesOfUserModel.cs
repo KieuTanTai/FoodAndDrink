@@ -32,6 +32,7 @@ namespace ProjectShop.Server.Core.Entities
         // Navigation properties
         public AccountModel Account { get; set; } = null!;
         public RoleModel Role { get; set; } = null!;
+        // End of navigation properties
 
         public RolesOfUserModel(uint id, uint accountId, uint roleId, DateTime addedDate)
         {

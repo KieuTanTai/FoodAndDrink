@@ -33,6 +33,7 @@ namespace ProjectShop.Server.Core.Entities
         // Navigation properties
         public ProductModel Product { get; set; } = null!;
         public ProductLotModel ProductLot { get; set; } = null!;
+        // End of navigation properties
 
         public DetailProductLotModel(uint productLotId, string productBarcode, DateTime productLotMfgDate, DateTime productLotExpDate, int productLotInitialQuantity)
         {

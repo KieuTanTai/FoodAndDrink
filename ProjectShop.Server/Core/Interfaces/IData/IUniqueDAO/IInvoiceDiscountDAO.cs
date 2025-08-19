@@ -2,9 +2,9 @@
 
 namespace ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO
 {
-    public interface IInvoiceDiscountDAO<T, TKey> : IGetByKeysAsync<InvoiceDiscountModel, TKey> where T : class where TKey : struct
+    public interface IInvoiceDiscountDAO<TEntity, TKey> : IGetByKeysAsync<TEntity, TKey> where TEntity : class where TKey : struct
     {
-        Task<IEnumerable<T>> GetByInvoiceId(uint invoiceId);
-        Task<IEnumerable<T>> GetBySaleEventId(uint saleEventId);
+        Task<IEnumerable<TEntity>> GetByInvoiceId(uint invoiceId);
+        Task<IEnumerable<TEntity>> GetBySaleEventId(uint saleEventId);
     }
 }

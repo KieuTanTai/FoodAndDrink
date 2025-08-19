@@ -1,12 +1,7 @@
 ﻿using ProjectShop.Server.Application.Services.Account;
-using ProjectShop.Server.Application.Services.Account.ForgotPassword;
-using ProjectShop.Server.Application.Services.Account.Login;
-using ProjectShop.Server.Application.Services.Account.Signup;
 using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Entities.GetNavigationPropertyOptions;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
-using ProjectShop.Server.Core.Interfaces.IServices.IAccount.IForgotPassword;
-using ProjectShop.Server.Core.Interfaces.IServices.IAccount.ILogin;
-using ProjectShop.Server.Core.Interfaces.IServices.IAccount.ISignup;
 
 namespace ProjectShop.Server.Infrastructure.Configuration
 {
@@ -14,11 +9,11 @@ namespace ProjectShop.Server.Infrastructure.Configuration
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            services.AddTransient<ISearchAccountService<AccountModel>, SearchAccountService>();
-            services.AddTransient<IUpdateAccountStatusService, UpdateAccountStatusService>();
+            services.AddTransient<ISearchAccountService<AccountModel, AccountNavigationOptions>, SearchAccountService>();
+            services.AddTransient<IUpdateAccountService, UpdateAccountService>();
             services.AddTransient<IForgotPasswordService, ForgotPasswordService>();
-            services.AddTransient<ILoginService<AccountModel>, LoginService>();
-            services.AddTransient<ISignupService<AccountModel>, SignupService>();
+            services.AddScoped<ILoginService<AccountModel, AccountNavigationOptions>, LoginService>();
+            services.AddScoped<ISignupService<AccountModel>, SignupService>();
             return services;
         }
     }

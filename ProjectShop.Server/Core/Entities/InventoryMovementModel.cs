@@ -27,6 +27,7 @@ namespace ProjectShop.Server.Core.Entities
         // Navigation properties
         public LocationModel SourceLocation { get; set; } = null!;
         public LocationModel DestinationLocation { get; set; } = null!;
+        // End of navigation properties
 
         public InventoryMovementModel(uint inventoryMovementId, uint sourceLocationId, uint destinationLocationId, uint inventoryMovementQuantity, DateTime inventoryMovementDate, EInventoryMovementReason inventoryMovementReason)
         {

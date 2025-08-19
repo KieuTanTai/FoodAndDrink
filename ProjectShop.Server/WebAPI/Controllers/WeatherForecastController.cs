@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ProjectShop.Server.Core.Entities;
-using ProjectShop.Server.Infrastructure.Services;
 
 namespace ProjectShop.Server.WebAPI.Controllers
 {

@@ -19,11 +19,9 @@ namespace ProjectShop.Server.Core.Entities
 
         // Corresponds to 'company_location_id' (INT UNSIGNED)
         public uint? CompanyLocationId { get; set; }
-        public LocationModel CompanyLocation { get; set; } = null!;
 
         // Corresponds to 'store_location_id' (INT UNSIGNED)
         public uint? StoreLocationId { get; set; }
-        public LocationModel StoreLocation { get; set; } = null!;
 
         // Corresponds to 'supplier_status' (TINYINT(1))
         public bool SupplierStatus { get; set; }
@@ -31,8 +29,11 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'supplier_cooperation_date' (DATETIME)
         public DateTime SupplierCooperationDate { get; set; }
 
-        // Navigation property: Một supplier có thể cung cấp nhiều sản phẩm
+        // Navigation properties
+        public LocationModel StoreLocation { get; set; } = null!;
+        public LocationModel CompanyLocation { get; set; } = null!;
         public ICollection<ProductModel> Products { get; set; } = new List<ProductModel>();
+        // End of navigation properties
 
         public SupplierModel(uint supplierId,
                         string supplierName,

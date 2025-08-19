@@ -1,8 +1,8 @@
 ﻿namespace ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO
 {
-    public interface IDetailInventoryMovementDAO<T> where T : class
+    public interface IDetailInventoryMovementDAO<TEntity> where TEntity : class
     {
-        Task<IEnumerable<T>> GetByMovementIdAsync(uint movementId);
-        Task<IEnumerable<T>> GetByProductBarcodeAsync(string barcode);
+        Task<IEnumerable<TEntity>> GetByMovementIdAsync(uint movementId);
+        Task<IEnumerable<TEntity>> GetByProductBarcodeAsync(string barcode);
     }
 }

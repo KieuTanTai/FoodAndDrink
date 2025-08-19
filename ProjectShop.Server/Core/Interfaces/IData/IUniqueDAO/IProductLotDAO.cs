@@ -1,7 +1,7 @@
 ﻿namespace ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO
 {
-    public interface IProductLotDAO<T> : IGetDataByDateTimeAsync<T> where T : class
+    public interface IProductLotDAO<TEntity> : IGetDataByDateTimeAsync<TEntity> where TEntity : class
     {
-        Task<IEnumerable<T>> GetByProductBarcodeAsync(string barcode);
+        Task<IEnumerable<TEntity>> GetByProductBarcodeAsync(string barcode);
     }
 }

@@ -22,9 +22,10 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'sale_event_id' (INT UNSIGNED)
         public uint SaleEventId { get; set; }
 
-        // Navigation property
+        // Navigation properties
         public SaleEventModel SaleEvent { get; set; } = null!;
         public InvoiceModel Invoice { get; set; } = null!;
+        // End of navigation properties
 
         public InvoiceDiscountModel(uint invoiceId, uint saleEventId)
         {

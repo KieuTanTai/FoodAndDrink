@@ -1,20 +1,18 @@
-﻿using ProjectShop.Server.Core.Entities;
-
-namespace ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO
+﻿namespace ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO
 {
-    public interface IUserPaymentMethodDAO<T> : IGetByStatusAsync<T>, IGetDataByDateTimeAsync<T>, IGetByEnumAsync<T> where T : class
+    public interface IUserPaymentMethodDAO<TEntity> : IGetByStatusAsync<TEntity>, IGetDataByDateTimeAsync<TEntity>, IGetByEnumAsync<TEntity> where TEntity : class
     {
-        Task<IEnumerable<T>> GetByCustomerIdAsync(uint customerId);
-        Task<IEnumerable<T>> GetByCustomerIdsAsync(IEnumerable<uint> customerIds);
-        Task<IEnumerable<T>> GetByBankIdAsync(uint bankId);
-        Task<IEnumerable<T>> GetByBankIdsAsync(IEnumerable<uint> bankIds);
-        Task<T?> GetByTokenAsync(string token);
-        Task<T?> GetByDisplayNameAsync(string displayName);
-        Task<T?> GetByLastFourDigitAsync(string lastFourDigit);
-        Task<IEnumerable<T>> GetByRelativeDisplayNameAsync(string displayName);
-        Task<IEnumerable<T>> GetAllByLastFourDigitAsync(string lastFourDigit);
-        Task<IEnumerable<T>> GetByExpiryYearAsync<TCompareType>(int year, TCompareType compareType) where TCompareType : Enum;
-        Task<IEnumerable<T>> GetByExpiryMonthAsync<TCompareType>(int month, TCompareType compareType) where TCompareType : Enum;
-        Task<IEnumerable<T>> GetByExpiryYearAndMonthAsync(int year, int month);
+        Task<IEnumerable<TEntity>> GetByCustomerIdAsync(uint customerId);
+        Task<IEnumerable<TEntity>> GetByCustomerIdsAsync(IEnumerable<uint> customerIds);
+        Task<IEnumerable<TEntity>> GetByBankIdAsync(uint bankId);
+        Task<IEnumerable<TEntity>> GetByBankIdsAsync(IEnumerable<uint> bankIds);
+        Task<TEntity?> GetByTokenAsync(string token);
+        Task<TEntity?> GetByDisplayNameAsync(string displayName);
+        Task<TEntity?> GetByLastFourDigitAsync(string lastFourDigit);
+        Task<IEnumerable<TEntity>> GetByRelativeDisplayNameAsync(string displayName);
+        Task<IEnumerable<TEntity>> GetAllByLastFourDigitAsync(string lastFourDigit);
+        Task<IEnumerable<TEntity>> GetByExpiryYearAsync<TCompareType>(int year, TCompareType compareType) where TCompareType : Enum;
+        Task<IEnumerable<TEntity>> GetByExpiryMonthAsync<TCompareType>(int month, TCompareType compareType) where TCompareType : Enum;
+        Task<IEnumerable<TEntity>> GetByExpiryYearAndMonthAsync(int year, int month);
     }
 }

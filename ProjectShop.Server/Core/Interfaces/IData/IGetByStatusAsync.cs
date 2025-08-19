@@ -1,7 +1,7 @@
 ﻿namespace ProjectShop.Server.Core.Interfaces.IData
 {
-    public interface IGetByStatusAsync<T> where T : class
+    public interface IGetByStatusAsync<TEntity> where TEntity : class
     {
-        Task<IEnumerable<T>> GetByStatusAsync(bool status);
+        Task<IEnumerable<TEntity>> GetByStatusAsync(bool status);
     }
 }

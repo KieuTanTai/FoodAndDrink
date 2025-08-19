@@ -62,7 +62,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             try
             {
                 string query = $"SELECT * FROM {TableName} WHERE {firstColName} = @FirstInput AND {secondColName} = @SecondInput";
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<CustomerAddressModel> addresses = await connection.QueryAsync<CustomerAddressModel>(query, new { FirstInput = firstInput, SecondInput = secondInput });
                 return addresses;
             }

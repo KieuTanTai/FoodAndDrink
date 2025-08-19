@@ -5,30 +5,28 @@ using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Persistence
 {
-    public abstract class BaseDAO<T>(
+    public abstract class BaseDAO<TEntity>(
         IDbConnectionFactory connectionFactory,
         IColumnService colService,
         IStringConverter converter,
         IStringChecker checker,
         string tableName,
         string columnIdName,
-        string secondColumnIdName = "") : BaseGetDataDAO<T>(connectionFactory, tableName, columnIdName), IDAO<T> where T : class
+        string secondColumnIdName = "") : BaseGetDataDAO<TEntity>(connectionFactory, colService, converter, checker, tableName, columnIdName, secondColumnIdName),
+        IDAO<TEntity> where TEntity : class
     {
-        protected IColumnService ColService { get; } = colService;
-        protected IStringConverter Converter { get; } = converter;
-        protected IStringChecker Checker { get; } = checker;
-        protected string SecondColumnIdName { get; } = secondColumnIdName ?? string.Empty;
+
 
         // INSERT ENTITY
-        public virtual async Task<int> InsertAsync(T entity)
+        public virtual async Task<int> InsertAsync(TEntity entity)
         {
             try
             {
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 using IDbTransaction transaction = connection.BeginTransaction();
                 try
                 {
-                    int result = await connection.QueryFirstOrDefaultAsync(GetInsertQuery(), entity, transaction);
+                    int result = await connection.ExecuteScalarAsync<int>(GetInsertQuery(), entity, transaction);
                     transaction.Commit();
                     return result;
                 }
@@ -44,14 +42,14 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             }
         }
 
-        public virtual async Task<int> InsertManyAsync(IEnumerable<T> entities)
+        public virtual async Task<int> InsertManyAsync(IEnumerable<TEntity> entities)
         {
             try
             {
                 if (entities == null || !entities.Any())
                     return 0; // Trả về 0 nếu không có đối tượng nào.
 
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 using IDbTransaction transaction = connection.BeginTransaction();
                 try
                 {
@@ -74,11 +72,11 @@ namespace ProjectShop.Server.Infrastructure.Persistence
         }
 
         // 2. Usage in UpdateAsync
-        public virtual async Task<int> UpdateAsync(T entity)
+        public virtual async Task<int> UpdateAsync(TEntity entity)
         {
             try
             {
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 using IDbTransaction transaction = connection.BeginTransaction();
                 try
                 {
@@ -98,14 +96,14 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             }
         }
 
-        public virtual async Task<int> UpdateManyAsync(IEnumerable<T> entities)
+        public virtual async Task<int> UpdateManyAsync(IEnumerable<TEntity> entities)
         {
             try
             {
                 if (entities == null || !entities.Any())
                     return 0; // Không có gì để cập nhật.
 
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 using IDbTransaction transaction = connection.BeginTransaction();
                 try
                 {
@@ -131,7 +129,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence
         {
             try
             {
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<TResult> result = await connection.QueryAsync<TResult>(query, parameters);
                 return result.AsList();
             }
@@ -146,7 +144,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence
         {
             try
             {
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 try
                 {
                     TResult? result = await connection.QueryFirstOrDefaultAsync(query, parameters, transaction);
@@ -171,7 +169,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence
         {
             try
             {
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 try
                 {
                     int affectedRows = await connection.ExecuteAsync(query, parameters, transaction);

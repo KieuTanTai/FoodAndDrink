@@ -4,7 +4,6 @@ using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
-using System.Globalization;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {

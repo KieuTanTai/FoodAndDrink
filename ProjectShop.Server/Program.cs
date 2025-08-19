@@ -13,6 +13,7 @@ try
 {
     builder.Services.AddInfrastructureServices();
     builder.Services.AddApplicationServices();
+    //builder.Services.AddControllerServices();
     SnakeCaseMapperInitializer.RegisterAllEntities();
 }
 catch (Exception ex)

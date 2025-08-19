@@ -1,19 +1,17 @@
-﻿using ProjectShop.Server.Core.Entities;
-
-namespace ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO
+﻿namespace ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO
 {
-    public interface IDetailProductLotDAO<T, TKey> : IGetByKeysAsync<T, TKey> where T : class where TKey : struct
+    public interface IDetailProductLotDAO<TEntity, TKey> : IGetByKeysAsync<TEntity, TKey> where TEntity : class where TKey : struct
     {
-        Task<IEnumerable<T>> GetByProductBarcode(string barcode);
-        Task<IEnumerable<T>> GetByInitialQuantityAsync<TEnum>(int initialQuantity, TEnum compareType) where TEnum : Enum;
-        Task<IEnumerable<T>> GetByMFGDateAsync(int year, int month);
-        Task<IEnumerable<T>> GetByMFGDateAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum;
-        Task<IEnumerable<T>> GetByMFGDateAsync(DateTime startDate, DateTime endDate);
-        Task<IEnumerable<T>> GetByMFGDateAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum;
+        Task<IEnumerable<TEntity>> GetByProductBarcode(string barcode);
+        Task<IEnumerable<TEntity>> GetByInitialQuantityAsync<TEnum>(int initialQuantity, TEnum compareType) where TEnum : Enum;
+        Task<IEnumerable<TEntity>> GetByMFGDateAsync(int year, int month);
+        Task<IEnumerable<TEntity>> GetByMFGDateAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum;
+        Task<IEnumerable<TEntity>> GetByMFGDateAsync(DateTime startDate, DateTime endDate);
+        Task<IEnumerable<TEntity>> GetByMFGDateAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum;
 
-        Task<IEnumerable<T>> GetByEXPDateAsync(int year, int month);
-        Task<IEnumerable<T>> GetByEXPDateAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum;
-        Task<IEnumerable<T>> GetByEXPDateAsync(DateTime startDate, DateTime endDate);
-        Task<IEnumerable<T>> GetByEXPDateAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum;
+        Task<IEnumerable<TEntity>> GetByEXPDateAsync(int year, int month);
+        Task<IEnumerable<TEntity>> GetByEXPDateAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum;
+        Task<IEnumerable<TEntity>> GetByEXPDateAsync(DateTime startDate, DateTime endDate);
+        Task<IEnumerable<TEntity>> GetByEXPDateAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum;
     }
 }

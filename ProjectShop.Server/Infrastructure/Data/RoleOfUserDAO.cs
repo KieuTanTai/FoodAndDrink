@@ -59,7 +59,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             try
             {
                 string query = GetByKeysQuery();
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<RolesOfUserModel> result = await connection.QueryAsync<RolesOfUserModel>(query, listKeys);
                 return result.AsList();
             }
@@ -74,7 +74,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             try
             {
                 string query = GetDeleteByKeysQuery();
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 int rowsAffected = await connection.ExecuteAsync(query, keys);
                 if (rowsAffected == 0)
                     throw new KeyNotFoundException($"No RolesOfUserModel found for AccountId: {keys.AccountId} and RoleId: {keys.RoleId}");
@@ -122,7 +122,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             try
             {
                 string query = GetDeleteByIdQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 int rowsAffected = await connection.ExecuteAsync(query, new { Input = key });
                 if (rowsAffected == 0)
                     throw new KeyNotFoundException($"No RolesOfUserModel found with {colName}: {key}");

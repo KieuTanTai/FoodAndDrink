@@ -5,15 +5,15 @@ using System.Data;
 namespace ProjectShop.Server.Infrastructure.Configuration
 {
     // Generic SQL Type Handler for Enums
-    public class SqlTypeHandler<T> : SqlMapper.TypeHandler<T> where T : Enum
+    public class SqlTypeHandler<TEntity> : SqlMapper.TypeHandler<TEntity> where TEntity : Enum
     {
-        public override T? Parse(object value)
+        public override TEntity? Parse(object value)
         {
             if (value is null)
                 throw new ArgumentNullException(nameof(value));
-            return (T?)Enum.Parse(typeof(T), value.ToString()!, ignoreCase: true);
+            return (TEntity?)Enum.Parse(typeof(TEntity), value.ToString()!, ignoreCase: true);
         }
-        public override void SetValue(IDbDataParameter parameter, T? value)
+        public override void SetValue(IDbDataParameter parameter, TEntity? value)
         {
             if (value is null)
                 throw new ArgumentNullException(nameof(value));

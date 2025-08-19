@@ -10,7 +10,7 @@ namespace ProjectShop.Server.Infrastructure.Services
         private readonly IDbConnectionFactory _connectionFactory = connectionFactory;
         private readonly Dictionary<string, HashSet<string>> _columnCache = new(StringComparer.OrdinalIgnoreCase);
 
-        public List<string> GetValidColumns(string tableName)
+        public async Task<List<string>> GetValidColumns(string tableName)
         {
             try
             {
@@ -19,7 +19,7 @@ namespace ProjectShop.Server.Infrastructure.Services
                     return cached.ToList();
                 }
 
-                using IDbConnection connection = _connectionFactory.CreateConnection();
+                using IDbConnection connection = await _connectionFactory.CreateConnection();
 
                 if (connection is not DbConnection dbConnection)
                     throw new InvalidOperationException("Connection must inherit from DbConnection to use GetSchema.");
@@ -55,11 +55,11 @@ namespace ProjectShop.Server.Infrastructure.Services
             }
         }
 
-        public bool IsValidColumn(string tableName, string columnName)
+        public async Task<bool> IsValidColumn(string tableName, string columnName)
         {
             if (!_columnCache.TryGetValue(tableName, out var cols))
             {
-                var colList = GetValidColumns(tableName);
+                var colList = await GetValidColumns(tableName);
                 cols = new HashSet<string>(colList, StringComparer.OrdinalIgnoreCase);
                 _columnCache[tableName] = cols;
             }

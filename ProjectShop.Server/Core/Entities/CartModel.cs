@@ -14,9 +14,10 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'cart_total_price' (DECIMAL(10, 2))
         public decimal CartTotalPrice { get; set; }
 
-        // Navigation property
+        // Navigation properties
         public CustomerModel Customer { get; set; } = null!;
         public ICollection<DetailCartModel> DetailCarts { get; set; } = new List<DetailCartModel>();
+        // End of navigation properties
 
         public CartModel(uint cartId, uint customerId, decimal cartTotalPrice)
         {

@@ -1,8 +1,8 @@
 ﻿namespace ProjectShop.Server.Core.Interfaces.IData
 {
-    public interface IUpdateAsync<T> where T : class
+    public interface IUpdateAsync<TEntity> where TEntity : class
     {
-        Task<int> UpdateAsync(T entity);
-        Task<int> UpdateManyAsync(IEnumerable<T> entities);
+        Task<int> UpdateAsync(TEntity entity);
+        Task<int> UpdateManyAsync(IEnumerable<TEntity> entities);
     }
 }

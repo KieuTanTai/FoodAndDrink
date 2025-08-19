@@ -20,6 +20,8 @@ namespace ProjectShop.Server.Core.Entities
 
         // Navigation properties
         public SaleEventModel SaleEvent { get; set; } = null!;
+        // End of navigation properties
+
         public SaleEventImageModel(uint saleEventImageId, uint saleEventId, string imageUrl, byte imagePriority)
         {
             SaleEventImageId = saleEventImageId;

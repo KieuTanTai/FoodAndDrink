@@ -23,6 +23,7 @@ namespace ProjectShop.Server.Core.Entities
         public LocationWardModel? Ward { get; set; }
         public LocationDistrictModel? District { get; set; }
         public LocationCityModel? City { get; set; }
+        // End of navigation properties
 
         // Constructor cho lớp cơ sở.
         public PersonModel(uint accountId, DateTime birthday, string phone, string name, string email, string avatarUrl, bool gender, bool status)

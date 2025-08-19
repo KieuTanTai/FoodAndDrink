@@ -4,14 +4,14 @@ using ProjectShop.Server.Infrastructure.Services;
 using System.Reflection;
 
 namespace ProjectShop.Server.Infrastructure.Configuration;
-public class SnakeCaseTypeMapperConfiguration<T> : FallbackTypeMapper
+public class SnakeCaseTypeMapperConfiguration<TEntity> : FallbackTypeMapper
 {
     public SnakeCaseTypeMapperConfiguration() : base(
     [
         // Use a lambda to match the expected delegate signature (PropertyInfo, not PropertyInfo?)
-        new CustomPropertyTypeMap(typeof(T), (type, columnName) => SelectProperty(type, columnName) ??
+        new CustomPropertyTypeMap(typeof(TEntity), (type, columnName) => SelectProperty(type, columnName) ??
             throw new InvalidOperationException($"No matching property for column '{columnName}' in type '{type.FullName}'.")),
-        new DefaultTypeMap(typeof(T))
+        new DefaultTypeMap(typeof(TEntity))
     ])
     { }
 

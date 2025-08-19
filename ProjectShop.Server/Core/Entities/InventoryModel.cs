@@ -19,6 +19,7 @@ namespace ProjectShop.Server.Core.Entities
 
         // Navigation properties
         public LocationModel Location { get; set; } = null!;
+        // End of navigation properties
 
         public InventoryModel(uint inventoryId, uint locationId, byte inventoryStatus, DateTime inventoryLastUpdatedDate)
         {

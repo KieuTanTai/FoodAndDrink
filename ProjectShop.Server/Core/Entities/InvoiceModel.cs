@@ -32,6 +32,7 @@ namespace ProjectShop.Server.Core.Entities
         public UserPaymentMethodModel UserPaymentMethod { get; set; } = null!;
         public ICollection<DetailInvoiceModel> DetailInvoices { get; set; } = new List<DetailInvoiceModel>();
         public ICollection<InvoiceDiscountModel> InvoiceDiscounts { get; set; } = new List<InvoiceDiscountModel>();
+        // End of navigation properties
 
         public InvoiceModel(uint invoiceId, uint customerId, uint employeeId, uint paymentMethodId, decimal invoiceTotalPrice, DateTime invoiceDate, bool invoiceStatus)
         {

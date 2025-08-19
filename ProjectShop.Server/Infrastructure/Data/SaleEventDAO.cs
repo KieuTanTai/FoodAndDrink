@@ -101,7 +101,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             {
                 string query = $@" SELECT * FROM {TableName}
                     WHERE sale_event_start_date >= @StartDate AND sale_event_end_date <= DATE_ADD(@EndDate, INTERVAL 1 DAY)";
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<SaleEventModel> result = await connection.QueryAsync<SaleEventModel>(query, new { StartDate = startDate, EndDate = endDate });
                 if (result == null || !result.Any())
                     throw new Exception("No SaleEvents found for the given date range.");

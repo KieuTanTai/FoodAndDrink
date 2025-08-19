@@ -22,9 +22,10 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'inventory_detail_last_updated_date' (DATETIME)
         public DateTime DetailInventoryLastUpdatedDate { get; set; }
 
-        // Navigation property
+        // Navigation properties
         public ProductModel Product { get; set; } = null!;
         public InventoryModel Inventory { get; set; } = null!;
+        // End of navigation properties
 
         public DetailInventoryModel(uint detailInventoryId, uint inventoryId, string productBarcode, uint detailInventoryQuantity, DateTime detailInventoryAddedDate, DateTime detailInventoryLastUpdatedDate)
         {

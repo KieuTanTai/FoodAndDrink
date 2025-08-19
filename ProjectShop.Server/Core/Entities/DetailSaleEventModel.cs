@@ -33,6 +33,7 @@ namespace ProjectShop.Server.Core.Entities
         // Navigation properties
         public SaleEventModel SaleEvent { get; set; } = null!;
         public ProductModel Product { get; set; } = null!;
+        // End of navigation properties
 
         public DetailSaleEventModel(uint detailSaleEventId, uint saleEventId, string productBarcode, EDiscountType discountType, decimal discountPercent, decimal discountAmount, decimal maxDiscountPrice, decimal minPriceToUse)
         {

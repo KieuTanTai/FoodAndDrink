@@ -43,7 +43,7 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<IEnumerable<InventoryMovementModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate)
             => await GetByDateTimeAsync("inventory_movement_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate));
 
-        public async Task<InventoryMovementModel?> GetByDestinationLocationId(uint locationId) 
+        public async Task<InventoryMovementModel?> GetByDestinationLocationId(uint locationId)
             => await GetSingleDataAsync(locationId.ToString(), "destination_location_id");
 
         public async Task<IEnumerable<InventoryMovementModel>> GetByDestinationLocationIdsAsync(IEnumerable<uint> locationIds) => await GetByInputsAsync(locationIds.Select(locationId => locationId.ToString()), "destination_location_id");

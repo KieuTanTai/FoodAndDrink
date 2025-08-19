@@ -13,11 +13,12 @@ namespace ProjectShop.Server.Core.Entities
         public string CustomerAddressNumber { get; set; } = string.Empty;
         public bool CustomerAddressStatus { get; set; } = true;
 
-        // Navigation properties (nullable if not always loaded)
+        // Navigation properties
         public LocationCityModel? City { get; set; }
         public LocationDistrictModel? District { get; set; }
         public LocationWardModel? Ward { get; set; }
         public CustomerModel? Customer { get; set; }
+        // End of navigation properties
 
         public CustomerAddressModel(
             uint customerAddressId,

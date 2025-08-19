@@ -11,8 +11,9 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'dispose_reason_name' (VARCHAR(30))
         public string DisposeReasonName { get; set; } = string.Empty;
 
-        // Navigation property
+        // Navigation properties
         public ICollection<DisposeProductModel> DisposeProducts { get; set; } = new List<DisposeProductModel>();
+        // End of navigation properties
 
         public DisposeReasonModel(uint disposeReasonId, string disposeReasonName)
         {

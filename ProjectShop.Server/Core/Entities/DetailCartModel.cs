@@ -23,9 +23,10 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'cart_quantity' (INT UNSIGNED)
         public uint DetailCartQuantity { get; set; }
 
-        // Navigation property
+        // Navigation properties
         public CartModel Cart { get; set; } = null!;
         public ProductModel Product { get; set; } = null!;
+        // End of navigation properties
 
         public DetailCartModel(uint detailCartId, uint cartId, string productBarcode, DateTime detailCartAddedDate, decimal detailCartPrice, uint detailCartQuantity)
         {

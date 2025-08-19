@@ -5,9 +5,10 @@ namespace ProjectShop.Server.Core.Entities
     {
         public uint CustomerId { get; set; }
 
-        // Các navigation properties riêng của Customer
+        // Navigation properties
         public CartModel Cart { get; set; } = null!;
         public ICollection<InvoiceModel> Invoices { get; set; } = new List<InvoiceModel>();
+        // End of navigation properties
 
         // Constructor sử dụng base(...) để gọi constructor của lớp cha PersonModel
         public CustomerModel(
@@ -25,7 +26,7 @@ namespace ProjectShop.Server.Core.Entities
             CustomerId = customerId;
         }
 
-        public CustomerModel() : base() { } 
+        public CustomerModel() : base() { }
 
         // Triển khai phương thức trừu tượng từ lớp cha.
         public override uint GetIdEntity() => CustomerId;

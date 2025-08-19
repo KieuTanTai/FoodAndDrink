@@ -46,8 +46,9 @@ namespace ProjectShop.Server.Core.Entities
         public ICollection<ProductImageModel> ProductImages { get; set; } = new List<ProductImageModel>();
         public ICollection<DetailSaleEventModel> DetailSaleEvents { get; set; } = new List<DetailSaleEventModel>();
         public ICollection<DetailInvoiceModel> DetailInvoices { get; set; } = new List<DetailInvoiceModel>();
+        // End of navigation properties
 
-        public ProductModel(string productBarcode, uint supplierId, string productName, decimal productNetWeight, string productWeightRange, EProductUnit productUnit, decimal productBasePrice, 
+        public ProductModel(string productBarcode, uint supplierId, string productName, decimal productNetWeight, string productWeightRange, EProductUnit productUnit, decimal productBasePrice,
                 string productRatingAge, bool productStatus, DateTime productAddedDate, DateTime productLastUpdatedDate)
         {
             ProductBarcode = productBarcode;

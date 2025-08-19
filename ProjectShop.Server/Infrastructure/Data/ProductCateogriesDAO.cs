@@ -50,7 +50,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             try
             {
                 string query = $@"SELECT * FROM {TableName} WHERE ({ColumnIdName}, {SecondColumnIdName}) IN @Keys";
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<ProductCategoriesModel> results = await connection.QueryAsync<ProductCategoriesModel>(query, new { Keys = keys.Select(k => new { k.CategoryId, k.ProductBarcode }) });
                 if (results == null || !results.Any())
                     throw new KeyNotFoundException($"No records found in {TableName} for the provided keys.");
@@ -67,7 +67,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             try
             {
                 string query = GetDeleteByKeysQuery();
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 return await connection.ExecuteAsync(query, keys);
             }
             catch (Exception ex)
@@ -84,7 +84,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             try
             {
                 string query = GetDeleteQuery(colName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 return await connection.ExecuteAsync(query, new { Input = key });
             }
             catch (Exception ex)

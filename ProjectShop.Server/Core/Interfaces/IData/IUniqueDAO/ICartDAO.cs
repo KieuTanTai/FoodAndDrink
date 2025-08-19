@@ -1,8 +1,8 @@
 ﻿namespace ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO
 {
-    public interface ICartDAO<T> where T : class
+    public interface ICartDAO<TEntity> where TEntity : class
     {
-        Task<IEnumerable<T>> GetByTotalPriceAsync(decimal minPrice, decimal maxPrice);
-        Task<IEnumerable<T>> GetByTotalPriceAsync<TEnum>(decimal price, TEnum compareType) where TEnum : Enum;
+        Task<IEnumerable<TEntity>> GetByTotalPriceAsync(decimal minPrice, decimal maxPrice);
+        Task<IEnumerable<TEntity>> GetByTotalPriceAsync<TEnum>(decimal price, TEnum compareType) where TEnum : Enum;
     }
 }

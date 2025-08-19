@@ -1,14 +1,14 @@
 ﻿namespace ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO
 {
-    public interface ICustomerAddressDAO<T> : IGetByStatusAsync<T> where T : class
+    public interface ICustomerAddressDAO<TEntity> : IGetByStatusAsync<TEntity> where TEntity : class
     {
-        Task<IEnumerable<T>> GetByCityIdAsync(uint cityId);
-        Task<IEnumerable<T>> GetByCustomerIdAsync(string customerId);
-        Task<IEnumerable<T>> GetByDistrictIdAsync(uint districtId);
-        Task<IEnumerable<T>> GetByWardIdAsync(uint wardId);
-        Task<IEnumerable<T>> GetByCityIdAndDistrictIdAsync(uint cityId, uint districtId);
-        Task<IEnumerable<T>> GetByCityIdAndWardIdAsync(uint cityId, uint wardId);
-        Task<IEnumerable<T>> GetByDistrictIdAndWardIdAsync(uint districtId, uint wardId);
-        Task<IEnumerable<T>> GetByStreetLikeAsync(string streetLike);
+        Task<IEnumerable<TEntity>> GetByCityIdAsync(uint cityId);
+        Task<IEnumerable<TEntity>> GetByCustomerIdAsync(string customerId);
+        Task<IEnumerable<TEntity>> GetByDistrictIdAsync(uint districtId);
+        Task<IEnumerable<TEntity>> GetByWardIdAsync(uint wardId);
+        Task<IEnumerable<TEntity>> GetByCityIdAndDistrictIdAsync(uint cityId, uint districtId);
+        Task<IEnumerable<TEntity>> GetByCityIdAndWardIdAsync(uint cityId, uint wardId);
+        Task<IEnumerable<TEntity>> GetByDistrictIdAndWardIdAsync(uint districtId, uint wardId);
+        Task<IEnumerable<TEntity>> GetByStreetLikeAsync(string streetLike);
     }
 }

@@ -30,6 +30,7 @@ namespace ProjectShop.Server.Core.Entities
         // Navigation properties
         public CategoryModel Category { get; set; } = null!;
         public ProductModel Product { get; set; } = null!;
+        // End of navigation properties
 
         public ProductCategoriesModel(uint id, uint categoryId, string productBarcode)
         {

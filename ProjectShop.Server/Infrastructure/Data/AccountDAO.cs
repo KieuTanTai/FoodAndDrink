@@ -40,7 +40,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             {
                 string query = $@"SELECT * FROM {TableName} 
                              WHERE user_name = @UserName AND password = @Password";
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 AccountModel? result = await connection.QueryFirstOrDefaultAsync<AccountModel>(query, new { UserName = userName, Password = password });
                 if (result == null)
                     throw new InvalidOperationException($"Account with username {userName} and provided password not found.");
@@ -50,12 +50,16 @@ namespace ProjectShop.Server.Infrastructure.Data
             {
                 throw new InvalidOperationException($"An error occurred while retrieving account with username {userName}.", ex);
             }
-        }   
+        }
 
         public async Task<AccountModel?> GetByUserNameAsync(string userName) => await GetSingleDataAsync(userName, "user_name");
 
         public async Task<IEnumerable<AccountModel>> GetByUserNameAsync(IEnumerable<string> userNames) => await GetByInputsAsync(userNames, "user_name");
+        
         public async Task<IEnumerable<AccountModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "account_status");
+        
+        public async Task<IEnumerable<AccountModel>> GetByStatusAsync(bool status, int maxGetCount)
+            => await GetByInputAsync(GetTinyIntString(status), "account_status", maxGetCount);
 
         // ---- Public API cho Created Date ----
         public async Task<IEnumerable<AccountModel>> GetByCreatedDateAsync(int year, int month)

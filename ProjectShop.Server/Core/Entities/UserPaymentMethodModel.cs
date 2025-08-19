@@ -41,10 +41,11 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'payment_method_token' (VARCHAR(255))
         public string PaymentMethodToken { get; set; } = string.Empty;
 
-        // Navigation property
+        // Navigation properties
         public BankModel? Bank { get; set; }
         public CustomerModel Customer { get; set; } = null!;
         public ICollection<InvoiceModel> Invoices { get; set; } = new List<InvoiceModel>();
+        // End of navigation properties
 
         public UserPaymentMethodModel(uint userPaymentMethodId, string paymentMethodType, uint? bankId, uint customerId, DateTime paymentMethodAddedDate, DateTime paymentMethodLastUpdatedDate, int paymentMethodStatus,
             string paymentMethodDisplayName, string paymentMethodLastFourDigit, int paymentMethodExpiryYear, int paymentMethod_ExpiryMonth, string paymentMethodToken)

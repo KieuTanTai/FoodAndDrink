@@ -20,6 +20,7 @@ namespace ProjectShop.Server.Core.Entities
         public ICollection<SupplierModel> StoreSuppliers { get; set; } = new List<SupplierModel>();
         public ICollection<CustomerModel> Customers { get; set; } = new List<CustomerModel>();
         public ICollection<EmployeeModel> Employees { get; set; } = new List<EmployeeModel>();
+        // End of navigation properties
 
         public LocationCityModel(uint locationCityId, string locationCityName, bool locationCityStatus)
         {

@@ -16,9 +16,10 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'detail_inventory_movement_quantity' (INT UNSIGNED)
         public uint DetailInventoryMovementQuantity { get; set; }
 
-        // Navigation property 
+        // Navigation properties
         public ProductModel Product { get; set; } = null!;
         public InventoryMovementModel InventoryMovement { get; set; } = null!;
+        // End of navigation properties
 
         public DetailInventoryMovementModel(uint detailInventoryMovementId, uint inventoryMovementId, string productBarcode, uint detailInventoryMovementQuantity)
         {

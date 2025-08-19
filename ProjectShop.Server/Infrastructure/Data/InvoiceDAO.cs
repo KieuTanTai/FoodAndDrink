@@ -32,7 +32,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             return await GetByDateTimeAsync("invoice_date", EQueryTimeType.DATE_TIME, type, dateTime);
         }
 
-        public async Task<IEnumerable<InvoiceModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate) 
+        public async Task<IEnumerable<InvoiceModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate)
             => await GetByDateTimeAsync("invoice_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate));
 
         public async Task<IEnumerable<InvoiceModel>> GetByInputPriceAsync<TEnum>(decimal price, TEnum compareType) where TEnum : Enum

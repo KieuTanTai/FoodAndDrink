@@ -85,7 +85,7 @@ namespace ProjectShop.Server.Infrastructure.Data
                 string query = $@"
                     SELECT * FROM {TableName}
                     WHERE payment_method_expiry_year = @Year AND payment_method_expiry_month = @Month;";
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<UserPaymentMethodModel> results = await connection.QueryAsync<UserPaymentMethodModel>(query, new { Year = year, Month = month });
                 if (results == null || !results.Any())
                     return Enumerable.Empty<UserPaymentMethodModel>();

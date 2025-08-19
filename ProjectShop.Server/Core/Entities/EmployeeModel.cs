@@ -16,6 +16,7 @@ namespace ProjectShop.Server.Core.Entities
         public LocationDistrictModel? EmployeeDistrict { get; set; }
         public LocationCityModel? EmployeeCity { get; set; }
         public LocationModel Location { get; set; } = null!;
+        // End of navigation properties
 
         public EmployeeModel(
             uint employeeId,
