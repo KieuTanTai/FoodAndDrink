@@ -44,10 +44,10 @@ namespace ProjectShop.Server.Infrastructure.Persistence
 
         public virtual async Task<IEnumerable<TEntity>> GetAllAsync(int maxGetCount)
         {
+            if (maxGetCount <= 0)
+                throw new ArgumentException("Max get count must be greater than zero.", nameof(maxGetCount));
             try
             {
-                if (maxGetCount <= 0)
-                    throw new ArgumentException("Max get count must be greater than zero.", nameof(maxGetCount));
                 string query = $"{GetAllQuery()} LIMIT @MaxGetCount";
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { MaxGetCount = maxGetCount });
@@ -73,10 +73,10 @@ namespace ProjectShop.Server.Infrastructure.Persistence
         // DRY
         protected async Task<TEntity?> GetSingleDataAsync(string input, string colName)
         {
+            if (string.IsNullOrEmpty(input))
+                throw new ArgumentException("Input cannot be null or empty.", nameof(input));
             try
             {
-                if (string.IsNullOrEmpty(input))
-                    throw new ArgumentException("Input cannot be null or empty.", nameof(input));
                 string query = GetDataQuery(colName);
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 TEntity? result = await connection.QueryFirstOrDefaultAsync<TEntity>(query, new { Input = input });
@@ -108,12 +108,12 @@ namespace ProjectShop.Server.Infrastructure.Persistence
 
         protected async Task<IEnumerable<TEntity>> GetByInputAsync(string input, string colName, int maxGetCount)
         {
+            if (string.IsNullOrEmpty(input))
+                throw new ArgumentException("Input cannot be null or empty.", nameof(input));
+            if (maxGetCount <= 0)
+                throw new ArgumentException("Max get count must be greater than zero.", nameof(maxGetCount));
             try
             {
-                if (string.IsNullOrEmpty(input))
-                    throw new ArgumentException("Input cannot be null or empty.", nameof(input));
-                if (maxGetCount <= 0)
-                    throw new ArgumentException("Max get count must be greater than zero.", nameof(maxGetCount));
                 string query = $"{GetDataQuery(colName)} LIMIT @MaxGetCount";
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Input = input, MaxGetCount = maxGetCount });
@@ -146,10 +146,10 @@ namespace ProjectShop.Server.Infrastructure.Persistence
 
         protected async Task<IEnumerable<TEntity>> GetByInputsAsync(IEnumerable<string> inputs, string colName)
         {
+            if (inputs == null || !inputs.Any())
+                throw new ArgumentException("Inputs cannot be null or empty.", nameof(inputs));
             try
             {
-                if (inputs == null || !inputs.Any())
-                    throw new ArgumentException("Inputs cannot be null or empty.", nameof(inputs));
                 string query = $"SELECT * FROM {TableName} WHERE {colName} IN @Inputs";
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Inputs = inputs });
@@ -165,12 +165,12 @@ namespace ProjectShop.Server.Infrastructure.Persistence
 
         protected async Task<IEnumerable<TEntity>> GetByInputsAsync(IEnumerable<string> inputs, string colName, int maxGetCount)
         {
+            if (inputs == null || !inputs.Any())
+                throw new ArgumentException("Inputs cannot be null or empty.", nameof(inputs));
+            if (maxGetCount <= 0)
+                throw new ArgumentException("Max get count must be greater than zero.", nameof(maxGetCount));
             try
             {
-                if (inputs == null || !inputs.Any())
-                    throw new ArgumentException("Inputs cannot be null or empty.", nameof(inputs));
-                if (maxGetCount <= 0)
-                    throw new ArgumentException("Max get count must be greater than zero.", nameof(maxGetCount));
                 string query = $"SELECT * FROM {TableName} WHERE {colName} IN @Inputs LIMIT @MaxGetCount";
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Inputs = inputs, MaxGetCount = maxGetCount });
@@ -203,16 +203,37 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             }
         }
 
-        protected async Task<IEnumerable<TEntity>> GetByDateTimeAsync(string colName, EQueryTimeType queryType, object param)
+        protected async Task<IEnumerable<TEntity>> GetByLikeStringAsync(string input, string colName, int maxGetCount)
         {
+            if (string.IsNullOrEmpty(input))
+                throw new ArgumentException("Input cannot be null or empty.", nameof(input));
+            if (maxGetCount <= 0)
+                throw new ArgumentException("Max get count must be greater than zero.", nameof(maxGetCount));
             try
             {
-                string query = queryType switch
-                {
-                    EQueryTimeType.MONTH_AND_YEAR => GetByMonthAndYear(colName),
-                    EQueryTimeType.DATE_TIME_RANGE => GetByDateTimeRange(colName),
-                    _ => throw new ArgumentException("Invalid query type")
-                };
+                string query = $"{RelativeQuery(colName)} LIMIT @MaxGetCount";
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
+                IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Input = input, MaxGetCount = maxGetCount });
+                if (results == null || !results.Any())
+                    throw new KeyNotFoundException($"No data found in {TableName} for {colName} = {input} with limit {maxGetCount}");
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving data by like string: {ex.Message}", ex);
+            }
+        }
+
+        protected async Task<IEnumerable<TEntity>> GetByDateTimeAsync(string colName, EQueryTimeType queryType, object param)
+        {
+            string query = queryType switch
+            {
+                EQueryTimeType.MONTH_AND_YEAR => GetByMonthAndYear(colName),
+                EQueryTimeType.DATE_TIME_RANGE => GetByDateTimeRange(colName),
+                _ => throw new ArgumentException("Invalid query type")
+            };
+            try
+            {
 
                 DynamicParameters DParam = new DynamicParameters();
                 if (queryType == EQueryTimeType.MONTH_AND_YEAR)
@@ -250,14 +271,14 @@ namespace ProjectShop.Server.Infrastructure.Persistence
 
         protected async Task<IEnumerable<TEntity>> GetByDateTimeAsync(string colName, EQueryTimeType queryType, ECompareType compareType, object param)
         {
+            string query = queryType switch
+            {
+                EQueryTimeType.YEAR => GetByYear(colName, compareType),
+                EQueryTimeType.DATE_TIME => GetByDateTime(colName, compareType),
+                _ => throw new ArgumentException("Invalid query type")
+            };
             try
             {
-                string query = queryType switch
-                {
-                    EQueryTimeType.YEAR => GetByYear(colName, compareType),
-                    EQueryTimeType.DATE_TIME => GetByDateTime(colName, compareType),
-                    _ => throw new ArgumentException("Invalid query type")
-                };
 
                 DynamicParameters DParam = new DynamicParameters();
                 if (queryType == EQueryTimeType.YEAR)

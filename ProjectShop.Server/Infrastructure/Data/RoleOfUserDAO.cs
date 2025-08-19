@@ -87,10 +87,22 @@ namespace ProjectShop.Server.Infrastructure.Data
         }
 
         public async Task<IEnumerable<RolesOfUserModel>> GetByAccountIdAsync(uint accountId)
-    => await GetByInputAsync(accountId.ToString(), "account_id");
+            => await GetByInputAsync(accountId.ToString(), "account_id");
+
+        public async Task<IEnumerable<RolesOfUserModel>> GetByAccountIdAsync(uint accountId, int maxGetCount)
+            => await GetByInputAsync(accountId.ToString(), "account_id", maxGetCount);
+
+        public async Task<IEnumerable<RolesOfUserModel>> GetByAccountIdsAsync(IEnumerable<uint> accountIds)
+            => await GetByInputsAsync(accountIds.Select(id => id.ToString()), "account_id");
 
         public async Task<IEnumerable<RolesOfUserModel>> GetByRoleIdAsync(uint roleId)
             => await GetByInputAsync(roleId.ToString(), "role_id");
+
+        public async Task<IEnumerable<RolesOfUserModel>> GetByRoleIdAsync(uint roleId, int maxGetCount)
+            => await GetByInputAsync(roleId.ToString(), "role_id", maxGetCount);
+
+        public async Task<IEnumerable<RolesOfUserModel>> GetByRoleIdsAsync(IEnumerable<uint> roleIds)
+            => await GetByInputsAsync(roleIds.Select(id => id.ToString()), "role_id");
 
         public async Task<IEnumerable<RolesOfUserModel>> GetByMonthAndYearAsync(int year, int month)
             => await GetByDateTimeAsync("added_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));

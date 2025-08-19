@@ -37,5 +37,11 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<IEnumerable<CategoryModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "category_status");
 
         public async Task<IEnumerable<CategoryModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "category_name");
+
+        public async Task<IEnumerable<CategoryModel>> GetByLikeStringAsync(string input, int maxGetCount)
+            => await GetByLikeStringAsync(input, "category_name", maxGetCount);
+
+        public async Task<IEnumerable<CategoryModel>> GetByStatusAsync(bool status, int maxGetCount)
+            => await GetByInputAsync(GetTinyIntString(status), "category_status", maxGetCount);
     }
 }

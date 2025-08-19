@@ -26,6 +26,9 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<IEnumerable<DetailInvoiceModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "detail_invoice_status");
 
+        public async Task<IEnumerable<DetailInvoiceModel>> GetByStatusAsync(bool status, int maxGetCount)
+            => await GetByInputAsync(GetTinyIntString(status), "detail_invoice_status", maxGetCount);
+
         public async Task<IEnumerable<DetailInvoiceModel>> GetByInputPriceAsync<TEnum>(decimal price, TEnum compareType) where TEnum : Enum
         {
             if (compareType is not ECompareType type)

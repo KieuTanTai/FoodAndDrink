@@ -6,7 +6,7 @@ using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services.Account
 {
-    public class SignupService : ValidateService<AccountModel>, ISignupService<AccountModel>
+    public class SignupService : BaseHelperService<AccountModel>, ISignupService<AccountModel>
     {
         private readonly IDAO<AccountModel> _baseDAO;
         private readonly IAccountDAO<AccountModel> _accountDAO;

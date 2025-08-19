@@ -3,6 +3,7 @@
     public interface IPersonDAO<TEntity> : IGetByStatusAsync<TEntity>, IGetRelativeAsync<TEntity>, IGetDataByDateTimeAsync<TEntity> where TEntity : class
     {
         Task<TEntity?> GetByAccountIdAsync(uint accountId);
+        Task<IEnumerable<TEntity>> GetByAccountIdsAsync(IEnumerable<uint> accountIds);
         Task<TEntity?> GetByPhoneAsync(string phone);
         Task<IEnumerable<TEntity>> GetByPhonesAsync(IEnumerable<string> phones);
         Task<IEnumerable<TEntity>> GetByGenderAsync(bool isMale);

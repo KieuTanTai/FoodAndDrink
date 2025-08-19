@@ -130,9 +130,18 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<CustomerModel?> GetByAccountIdAsync(uint accountId) => await GetSingleDataAsync(accountId.ToString(), "account_id");
 
+        public async Task<IEnumerable<CustomerModel>> GetByAccountIdsAsync(IEnumerable<uint> accountIds)
+            => await GetByInputsAsync(accountIds.Select(id => id.ToString()), "account_id");
+
         public async Task<IEnumerable<CustomerModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "customer_name");
 
+        public async Task<IEnumerable<CustomerModel>> GetByLikeStringAsync(string input, int maxGetCount)
+            => await GetByLikeStringAsync(input, "customer_name", maxGetCount);
+
         public async Task<IEnumerable<CustomerModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "customer_status");
+
+        public async Task<IEnumerable<CustomerModel>> GetByStatusAsync(bool status, int maxGetCount) 
+            => await GetByInputAsync(GetTinyIntString(status), "customer_status", maxGetCount);
 
         public async Task<IEnumerable<CustomerModel>> GetByGenderAsync(bool isMale) => await GetByInputAsync(isMale.ToString(), "customer_gender");
 

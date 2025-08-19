@@ -32,6 +32,12 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<IEnumerable<LocationCityModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "location_city_name");
 
+        public async Task<IEnumerable<LocationCityModel>> GetByLikeStringAsync(string input, int maxGetCount)
+            => await GetByLikeStringAsync(input, "location_city_name", maxGetCount);
+
         public async Task<IEnumerable<LocationCityModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "location_city_status");
+    
+        public async Task<IEnumerable<LocationCityModel>> GetByStatusAsync(bool status, int maxGetCount)
+            => await GetByInputAsync(GetTinyIntString(status), "location_city_status", maxGetCount);
     }
 }

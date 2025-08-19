@@ -283,7 +283,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
             try
             {
-                IEnumerable<AccountModel> accounts = await _searchAccountService.GetByStatusAsync(status, options);
+                IEnumerable<AccountModel> accounts = await _searchAccountService.GetByStatusAsync(status, null, options);
                 _logger.LogInformation($"Số lượng tài khoản với trạng thái {status}: {accounts.Count()}");
                 return Ok(accounts);
             }

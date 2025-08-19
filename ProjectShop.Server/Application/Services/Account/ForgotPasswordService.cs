@@ -6,7 +6,7 @@ using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services.Account
 {
-    public class ForgotPasswordService : ValidateService<AccountModel>, IForgotPasswordService
+    public class ForgotPasswordService : BaseHelperService<AccountModel>, IForgotPasswordService
     {
         private readonly IDAO<AccountModel> _baseDAO;
         private readonly IAccountDAO<AccountModel> _accountDAO;

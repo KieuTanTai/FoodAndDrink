@@ -1,10 +1,12 @@
-﻿using ProjectShop.Server.Core.Interfaces.IData;
+﻿using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Entities.GetNavigationPropertyOptions;
+using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Services;
 
 namespace TLGames.Application.Services
 {
-    public abstract class ValidateService<TEntity> where TEntity : class //: IGetDataService<TEntity>, IInsertDataService<TEntity>, IUpdateSingleKeyDataService<TEntity> where TEntity : class
+    public abstract class BaseHelperService<TEntity> where TEntity : class //: IGetDataService<TEntity>, IInsertDataService<TEntity>, IUpdateSingleKeyDataService<TEntity> where TEntity : class
     {
         protected readonly IHashPassword hashPassword = GetProviderService.SystemServices.GetRequiredService<IHashPassword>();
         protected readonly IColumnService colService = GetProviderService.SystemServices.GetRequiredService<IColumnService>();

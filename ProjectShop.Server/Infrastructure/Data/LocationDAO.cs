@@ -50,6 +50,9 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<IEnumerable<LocationModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "location_name");
 
+        public async Task<IEnumerable<LocationModel>> GetByLikeStringAsync(string input, int maxGetCount)
+            => await GetByLikeStringAsync(input, "location_name", maxGetCount);
+
         public async Task<IEnumerable<LocationModel>> GetByLocationCitiesAsync(IEnumerable<uint> cityIds) => await GetByInputsAsync(cityIds.Select(locationCity => locationCity.ToString()), "location_city_id");
 
         public async Task<IEnumerable<LocationModel>> GetByLocationCityAsync(uint cityId) => await GetByInputAsync(cityId.ToString(), "location_city_id");
@@ -75,6 +78,9 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<IEnumerable<LocationModel>> GetByLocationWardIdsAsync(IEnumerable<uint> wardIds) => await GetByInputsAsync(wardIds.Select(locationWard => locationWard.ToString()), "location_ward_id");
 
         public async Task<IEnumerable<LocationModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "location_status");
+
+        public async Task<IEnumerable<LocationModel>> GetByStatusAsync(bool status, int maxGetCount)
+            => await GetByInputAsync(GetTinyIntString(status), "location_status", maxGetCount);
 
         public async Task<IEnumerable<LocationModel>> GetByStreetAsync(string streetName) => await GetByInputAsync(streetName, "location_street");
     }

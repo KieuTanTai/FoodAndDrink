@@ -32,6 +32,12 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<IEnumerable<BankModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "bank_name");
 
+        public async Task<IEnumerable<BankModel>> GetByLikeStringAsync(string input, int maxGetCount)
+            => await GetByLikeStringAsync(input, "bank_name", maxGetCount);
+
         public async Task<IEnumerable<BankModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "bank_status");
+
+        public async Task<IEnumerable<BankModel>> GetByStatusAsync(bool status, int maxGetCount)
+            => await GetByInputAsync(GetTinyIntString(status), "bank_status", maxGetCount);
     }
 }

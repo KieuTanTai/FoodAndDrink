@@ -4,5 +4,6 @@
     {
         //public string GetQueryDataString(string colName);
         Task<IEnumerable<TEntity>> GetByLikeStringAsync(string input);
+        Task<IEnumerable<TEntity>> GetByLikeStringAsync(string input, int maxGetCount);
     }
 }

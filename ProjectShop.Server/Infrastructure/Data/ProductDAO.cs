@@ -94,6 +94,9 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<IEnumerable<ProductModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "product_name");
 
+        public async Task<IEnumerable<ProductModel>> GetByLikeStringAsync(string input, int maxGetCount)
+            => await GetByLikeStringAsync(input, "product_name", maxGetCount);
+
         public async Task<IEnumerable<ProductModel>> GetByMonthAndYearAsync(int year, int month) => await GetByDateTimeAsync("product_added_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month));
 
         public async Task<IEnumerable<ProductModel>> GetByNetWeightAsync<TCompareType>(decimal netWeight, TCompareType compareType) where TCompareType : Enum
@@ -110,6 +113,9 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<IEnumerable<ProductModel>> GetByRatingAgeAsync(string ratingAge) => await GetByInputAsync(ratingAge, "product_rating_age");
 
         public async Task<IEnumerable<ProductModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "product_status");
+
+        public async Task<IEnumerable<ProductModel>> GetByStatusAsync(bool status, int maxGetCount)
+            => await GetByInputAsync(GetTinyIntString(status), "product_status", maxGetCount);
 
         public async Task<IEnumerable<ProductModel>> GetBySupplierIdAsync(uint supplierId) => await GetByInputAsync(supplierId.ToString(), "supplier_id");
 

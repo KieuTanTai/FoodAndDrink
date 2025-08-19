@@ -2,7 +2,6 @@
 {
     public interface IAccountDAO<TEntity> : IGetByStatusAsync<TEntity> where TEntity : class
     {
-        Task<IEnumerable<TEntity>> GetByStatusAsync(bool status, int maxGetCount = 0);
         Task<TEntity?> GetByUserNameAsync(string userName);
         Task<TEntity?> GetByUserNameAndPasswordAsync(string userName, string password);
         Task<IEnumerable<TEntity>> GetByUserNameAsync(IEnumerable<string> userNames);

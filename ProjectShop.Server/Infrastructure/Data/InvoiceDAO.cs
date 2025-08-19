@@ -48,6 +48,9 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<IEnumerable<InvoiceModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "invoice_status");
 
+        public async Task<IEnumerable<InvoiceModel>> GetByStatusAsync(bool status, int maxGetCount)
+            => await GetByInputAsync(GetTinyIntString(status), "invoice_status", maxGetCount);
+
         public async Task<IEnumerable<InvoiceModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
         {
             if (compareType is not ECompareType type)

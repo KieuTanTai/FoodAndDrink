@@ -9,7 +9,7 @@ using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services.Account
 {
-    public class LoginService : BaseReturnAccountService<AccountModel>, ILoginService<AccountModel, AccountNavigationOptions>
+    public class LoginService : BaseReturnAccountService, ILoginService<AccountModel, AccountNavigationOptions>
     {
         public LoginService(
             IDAO<AccountModel> baseDAO,
@@ -33,7 +33,7 @@ namespace ProjectShop.Server.Application.Services.Account
                 if (!await hashPassword.ComparePasswords(accountPassword, password))
                     throw new InvalidOperationException("Incorrect password.");
                 if (options != null)
-                    account = await GetNavigationPropertyByOptions(account, options);
+                    account = await GetNavigationPropertyByOptionsAsync(account, options);
                 //_currentAccountLogin.SetAccount(account);
                 return account;
             }

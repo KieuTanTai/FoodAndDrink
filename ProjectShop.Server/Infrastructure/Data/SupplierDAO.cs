@@ -81,6 +81,9 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<IEnumerable<SupplierModel>> GetByLikeStringAsync(string input)
             => await GetByLikeStringAsync(input, "supplier_name");
 
+        public async Task<IEnumerable<SupplierModel>> GetByLikeStringAsync(string input, int maxGetCount)
+            => await GetByLikeStringAsync(input, "supplier_name", maxGetCount);
+
         public async Task<IEnumerable<SupplierModel>> GetByMonthAndYearAsync(int year, int month)
             => await GetByDateTimeAsync("supplier_cooperation_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
 
@@ -101,6 +104,9 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<IEnumerable<SupplierModel>> GetByStatusAsync(bool status)
             => await GetByInputAsync(GetTinyIntString(status), "supplier_status");
+
+        public async Task<IEnumerable<SupplierModel>> GetByStatusAsync(bool status, int maxGetCount)
+            => await GetByInputAsync(GetTinyIntString(status), "supplier_status", maxGetCount);
 
         public async Task<SupplierModel?> GetByStoreLocationIdAsync(uint locationId)
             => await GetSingleDataAsync(locationId.ToString(), "store_location_id");

@@ -40,6 +40,9 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<IEnumerable<CustomerAddressModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "customer_address_status");
 
+        public async Task<IEnumerable<CustomerAddressModel>> GetByStatusAsync(bool status, int maxGetCount)
+            => await GetByInputAsync(GetTinyIntString(status), "customer_address_status", maxGetCount);
+
         public async Task<IEnumerable<CustomerAddressModel>> GetByStreetLikeAsync(string streetLike) => await GetByLikeStringAsync(streetLike, "customer_street");
 
         public async Task<IEnumerable<CustomerAddressModel>> GetByCityIdAsync(uint cityId) => await GetByInputAsync(cityId.ToString(), "customer_city_id");

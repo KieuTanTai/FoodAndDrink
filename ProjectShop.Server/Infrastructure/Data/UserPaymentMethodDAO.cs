@@ -116,6 +116,9 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<IEnumerable<UserPaymentMethodModel>> GetByStatusAsync(bool status)
             => await GetByInputAsync(GetTinyIntString(status), "payment_method_status");
 
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetByStatusAsync(bool status, int maxGetCount)
+            => await GetByInputAsync(GetTinyIntString(status), "payment_method_status", maxGetCount);
+
         public async Task<UserPaymentMethodModel?> GetByTokenAsync(string token)
             => await GetSingleDataAsync(token, "TokenColumnName");
 

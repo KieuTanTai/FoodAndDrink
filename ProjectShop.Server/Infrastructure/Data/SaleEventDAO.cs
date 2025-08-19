@@ -59,6 +59,9 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<IEnumerable<SaleEventModel>> GetByLikeStringAsync(string input)
             => await GetByLikeStringAsync(input, "sale_event_name");
 
+        public async Task<IEnumerable<SaleEventModel>> GetByLikeStringAsync(string input, int maxGetCount)
+            => await GetByLikeStringAsync(input, "sale_event_name", maxGetCount);
+
         public async Task<SaleEventModel?> GetByNameAsync(string name)
             => await GetSingleDataAsync(name, "sale_event_name");
 
@@ -90,6 +93,9 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<IEnumerable<SaleEventModel>> GetByStatusAsync(bool status)
             => await GetByInputAsync(GetTinyIntString(status), "sale_event_status");
+
+        public async Task<IEnumerable<SaleEventModel>> GetByStatusAsync(bool status, int maxGetCount)
+            => await GetByInputAsync(GetTinyIntString(status), "sale_event_status", maxGetCount);
 
         public async Task<IEnumerable<SaleEventModel>> GetByTextAsync(string text)
             => await GetByLikeStringAsync(text, "sale_event_name");

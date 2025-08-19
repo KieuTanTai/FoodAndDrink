@@ -166,7 +166,8 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<IEnumerable<EmployeeModel>> GetByLocationIdsAsync(IEnumerable<uint> locationIds) => await GetByInputsAsync(locationIds.Select(locationId => locationId.ToString()), "location_id");
 
         public async Task<EmployeeModel?> GetByAccountIdAsync(uint accountId) => await GetSingleDataAsync(accountId.ToString(), "account_id");
-
+        public async Task<IEnumerable<EmployeeModel>> GetByAccountIdsAsync(IEnumerable<uint> accountIds) 
+            => await GetByInputsAsync(accountIds.Select(accountId => accountId.ToString()), "account_id");
         public async Task<EmployeeModel?> GetByPhoneAsync(string phone) => await GetSingleDataAsync(phone, "employee_phone");
 
         public async Task<IEnumerable<EmployeeModel>> GetByPhonesAsync(IEnumerable<string> phones) => await GetByInputsAsync(phones, "employee_phone");
@@ -185,7 +186,13 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<IEnumerable<EmployeeModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "employee_status");
 
+        public async Task<IEnumerable<EmployeeModel>> GetByStatusAsync(bool status, int maxGetCount)
+            => await GetByInputAsync(GetTinyIntString(status), "employee_status", maxGetCount);
+
         public async Task<IEnumerable<EmployeeModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "employee_name");
+
+        public async Task<IEnumerable<EmployeeModel>> GetByLikeStringAsync(string input, int maxGetCount)
+            => await GetByLikeStringAsync(input, "employee_name", maxGetCount);
 
         public async Task<IEnumerable<EmployeeModel>> GetByMonthAndYearAsync(int year, int month) => await GetByDateTimeAsync("employee_birthday", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month));
 
