@@ -11,6 +11,7 @@ import ForgotPasswordForm from './pages/forgot-password-page';
 import SignupForm from './pages/signup-page';
 import Cart from './pages/cart-page';
 import UserPage from './pages/user-page';
+//import SaleEventBlock from './components/index-sale-event';
 
 createRoot(document.getElementById('header')!).render(
   <StrictMode>
@@ -20,6 +21,7 @@ createRoot(document.getElementById('header')!).render(
 );
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    {/*<SaleEventBlock/>*/}
     <App />
     <ProductContainer
       id="featured-products"

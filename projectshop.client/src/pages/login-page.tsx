@@ -3,9 +3,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle, faLock } from '@fortawesome/free-solid-svg-icons';
 import { faFacebook as faFacebookBrand, faGoogle as faGoogleBrand } from '@fortawesome/free-brands-svg-icons';
 
+//interface AccountLogin {
+//    accountId: number;
+//    email: string;
+//    password: string;
+//    rememberMe: boolean;
+//}
+
 const LoginForm: React.FC = () => {
      // State to manage form inputs
-     const [username, setUserName] = useState('');
+     const [email, setEmail] = useState('');
      const [password, setPassword] = useState('');
      const [rememberMe, setRememberMe] = useState(false);
 
@@ -13,7 +20,7 @@ const LoginForm: React.FC = () => {
      const handleSubmit = (e: React.FormEvent) => {
           e.preventDefault();
           // Logic to handle user login
-          console.log('Username:', username);
+          console.log('Email:', email);
           console.log('Mật khẩu:', password);
           console.log('Ghi nhớ tôi:', rememberMe);
           // In a real app, you would send this data to an API
@@ -22,7 +29,7 @@ const LoginForm: React.FC = () => {
 
      return (
           <div className="mx-auto flex max-w-[75rem] flex-col items-center justify-center p-4 lg:px-0">
-               <div className="w-full max-w-lg space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-lg">
+               <div className="w-full max-w-lg space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-lg" id="login-form-container">
                     <div className="text-center">
                          <h2 className="text-2xl font-bold text-gray-900">Chào mừng đến với cửa hàng</h2>
                          <p className="mt-2 text-sm text-gray-500">Đăng nhập tài khoản để tiếp tục</p>
@@ -31,20 +38,20 @@ const LoginForm: React.FC = () => {
                     <form className="space-y-4" onSubmit={handleSubmit} id="login-form">
                          {/* Username input */}
                          <div>
-                              <label htmlFor="login-username" className="sr-only">Username</label>
+                              <label htmlFor="login-email" className="sr-only">Username</label>
                               <div className="relative">
                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                         <FontAwesomeIcon icon={faUserCircle} className="text-gray-400" />
                                    </div>
                                    <input
-                                        id="login-username"
-                                        name="login_username"
-                                        type="text"
-                                        autoComplete="username"
+                                        id="login-email"
+                                        name="login_email"
+                                        type="email"
+                                        autoComplete="email"
                                         required
-                                        placeholder="Tài khoản"
-                                        value={username}
-                                        onChange={(e) => setUserName(e.target.value)}
+                                        placeholder="Email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
                                         className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none"
                                    />
                               </div>

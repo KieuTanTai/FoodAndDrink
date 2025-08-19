@@ -1,77 +1,98 @@
 ﻿import React, { useState, type FormEvent } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserCircle, faEnvelope, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope, faArrowLeft, faKey, faLock } from "@fortawesome/free-solid-svg-icons";
 
 interface ForgotPasswordFormProps {
     onBackToLogin: () => void;
 }
 
-// Giả lập API kiểm tra username có gắn email không
-async function mockCheckUsernameHasEmail(username: string): Promise<boolean> {
-    // Ví dụ: chỉ username "demo" là không có email
-    await new Promise((r) => setTimeout(r, 350));
-    return username.trim().toLowerCase() !== "demo";
+// Giả lập API
+async function mockSendVerifyCode(email: string): Promise<boolean> {
+    await new Promise((r) => setTimeout(r, 600));
+    return /\S+@\S+\.\S+/.test(email);
+}
+async function mockVerifyCode(email: string, code: string): Promise<boolean> {
+    await new Promise((r) => setTimeout(r, 600));
+    return code === "123456";
+}
+async function mockResetPassword(email: string, newPassword: string): Promise<boolean> {
+    await new Promise((r) => setTimeout(r, 600));
+    return newPassword.length >= 6;
 }
 
 const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackToLogin }) => {
-    const [username, setUsername] = useState<string>("");
     const [email, setEmail] = useState<string>("");
-    const [useRegisteredEmail, setUseRegisteredEmail] = useState<boolean>(true);
-    const [hasRegisteredEmail, setHasRegisteredEmail] = useState<boolean | null>(null);
-    const [checkingEmail, setCheckingEmail] = useState<boolean>(false);
+    const [verifyCode, setVerifyCode] = useState<string>("");
+    const [codeSent, setCodeSent] = useState<boolean>(false);
+    const [sendingCode, setSendingCode] = useState<boolean>(false);
+    const [canResetPassword, setCanResetPassword] = useState<boolean>(false);
+    const [verifying, setVerifying] = useState<boolean>(false);
+
+    const [newPassword, setNewPassword] = useState<string>("");
+    const [confirmPassword, setConfirmPassword] = useState<string>("");
+
     const [sent, setSent] = useState<boolean>(false);
     const [errorMsg, setErrorMsg] = useState<string>("");
+    const [verifyErrorMsg, setVerifyErrorMsg] = useState<string>("");
+    const [resetErrorMsg, setResetErrorMsg] = useState<string>("");
 
-    // Khi username thay đổi, kiểm tra lại email đã đăng kí (chỉ khi tick vào checkbox)
-    React.useEffect(() => {
-        if (useRegisteredEmail && username.trim()) {
-            setCheckingEmail(true);
-            mockCheckUsernameHasEmail(username.trim())
-                .then((result) => {
-                    setHasRegisteredEmail(result);
-                    setCheckingEmail(false);
-                })
-                .catch(() => {
-                    setHasRegisteredEmail(null);
-                    setCheckingEmail(false);
-                });
-        } else {
-            setHasRegisteredEmail(null);
-        }
-        // eslint-disable-next-line
-    }, [username, useRegisteredEmail]);
-
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (!username || username.length < 3) {
-            setErrorMsg("Vui lòng nhập tên đăng nhập hợp lệ.");
+    const handleSendCode = async () => {
+        setErrorMsg("");
+        if (!email || !/\S+@\S+\.\S+/.test(email)) {
+            setErrorMsg("Vui lòng nhập email hợp lệ.");
             return;
         }
-        if (!useRegisteredEmail) {
-            if (!email || !/\S+@\S+\.\S+/.test(email)) {
-                setErrorMsg("Vui lòng nhập email hợp lệ.");
-                return;
-            }
+        setSendingCode(true);
+        const result = await mockSendVerifyCode(email.trim());
+        setSendingCode(false);
+        if (result) {
+            setCodeSent(true);
+        } else {
+            setErrorMsg("Không thể gửi mã xác thực. Vui lòng thử lại.");
         }
-        setErrorMsg("");
-        setSent(true);
-        // TODO: Gọi API gửi yêu cầu quên mật khẩu với username và email (nếu có)
     };
 
-    // Chỉ enable email input khi tickbox KHÔNG được tích
-    const emailInputDisabled = useRegisteredEmail;
+    const handleVerifyCode = async () => {
+        setVerifyErrorMsg("");
+        setVerifying(true);
+        const result = await mockVerifyCode(email.trim(), verifyCode.trim());
+        setVerifying(false);
+        if (result) {
+            setCanResetPassword(true);
+        } else {
+            setVerifyErrorMsg("Mã xác thực không đúng.");
+        }
+    };
+
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setResetErrorMsg("");
+        if (!canResetPassword) return;
+        if (!newPassword || newPassword.length < 6) {
+            setResetErrorMsg("Mật khẩu mới phải có ít nhất 6 ký tự.");
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            setResetErrorMsg("Mật khẩu xác nhận không khớp.");
+            return;
+        }
+        const ok = await mockResetPassword(email.trim(), newPassword);
+        if (ok) {
+            setSent(true);
+        } else {
+            setResetErrorMsg("Đổi mật khẩu thất bại. Thử lại!");
+        }
+    };
 
     return (
-        <div
-            className="mx-auto flex max-w-[75rem] flex-col items-center justify-center p-4 lg:px-0"
-            style={{ gridTemplateColumns: "1fr minmax(0, 400px) 1fr" }}
-        >
+        <div className="mx-auto flex max-w-[75rem] flex-col items-center justify-center p-4 lg:px-0"
+            style={{ gridTemplateColumns: "1fr minmax(0, 400px) 1fr" }}>
             <div></div>
             <div className="w-full max-w-lg space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-lg">
                 <button
                     type="button"
                     onClick={onBackToLogin}
-                    className="mb-4 flex items-center bg-white! text-sm text-blue-300 hover:text-blue-400"
+                    className="main-color mb-4 flex items-center bg-transparent! text-sm"
                 >
                     <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
                     Quay lại đăng nhập
@@ -79,44 +100,19 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackToLogin }
                 <div className="text-center">
                     <h2 className="text-2xl font-bold text-gray-900">Quên mật khẩu?</h2>
                     <p className="mt-2 text-sm text-gray-500">
-                        Điền tên đăng nhập và email để nhận hướng dẫn đặt lại mật khẩu
+                        Nhập email đã đăng ký để nhận mã xác thực và đặt lại mật khẩu
                     </p>
                 </div>
                 {sent ? (
                     <div className="text-center font-medium text-green-600">
-                        Yêu cầu đặt lại mật khẩu đã được gửi!
+                        Đổi mật khẩu thành công! Kiểm tra email để đăng nhập lại.
                     </div>
                 ) : (
                     <form className="space-y-4" onSubmit={handleSubmit}>
-                        {/* Username */}
-                        <div>
-                            <label htmlFor="forgot-username" className="sr-only">
-                                Username
-                            </label>
-                            <div className="relative">
-                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                    <FontAwesomeIcon icon={faUserCircle} className="text-gray-400" />
-                                </div>
-                                <input
-                                    id="forgot-username"
-                                    name="forgot_username"
-                                    type="text"
-                                    autoComplete="username"
-                                    required
-                                    placeholder="Nhập tên đăng nhập"
-                                    value={username}
-                                    onChange={(e) => {
-                                        setUsername(e.target.value);
-                                        setSent(false);
-                                    }}
-                                    className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none"
-                                />
-                            </div>
-                        </div>
                         {/* Email */}
                         <div>
                             <label htmlFor="forgot-email" className="sr-only">
-                                Email
+                                Email đã đăng ký
                             </label>
                             <div className="relative">
                                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -127,33 +123,71 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackToLogin }
                                     name="forgot_email"
                                     type="email"
                                     autoComplete="email"
-                                    placeholder="Nhập email nhận link đặt lại mật khẩu"
+                                    required
+                                    placeholder="Nhập email đã đăng ký"
                                     value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className={`w-full rounded-lg border ${emailInputDisabled ? "bg-gray-100 border-gray-200" : "border-gray-300"} py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none`}
-                                    disabled={emailInputDisabled}
-                                    required={!emailInputDisabled}
+                                    onChange={(e) => {
+                                        setEmail(e.target.value);
+                                        setSent(false);
+                                        setCodeSent(false);
+                                        setVerifyCode("");
+                                        setCanResetPassword(false);
+                                    }}
+                                    className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none"
+                                    disabled={sendingCode || codeSent}
                                 />
                             </div>
                         </div>
-                        {/* Checkbox: gửi đến email đã đăng ký */}
-                        <div className="flex items-center">
-                            <input
-                                id="use-registered-email"
-                                type="checkbox"
-                                checked={useRegisteredEmail}
-                                disabled={checkingEmail || hasRegisteredEmail === false}
-                                onChange={(e) => setUseRegisteredEmail(e.target.checked)}
-                                className="h-4 w-4 rounded border-gray-300 text-blue-600"
-                            />
-                            <label htmlFor="use-registered-email" className="ml-2 block text-sm text-gray-900 select-none">
-                                Gửi link đặt lại mật khẩu tới email đã đăng ký
-                            </label>
+                        {/* Mã xác thực và Gửi mã xác thực kế bên nhau */}
+                        <div className="flex flex-row items-center gap-2">
+                            <div className="flex-1">
+                                <label htmlFor="verify-code" className="sr-only">
+                                    Mã xác thực
+                                </label>
+                                <div className="relative">
+                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                        <FontAwesomeIcon icon={faKey} className="text-gray-400" />
+                                    </div>
+                                    <input
+                                        id="verify-code"
+                                        name="verify_code"
+                                        type="text"
+                                        placeholder="Mã xác thực"
+                                        value={verifyCode}
+                                        onChange={(e) => {
+                                            setVerifyCode(e.target.value);
+                                            setVerifyErrorMsg("");
+                                        }}
+                                        className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none"
+                                        disabled={!codeSent || canResetPassword}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={handleSendCode}
+                                disabled={!email || !/\S+@\S+\.\S+/.test(email) || sendingCode || codeSent}
+                                    className="rounded-lg text-sm font-medium shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {sendingCode ? "Đang gửi..." : codeSent ? "Đã gửi" : "Gửi mã"}
+                            </button>
                         </div>
-                        {/* Nếu không có email đăng kí, thông báo lỗi (chữ đỏ) */}
-                        {useRegisteredEmail && hasRegisteredEmail === false && (
-                            <div className="text-sm text-red-600">
-                                Tài khoản này chưa đăng ký email. Vui lòng bỏ chọn để nhập email nhận link đặt lại mật khẩu!
+                        {/* Xác thực mã */}
+                        {codeSent && !canResetPassword && (
+                            <div className="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={handleVerifyCode}
+                                    disabled={!verifyCode || verifying}
+                                    className="bg-green-500 hover:bg-green-600"
+                                    style={{ color: "white", minWidth: 120 }}
+                                >
+                                    {verifying ? "Đang xác thực..." : "Xác thực mã"}
+                                </button>
+                                {verifyErrorMsg && (
+                                    <div className="text-xs text-red-500">{verifyErrorMsg}</div>
+                                )}
                             </div>
                         )}
                         {/* Error */}
@@ -162,14 +196,67 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackToLogin }
                                 {errorMsg}
                             </div>
                         )}
+                        {/* Đặt lại mật khẩu */}
+                        <div className="space-y-2">
+                            <div className="relative">
+                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                    <FontAwesomeIcon icon={faLock} className="text-gray-400" />
+                                </div>
+                                <input
+                                    id="new-password"
+                                    name="new_password"
+                                    type="password"
+                                    placeholder="Mật khẩu mới"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    disabled={!canResetPassword}
+                                    className={`w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none
+                                        ${!canResetPassword ? "bg-gray-100 text-gray-400 cursor-not-allowed" : ""}`}
+                                    required={canResetPassword}
+                                />
+                            </div>
+                            <div className="relative">
+                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                    <FontAwesomeIcon icon={faLock} className="text-gray-400" />
+                                </div>
+                                <input
+                                    id="confirm-password"
+                                    name="confirm_password"
+                                    type="password"
+                                    placeholder="Xác nhận mật khẩu mới"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    disabled={!canResetPassword}
+                                    className={`w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none
+                                        ${!canResetPassword ? "bg-gray-100 text-gray-400 cursor-not-allowed" : ""}`}
+                                    required={canResetPassword}
+                                />
+                            </div>
+                            {resetErrorMsg && (
+                                <div className="text-xs text-red-500">{resetErrorMsg}</div>
+                            )}
+                        </div>
                         {/* Submit */}
                         <div>
                             <button
                                 type="submit"
-                                className="flex w-full justify-center rounded-lg border border-transparent px-4 py-2 text-sm font-medium shadow-sm focus:outline-none"
-                                disabled={checkingEmail}
+                                disabled={!canResetPassword}
+                                style={{
+                                    width: "100%",
+                                    borderRadius: 8,
+                                    backgroundColor: "var(--main-color)",
+                                    color: !canResetPassword ? "#a3a3a3" : "#fff",
+                                    border: "1px solid transparent",
+                                    padding: "0.6em 1.2em",
+                                    fontSize: "1em",
+                                    fontWeight: 500,
+                                    fontFamily: "inherit",
+                                    cursor: !canResetPassword ? "not-allowed" : "pointer",
+                                    background: !canResetPassword ? "#e5e7eb" : "var(--main-color)",
+                                    transition: "border-color 0.25s"
+                                }}
                             >
-                                {checkingEmail ? "Đang kiểm tra..." : "Gửi yêu cầu đặt lại mật khẩu"}
+                                Đặt lại mật khẩu
                             </button>
                         </div>
                     </form>

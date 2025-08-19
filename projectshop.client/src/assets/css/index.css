@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -19,6 +19,10 @@
 
 .main-color {
   color: var(--main-color);
+}
+
+.main-color:hover {
+  color: var(--main-hover);
 }
 
 .bg-main-color {
@@ -80,7 +84,7 @@ h1 {
 button {
   /* border-radius: 8px; */
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
+  padding: 0.5em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
@@ -91,6 +95,14 @@ button {
 
 button:hover {
   background-color: var(--main-hover);
+}
+
+button:disabled,
+button[disabled] {
+    background-color: #e5e7eb; /* xám nhạt */
+    color: #a3a3a3;
+    cursor: not-allowed;
+    border-color: #ccc;
 }
 
 /* button:focus,
