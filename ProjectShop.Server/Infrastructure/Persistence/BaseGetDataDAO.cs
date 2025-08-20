@@ -353,8 +353,8 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             {
                 string query = GetByTwoIdQuery(firstColName, secondColName);
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                TEntity? result = await connection.QueryFirstOrDefaultAsync<TEntity>(query, new { FirstInput = firstParam, SecondInput = secondParam }) ??
-                    throw new KeyNotFoundException($"No data found in {TableName} for {firstColName} and {secondColName} with parameters {firstParam} + {secondParam}");
+                TEntity result = await connection.QueryFirstOrDefaultAsync<TEntity>(query, new { FirstInput = firstParam, SecondInput = secondParam })
+                    ?? throw new KeyNotFoundException($"No data found in {TableName} for {firstColName} = {firstParam} and {secondColName} = {secondParam}");
                 return result;
             }
             catch (Exception ex)

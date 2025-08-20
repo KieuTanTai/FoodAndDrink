@@ -1,4 +1,5 @@
 ﻿using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Entities.EntitiesRequest;
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
@@ -40,28 +41,40 @@ namespace ProjectShop.Server.Application.Services.Account
             }
         }
 
-        public async Task<int> AddAccountsAsync(IEnumerable<AccountModel> entities)
+        public async Task<IEnumerable<BatchItemResult<AccountModel>>> AddAccountsAsync(IEnumerable<AccountModel> entities)
         {
             try
             {
-                IEnumerable<string> usernames = entities.Select(e => e.UserName);
-                if (await DoAllIdsExistAsync(usernames, _accountDAO.GetByUserNameAsync))
-                    throw new InvalidOperationException("One or more accounts with the provided usernames already exist.");
-                foreach (AccountModel entity in entities)
-                {
-                    if (!await hashPassword.IsPasswordValidAsync(entity.Password))
-                        throw new ArgumentException($"Password for user {entity.UserName} does not meet the required criteria.", nameof(entity.Password));
-                    entity.Password = await hashPassword.HashPasswordAsync(entity.Password);
-                }
-                int affectedRows = await _baseDAO.InsertManyAsync(entities);
+                var filteredEntities = await FilterValidEntities(entities, entity => entity.UserName, _accountDAO.GetByUserNameAsync);
+                filteredEntities.TryGetValue(filteredEntities.Keys.FirstOrDefault(), out var batchObjectResult);
+                if (batchObjectResult == null)
+                    throw new InvalidOperationException("No valid accounts found to add.");
+                if (!batchObjectResult.ValidEntities.Any())
+                    throw new InvalidOperationException("No valid accounts found to add.");
+
+                // Hash passwords for valid entities
+                var validEntities = batchObjectResult.ValidEntities;
+                validEntities = await HashPasswordAsync(validEntities);
+                int affectedRows = await _baseDAO.InsertAsync(validEntities);
                 if (affectedRows == 0)
                     throw new InvalidOperationException("Failed to insert the accounts.");
-                return affectedRows;
+                return batchObjectResult.BatchResults;
             }
             catch (Exception ex)
             {
                 throw new InvalidOperationException("An error occurred while inserting multiple accounts.", ex);
             }
+        }
+
+        private async Task<IEnumerable<AccountModel>> HashPasswordAsync(IEnumerable<AccountModel> entities)
+        {
+            foreach (AccountModel entity in entities)
+            {
+                if (!await hashPassword.IsPasswordValidAsync(entity.Password))
+                    throw new ArgumentException($"Password for user {entity.UserName} does not meet the required criteria.", nameof(entity.Password));
+                entity.Password = await hashPassword.HashPasswordAsync(entity.Password);
+            }
+            return entities;
         }
     }
 }

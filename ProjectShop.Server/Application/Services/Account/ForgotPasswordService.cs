@@ -48,7 +48,7 @@ namespace ProjectShop.Server.Application.Services.Account
                     throw new InvalidOperationException("No accounts found with the provided usernames.");
                 entities = await PasswordMapping(entities, passwords);
 
-                int affectedRows = await _baseDAO.UpdateManyAsync(entities);
+                int affectedRows = await _baseDAO.UpdateAsync(entities);
                 if (affectedRows == 0)
                     throw new InvalidOperationException("Failed to update the accounts.");
                 return affectedRows;

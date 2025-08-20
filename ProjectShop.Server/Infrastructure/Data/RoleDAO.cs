@@ -79,7 +79,11 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<IEnumerable<RoleModel>> GetByLikeStringAsync(string input, int maxGetCount)
             => await GetByLikeStringAsync(input, "role_name", maxGetCount);
-        public async Task<RoleModel?> GetByRoleNameAsync(string roleName) => await GetSingleDataAsync(roleName, "role_name");
+        public async Task<RoleModel?> GetByRoleNameAsync(string roleName) 
+            => await GetSingleDataAsync(roleName, "role_name");
+
+        public async Task<IEnumerable<RoleModel>> GetByRoleNamesAsync(IEnumerable<string> roleNames)
+            => await GetByInputsAsync(roleNames, "role_name");
         // ----------- Status -----------
         public async Task<IEnumerable<RoleModel>> GetByStatusAsync(bool status)
             => await GetByInputAsync(GetTinyIntString(status), "role_status");

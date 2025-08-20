@@ -1,8 +1,10 @@
-﻿namespace ProjectShop.Server.Core.Interfaces.IServices.IAccount
+﻿using ProjectShop.Server.Core.Entities.EntitiesRequest;
+
+namespace ProjectShop.Server.Core.Interfaces.IServices.IAccount
 {
     public interface ISignupService<TEntity> where TEntity : class
     {
         Task<int> AddAccountAsync(TEntity entity);
-        Task<int> AddAccountsAsync(IEnumerable<TEntity> entities);
+        Task<IEnumerable<BatchItemResult<TEntity>>> AddAccountsAsync(IEnumerable<TEntity> entities);
     }
 }

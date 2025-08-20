@@ -9,7 +9,7 @@
         Task<IEnumerable<TEntity>> GetByInputsAsync(IEnumerable<string> inputs, int maxGetCount); // remove colName for simplicity
         Task<IEnumerable<TEntity>> GetByInputsAsync(IEnumerable<string> inputs); // remove colName for simplicity
         Task<int> InsertAsync(TEntity entity);
-        Task<int> InsertManyAsync(IEnumerable<TEntity> entities);
+        Task<int> InsertAsync(IEnumerable<TEntity> entities);
         //Task<bool> IsExistObjectAsync(T entity);
     }
 }

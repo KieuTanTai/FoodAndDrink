@@ -1,6 +1,7 @@
 ﻿namespace ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO
 {
-    public interface IInvoiceDAO<TEntity> : IGetDataByDateTimeAsync<TEntity>, IGetByStatusAsync<TEntity>, IGetByRangePriceAsync<TEntity> where TEntity : class
+    public interface IInvoiceDAO<TEntity> : IGetDataByDateTimeAsync<TEntity>, IGetByStatusAsync<TEntity>, 
+        IGetByRangePriceAsync<TEntity>, IGetByEnumAsync<TEntity> where TEntity : class
     {
         Task<IEnumerable<TEntity>> GetByCustomerIdAsync(uint customerId);
         Task<IEnumerable<TEntity>> GetByCustomerIdsAsync(IEnumerable<uint> customerIds);

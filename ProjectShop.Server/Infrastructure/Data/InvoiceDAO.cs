@@ -21,8 +21,8 @@ namespace ProjectShop.Server.Infrastructure.Data
         protected override string GetInsertQuery()
         {
             return $@"INSERT INTO {TableName} (customer_id, employee_id, payment_method_id, invoice_total_price, 
-                invoice_date, invoice_status) 
-                      VALUES (@CustomerId, @EmployeeId, @PaymentMethodId, @InvoiceTotalPrice, @InvoiceDate, @InvoiceStatus); SELECT LAST_INSERT_ID();";
+                invoice_date, invoice_status, payment_type) 
+                      VALUES (@CustomerId, @EmployeeId, @PaymentMethodId, @InvoiceTotalPrice, @InvoiceDate, @InvoiceStatus, @PaymentType); SELECT LAST_INSERT_ID();";
         }
 
         public async Task<IEnumerable<InvoiceModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
@@ -69,5 +69,19 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<IEnumerable<InvoiceModel>> GetByPaymentMethodIdAsync(uint paymentMethodId) => await GetByInputAsync(paymentMethodId.ToString(), "payment_method_id");
 
         public async Task<IEnumerable<InvoiceModel>> GetByPaymentMethodIdsAsync(IEnumerable<uint> paymentMethodIds) => await GetByInputsAsync(paymentMethodIds.Select(paymentMethodId => paymentMethodId.ToString()), "payment_method_id");
+
+        public async Task<IEnumerable<InvoiceModel>> GetAllByEnumAsync<TEnum>(TEnum tEnum) where TEnum : Enum
+        {
+            if (tEnum is not EInvoicePaymentType type)
+                throw new ArgumentException("Invalid enum type provided.", nameof(tEnum));
+            return await GetByInputAsync(type.ToString(), "payment_type");
+        }
+
+        public async Task<InvoiceModel?> GetByEnumAsync<TEnum>(TEnum tEnum) where TEnum : Enum
+        {
+            if (tEnum is not EInvoicePaymentType type)
+                throw new ArgumentException("Invalid enum type provided.", nameof(tEnum));
+            return await GetSingleDataAsync(type.ToString(), TableName);
+        }
     }
 }

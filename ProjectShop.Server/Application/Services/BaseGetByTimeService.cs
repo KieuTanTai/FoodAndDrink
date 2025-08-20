@@ -4,7 +4,9 @@ using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services
 {
-    public abstract class BaseGetByTimeService<TEntity, TOptions> : BaseHelperService<TEntity> where TEntity : class where TOptions : class
+    public abstract class BaseGetByTimeService<TEntity, TOptions> : BaseHelperService<TEntity> 
+        where TEntity : class 
+        where TOptions : class
     {
         //DRY
         protected async Task<IEnumerable<TEntity>> GetByDateTimeGenericAsync<TCompareType>(Func<TCompareType, Task<IEnumerable<TEntity>>> daoFunc, TCompareType compareType, TOptions? options, string errorMsg) where TCompareType : Enum

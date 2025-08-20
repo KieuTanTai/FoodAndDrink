@@ -77,7 +77,7 @@ namespace ProjectShop.Server.Application.Services.Account
                         account.Password = newPassword; // Assuming password is already hashed before this call
                     }
                 }
-                int affectedRows = await _baseDAO.UpdateManyAsync(accounts);
+                int affectedRows = await _baseDAO.UpdateAsync(accounts);
                 return affectedRows;
             }
             catch (Exception ex)
@@ -110,7 +110,7 @@ namespace ProjectShop.Server.Application.Services.Account
                 IEnumerable<AccountModel> accounts = await daoFunc(inputs);
                 foreach (AccountModel account in accounts)
                     account.AccountStatus = status;
-                int affectedRows = await _baseDAO.UpdateManyAsync(accounts);
+                int affectedRows = await _baseDAO.UpdateAsync(accounts);
                 return affectedRows;
             }
             catch (Exception ex)

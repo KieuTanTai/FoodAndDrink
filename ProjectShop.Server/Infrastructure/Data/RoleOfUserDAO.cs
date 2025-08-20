@@ -126,23 +126,66 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         // Các method delete giữ nguyên cho bạn tự sửa
         public async Task<int> DeleteByAccountIdAsync(uint accountId) => await DeleteByColumnNameAsync(accountId.ToString(), "account_id");
+
+        public async Task<int> DeleteByAccountIdsAsync(IEnumerable<uint> accountIds) 
+            => await DeleteByColumnNameAsync(accountIds.Select(id => id.ToString()), "account_id");
+
         public async Task<int> DeleteByRoleIdAsync(uint roleId) => await DeleteByColumnNameAsync(roleId.ToString(), "role_id");
 
+        public async Task<int> DeleteByRoleIdsAsync(IEnumerable<uint> roleIds) 
+            => await DeleteByColumnNameAsync(roleIds.Select(id => id.ToString()), "role_id");
+
+        public async Task<int> DeleteByListKeysAsync(IEnumerable<RolesOfUserKey> keys) => await DeleteByKeysAsync(keys);
+
         // DRY:
-        private async Task<int> DeleteByColumnNameAsync(string key, string colName)
+        private async Task<int> DeleteByColumnNameAsync(string id, string colName)
         {
             try
             {
                 string query = GetDeleteByIdQuery(colName);
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                int rowsAffected = await connection.ExecuteAsync(query, new { Input = key });
+                int rowsAffected = await connection.ExecuteAsync(query, new { Input = id });
                 if (rowsAffected == 0)
-                    throw new KeyNotFoundException($"No RolesOfUserModel found with {colName}: {key}");
+                    throw new KeyNotFoundException($"No RolesOfUserModel found with {colName}: {id}");
                 return rowsAffected;
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error deleting RolesOfUserModel by single key: {ex.Message}", ex);
+                throw new Exception($"Error deleting RolesOfUserModel by single id: {ex.Message}", ex);
+            }
+        }
+
+        private async Task<int> DeleteByColumnNameAsync(IEnumerable<string> ids, string colName)
+        {
+            try
+            {
+                string query = GetDeleteByIdQuery(colName);
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
+                int rowsAffected = await connection.ExecuteAsync(query, new { Input = ids });
+                if (rowsAffected == 0)
+                    throw new KeyNotFoundException($"No RolesOfUserModel found for the provided {colName} values.");
+                return rowsAffected;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deleting RolesOfUserModel by list of ids: {ex.Message}", ex);
+            }
+        }
+
+        private async Task<int> DeleteByKeysAsync(IEnumerable<RolesOfUserKey> keys)
+        {
+            try
+            {
+                string query = GetDeleteByKeysQuery();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
+                int rowsAffected = await connection.ExecuteAsync(query, keys);
+                if (rowsAffected == 0)
+                    throw new KeyNotFoundException("No RolesOfUserModel found for the provided keys.");
+                return rowsAffected;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deleting RolesOfUserModel by list of keys: {ex.Message}", ex);
             }
         }
     }

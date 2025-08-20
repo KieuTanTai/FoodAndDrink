@@ -9,6 +9,9 @@
         Task<IEnumerable<TEntity>> GetByRoleIdAsync(uint roleId, int maxGetCount);
         Task<IEnumerable<TEntity>> GetByRoleIdsAsync(IEnumerable<uint> roleIds);
         Task<int> DeleteByAccountIdAsync(uint accountId);
+        Task<int> DeleteByAccountIdsAsync(IEnumerable<uint> accountIds);
         Task<int> DeleteByRoleIdAsync(uint roleId);
+        Task<int> DeleteByRoleIdsAsync(IEnumerable<uint> roleIds);
+        Task<int> DeleteByListKeysAsync(IEnumerable<TKey> keys);
     }
 }

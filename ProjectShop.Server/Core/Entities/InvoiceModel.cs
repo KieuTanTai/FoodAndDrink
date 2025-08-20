@@ -1,4 +1,5 @@
 // File: Invoice.cs
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IEntities;
 
 namespace ProjectShop.Server.Core.Entities
@@ -26,6 +27,9 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'invoice_status' (TINYINT(1))
         public bool InvoiceStatus { get; set; }
 
+        // Corresponds to 'payment_type' (ENUM)
+        public EInvoicePaymentType PaymentType { get; set; } = EInvoicePaymentType.COD;
+
         // Navigation properties
         public CustomerModel Customer { get; set; } = null!;
         public EmployeeModel Employee { get; set; } = null!;
@@ -34,7 +38,8 @@ namespace ProjectShop.Server.Core.Entities
         public ICollection<InvoiceDiscountModel> InvoiceDiscounts { get; set; } = new List<InvoiceDiscountModel>();
         // End of navigation properties
 
-        public InvoiceModel(uint invoiceId, uint customerId, uint employeeId, uint paymentMethodId, decimal invoiceTotalPrice, DateTime invoiceDate, bool invoiceStatus)
+        public InvoiceModel(uint invoiceId, uint customerId, uint employeeId, uint paymentMethodId, decimal invoiceTotalPrice, 
+            DateTime invoiceDate, bool invoiceStatus, EInvoicePaymentType paymentType)
         {
             InvoiceId = invoiceId;
             CustomerId = customerId;
@@ -43,6 +48,7 @@ namespace ProjectShop.Server.Core.Entities
             InvoiceTotalPrice = invoiceTotalPrice;
             InvoiceDate = invoiceDate;
             InvoiceStatus = invoiceStatus;
+            PaymentType = paymentType;
         }
 
         public InvoiceModel() { }

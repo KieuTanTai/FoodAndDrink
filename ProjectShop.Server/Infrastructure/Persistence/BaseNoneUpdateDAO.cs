@@ -40,7 +40,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             }
         }
 
-        public virtual async Task<int> InsertManyAsync(IEnumerable<TEntity> entities)
+        public virtual async Task<int> InsertAsync(IEnumerable<TEntity> entities)
         {
             try
             {
