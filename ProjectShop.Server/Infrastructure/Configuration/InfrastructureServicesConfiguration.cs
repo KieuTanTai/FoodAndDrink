@@ -1,7 +1,6 @@
 ﻿using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
-using ProjectShop.Server.Core.Interfaces.IEntities;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Data;
 using ProjectShop.Server.Infrastructure.Persistence;
@@ -18,6 +17,8 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddSingleton<IStringConverter, StringConverter>();
             services.AddSingleton<IColumnService, ColumnService>();
             services.AddSingleton<IHashPassword, HashPaswordService>();
+            services.AddSingleton<IClock, SystemClockService>();
+            services.AddSingleton<IClock>(provider => new FakeClockService { UtcNow = new DateTime(2030, 12, 31) });
 
             string connectionString = AppConfigConnection.GetConnectionString();
             if (string.IsNullOrEmpty(connectionString))

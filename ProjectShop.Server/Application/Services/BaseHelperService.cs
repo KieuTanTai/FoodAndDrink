@@ -12,7 +12,7 @@ namespace TLGames.Application.Services
         protected readonly IHashPassword hashPassword = GetProviderService.SystemServices.GetRequiredService<IHashPassword>();
         protected readonly IColumnService colService = GetProviderService.SystemServices.GetRequiredService<IColumnService>();
         protected readonly IStringConverter converter = GetProviderService.SystemServices.GetRequiredService<IStringConverter>();
-
+        protected readonly IClock clock = GetProviderService.SystemServices.GetRequiredService<IClock>();
         protected async Task<bool> IsExistObject(string input, Func<string, Task<TEntity?>> daoFunc)
         {
             try
