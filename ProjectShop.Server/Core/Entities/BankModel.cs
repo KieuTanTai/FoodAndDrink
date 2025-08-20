@@ -1,35 +1,35 @@
-﻿using ProjectShop.Server.Core.Enums;
+// File: Bank.cs
+using ProjectShop.Server.Core.Interfaces.IEntities;
 
 namespace ProjectShop.Server.Core.Entities
 {
-    public class BankModel
+    public class BankModel : IGetIdEntity<uint>
     {
-        public int BankId { get; private set; }
-        public string BankName { get; private set; } = string.Empty;
-        public EActiveStatus Status { get; private set; }
+        // Corresponds to 'bank_id' (INT UNSIGNED AUTO_INCREMENT)
+        public uint BankId { get; set; }
 
-        public BankModel() { }
+        // Corresponds to 'bank_name' (NVARCHAR(100))
+        public string BankName { get; set; } = string.Empty;
 
-        public BankModel(int id, string name, EActiveStatus status)
+        // Corresponds to 'bank_status' (TINYINT(1))
+        public bool BankStatus { get; set; }
+
+        // Navigation properties
+        public ICollection<UserPaymentMethodModel> UserPaymentMethods { get; set; } = new List<UserPaymentMethodModel>();
+        // End of navigation properties
+
+        public BankModel(uint bankId, string bankName, bool bankStatus)
         {
-            BankId = id;
-            BankName = name;
-            Status = status;
+            BankId = bankId;
+            BankName = bankName;
+            BankStatus = bankStatus;
         }
 
-        public void SetBankId(int id)
+        public BankModel()
         {
-            BankId = id;
         }
 
-        public void SetBankName(string name)
-        {
-            BankName = name;
-        }
-
-        public void SetStatus(EActiveStatus status)
-        {
-            Status = status;
-        }
+        public uint GetIdEntity() => BankId;
     }
 }
+

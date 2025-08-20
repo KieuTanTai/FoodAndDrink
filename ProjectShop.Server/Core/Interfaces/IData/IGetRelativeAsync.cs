@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace ProjectShop.Server.Core.Interfaces.IData
+﻿namespace ProjectShop.Server.Core.Interfaces.IData
 {
-    public interface IGetRelativeAsync<T> where T : class
+    public interface IGetRelativeAsync<TEntity> where TEntity : class
     {
-        public string GetQueryDataString(string colName);
-        Task<List<T>> GetRelativeAsync(string input, string colName);
+        //public string GetQueryDataString(string colName);
+        Task<IEnumerable<TEntity>> GetByLikeStringAsync(string input);
+        Task<IEnumerable<TEntity>> GetByLikeStringAsync(string input, int maxGetCount);
     }
 }

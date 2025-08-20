@@ -1,8 +1,10 @@
-﻿namespace ProjectShop.Server.Core.Interfaces.IData
+﻿using System.Data;
+
+namespace ProjectShop.Server.Core.Interfaces.IData
 {
     public interface IDbConnectionFactory
     {
-        System.Data.IDbConnection CreateConnection();
-        void ExecuteQuery(string query);
+        Task<IDbConnection> CreateConnection();
+        //void ExecuteQuery(string query);
     }
 }

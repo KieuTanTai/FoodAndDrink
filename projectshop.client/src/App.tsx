@@ -1,5 +1,5 @@
 ﻿import { useEffect, useState } from 'react';
-import './App.css';
+// import './assets/css/App.css';
 
 interface Forecast {
     date: string;
@@ -14,7 +14,6 @@ function App() {
     useEffect(() => {
         populateWeatherData();
     }, []);
-
     const contents = forecasts === undefined
         ? <p><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationreact">https://aka.ms/jspsintegrationreact</a> for more details.</em></p>
         : <table className="table-striped table" aria-labelledby="tableLabel">
@@ -37,17 +36,18 @@ function App() {
                 )}
             </tbody>
         </table>;
-
     return (
-        <div>
+        <div className='container mx-auto flex max-w-[75rem] flex-col items-center justify-center p-4 lg:px-0'>
             <h1 id="tableLabel">Weather forecast</h1>
+            <img src="./src/assets/react.svg"></img>
+            <div className="text-s font-bold text-red-200 underline">REACT</div>
             <p>This component demonstrates fetching data from the server.</p>
             {contents}
         </div>
     );
 
     async function populateWeatherData() {
-        const response = await fetch('weatherforecast');
+        const response = await fetch('api/weatherforecast');
         if (response.ok) {
             const data = await response.json();
             setForecasts(data);

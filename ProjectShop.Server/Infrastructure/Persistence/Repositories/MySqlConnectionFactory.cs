@@ -1,7 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
-using System;
-using System.Data;
 using ProjectShop.Server.Core.Interfaces.IData;
+using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
 {
@@ -20,12 +19,14 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
             _connectionString = connectionString;
         }
 
-        public IDbConnection CreateConnection()
+        public async Task<IDbConnection> CreateConnection()
         {
-            return new MySqlConnection(_connectionString);
+            var connection = new MySqlConnection(_connectionString);
+            await connection.OpenAsync();
+            return connection;
         }
 
-        public void ExecuteQuery(string query) { }
+        //public void ExecuteQuery(string query) { }
 
     }
 }

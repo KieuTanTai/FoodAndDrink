@@ -1,15 +1,30 @@
+﻿using ProjectShop.Server.Infrastructure.Configuration;
+using ProjectShop.Server.Infrastructure.Persistence;
+using ProjectShop.Server.Infrastructure.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-var app = builder.Build();
+try
+{
+    builder.Services.AddInfrastructureServices();
+    builder.Services.AddApplicationServices();
+    //builder.Services.AddControllerServices();
+    SnakeCaseMapperInitializer.RegisterAllEntities();
+}
+catch (Exception ex)
+{
+    System.Console.WriteLine($"Application startup failed: {ex.Message}");
+    Environment.Exit(1);
+}
 
-app.UseDefaultFiles();
-app.MapStaticAssets();
+var app = builder.Build();
+SqlTypeHandlerRegistration.Register();
+GetProviderService.SetServiceProvider(app.Services);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

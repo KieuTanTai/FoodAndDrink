@@ -5,250 +5,131 @@ using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Persistence
 {
-    public abstract class BaseDAO<T>(
+    public abstract class BaseDAO<TEntity>(
         IDbConnectionFactory connectionFactory,
         IColumnService colService,
         IStringConverter converter,
         IStringChecker checker,
         string tableName,
         string columnIdName,
-        string secondColumnIdName = "") : IDAO<T>, ICrudOperationsAsync<T>, IQueryOperationsAsync, IExecuteOperationsAsync where T : class
+        string secondColumnIdName = "") : BaseGetDataDAO<TEntity>(connectionFactory, colService, converter, checker, tableName, columnIdName, secondColumnIdName),
+        IDAO<TEntity> where TEntity : class
     {
-        protected IDbConnectionFactory ConnectionFactory { get; } = connectionFactory;
-        protected IColumnService ColService { get; } = colService;
-        protected IStringConverter Converter { get; } = converter;
-        protected IStringChecker Checker { get; } = checker;
 
-        protected string TableName { get; } = tableName;
-        protected string ColumnIdName { get; } = columnIdName;
-        protected string SecondColumnIdName { get; } = secondColumnIdName ?? string.Empty;
-
-        // GET ALL
-        public virtual async Task<List<T>> GetAllAsync()
-        {
-            try
-            {
-                string query = $"SELECT * FROM {TableName}";
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<T> result = await connection.QueryAsync<T>(query);
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return new();
-            }
-        }
-
-        // GET SINGLE BY ID
-        public virtual async Task<T?> GetByIdAsync(string id)
-        {
-            try
-            {
-                string query = GetByIdQuery(ColumnIdName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                T? result = await connection.QueryFirstOrDefaultAsync(query);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return null;
-            }
-        }
-
-        public virtual async Task<List<T>> GetByIdsAsync(IEnumerable<string> ids)
-        {
-            try
-            {
-                if (ids == null || !ids.Any())
-                    return new List<T>();
-                string query = $"SELECT * FROM {TableName} WHERE {ColumnIdName} IN @Ids";
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                IEnumerable<T> result = await connection.QueryAsync<T>(query, new { Ids = ids });
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return new List<T>();
-            }
-        }
 
         // INSERT ENTITY
-        public virtual async Task<int> InsertAsync(T entity)
+        public virtual async Task<int> InsertAsync(TEntity entity)
         {
             try
             {
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 using IDbTransaction transaction = connection.BeginTransaction();
                 try
                 {
-                    int result = await connection.QueryFirstOrDefaultAsync(GetInsertQuery(), entity, transaction);
+                    int result = await connection.ExecuteScalarAsync<int>(GetInsertQuery(), entity, transaction);
                     transaction.Commit();
                     return result;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error Commit!\n{ex.StackTrace}");
                     transaction.Rollback();
-                    return -1;
+                    throw new Exception($"Error inserting data into {TableName}: {ex.Message}", ex);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return -1;
+                throw new Exception($"Error creating connection or transaction for {TableName}: {ex.Message}", ex);
             }
         }
 
-        public virtual async Task<int> InsertManyAsync(IEnumerable<T> entities)
+        public virtual async Task<int> InsertAsync(IEnumerable<TEntity> entities)
         {
             try
             {
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                if (entities == null || !entities.Any())
+                    return 0; // Trả về 0 nếu không có đối tượng nào.
+
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 using IDbTransaction transaction = connection.BeginTransaction();
                 try
                 {
-                    int result = 0;
-                    foreach (T entity in entities)
-                        result += await connection.ExecuteAsync(GetInsertQuery(), entity, transaction);
+                    string insertQuery = GetInsertQuery();
+                    int affectedRows = await connection.ExecuteAsync(insertQuery, entities, transaction);
+
                     transaction.Commit();
-                    return result;
+                    return affectedRows;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error Commit!\n{ex.StackTrace}");
                     transaction.Rollback();
-                    return -1;
+                    throw new Exception(TableName + $" Error inserting multiple entities: {ex.Message}", ex);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return -1;
+                throw new Exception($"Error creating connection or transaction for {TableName}: {ex.Message}", ex);
             }
         }
 
         // 2. Usage in UpdateAsync
-        public virtual async Task<int> UpdateAsync(T entity)
+        public virtual async Task<int> UpdateAsync(TEntity entity)
         {
             try
             {
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 using IDbTransaction transaction = connection.BeginTransaction();
                 try
                 {
                     int affectedRows = await connection.ExecuteAsync(GetUpdateQuery(), entity, transaction);
                     transaction.Commit();
                     return affectedRows;
-
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error Commit!\n{ex.StackTrace}");
                     transaction.Rollback();
-                    return -1;
+                    throw new Exception($"Error updating data in {TableName}: {ex.Message}", ex);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return -1;
+                throw new Exception($"Error creating connection or transaction for {TableName}: {ex.Message}", ex);
             }
         }
 
-        public virtual async Task<int> UpdateManyAsync(IEnumerable<T> entities)
+        public virtual async Task<int> UpdateAsync(IEnumerable<TEntity> entities)
         {
             try
             {
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                if (entities == null || !entities.Any())
+                    return 0; // Không có gì để cập nhật.
+
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 using IDbTransaction transaction = connection.BeginTransaction();
                 try
                 {
-                    int affectedRows = 0;
-                    foreach (T entity in entities)
-                        affectedRows += await connection.ExecuteAsync(GetUpdateQuery(), entity, transaction);
+                    string updateQuery = GetUpdateQuery();
+                    int affectedRows = await connection.ExecuteAsync(updateQuery, entities, transaction);
                     transaction.Commit();
                     return affectedRows;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error Commit!\n{ex.StackTrace}");
                     transaction.Rollback();
-                    return -1;
+                    throw new Exception($"Error updating multiple entities in {TableName}: {ex.Message}", ex);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                return -1;
-            }
-        }
-
-        //DELETE ENTITY
-        public virtual async Task<int> DeleteAsync(string id)
-        {
-            try
-            {
-                string query = DeleteByIdQuery(ColumnIdName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                using IDbTransaction transaction = connection.BeginTransaction();
-                try
-                {
-                    int affectedRows = await connection.ExecuteAsync(query, new { Id = id }, transaction);
-                    transaction.Commit();
-                    return affectedRows;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error Commit!\n{ex.StackTrace}");
-                    transaction.Rollback();
-                    return -1;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return -1;
-            }
-        }
-
-        public virtual async Task<int> DeleteManyAsync(IEnumerable<string> ids)
-        {
-            try
-            {
-                string query = DeleteByIdQuery(ColumnIdName);
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
-                using IDbTransaction transaction = connection.BeginTransaction();
-                try
-                {
-                    int affectedRows = 0;
-                    foreach (string id in ids)
-                        affectedRows += await connection.ExecuteAsync(query, new { Id = id }, transaction);
-                    transaction.Commit();
-                    return affectedRows;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error Commit!\n{ex.StackTrace}");
-                    transaction.Rollback();
-                    return -1;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return -1;
+                throw new Exception($"Error creating connection or transaction for {TableName}: {ex.Message}", ex);
             }
         }
 
 #nullable enable
-        public virtual async Task<List<TResult>?> QueryAsync<TResult>(string query, object? parameters = null)
+        public virtual async Task<IEnumerable<TResult>?> QueryAsync<TResult>(string query, object? parameters = null)
         {
             try
             {
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<TResult> result = await connection.QueryAsync<TResult>(query, parameters);
                 return result.AsList();
             }
@@ -263,7 +144,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence
         {
             try
             {
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 try
                 {
                     TResult? result = await connection.QueryFirstOrDefaultAsync(query, parameters, transaction);
@@ -288,7 +169,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence
         {
             try
             {
-                using IDbConnection connection = ConnectionFactory.CreateConnection();
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 try
                 {
                     int affectedRows = await connection.ExecuteAsync(query, parameters, transaction);
@@ -307,36 +188,6 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 Console.WriteLine(ex.StackTrace);
                 return false;
             }
-        }
-
-        public virtual async Task<bool> IsExistObjectAsync(T entity)
-        {
-            using IDbConnection connection = ConnectionFactory.CreateConnection();
-            string query = GetByIdQuery(ColumnIdName);
-            try
-            {
-                T? existingObject = await connection.QueryFirstOrDefaultAsync<T>(query, entity);
-                return existingObject != null;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return false;
-            }
-        }
-
-        protected virtual string GetByIdQuery(string colIdName)
-        {
-            if (!ColService.IsValidColumn(TableName, colIdName))
-                return "";
-            return $"SELECT * FROM {TableName} WHERE {colIdName} = @Id";
-        }
-
-        protected virtual string DeleteByIdQuery(string colIdName)
-        {
-            if (!ColService.IsValidColumn(TableName, colIdName))
-                return "";
-            return $"DELETE FROM {TableName} WHERE {colIdName} = @Id";
         }
 
 #nullable disable

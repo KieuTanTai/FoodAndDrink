@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace ProjectShop.Server.Core.Interfaces.IData
+﻿namespace ProjectShop.Server.Core.Interfaces.IData
 {
-    public interface IGetDataByDateTimeAsync<T> where T : class
+    public interface IGetDataByDateTimeAsync<TEntity> where TEntity : class
     {
-        string GetByMonth(string colName);
-        string GetByYear(string colName);
-        string GetByDateTime(string colName);
-        string GetByDateTimeRange(string colName);
-        string GetByMonthAndYear(string colName);
-#nullable enable
-        Task<List<T>?> GetAllByTimeAsync<TEnum>(string time, string colName, TEnum timeType) where TEnum : Enum;
-        Task<List<T>?> GetAllByTimeRangeAsync<TEnum>(string timeStart, string timeEnd, string colName, TEnum timeType) where TEnum : Enum;
+        Task<IEnumerable<TEntity>> GetByMonthAndYearAsync(int year, int month);
+        Task<IEnumerable<TEntity>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum;
+        Task<IEnumerable<TEntity>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate);
+        Task<IEnumerable<TEntity>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum;
     }
 }

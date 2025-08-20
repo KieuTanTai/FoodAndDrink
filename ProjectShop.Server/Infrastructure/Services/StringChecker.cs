@@ -1,5 +1,5 @@
-﻿using System.Text.RegularExpressions;
-using ProjectShop.Server.Core.Interfaces.IValidate;
+﻿using ProjectShop.Server.Core.Interfaces.IValidate;
+using System.Text.RegularExpressions;
 
 namespace ProjectShop.Server.Infrastructure.Services
 {

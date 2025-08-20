@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace ProjectShop.Server.Infrastructure.Configuration
 {
@@ -8,66 +6,278 @@ namespace ProjectShop.Server.Infrastructure.Configuration
     {
         private static readonly HashSet<string> AllowedColumnNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            // LOCATIONS
-            "location_type_id", "location_type_name", "location_type_status",
-            "location_city_id", "location_city_name", "location_city_status",
-            "location_district_id", "location_district_name", "location_district_status",
-            "location_ward_id", "location_ward_name", "location_ward_status",
-            "location_street_id", "location_street_name", "location_street_status",
-            "location_id", "address_number", "location_phone", "location_email", "location_name", "location_status",
-            
-            // USERS
-            "supplier_id", "supplier_name", "supplier_phone", "supplier_email", "supplier_company_address_number",
-            "supplier_company_street_id", "supplier_company_ward_id", "supplier_company_district_id",
-            "supplier_company_city_id", "supplier_store_address_number", "supplier_store_street_id",
-            "supplier_store_ward_id", "supplier_store_district_id", "supplier_store_city_id", "supplier_status",
-            "account_id", "user_name", "password", "account_create_date", "account_status",
-            "role_id", "role_name", "role_status",
-            "customer_id", "customer_birthday", "customer_phone", "customer_name",
-            "customer_address_number", "customer_street_id", "customer_ward_id", "customer_district_id",
-            "customer_city_id", "customer_avatar_url", "customer_gender", "customer_status",
-            "employee_id", "employee_birthday", "employee_phone", "employee_name",
-            "employee_address_number", "employee_street_id", "employee_ward_id", "employee_district_id",
-            "employee_city_id", "employee_avatar_url", "employee_gender", "employee_status",
-            "id", "create_date",
-            "cart_id", "cart_total_price",
-            "point_wallet_id", "balance_point", "last_update_balance_date",
+            // location_type
+            "location_type_id",
+            "location_type_name",
+            "location_type_status",
 
-            // PRODUCTS
-            "product_id", "product_name", "product_net_weight", "product_weight_range", "product_unit",
-            "product_base_price", "product_rating_age", "product_status",
-            "detail_cart_id", "cart_id", "product_id", "cart_add_date", "cart_price", "cart_quantity",
-            "product_lot_id", "product_lot_mfg_date", "product_lot_exp_date", "product_lot_initial_quantity",
-            "dispose_reason_id", "dispose_reason_name",
-            "category_id", "category_name", "category_status",
-            "product_image_id", "image_url", "product_image_priority",
+            // location_city
+            "location_city_id",
+            "location_city_name",
+            "location_city_status",
 
-            // SALE EVENTS
-            "sale_event_id", "sale_event_start_date", "sale_event_end_date", "sale_event_name",
-            "sale_event_status", "sale_event_description", "sale_event_discount_code",
-            "detail_sale_event_id", "discount_type", "discount_percent", "discount_amount",
-            "max_discount_price", "min_price_to_use",
+            // location_district
+            "location_district_id",
+            "location_district_name",
+            "location_district_status",
 
-            // NEWS
-            "news_category_id", "news_category_name", "news_category_status",
-            "news_id", "news_related_product_id", "news_title", "news_published_date",
-            "news_content", "news_status",
-            "news_image_id", "news_image_url",
+            // location_ward
+            "location_ward_id",
+            "location_ward_name",
+            "location_ward_status",
 
-            // PAYMENT & INVOICES
-            "bank_id", "bank_name", "bank_status",
-            "user_payment_method_id", "payment_method_type", "added_date", "last_updated_date",
-            "status", "display_name", "last_four_digit", "expiry_year", "expiry_month", "token",
-            "invoice_id", "payment_method_id", "invoice_total_price", "invoice_date", "invoice_status",
-            "detail_invoice_id", "detail_invoice_quantity", "detail_invoice_price",
-            "transaction_id", "point_wallet_id", "transaction_date", "transaction_type",
-            "transaction_current_balance", "transaction_status",
+            // location
+            "location_id",
+            "location_type_id",
+            "location_house_number",
+            "location_street",
+            "location_ward_id",
+            "location_district_id",
+            "location_city_id",
+            "location_phone",
+            "location_email",
+            "location_name",
+            "location_status",
 
-            // INVENTORIES
-            "inventory_id", "inventory_current_quantity",
-            "inventory_movement_id", "source_location_id", "destination_location_id",
-            "inventory_movement_quantity", "inventory_movement_date", "inventory_movement_reason",
-            "dispose_product_id", "dispose_by_employee_id", "dispose_reason_id", "dispose_quantity"
+            // supplier
+            "supplier_id",
+            "supplier_name",
+            "supplier_phone",
+            "supplier_email",
+            "company_location_id",
+            "store_location_id",
+            "supplier_status",
+            "supplier_cooperation_date",
+
+            // account
+            "account_id",
+            "user_name",
+            "password",
+            "account_created_date",
+            "account_last_updated_date",
+            "account_status",
+
+            // role
+            "role_id",
+            "role_name",
+            "role_status",
+            "role_created_date",
+            "role_last_updated_date",
+
+            // customer
+            "customer_id",
+            "account_id",
+            "customer_birthday",
+            "customer_phone",
+            "customer_name",
+            "customer_email",
+            "customer_avatar_url",
+            "customer_gender",
+            "customer_status",
+
+            // customer_address
+            "customer_address_id",
+            "customer_city_id",
+            "customer_district_id",
+            "customer_ward_id",
+            "customer_id",
+            "customer_street",
+            "customer_address_number",
+            "customer_address_status",
+
+            // employee
+            "employee_id",
+            "account_id",
+            "employee_birthday",
+            "employee_phone",
+            "employee_name",
+            "employee_house_number",
+            "employee_street",
+            "employee_ward_id",
+            "employee_district_id",
+            "employee_city_id",
+            "employee_avatar_url",
+            "location_id",
+            "employee_email",
+            "employee_gender",
+            "employee_status",
+
+            // roles_of_user
+            "id",
+            "account_id",
+            "role_id",
+            "added_date",
+
+            // cart
+            "cart_id",
+            "customer_id",
+            "cart_total_price",
+
+            // category
+            "category_id",
+            "category_name",
+            "category_status",
+
+            // product
+            "product_barcode",
+            "category_id",
+            "supplier_id",
+            "product_name",
+            "product_net_weight",
+            "product_weight_range",
+            "product_unit",
+            "product_base_price",
+            "product_rating_age",
+            "product_status",
+            "product_added_date",
+            "product_last_updated_date",
+
+            // detail_cart
+            "detail_cart_id",
+            "cart_id",
+            "product_barcode",
+            "detail_cart_added_date",
+            "detail_cart_price",
+            "detail_cart_quantity",
+
+            // dispose_reason
+            "dispose_reason_id",
+            "dispose_reason_name",
+
+            // product_categories
+            "id",
+            "category_id",
+            "product_barcode",
+
+            // product_image
+            "product_image_id",
+            "product_barcode",
+            "product_image_url",
+            "product_image_priority",
+            "product_image_created_date",
+            "product_image_last_updated_date",
+
+            // sale_event
+            "sale_event_id",
+            "sale_event_start_date",
+            "sale_event_end_date",
+            "sale_event_name",
+            "sale_event_status",
+            "sale_event_description",
+            "sale_event_discount_code",
+
+            // sale_event_image
+            "sale_event_image_id",
+            "sale_event_id",
+            "sale_event_image_url",
+            "sale_event_image_created_date",
+            "sale_event_image_last_updated_date",
+
+            // detail_sale_event
+            "detail_sale_event_id",
+            "sale_event_id",
+            "product_barcode",
+            "discount_type",
+            "discount_percent",
+            "discount_amount",
+            "max_discount_price",
+            "min_price_to_use",
+
+            // bank
+            "bank_id",
+            "bank_name",
+            "bank_status",
+
+            // user_payment_method
+            "user_payment_method_id",
+            "payment_method_type",
+            "bank_id",
+            "customer_id",
+            "payment_method_added_date",
+            "payment_method_last_updated_date",
+            "payment_method_status",
+            "payment_method_display_name",
+            "payment_method_last_four_digit",
+            "payment_method_expiry_year",
+            "payment_method_expiry_month",
+            "payment_method_token",
+
+            // inventory
+            "inventory_id",
+            "location_id",
+            "inventory_status",
+            "inventory_last_updated_date",
+
+            // product_lot
+            "product_lot_id",
+            "inventory_id",
+            "product_lot_created_date",
+
+            // detail_product_lot
+            "product_lot_id",
+            "product_barcode",
+            "product_lot_mfg_date",
+            "product_lot_exp_date",
+            "product_lot_initial_quantity",
+
+            // product_lot_inventory
+            "product_lot_id",
+            "inventory_id",
+            "product_lot_inventory_quantity",
+            "product_lot_inventory_added_date",
+
+            // detail_inventory
+            "detail_inventory_id",
+            "inventory_id",
+            "product_barcode",
+            "detail_inventory_quantity",
+            "detail_inventory_added_date",
+            "detail_inventory_last_updated_date",
+
+            // inventory_movement
+            "inventory_movement_id",
+            "source_location_id",
+            "destination_location_id",
+            "inventory_id",
+            "inventory_movement_quantity",
+            "inventory_movement_date",
+            "inventory_movement_reason",
+
+            // detail_inventory_movement
+            "detail_inventory_movement_id",
+            "inventory_movement_id",
+            "product_barcode",
+            "detail_inventory_movement_quantity",
+
+            // dispose_product
+            "dispose_product_id",
+            "location_id",
+            "product_barcode",
+            "dispose_by_employee_id",
+            "dispose_reason_id",
+            "dispose_quantity",
+            "disposed_date",
+
+            // invoice
+            "invoice_id",
+            "customer_id",
+            "employee_id",
+            "payment_method_id",
+            "invoice_total_price",
+            "invoice_date",
+            "invoice_status",
+
+            // detail_invoice
+            "detail_invoice_id",
+            "invoice_id",
+            "product_barcode",
+            "detail_invoice_quantity",
+            "detail_invoice_price",
+            "detail_invoice_status",
+
+            // invoice_discount
+            "invoice_id",
+            "sale_event_id"
         };
 
         private static readonly Regex ColumnNameRegex = new Regex("^[a-zA-Z_][a-zA-Z0-9_]*$", RegexOptions.Compiled);

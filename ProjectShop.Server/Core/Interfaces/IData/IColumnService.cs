@@ -2,7 +2,7 @@
 {
     public interface IColumnService
     {
-        List<string> GetValidColumns(string tableName);
-        bool IsValidColumn(string tableName, string columnName);
+        Task<List<string>> GetValidColumns(string tableName);
+        Task<bool> IsValidColumn(string tableName, string columnName);
     }
 }
