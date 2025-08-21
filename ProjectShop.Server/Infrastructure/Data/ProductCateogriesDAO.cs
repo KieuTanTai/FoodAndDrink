@@ -51,13 +51,19 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<ProductCategoriesModel> GetByKeysAsync(ProductCategoriesKey keys) => await GetSingleByTwoIdAsync(ColumnIdName, SecondColumnIdName, keys.CategoryId, keys.ProductBarcode);
 
-        public async Task<IEnumerable<ProductCategoriesModel>> GetByListKeysAsync(IEnumerable<ProductCategoriesKey> keys)
+        public async Task<IEnumerable<ProductCategoriesModel>> GetByListKeysAsync(IEnumerable<ProductCategoriesKey> keys, int? maxGetCount)
         {
+            string query = $@"";
+            if (maxGetCount.HasValue && maxGetCount.Value <= 0)
+                throw new ArgumentOutOfRangeException(nameof(maxGetCount), "maxGetCount must be greater than 0.");
+            else if (maxGetCount.HasValue && maxGetCount.Value > 0)
+                query = $@"SELECT * FROM {TableName} WHERE (category_id, product_barcode) IN @Keys LIMIT @MaxGetCount";
+            else
+                query = $"SELECT * FROM {TableName} WHERE ({ColumnIdName}, {SecondColumnIdName}) IN @Keys";
             try
             {
-                string query = $@"SELECT * FROM {TableName} WHERE ({ColumnIdName}, {SecondColumnIdName}) IN @Keys";
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                IEnumerable<ProductCategoriesModel> results = await connection.QueryAsync<ProductCategoriesModel>(query, new { Keys = keys.Select(k => new { k.CategoryId, k.ProductBarcode }) });
+                IEnumerable<ProductCategoriesModel> results = await connection.QueryAsync<ProductCategoriesModel>(query, new { Keys = keys.Select(k => new { k.CategoryId, k.ProductBarcode }), MaxGetCount = maxGetCount });
                 if (results == null || !results.Any())
                     throw new KeyNotFoundException($"No records found in {TableName} for the provided keys.");
                 return results;
