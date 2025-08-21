@@ -13,13 +13,11 @@ namespace ProjectShop.Server.Application.Services.Roles
         {
         }
 
-        public async Task<IEnumerable<RolesOfUserModel>> GetAllAsync(int? maxGetCount = null, RolesOfUserNavigationOptions? options = null)
+        public async Task<IEnumerable<RolesOfUserModel>> GetAllAsync(RolesOfUserNavigationOptions? options, int? maxGetCount)
         {
             try
             {
-                IEnumerable<RolesOfUserModel> roles = maxGetCount.HasValue
-                    ? await _baseDAO.GetAllAsync(maxGetCount.Value)
-                    : await _baseDAO.GetAllAsync();
+                IEnumerable<RolesOfUserModel> roles = await _baseDAO.GetAllAsync(GetValidMaxRecord(maxGetCount));
                 if (options != null)
                     roles = await GetNavigationPropertyByOptionsAsync(roles, options);
                 return roles;
@@ -30,13 +28,11 @@ namespace ProjectShop.Server.Application.Services.Roles
             }
         }
 
-        public async Task<IEnumerable<RolesOfUserModel>> GetByAccountIdAsync(uint accountId, int? maxGetCount = null, RolesOfUserNavigationOptions? options = null)
+        public async Task<IEnumerable<RolesOfUserModel>> GetByAccountIdAsync(uint accountId, RolesOfUserNavigationOptions? options, int? maxGetCount)
         {
             try
             {
-                IEnumerable<RolesOfUserModel> roles = maxGetCount.HasValue
-                    ? await _roleOfUserDAO.GetByAccountIdAsync(accountId, maxGetCount.Value)
-                    : await _roleOfUserDAO.GetByAccountIdAsync(accountId);
+                IEnumerable<RolesOfUserModel> roles = await _roleOfUserDAO.GetByAccountIdAsync(accountId, GetValidMaxRecord(maxGetCount));
                 if (options != null)
                     roles = await GetNavigationPropertyByOptionsAsync(roles, options);
                 return roles;
@@ -47,11 +43,11 @@ namespace ProjectShop.Server.Application.Services.Roles
             }
         }
 
-        public async Task<IEnumerable<RolesOfUserModel>> GetByAccountIdsAsync(IEnumerable<uint> accountIds, RolesOfUserNavigationOptions? options = null)
+        public async Task<IEnumerable<RolesOfUserModel>> GetByAccountIdsAsync(IEnumerable<uint> accountIds, RolesOfUserNavigationOptions? options, int? maxGetCount)
         {
             try
             {
-                IEnumerable<RolesOfUserModel> roles = await _roleOfUserDAO.GetByAccountIdsAsync(accountIds);
+                IEnumerable<RolesOfUserModel> roles = await _roleOfUserDAO.GetByAccountIdsAsync(accountIds, GetValidMaxRecord(maxGetCount));
                 if (options != null)
                     roles = await GetNavigationPropertyByOptionsAsync(roles, options);
                 return roles;
@@ -62,31 +58,31 @@ namespace ProjectShop.Server.Application.Services.Roles
             }
         }
 
-        public async Task<IEnumerable<RolesOfUserModel>> GetByAddedDateMonthAndYearAsync(int year, int month, RolesOfUserNavigationOptions? options = null)
+        public async Task<IEnumerable<RolesOfUserModel>> GetByAddedDateMonthAndYearAsync(int year, int month, RolesOfUserNavigationOptions? options, int? maxGetCount)
         {
             return await GetByMonthAndYearGenericAsync(
-                _roleOfUserDAO.GetByMonthAndYearAsync, year, month, options, $"No roles found added in {month}/{year}.");
+                _roleOfUserDAO.GetByMonthAndYearAsync, year, month, options, $"No roles found added in {month}/{year}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<RolesOfUserModel>> GetByAddedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, RolesOfUserNavigationOptions? options = null) where TCompareType : Enum
+        public async Task<IEnumerable<RolesOfUserModel>> GetByAddedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, RolesOfUserNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
         {
             return await GetByDateTimeGenericAsync(
-                (ct) => _roleOfUserDAO.GetByDateTimeAsync(dateTime, ct), compareType, options, $"No roles found added at {dateTime} with comparison type {compareType}.");
+                (compareType, maxGetCount) => _roleOfUserDAO.GetByDateTimeAsync(dateTime, compareType, maxGetCount), compareType, options, $"No roles found added at {dateTime} with comparison type {compareType}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<RolesOfUserModel>> GetByAddedDateTimeRangeAsync(DateTime startDate, DateTime endDate, RolesOfUserNavigationOptions? options = null)
+        public async Task<IEnumerable<RolesOfUserModel>> GetByAddedDateTimeRangeAsync(DateTime startDate, DateTime endDate, RolesOfUserNavigationOptions? options, int? maxGetCount)
         {
             return await GetByDateTimeRangeGenericAsync(
-                () => _roleOfUserDAO.GetByDateTimeRangeAsync(startDate, endDate), options, $"No account roles found created between {startDate} and {endDate}.");
+                (maxGetCount) => _roleOfUserDAO.GetByDateTimeRangeAsync(startDate, endDate, maxGetCount), options, $"No account roles found created between {startDate} and {endDate}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<RolesOfUserModel>> GetByAddedYearAsync<TCompareType>(int year, TCompareType compareType, RolesOfUserNavigationOptions? options = null) where TCompareType : Enum
+        public async Task<IEnumerable<RolesOfUserModel>> GetByAddedYearAsync<TCompareType>(int year, TCompareType compareType, RolesOfUserNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
         {
             return await GetByDateTimeGenericAsync(
-                (ct) => _roleOfUserDAO.GetByYearAsync(year, ct), compareType, options, $"No roles found added in year {year} with comparison type {compareType}.");
+                (compareType, maxGetCount) => _roleOfUserDAO.GetByYearAsync(year, compareType, maxGetCount), compareType, options, $"No roles found added in year {year} with comparison type {compareType}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<RolesOfUserModel?> GetByKeysAsync(RolesOfUserKey keys, RolesOfUserNavigationOptions? options = null)
+        public async Task<RolesOfUserModel?> GetByKeysAsync(RolesOfUserKey keys, RolesOfUserNavigationOptions? options)
         {
             try
             {
@@ -101,11 +97,11 @@ namespace ProjectShop.Server.Application.Services.Roles
             }
         }
 
-        public async Task<IEnumerable<RolesOfUserModel>> GetByListKeysAsync(IEnumerable<RolesOfUserKey> listKeys, RolesOfUserNavigationOptions? options = null)
+        public async Task<IEnumerable<RolesOfUserModel>> GetByListKeysAsync(IEnumerable<RolesOfUserKey> listKeys, RolesOfUserNavigationOptions? options, int? maxGetCount)
         {
             try
             {
-                IEnumerable<RolesOfUserModel> rolesOfUsers = await _roleOfUserDAO.GetByListKeysAsync(listKeys);
+                IEnumerable<RolesOfUserModel> rolesOfUsers = await _roleOfUserDAO.GetByListKeysAsync(listKeys, GetValidMaxRecord(maxGetCount));
                 if (options != null)
                     rolesOfUsers = await GetNavigationPropertyByOptionsAsync(rolesOfUsers, options);
                 return rolesOfUsers;
@@ -116,13 +112,11 @@ namespace ProjectShop.Server.Application.Services.Roles
             }
         }
 
-        public async Task<IEnumerable<RolesOfUserModel>> GetByRoleIdAsync(uint roleId, int? maxGetCount = null, RolesOfUserNavigationOptions? options = null)
+        public async Task<IEnumerable<RolesOfUserModel>> GetByRoleIdAsync(uint roleId, RolesOfUserNavigationOptions? options, int? maxGetCount)
         {
             try
             {
-                IEnumerable<RolesOfUserModel> rolesOfUserModels = maxGetCount.HasValue
-                    ? await _roleOfUserDAO.GetByRoleIdAsync(roleId, maxGetCount.Value)
-                    : await _roleOfUserDAO.GetByRoleIdAsync(roleId);
+                IEnumerable<RolesOfUserModel> rolesOfUserModels = await _roleOfUserDAO.GetByRoleIdAsync(roleId, GetValidMaxRecord(maxGetCount));
                 if (options != null)
                     rolesOfUserModels = await GetNavigationPropertyByOptionsAsync(rolesOfUserModels, options);
                 return rolesOfUserModels;
@@ -133,11 +127,11 @@ namespace ProjectShop.Server.Application.Services.Roles
             }
         }
 
-        public async Task<IEnumerable<RolesOfUserModel>> GetByRoleIdsAsync(IEnumerable<uint> roleIds, RolesOfUserNavigationOptions? options = null)
+        public async Task<IEnumerable<RolesOfUserModel>> GetByRoleIdsAsync(IEnumerable<uint> roleIds, RolesOfUserNavigationOptions? options, int? maxGetCount)
         {
             try
             {
-                IEnumerable<RolesOfUserModel> rolesOfUserModels = await _roleOfUserDAO.GetByRoleIdsAsync(roleIds);
+                IEnumerable<RolesOfUserModel> rolesOfUserModels = await _roleOfUserDAO.GetByRoleIdsAsync(roleIds, GetValidMaxRecord(maxGetCount));
                 if (options != null)
                     rolesOfUserModels = await GetNavigationPropertyByOptionsAsync(rolesOfUserModels, options);
                 return rolesOfUserModels;

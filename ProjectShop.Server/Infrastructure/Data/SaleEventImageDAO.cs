@@ -34,49 +34,49 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName};";
         }
 
-        public async Task<IEnumerable<SaleEventImageModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<SaleEventImageModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("sale_event_image_created_date", EQueryTimeType.DATE_TIME, ct, dateTime);
+                return await GetByDateTimeAsync("sale_event_image_created_date", EQueryTimeType.DATE_TIME, ct, dateTime, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<IEnumerable<SaleEventImageModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate)
-            => await GetByDateTimeAsync("sale_event_image_created_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate));
+        public async Task<IEnumerable<SaleEventImageModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+            => await GetByDateTimeAsync("sale_event_image_created_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate), maxGetCount);
 
-        public async Task<IEnumerable<SaleEventImageModel>> GetByMonthAndYearAsync(int year, int month)
-            => await GetByDateTimeAsync("sale_event_image_created_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+        public async Task<IEnumerable<SaleEventImageModel>> GetByMonthAndYearAsync(int year, int month, int? maxGetCount)
+            => await GetByDateTimeAsync("sale_event_image_created_date", EQueryTimeType.MONTH_AND_YEAR, (year, month), maxGetCount);
 
-        public async Task<IEnumerable<SaleEventImageModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<SaleEventImageModel>> GetByYearAsync<TEnum>(int year, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("sale_event_image_created_date", EQueryTimeType.YEAR, ct, year);
+                return await GetByDateTimeAsync("sale_event_image_created_date", EQueryTimeType.YEAR, ct, year, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
         // ----------- LastUpdatedDate -----------
-        public async Task<IEnumerable<SaleEventImageModel>> GetByLastUpdatedDateAsync<TCompareType>(DateTime lastUpdated, TCompareType compareType) where TCompareType : Enum
+        public async Task<IEnumerable<SaleEventImageModel>> GetByLastUpdatedDateAsync<TCompareType>(DateTime lastUpdated, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("sale_event_image_last_updated_date", EQueryTimeType.DATE_TIME, ct, lastUpdated);
+                return await GetByDateTimeAsync("sale_event_image_last_updated_date", EQueryTimeType.DATE_TIME, ct, lastUpdated, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<IEnumerable<SaleEventImageModel>> GetByLastUpdatedDateTimeRangeAsync(DateTime start, DateTime end)
-            => await GetByDateTimeAsync("sale_event_image_last_updated_date", EQueryTimeType.DATE_TIME_RANGE, (start, end));
+        public async Task<IEnumerable<SaleEventImageModel>> GetByLastUpdatedDateTimeRangeAsync(DateTime start, DateTime end, int? maxGetCount)
+            => await GetByDateTimeAsync("sale_event_image_last_updated_date", EQueryTimeType.DATE_TIME_RANGE, (start, end), maxGetCount);
 
-        public async Task<IEnumerable<SaleEventImageModel>> GetByLastUpdatedMonthAndYearAsync(int month, int year)
-            => await GetByDateTimeAsync("sale_event_image_last_updated_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+        public async Task<IEnumerable<SaleEventImageModel>> GetByLastUpdatedMonthAndYearAsync(int month, int year, int? maxGetCount)
+            => await GetByDateTimeAsync("sale_event_image_last_updated_date", EQueryTimeType.MONTH_AND_YEAR, (year, month), maxGetCount);
 
-        public async Task<IEnumerable<SaleEventImageModel>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType) where TCompareType : Enum
+        public async Task<IEnumerable<SaleEventImageModel>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("sale_event_image_last_updated_date", EQueryTimeType.YEAR, ct, year);
+                return await GetByDateTimeAsync("sale_event_image_last_updated_date", EQueryTimeType.YEAR, ct, year, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
         // ----------- SaleEventId -----------
-        public async Task<IEnumerable<SaleEventImageModel>> GetBySaleEventIdAsync(uint saleEventId)
-            => await GetByInputAsync(saleEventId.ToString(), "sale_event_id");
+        public async Task<IEnumerable<SaleEventImageModel>> GetBySaleEventIdAsync(uint saleEventId, int? maxGetCount)
+            => await GetByInputAsync(saleEventId.ToString(), "sale_event_id", maxGetCount);
     }
 }

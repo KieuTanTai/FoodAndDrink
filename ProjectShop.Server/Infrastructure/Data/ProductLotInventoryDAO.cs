@@ -31,49 +31,64 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"SELECT * FROM {TableName} WHERE {ColumnIdName} = @ProductLotId AND {SecondColumnIdName} = @InventoryId;";
         }
 
-        public async Task<IEnumerable<ProductLotInventoryModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<ProductLotInventoryModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("product_lot_inventory_added_date", EQueryTimeType.DATE_TIME, ct, dateTime);
+                return await GetByDateTimeAsync("product_lot_inventory_added_date", EQueryTimeType.DATE_TIME, ct, dateTime, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<IEnumerable<ProductLotInventoryModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate) => await GetByDateTimeAsync("product_lot_inventory_added_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate));
+        public async Task<IEnumerable<ProductLotInventoryModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+            => await GetByDateTimeAsync("product_lot_inventory_added_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate), maxGetCount);
 
-        public async Task<IEnumerable<ProductLotInventoryModel>> GetByMonthAndYearAsync(int year, int month) => await GetByDateTimeAsync("product_lot_inventory_added_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+        public async Task<IEnumerable<ProductLotInventoryModel>> GetByMonthAndYearAsync(int year, int month, int? maxGetCount)
+            => await GetByDateTimeAsync("product_lot_inventory_added_date", EQueryTimeType.MONTH_AND_YEAR, (year, month), maxGetCount);
 
-        public async Task<IEnumerable<ProductLotInventoryModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<ProductLotInventoryModel>> GetByYearAsync<TEnum>(int year, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("product_lot_inventory_added_date", EQueryTimeType.YEAR, ct, year);
+                return await GetByDateTimeAsync("product_lot_inventory_added_date", EQueryTimeType.YEAR, ct, year, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
         // ----------- InventoryId -----------
-        public async Task<IEnumerable<ProductLotInventoryModel>> GetByInventoryIdAsync(uint inventoryId) => await GetByInputAsync(inventoryId.ToString(), "inventory_id");
+        public async Task<IEnumerable<ProductLotInventoryModel>> GetByInventoryIdAsync(uint inventoryId, int? maxGetCount)
+            => await GetByInputAsync(inventoryId.ToString(), "inventory_id", maxGetCount);
 
         // ----------- InventoryQuantity -----------
-        public async Task<IEnumerable<ProductLotInventoryModel>> GetByInventoryQuantityAsync<TCompareType>(int quantity, TCompareType compareType) where TCompareType : Enum
+        public async Task<IEnumerable<ProductLotInventoryModel>> GetByInventoryQuantityAsync<TCompareType>(int quantity, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDecimalAsync(quantity, ct, "product_lot_inventory_quantity");
+                return await GetByDecimalAsync(quantity, ct, "product_lot_inventory_quantity", maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
         // ----------- ProductLotId -----------
-        public async Task<IEnumerable<ProductLotInventoryModel>> GetByProductLotIdAsync(uint productLotId) => await GetByInputAsync(productLotId.ToString(), "product_lot_id");
+        public async Task<IEnumerable<ProductLotInventoryModel>> GetByProductLotIdAsync(uint productLotId, int? maxGetCount)
+            => await GetByInputAsync(productLotId.ToString(), "product_lot_id", maxGetCount);
 
         // ----------- Keys -----------
-        public async Task<ProductLotInventoryModel> GetByKeysAsync(ProductLotInventoryKey keys) => await GetSingleByTwoIdAsync(ColumnIdName, SecondColumnIdName, keys.ProductLotId, keys.InventoryId);
+        public async Task<ProductLotInventoryModel> GetByKeysAsync(ProductLotInventoryKey keys)
+            => await GetSingleByTwoIdAsync(ColumnIdName, SecondColumnIdName, keys.ProductLotId, keys.InventoryId);
 
         // ----------- ListKeys (giữ nguyên) -----------
-        public async Task<IEnumerable<ProductLotInventoryModel>> GetByListKeysAsync(IEnumerable<ProductLotInventoryKey> keys)
+        public async Task<IEnumerable<ProductLotInventoryModel>> GetByListKeysAsync(IEnumerable<ProductLotInventoryKey> keys, int? maxGetCount)
         {
+            string query = "";
+            if (maxGetCount.HasValue && maxGetCount.Value <= 0)
+                throw new ArgumentOutOfRangeException("maxGetCount must be greater than 0.");
+            else if (maxGetCount.HasValue && maxGetCount.Value > 0)
+                query = $"{GetSelectByKeysQuery()} LIMIT @MaxGetCount";
+            else
+                query = GetSelectByKeysQuery();
+
             try
             {
-                string query = GetSelectByKeysQuery();
+                DynamicParameters parameters = new DynamicParameters();
+                parameters.AddDynamicParams(keys);
+                parameters.Add("MaxGetCount", maxGetCount);
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                IEnumerable<ProductLotInventoryModel> results = await connection.QueryAsync<ProductLotInventoryModel>(query, keys);
+                IEnumerable<ProductLotInventoryModel> results = await connection.QueryAsync<ProductLotInventoryModel>(query, parameters);
                 return results;
             }
             catch (Exception ex)

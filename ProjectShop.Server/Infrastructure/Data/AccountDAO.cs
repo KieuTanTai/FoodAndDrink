@@ -54,52 +54,52 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<AccountModel?> GetByUserNameAsync(string userName) => await GetSingleDataAsync(userName, "user_name");
 
-        public async Task<IEnumerable<AccountModel>> GetByUserNameAsync(IEnumerable<string> userNames) => await GetByInputsAsync(userNames, "user_name");
-        
-        
+        public async Task<IEnumerable<AccountModel>> GetByUserNameAsync(IEnumerable<string> userNames, int? maxGetCount) 
+            => await GetByInputsAsync(userNames, "user_name", maxGetCount);
+
         public async Task<IEnumerable<AccountModel>> GetByStatusAsync(bool status, int? maxGetCount)
             => await GetByInputAsync(GetTinyIntString(status), "account_status", maxGetCount);
 
         // ---- Public API cho Created Date ----
-        public async Task<IEnumerable<AccountModel>> GetByCreatedDateAsync(int year, int month)
-            => await GetByDateTimeAsync("account_created_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month));
+        public async Task<IEnumerable<AccountModel>> GetByCreatedDateAsync(int year, int month, int? maxGetCount)
+            => await GetByDateTimeAsync("account_created_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month), maxGetCount);
 
-        public async Task<IEnumerable<AccountModel>> GetByCreatedDateAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<AccountModel>> GetByCreatedDateAsync<TEnum>(int year, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type provided.");
-            return await GetByDateTimeAsync("account_created_date", EQueryTimeType.YEAR, type, year);
+            return await GetByDateTimeAsync("account_created_date", EQueryTimeType.YEAR, type, year, maxGetCount);
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByCreatedDateAsync(DateTime startDate, DateTime endDate)
-            => await GetByDateTimeAsync("account_created_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate));
+        public async Task<IEnumerable<AccountModel>> GetByCreatedDateAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+            => await GetByDateTimeAsync("account_created_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate), maxGetCount);
 
-        public async Task<IEnumerable<AccountModel>> GetByCreatedDateAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<AccountModel>> GetByCreatedDateAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type provided.");
-            return await GetByDateTimeAsync("account_created_date", EQueryTimeType.DATE_TIME, type, dateTime);
+            return await GetByDateTimeAsync("account_created_date", EQueryTimeType.DATE_TIME, type, dateTime, maxGetCount);
         }
 
         // ---- Public API cho Last Updated Date ----
-        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateAsync(int year, int month)
-            => await GetByDateTimeAsync("account_last_updated_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month));
+        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateAsync(int year, int month, int? maxGetCount)
+            => await GetByDateTimeAsync("account_last_updated_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month), maxGetCount);
 
-        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateAsync<TEnum>(int year, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type provided.");
-            return await GetByDateTimeAsync("account_last_updated_date", EQueryTimeType.YEAR, type, year);
+            return await GetByDateTimeAsync("account_last_updated_date", EQueryTimeType.YEAR, type, year, maxGetCount);
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateAsync(DateTime startDate, DateTime endDate)
-            => await GetByDateTimeAsync("account_last_updated_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate));
+        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+            => await GetByDateTimeAsync("account_last_updated_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate), maxGetCount);
 
-        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type provided.");
-            return await GetByDateTimeAsync("account_last_updated_date", EQueryTimeType.DATE_TIME, type, dateTime);
+            return await GetByDateTimeAsync("account_last_updated_date", EQueryTimeType.DATE_TIME, type, dateTime, maxGetCount);
         }
     }
 }

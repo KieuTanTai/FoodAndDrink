@@ -39,7 +39,7 @@ namespace ProjectShop.Server.Application.Services.Roles
         {
             try
             {
-                if (!await DoAllKeysExistAsync(Listkeys, _roleOfUserDAO.Ar))
+                if (!await DoAllKeysExistAsync(Listkeys, _roleOfUserDAO.GetByListKeysAsync))
                     throw new KeyNotFoundException("One or more specified account roles do not exist.");
                 // Delete the roles
                 int result = await _roleOfUserDAO.DeleteByListKeysAsync(Listkeys);
@@ -65,12 +65,12 @@ namespace ProjectShop.Server.Application.Services.Roles
 
         //DRY:
 
-        private async Task<int> DeleteByIdGenericAsync(uint input, Func<uint, Task<IEnumerable<RolesOfUserModel>>> searchFunc, Func<uint, Task<int>> deleteFunc)
+        private async Task<int> DeleteByIdGenericAsync(uint input, Func<uint, int?, Task<IEnumerable<RolesOfUserModel>>> searchFunc, Func<uint, Task<int>> deleteFunc)
         {
             try
             {
                 // Check if the role exists
-                var existingRoles = await searchFunc(input);
+                var existingRoles = await searchFunc(input, null);
                 if (!existingRoles.Any())
                     throw new KeyNotFoundException("The specified account role does not exist.");
                 // Delete the role
@@ -84,12 +84,12 @@ namespace ProjectShop.Server.Application.Services.Roles
             }
         }
 
-        private async Task<int> DeleteByIdsGenericAsync(IEnumerable<uint> inputs, Func<IEnumerable<uint>, Task<IEnumerable<RolesOfUserModel>>> searchFunc, Func<IEnumerable<uint>, Task<int>> deleteFunc)
+        private async Task<int> DeleteByIdsGenericAsync(IEnumerable<uint> inputs, Func<IEnumerable<uint>, int?, Task<IEnumerable<RolesOfUserModel>>> searchFunc, Func<IEnumerable<uint>, Task<int>> deleteFunc)
         {
             try
             {
                 // Check if all roles exist
-                var existingRoles = await searchFunc(inputs);
+                var existingRoles = await searchFunc(inputs, null);
                 if (!existingRoles.Any())
                     throw new KeyNotFoundException("One or more specified account roles do not exist.");
                 // Delete the roles

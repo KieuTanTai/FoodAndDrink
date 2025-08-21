@@ -60,11 +60,11 @@ namespace ProjectShop.Server.Application.Services.Account
             }
         }
 
-        private async Task<int> UpdateAccountPasswordAsync(IEnumerable<string> inputs, IEnumerable<string> newPasswords, Func<IEnumerable<string>, Task<IEnumerable<AccountModel>>> daoFunc)
+        private async Task<int> UpdateAccountPasswordAsync(IEnumerable<string> inputs, IEnumerable<string> newPasswords, Func<IEnumerable<string>, int?, Task<IEnumerable<AccountModel>>> daoFunc)
         {
             try
             {
-                IEnumerable<AccountModel> accounts = await daoFunc(inputs);
+                IEnumerable<AccountModel> accounts = await daoFunc(inputs, null);
                 using (var enumerator = accounts.GetEnumerator())
                 {
                     foreach (string newPassword in newPasswords)
@@ -103,11 +103,11 @@ namespace ProjectShop.Server.Application.Services.Account
             }
         }
 
-        private async Task<int> UpdateAccountStatusAsync(IEnumerable<string> inputs, bool status, Func<IEnumerable<string>, Task<IEnumerable<AccountModel>>> daoFunc)
+        private async Task<int> UpdateAccountStatusAsync(IEnumerable<string> inputs, bool status, Func<IEnumerable<string>, int?, Task<IEnumerable<AccountModel>>> daoFunc)
         {
             try
             {
-                IEnumerable<AccountModel> accounts = await daoFunc(inputs);
+                IEnumerable<AccountModel> accounts = await daoFunc(inputs, null);
                 foreach (AccountModel account in accounts)
                     account.AccountStatus = status;
                 int affectedRows = await _baseDAO.UpdateAsync(accounts);

@@ -14,7 +14,7 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'bank_id' (INT UNSIGNED)
         public uint? BankId { get; set; }
 
-        // Corresponds to 'account_id' (INT UNSIGNED)
+        // Corresponds to 'customer_id' (INT UNSIGNED)
         public uint CustomerId { get; set; }
 
         // Corresponds to 'payment_method_added_date' (DATETIME)

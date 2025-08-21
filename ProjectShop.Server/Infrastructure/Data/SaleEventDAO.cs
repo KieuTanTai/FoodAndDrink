@@ -36,79 +36,80 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<SaleEventModel?> GetByDiscountCodeAsync(string discountCode)
             => await GetSingleDataAsync(discountCode, "sale_event_discount_code");
 
-        public async Task<IEnumerable<SaleEventModel>> GetByEndDateMonthAndYearAsync(int month, int year)
-            => await GetByDateTimeAsync("sale_event_end_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+        public async Task<IEnumerable<SaleEventModel>> GetByEndDateMonthAndYearAsync(int month, int year, int? maxGetCount)
+            => await GetByDateTimeAsync("sale_event_end_date", EQueryTimeType.MONTH_AND_YEAR, (year, month), maxGetCount);
 
-        public async Task<IEnumerable<SaleEventModel>> GetByEndDateRangeAsync(DateTime startDate, DateTime endDate)
-            => await GetByDateTimeAsync("sale_event_end_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate));
+        public async Task<IEnumerable<SaleEventModel>> GetByEndDateRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+            => await GetByDateTimeAsync("sale_event_end_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate), maxGetCount);
 
-        public async Task<IEnumerable<SaleEventModel>> GetByEndDateAsync<TCompareType>(DateTime endDate, TCompareType compareType) where TCompareType : Enum
+        public async Task<IEnumerable<SaleEventModel>> GetByEndDateAsync<TCompareType>(DateTime endDate, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("sale_event_end_date", EQueryTimeType.DATE_TIME, ct, endDate);
+                return await GetByDateTimeAsync("sale_event_end_date", EQueryTimeType.DATE_TIME, ct, endDate, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<IEnumerable<SaleEventModel>> GetByEndDateYearAsync<TCompareType>(int year, TCompareType compareType) where TCompareType : Enum
+        public async Task<IEnumerable<SaleEventModel>> GetByEndDateYearAsync<TCompareType>(int year, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("sale_event_end_date", EQueryTimeType.YEAR, ct, year);
+                return await GetByDateTimeAsync("sale_event_end_date", EQueryTimeType.YEAR, ct, year, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
-
-        public async Task<IEnumerable<SaleEventModel>> GetByLikeStringAsync(string input)
-            => await GetByLikeStringAsync(input, "sale_event_name");
-
-        public async Task<IEnumerable<SaleEventModel>> GetByLikeStringAsync(string input, int maxGetCount)
+        public async Task<IEnumerable<SaleEventModel>> GetByLikeStringAsync(string input, int? maxGetCount)
             => await GetByLikeStringAsync(input, "sale_event_name", maxGetCount);
 
         public async Task<SaleEventModel?> GetByNameAsync(string name)
             => await GetSingleDataAsync(name, "sale_event_name");
 
-        public async Task<IEnumerable<SaleEventModel>> GetByRelativeDiscountCodeAsync(string discountCode)
-            => await GetByLikeStringAsync(discountCode, "sale_event_discount_code");
+        public async Task<IEnumerable<SaleEventModel>> GetByRelativeDiscountCodeAsync(string discountCode, int? maxGetCount)
+            => await GetByLikeStringAsync(discountCode, "sale_event_discount_code", maxGetCount);
 
-        public async Task<IEnumerable<SaleEventModel>> GetByStartAndEndDateRangeAsync(DateTime startDate, DateTime endDate)
-            => await GetByStartAndEndDateRangeCustomAsync(startDate, endDate); // Method riêng cho logic này
+        public async Task<IEnumerable<SaleEventModel>> GetByStartAndEndDateRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+            => await GetByStartAndEndDateRangeCustomAsync(startDate, endDate, maxGetCount); // Method riêng cho logic này
 
-        public async Task<IEnumerable<SaleEventModel>> GetByStartDateAsync<TCompareType>(DateTime startDate, TCompareType compareType) where TCompareType : Enum
+        public async Task<IEnumerable<SaleEventModel>> GetByStartDateAsync<TCompareType>(DateTime startDate, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("sale_event_start_date", EQueryTimeType.DATE_TIME, ct, startDate);
+                return await GetByDateTimeAsync("sale_event_start_date", EQueryTimeType.DATE_TIME, ct, startDate, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<IEnumerable<SaleEventModel>> GetByStartDateMonthAndYearAsync(int month, int year)
-            => await GetByDateTimeAsync("sale_event_start_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+        public async Task<IEnumerable<SaleEventModel>> GetByStartDateMonthAndYearAsync(int month, int year, int? maxGetCount)
+            => await GetByDateTimeAsync("sale_event_start_date", EQueryTimeType.MONTH_AND_YEAR, (year, month), maxGetCount);
 
-        public async Task<IEnumerable<SaleEventModel>> GetByStartDateRangeAsync(DateTime startDate, DateTime endDate)
-            => await GetByDateTimeAsync("sale_event_start_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate));
+        public async Task<IEnumerable<SaleEventModel>> GetByStartDateRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+            => await GetByDateTimeAsync("sale_event_start_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate), maxGetCount);
 
-        public async Task<IEnumerable<SaleEventModel>> GetByStartDateYearAsync<TCompareType>(int year, TCompareType compareType) where TCompareType : Enum
+        public async Task<IEnumerable<SaleEventModel>> GetByStartDateYearAsync<TCompareType>(int year, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("sale_event_start_date", EQueryTimeType.YEAR, ct, year);
+                return await GetByDateTimeAsync("sale_event_start_date", EQueryTimeType.YEAR, ct, year, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<IEnumerable<SaleEventModel>> GetByStatusAsync(bool status)
-            => await GetByInputAsync(GetTinyIntString(status), "sale_event_status");
-
-        public async Task<IEnumerable<SaleEventModel>> GetByStatusAsync(bool status, int maxGetCount)
+        public async Task<IEnumerable<SaleEventModel>> GetByStatusAsync(bool status, int? maxGetCount)
             => await GetByInputAsync(GetTinyIntString(status), "sale_event_status", maxGetCount);
 
-        public async Task<IEnumerable<SaleEventModel>> GetByTextAsync(string text)
-            => await GetByLikeStringAsync(text, "sale_event_name");
+        public async Task<IEnumerable<SaleEventModel>> GetByTextAsync(string text, int? maxGetCount)
+            => await GetByLikeStringAsync(text, "sale_event_name", maxGetCount);
 
         // Method riêng cho logic lấy theo cả start và end date range
-        private async Task<IEnumerable<SaleEventModel>> GetByStartAndEndDateRangeCustomAsync(DateTime startDate, DateTime endDate)
+        private async Task<IEnumerable<SaleEventModel>> GetByStartAndEndDateRangeCustomAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
         {
+            string query = $@"";
+            if (maxGetCount.HasValue && maxGetCount.Value <= 0)
+                throw new ArgumentOutOfRangeException(nameof(maxGetCount), "maxGetCount must be greater than 0.");
+            else if (maxGetCount.HasValue && maxGetCount.Value > 0)
+                query = $@"
+                    SELECT * FROM {TableName}
+                    WHERE sale_event_start_date >= @StartDate AND sale_event_end_date <= @EndDate
+                    LIMIT @MaxGetCount;";
+            else
+                query = $" SELECT * FROM {TableName} WHERE sale_event_start_date >= @StartDate AND sale_event_end_date <= DATE_ADD(@EndDate, INTERVAL 1 DAY)";
             try
             {
-                string query = $@" SELECT * FROM {TableName}
-                    WHERE sale_event_start_date >= @StartDate AND sale_event_end_date <= DATE_ADD(@EndDate, INTERVAL 1 DAY)";
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                IEnumerable<SaleEventModel> result = await connection.QueryAsync<SaleEventModel>(query, new { StartDate = startDate, EndDate = endDate });
+                IEnumerable<SaleEventModel> result = await connection.QueryAsync<SaleEventModel>(query, new { StartDate = startDate, EndDate = endDate, MaxGetCount = maxGetCount});
                 if (result == null || !result.Any())
                     throw new Exception("No SaleEvents found for the given date range.");
                 return result;

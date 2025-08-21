@@ -45,11 +45,11 @@ namespace ProjectShop.Server.Application.Services.Roles
             }
         }
 
-        private async Task<int> UpdateRoleNamesAsync(IEnumerable<string> inputs, IEnumerable<string> newNames, Func<IEnumerable<string>, Task<IEnumerable<RoleModel>>> daoFunc)
+        private async Task<int> UpdateRoleNamesAsync(IEnumerable<string> inputs, IEnumerable<string> newNames, Func<IEnumerable<string>, int?, Task<IEnumerable<RoleModel>>> daoFunc)
         {
             try
             {
-                var roles = await daoFunc(inputs);
+                var roles = await daoFunc(inputs, null);
                 if (roles == null || !roles.Any())
                     throw new InvalidOperationException($"No roles found for inputs: {string.Join(", ", inputs)}.");
                 int index = 0;
@@ -86,11 +86,11 @@ namespace ProjectShop.Server.Application.Services.Roles
             }
         }
 
-        private async Task<int> UpdateRoleStatusAsync(IEnumerable<string> inputs, bool status, Func<IEnumerable<string>, Task<IEnumerable<RoleModel>>> daoFunc)
+        private async Task<int> UpdateRoleStatusAsync(IEnumerable<string> inputs, bool status, Func<IEnumerable<string>, int?, Task<IEnumerable<RoleModel>>> daoFunc)
         {
             try
             {
-                var roles = await daoFunc(inputs);
+                var roles = await daoFunc(inputs, null);
                 if (roles == null || !roles.Any())
                     throw new InvalidOperationException($"No roles found for inputs: {string.Join(", ", inputs)}.");
 

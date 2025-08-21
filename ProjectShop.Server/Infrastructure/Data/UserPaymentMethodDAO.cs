@@ -37,33 +37,33 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName};";
         }
 
-        public async Task<IEnumerable<UserPaymentMethodModel>> GetAllByEnumAsync<TEnum>(TEnum tEnum) where TEnum : Enum
-            => await GetByInputAsync(tEnum.ToString(), "payment_method_type");
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetAllByEnumAsync<TEnum>(TEnum tEnum, int? maxGetCount) where TEnum : Enum
+            => await GetByInputAsync(tEnum.ToString(), "payment_method_type", maxGetCount);
 
-        public async Task<IEnumerable<UserPaymentMethodModel>> GetAllByLastFourDigitAsync(string lastFourDigit)
-            => await GetByInputAsync(lastFourDigit, "payment_method_last_four_digit");
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetAllByLastFourDigitAsync(string lastFourDigit, int? maxGetCount)
+            => await GetByInputAsync(lastFourDigit, "payment_method_last_four_digit", maxGetCount);
 
-        public async Task<IEnumerable<UserPaymentMethodModel>> GetByBankIdAsync(uint bankId)
-            => await GetByInputAsync(bankId.ToString(), "bank_id");
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetByBankIdAsync(uint bankId, int? maxGetCount)
+            => await GetByInputAsync(bankId.ToString(), "bank_id", maxGetCount);
 
-        public async Task<IEnumerable<UserPaymentMethodModel>> GetByBankIdsAsync(IEnumerable<uint> bankIds)
-            => await GetByInputsAsync(bankIds.Select(bankId => bankId.ToString()), "bank_id");
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetByBankIdsAsync(IEnumerable<uint> bankIds, int? maxGetCount)
+            => await GetByInputsAsync(bankIds.Select(bankId => bankId.ToString()), "bank_id", maxGetCount);
 
-        public async Task<IEnumerable<UserPaymentMethodModel>> GetByCustomerIdAsync(uint customerId)
-            => await GetByInputAsync(customerId.ToString(), "customer_id");
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetByCustomerIdAsync(uint customerId, int? maxGetCount)
+            => await GetByInputAsync(customerId.ToString(), "customer_id", maxGetCount);
 
-        public async Task<IEnumerable<UserPaymentMethodModel>> GetByCustomerIdsAsync(IEnumerable<uint> customerIds)
-            => await GetByInputsAsync(customerIds.Select(customerId => customerId.ToString()), "customer_id");
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetByCustomerIdsAsync(IEnumerable<uint> customerIds, int? maxGetCount)
+            => await GetByInputsAsync(customerIds.Select(customerId => customerId.ToString()), "customer_id", maxGetCount);
 
-        public async Task<IEnumerable<UserPaymentMethodModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("payment_method_added_date", EQueryTimeType.DATE_TIME, ct, dateTime);
+                return await GetByDateTimeAsync("payment_method_added_date", EQueryTimeType.DATE_TIME, ct, dateTime, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<IEnumerable<UserPaymentMethodModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate)
-            => await GetByDateTimeAsync("payment_method_added_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate));
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+            => await GetByDateTimeAsync("payment_method_added_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate), maxGetCount);
 
         public async Task<UserPaymentMethodModel?> GetByDisplayNameAsync(string displayName)
             => await GetSingleDataAsync(displayName, "payment_method_display_name");
@@ -71,22 +71,31 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<UserPaymentMethodModel?> GetByEnumAsync<TEnum>(TEnum tEnum) where TEnum : Enum
             => await GetSingleDataAsync(tEnum.ToString(), "payment_method_type");
 
-        public async Task<IEnumerable<UserPaymentMethodModel>> GetByExpiryMonthAsync<TCompareType>(int month, TCompareType compareType) where TCompareType : Enum
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetByExpiryMonthAsync<TCompareType>(int month, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDecimalAsync(month, ct, "payment_method_expiry_month");
+                return await GetByDecimalAsync(month, ct, "payment_method_expiry_month", maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<IEnumerable<UserPaymentMethodModel>> GetByExpiryYearAndMonthAsync(int year, int month)
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetByExpiryYearAndMonthAsync(int year, int month, int? maxGetCount)
         {
+            string query = $@"";
+            if (maxGetCount.HasValue && maxGetCount.Value <= 0)
+                throw new ArgumentOutOfRangeException(nameof(maxGetCount), "Max get count must be greater than zero.");
+            else if (maxGetCount.HasValue && maxGetCount.Value > 0)
+                query = $@"SELECT * FROM {TableName} 
+                           WHERE payment_method_expiry_year = @Year AND payment_method_expiry_month = @Month 
+                           LIMIT @MaxGetCount";
+            else
+                query = $@"
+                    SELECT * FROM {TableName}
+                    WHERE payment_method_expiry_year = @Year AND payment_method_expiry_month = @Month";
+
             try
             {
-                string query = $@"
-                    SELECT * FROM {TableName}
-                    WHERE payment_method_expiry_year = @Year AND payment_method_expiry_month = @Month;";
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                IEnumerable<UserPaymentMethodModel> results = await connection.QueryAsync<UserPaymentMethodModel>(query, new { Year = year, Month = month });
+                IEnumerable<UserPaymentMethodModel> results = await connection.QueryAsync<UserPaymentMethodModel>(query, new { Year = year, Month = month, MaxGetCount = maxGetCount});
                 if (results == null || !results.Any())
                     return Enumerable.Empty<UserPaymentMethodModel>();
                 return results;
@@ -97,35 +106,32 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<IEnumerable<UserPaymentMethodModel>> GetByExpiryYearAsync<TCompareType>(int year, TCompareType compareType) where TCompareType : Enum
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetByExpiryYearAsync<TCompareType>(int year, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("payment_method_expiry_year", EQueryTimeType.YEAR, ct, year);
+                return await GetByDateTimeAsync("payment_method_expiry_year", EQueryTimeType.YEAR, ct, year, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
         public async Task<UserPaymentMethodModel?> GetByLastFourDigitAsync(string lastFourDigit)
             => await GetSingleDataAsync(lastFourDigit, "payment_method_last_four_digit");
 
-        public async Task<IEnumerable<UserPaymentMethodModel>> GetByMonthAndYearAsync(int year, int month)
-            => await GetByDateTimeAsync("payment_method_added_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetByMonthAndYearAsync(int year, int month, int? maxGetCount)
+            => await GetByDateTimeAsync("payment_method_added_date", EQueryTimeType.MONTH_AND_YEAR, (year, month), maxGetCount);
 
-        public async Task<IEnumerable<UserPaymentMethodModel>> GetByRelativeDisplayNameAsync(string displayName)
-            => await GetByLikeStringAsync(displayName, "payment_method_display_name");
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetByRelativeDisplayNameAsync(string displayName, int? maxGetCount)
+            => await GetByLikeStringAsync(displayName, "payment_method_display_name", maxGetCount);
 
-        public async Task<IEnumerable<UserPaymentMethodModel>> GetByStatusAsync(bool status)
-            => await GetByInputAsync(GetTinyIntString(status), "payment_method_status");
-
-        public async Task<IEnumerable<UserPaymentMethodModel>> GetByStatusAsync(bool status, int maxGetCount)
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetByStatusAsync(bool status, int? maxGetCount)
             => await GetByInputAsync(GetTinyIntString(status), "payment_method_status", maxGetCount);
 
         public async Task<UserPaymentMethodModel?> GetByTokenAsync(string token)
             => await GetSingleDataAsync(token, "TokenColumnName");
 
-        public async Task<IEnumerable<UserPaymentMethodModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetByYearAsync<TEnum>(int year, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("payment_method_added_date", EQueryTimeType.YEAR, ct, year);
+                return await GetByDateTimeAsync("payment_method_added_date", EQueryTimeType.YEAR, ct, year, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
     }

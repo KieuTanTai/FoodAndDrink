@@ -32,63 +32,58 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        public async Task<IEnumerable<RoleModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<RoleModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("role_created_date", EQueryTimeType.DATE_TIME, ct, dateTime);
+                return await GetByDateTimeAsync("role_created_date", EQueryTimeType.DATE_TIME, ct, dateTime, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<IEnumerable<RoleModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate)
-            => await GetByDateTimeAsync("role_created_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate));
+        public async Task<IEnumerable<RoleModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+            => await GetByDateTimeAsync("role_created_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate), maxGetCount);
 
-        public async Task<IEnumerable<RoleModel>> GetByMonthAndYearAsync(int year, int month)
-            => await GetByDateTimeAsync("role_created_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+        public async Task<IEnumerable<RoleModel>> GetByMonthAndYearAsync(int year, int month, int? maxGetCount)
+            => await GetByDateTimeAsync("role_created_date", EQueryTimeType.MONTH_AND_YEAR, (year, month), maxGetCount);
 
-        public async Task<IEnumerable<RoleModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<RoleModel>> GetByYearAsync<TEnum>(int year, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("role_created_date", EQueryTimeType.YEAR, ct, year);
+                return await GetByDateTimeAsync("role_created_date", EQueryTimeType.YEAR, ct, year, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
         // ----------- LastUpdatedDate -----------
-        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedDateAsync<TCompareType>(DateTime dateTime, TCompareType compareType) where TCompareType : Enum
+        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedDateAsync<TCompareType>(DateTime dateTime, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("role_last_updated_date", EQueryTimeType.DATE_TIME, ct, dateTime);
+                return await GetByDateTimeAsync("role_last_updated_date", EQueryTimeType.DATE_TIME, ct, dateTime, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedDateTimeRangeAsync(DateTime startDate, DateTime endDate)
-            => await GetByDateTimeAsync("role_last_updated_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate));
+        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+            => await GetByDateTimeAsync("role_last_updated_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate), maxGetCount);
 
-        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedMonthAndYearAsync(int month, int year)
-            => await GetByDateTimeAsync("role_last_updated_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedMonthAndYearAsync(int month, int year, int? maxGetCount)
+            => await GetByDateTimeAsync("role_last_updated_date", EQueryTimeType.MONTH_AND_YEAR, (year, month), maxGetCount);
 
-        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType) where TCompareType : Enum
+        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("role_last_updated_date", EQueryTimeType.YEAR, ct, year);
+                return await GetByDateTimeAsync("role_last_updated_date", EQueryTimeType.YEAR, ct, year, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
         // ----------- LIKE String -----------
-        public async Task<IEnumerable<RoleModel>> GetByLikeStringAsync(string input)
-            => await GetByLikeStringAsync(input, "role_name");
-
-        public async Task<IEnumerable<RoleModel>> GetByLikeStringAsync(string input, int maxGetCount)
+        public async Task<IEnumerable<RoleModel>> GetByLikeStringAsync(string input, int? maxGetCount)
             => await GetByLikeStringAsync(input, "role_name", maxGetCount);
         public async Task<RoleModel?> GetByRoleNameAsync(string roleName) 
             => await GetSingleDataAsync(roleName, "role_name");
 
-        public async Task<IEnumerable<RoleModel>> GetByRoleNamesAsync(IEnumerable<string> roleNames)
-            => await GetByInputsAsync(roleNames, "role_name");
+        public async Task<IEnumerable<RoleModel>> GetByRoleNamesAsync(IEnumerable<string> roleNames, int? maxGetCount)
+            => await GetByInputsAsync(roleNames, "role_name", maxGetCount);
         // ----------- Status -----------
-        public async Task<IEnumerable<RoleModel>> GetByStatusAsync(bool status)
-            => await GetByInputAsync(GetTinyIntString(status), "role_status");
 
-        public async Task<IEnumerable<RoleModel>> GetByStatusAsync(bool status, int maxGetCount)
+        public async Task<IEnumerable<RoleModel>> GetByStatusAsync(bool status, int? maxGetCount)
             => await GetByInputAsync(GetTinyIntString(status), "role_status", maxGetCount);
     }
 }

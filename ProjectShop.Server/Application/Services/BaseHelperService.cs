@@ -13,6 +13,7 @@ namespace TLGames.Application.Services
         protected readonly IColumnService colService = GetProviderService.SystemServices.GetRequiredService<IColumnService>();
         protected readonly IStringConverter converter = GetProviderService.SystemServices.GetRequiredService<IStringConverter>();
         protected readonly IClock clock = GetProviderService.SystemServices.GetRequiredService<IClock>();
+        protected readonly IMaxGetRecord maxGetRecord = GetProviderService.SystemServices.GetRequiredService<IMaxGetRecord>();
         protected async Task<bool> IsExistObject(string input, Func<string, Task<TEntity?>> daoFunc)
         {
             try
@@ -82,13 +83,13 @@ namespace TLGames.Application.Services
             }
         }
 
-        protected async Task<bool> DoAllKeysExistAsync<TKey>(IEnumerable<TKey> keys, Func<IEnumerable<TKey>, Task<IEnumerable<TEntity>>> daoFunc) where TKey : struct
+        protected async Task<bool> DoAllKeysExistAsync<TKey>(IEnumerable<TKey> keys, Func<IEnumerable<TKey>, int?, Task<IEnumerable<TEntity>>> daoFunc) where TKey : struct
         {
             if (keys == null || !keys.Any())
                 return false;
             try
             {
-                IEnumerable<TEntity> existingObjects = await daoFunc(keys);
+                IEnumerable<TEntity> existingObjects = await daoFunc(keys, null);
                 return existingObjects.Count() == keys.Count();
             }
             catch (Exception)
@@ -127,13 +128,13 @@ namespace TLGames.Application.Services
             }
         }
 
-        protected async Task<bool> DoNoneOfKeysExistAsync<TKey>(IEnumerable<TKey> keys, Func<IEnumerable<TKey>, Task<IEnumerable<TEntity>>> daoFunc) where TKey : struct
+        protected async Task<bool> DoNoneOfKeysExistAsync<TKey>(IEnumerable<TKey> keys, Func<IEnumerable<TKey>, int?, Task<IEnumerable<TEntity>>> daoFunc) where TKey : struct
         {
             if (keys == null || !keys.Any())
                 return false;
             try
             {
-                IEnumerable<TEntity> existingObjects = await daoFunc(keys);
+                IEnumerable<TEntity> existingObjects = await daoFunc(keys, null);
                 return !existingObjects.Any();
             }
             catch (Exception)
@@ -142,17 +143,24 @@ namespace TLGames.Application.Services
             }
         }
 
+        protected int? GetValidMaxRecord(int? maxGetCount)
+        {
+            if (maxGetCount.HasValue && maxGetCount.Value <= 0)
+                return 200;
+            return maxGetCount > maxGetRecord.MaxGetRecord ? maxGetRecord.MaxGetRecord : maxGetCount;
+        }
+
         // NOTE: This method filters valid entities based on a field selector and a DAO function.
         protected async Task<Dictionary<uint, BatchObjectResult<TEntity>>> FilterValidEntities(
             IEnumerable<TEntity> entities,
             Func<TEntity, string> fieldSelector,
-            Func<IEnumerable<string>, Task<IEnumerable<TEntity>>> daoFunc)
+            Func<IEnumerable<string>, int?, Task<IEnumerable<TEntity>>> daoFunc)
         {
             try
             {
                 var entityList = entities.ToList();
                 var fieldValues = entityList.Select(fieldSelector).ToList();
-                var existingEntities = (await daoFunc(fieldValues)).ToList();
+                var existingEntities = (await daoFunc(fieldValues, null)).ToList();
 
                 // Tạo HashSet cho hiệu suất so sánh
                 var existingFieldSet = new HashSet<string>(existingEntities.Select(fieldSelector), StringComparer.OrdinalIgnoreCase);
@@ -195,13 +203,13 @@ namespace TLGames.Application.Services
         protected async Task<Dictionary<uint, BatchObjectResult<TEntity>>> FilterValidEntities<TKey>(
             IEnumerable<TEntity> entities,
             Func<TEntity, TKey> fieldSelector,
-            Func<IEnumerable<TKey>, Task<IEnumerable<TEntity>>> daoFunc) where TKey : struct
+            Func<IEnumerable<TKey>, int?, Task<IEnumerable<TEntity>>> daoFunc) where TKey : struct
         {
             try
             {
                 var entityList = entities.ToList();
                 var fieldValues = entityList.Select(fieldSelector).ToList();
-                var existingEntities = (await daoFunc(fieldValues)).ToList();
+                var existingEntities = (await daoFunc(fieldValues, null)).ToList();
                 // Tạo HashSet cho hiệu suất so sánh
                 var existingFieldSet = new HashSet<TKey>(existingEntities.Select(fieldSelector), EqualityComparer<TKey>.Default);
                 // Lọc entity hợp lệ

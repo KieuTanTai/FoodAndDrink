@@ -24,24 +24,27 @@ namespace ProjectShop.Server.Infrastructure.Data
                       VALUES (@InventoryId, @ProductLotCreatedDate); SELECT LAST_INSERT_ID();";
         }
 
-        public async Task<IEnumerable<ProductLotModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<ProductLotModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("product_lot_created_date", EQueryTimeType.DATE_TIME, ct, dateTime);
+                return await GetByDateTimeAsync("product_lot_created_date", EQueryTimeType.DATE_TIME, ct, dateTime, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<IEnumerable<ProductLotModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate) => await GetByDateTimeAsync("product_lot_created_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate));
+        public async Task<IEnumerable<ProductLotModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount) 
+            => await GetByDateTimeAsync("product_lot_created_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate), maxGetCount);
 
-        public async Task<IEnumerable<ProductLotModel>> GetByMonthAndYearAsync(int year, int month) => await GetByDateTimeAsync("product_lot_created_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+        public async Task<IEnumerable<ProductLotModel>> GetByMonthAndYearAsync(int year, int month, int? maxGetCount) 
+            => await GetByDateTimeAsync("product_lot_created_date", EQueryTimeType.MONTH_AND_YEAR, (year, month), maxGetCount);
 
-        public async Task<IEnumerable<ProductLotModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<ProductLotModel>> GetByYearAsync<TEnum>(int year, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("product_lot_created_date", EQueryTimeType.YEAR, ct, year);
+                return await GetByDateTimeAsync("product_lot_created_date", EQueryTimeType.YEAR, ct, year, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<IEnumerable<ProductLotModel>> GetByProductBarcodeAsync(string barcode) => await GetByInputAsync(barcode, "product_barcode");
+        public async Task<IEnumerable<ProductLotModel>> GetByProductBarcodeAsync(string barcode, int? maxGetCount) 
+            => await GetByInputAsync(barcode, "product_barcode", maxGetCount);
     }
 }

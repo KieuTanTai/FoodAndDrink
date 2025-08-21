@@ -51,16 +51,27 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"DELETE FROM {TableName} WHERE {colName} = @Input";
         }
 
+        public async Task<RolesOfUserModel> GetByKeysAsync(RolesOfUserKey keys)
+            => await GetSingleByTwoIdAsync("account_id", "role_id", keys.AccountId, keys.RoleId);
 
-        public async Task<RolesOfUserModel> GetByKeysAsync(RolesOfUserKey keys) => await GetSingleByTwoIdAsync("account_id", "role_id", keys.AccountId, keys.RoleId);
-
-        public async Task<IEnumerable<RolesOfUserModel>> GetByListKeysAsync(IEnumerable<RolesOfUserKey> listKeys)
+        public async Task<IEnumerable<RolesOfUserModel>> GetByListKeysAsync(IEnumerable<RolesOfUserKey> listKeys, int? maxGetCount)
         {
+            string query = "";
+            if (maxGetCount.HasValue && maxGetCount.Value <= 0)
+                throw new ArgumentOutOfRangeException(nameof(maxGetCount), "maxGetCount must be greater than 0");
+            if (maxGetCount.HasValue && maxGetCount.Value > 0)
+                query = $@"{GetByKeysQuery()} LIMIT @MaxGetCount";
+            else
+                query = GetByKeysQuery();
+
             try
             {
-                string query = GetByKeysQuery();
+                DynamicParameters parameters = new DynamicParameters();
+                parameters.AddDynamicParams(listKeys);
+                parameters.Add("MaxGetCount", maxGetCount);
+
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                IEnumerable<RolesOfUserModel> result = await connection.QueryAsync<RolesOfUserModel>(query, listKeys);
+                IEnumerable<RolesOfUserModel> result = await connection.QueryAsync<RolesOfUserModel>(query, parameters);
                 return result.AsList();
             }
             catch (Exception ex)
@@ -86,53 +97,47 @@ namespace ProjectShop.Server.Infrastructure.Data
             }
         }
 
-        public async Task<IEnumerable<RolesOfUserModel>> GetByAccountIdAsync(uint accountId)
-            => await GetByInputAsync(accountId.ToString(), "account_id");
-
-        public async Task<IEnumerable<RolesOfUserModel>> GetByAccountIdAsync(uint accountId, int maxGetCount)
+        public async Task<IEnumerable<RolesOfUserModel>> GetByAccountIdAsync(uint accountId, int? maxGetCount)
             => await GetByInputAsync(accountId.ToString(), "account_id", maxGetCount);
 
-        public async Task<IEnumerable<RolesOfUserModel>> GetByAccountIdsAsync(IEnumerable<uint> accountIds)
-            => await GetByInputsAsync(accountIds.Select(id => id.ToString()), "account_id");
-
-        public async Task<IEnumerable<RolesOfUserModel>> GetByRoleIdAsync(uint roleId)
-            => await GetByInputAsync(roleId.ToString(), "role_id");
-
-        public async Task<IEnumerable<RolesOfUserModel>> GetByRoleIdAsync(uint roleId, int maxGetCount)
+        public async Task<IEnumerable<RolesOfUserModel>> GetByAccountIdsAsync(IEnumerable<uint> accountIds, int? maxGetCount)
+            => await GetByInputsAsync(accountIds.Select(id => id.ToString()), "account_id", maxGetCount);
+        public async Task<IEnumerable<RolesOfUserModel>> GetByRoleIdAsync(uint roleId, int? maxGetCount)
             => await GetByInputAsync(roleId.ToString(), "role_id", maxGetCount);
 
-        public async Task<IEnumerable<RolesOfUserModel>> GetByRoleIdsAsync(IEnumerable<uint> roleIds)
-            => await GetByInputsAsync(roleIds.Select(id => id.ToString()), "role_id");
+        public async Task<IEnumerable<RolesOfUserModel>> GetByRoleIdsAsync(IEnumerable<uint> roleIds, int? maxGetCount)
+            => await GetByInputsAsync(roleIds.Select(id => id.ToString()), "role_id", maxGetCount);
 
-        public async Task<IEnumerable<RolesOfUserModel>> GetByMonthAndYearAsync(int year, int month)
-            => await GetByDateTimeAsync("added_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+        public async Task<IEnumerable<RolesOfUserModel>> GetByMonthAndYearAsync(int year, int month, int? maxGetCount)
+            => await GetByDateTimeAsync("added_date", EQueryTimeType.MONTH_AND_YEAR, (year, month), maxGetCount);
 
-        public async Task<IEnumerable<RolesOfUserModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<RolesOfUserModel>> GetByYearAsync<TEnum>(int year, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("added_date", EQueryTimeType.YEAR, ct, year);
+                return await GetByDateTimeAsync("added_date", EQueryTimeType.YEAR, ct, year, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<IEnumerable<RolesOfUserModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate)
-            => await GetByDateTimeAsync("added_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate));
+        public async Task<IEnumerable<RolesOfUserModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+            => await GetByDateTimeAsync("added_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate), maxGetCount);
 
-        public async Task<IEnumerable<RolesOfUserModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<RolesOfUserModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("added_date", EQueryTimeType.DATE_TIME, ct, dateTime);
+                return await GetByDateTimeAsync("added_date", EQueryTimeType.DATE_TIME, ct, dateTime, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
         // Các method delete giữ nguyên cho bạn tự sửa
-        public async Task<int> DeleteByAccountIdAsync(uint accountId) => await DeleteByColumnNameAsync(accountId.ToString(), "account_id");
+        public async Task<int> DeleteByAccountIdAsync(uint accountId)
+            => await DeleteByColumnNameAsync(accountId.ToString(), "account_id");
 
-        public async Task<int> DeleteByAccountIdsAsync(IEnumerable<uint> accountIds) 
+        public async Task<int> DeleteByAccountIdsAsync(IEnumerable<uint> accountIds)
             => await DeleteByColumnNameAsync(accountIds.Select(id => id.ToString()), "account_id");
 
         public async Task<int> DeleteByRoleIdAsync(uint roleId) => await DeleteByColumnNameAsync(roleId.ToString(), "role_id");
 
-        public async Task<int> DeleteByRoleIdsAsync(IEnumerable<uint> roleIds) 
+        public async Task<int> DeleteByRoleIdsAsync(IEnumerable<uint> roleIds)
             => await DeleteByColumnNameAsync(roleIds.Select(id => id.ToString()), "role_id");
 
         public async Task<int> DeleteByListKeysAsync(IEnumerable<RolesOfUserKey> keys) => await DeleteByKeysAsync(keys);

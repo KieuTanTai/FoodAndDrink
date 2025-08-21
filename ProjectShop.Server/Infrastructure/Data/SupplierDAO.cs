@@ -53,39 +53,36 @@ namespace ProjectShop.Server.Infrastructure.Data
                 WHERE {ColumnIdName} = @{ColumnIdName};";
         }
 
-        public async Task<IEnumerable<SupplierModel>> GetAllByCompanyLocationIdAsync(uint locationId)
-    => await GetByInputAsync(locationId.ToString(), "company_location_id");
+        public async Task<IEnumerable<SupplierModel>> GetAllByCompanyLocationIdAsync(uint locationId, int? maxGetCount)
+            => await GetByInputAsync(locationId.ToString(), "company_location_id", maxGetCount);
 
-        public async Task<IEnumerable<SupplierModel>> GetAllByStoreLocationIdAsync(uint locationId)
-            => await GetByInputAsync(locationId.ToString(), "store_location_id");
+        public async Task<IEnumerable<SupplierModel>> GetAllByStoreLocationIdAsync(uint locationId, int? maxGetCount)
+            => await GetByInputAsync(locationId.ToString(), "store_location_id", maxGetCount);
 
         public async Task<SupplierModel?> GetByCompanyLocationIdAsync(uint locationId)
             => await GetSingleDataAsync(locationId.ToString(), "company_location_id");
 
-        public async Task<IEnumerable<SupplierModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<SupplierModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("supplier_cooperation_date", EQueryTimeType.DATE_TIME, ct, dateTime);
+                return await GetByDateTimeAsync("supplier_cooperation_date", EQueryTimeType.DATE_TIME, ct, dateTime, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<IEnumerable<SupplierModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate)
-            => await GetByDateTimeAsync("supplier_cooperation_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate));
+        public async Task<IEnumerable<SupplierModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+            => await GetByDateTimeAsync("supplier_cooperation_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate), maxGetCount);
 
         public async Task<SupplierModel?> GetByEmailAsync(string email)
             => await GetSingleDataAsync(email, "supplier_email");
 
-        public async Task<IEnumerable<SupplierModel>> GetByEmailsAsync(IEnumerable<string> emails)
-            => await GetByInputsAsync(emails, "supplier_email");
+        public async Task<IEnumerable<SupplierModel>> GetByEmailsAsync(IEnumerable<string> emails, int? maxGetCount)
+            => await GetByInputsAsync(emails, "supplier_email", maxGetCount);
 
-        public async Task<IEnumerable<SupplierModel>> GetByLikeStringAsync(string input)
-            => await GetByLikeStringAsync(input, "supplier_name");
-
-        public async Task<IEnumerable<SupplierModel>> GetByLikeStringAsync(string input, int maxGetCount)
+        public async Task<IEnumerable<SupplierModel>> GetByLikeStringAsync(string input, int? maxGetCount)
             => await GetByLikeStringAsync(input, "supplier_name", maxGetCount);
 
-        public async Task<IEnumerable<SupplierModel>> GetByMonthAndYearAsync(int year, int month)
-            => await GetByDateTimeAsync("supplier_cooperation_date", EQueryTimeType.MONTH_AND_YEAR, (year, month));
+        public async Task<IEnumerable<SupplierModel>> GetByMonthAndYearAsync(int year, int month, int? maxGetCount)
+            => await GetByDateTimeAsync("supplier_cooperation_date", EQueryTimeType.MONTH_AND_YEAR, (year, month), maxGetCount);
 
         public async Task<SupplierModel?> GetByNameAsync(string name)
             => await GetSingleDataAsync(name, "supplier_name");
@@ -93,28 +90,25 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<SupplierModel?> GetByPhoneAsync(string phone)
             => await GetSingleDataAsync(phone, "supplier_phone");
 
-        public async Task<IEnumerable<SupplierModel>> GetByPhonesAsync(IEnumerable<string> phones)
-            => await GetByInputsAsync(phones, "supplier_phone");
+        public async Task<IEnumerable<SupplierModel>> GetByPhonesAsync(IEnumerable<string> phones, int? maxGetCount)
+            => await GetByInputsAsync(phones, "supplier_phone", maxGetCount);
 
-        public async Task<IEnumerable<SupplierModel>> GetByRelativeEmailAsync(string email)
-            => await GetByLikeStringAsync(email, "supplier_email");
+        public async Task<IEnumerable<SupplierModel>> GetByRelativeEmailAsync(string email, int? maxGetCount)
+            => await GetByLikeStringAsync(email, "supplier_email", maxGetCount);
 
-        public async Task<IEnumerable<SupplierModel>> GetByRelativePhoneAsync(string phone)
-            => await GetByLikeStringAsync(phone, "supplier_phone");
+        public async Task<IEnumerable<SupplierModel>> GetByRelativePhoneAsync(string phone, int? maxGetCount)
+            => await GetByLikeStringAsync(phone, "supplier_phone", maxGetCount);
 
-        public async Task<IEnumerable<SupplierModel>> GetByStatusAsync(bool status)
-            => await GetByInputAsync(GetTinyIntString(status), "supplier_status");
-
-        public async Task<IEnumerable<SupplierModel>> GetByStatusAsync(bool status, int maxGetCount)
+        public async Task<IEnumerable<SupplierModel>> GetByStatusAsync(bool status, int? maxGetCount)
             => await GetByInputAsync(GetTinyIntString(status), "supplier_status", maxGetCount);
 
         public async Task<SupplierModel?> GetByStoreLocationIdAsync(uint locationId)
             => await GetSingleDataAsync(locationId.ToString(), "store_location_id");
 
-        public async Task<IEnumerable<SupplierModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<SupplierModel>> GetByYearAsync<TEnum>(int year, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is ECompareType ct)
-                return await GetByDateTimeAsync("supplier_cooperation_date", EQueryTimeType.YEAR, ct, year);
+                return await GetByDateTimeAsync("supplier_cooperation_date", EQueryTimeType.YEAR, ct, year, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
     }

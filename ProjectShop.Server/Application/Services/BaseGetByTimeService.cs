@@ -9,11 +9,11 @@ namespace ProjectShop.Server.Application.Services
         where TOptions : class
     {
         //DRY
-        protected async Task<IEnumerable<TEntity>> GetByDateTimeGenericAsync<TCompareType>(Func<TCompareType, Task<IEnumerable<TEntity>>> daoFunc, TCompareType compareType, TOptions? options, string errorMsg) where TCompareType : Enum
+        protected async Task<IEnumerable<TEntity>> GetByDateTimeGenericAsync<TCompareType>(Func<TCompareType, int?, Task<IEnumerable<TEntity>>> daoFunc, TCompareType compareType, TOptions? options, string errorMsg, int? maxGetCount = null) where TCompareType : Enum
         {
             try
             {
-                IEnumerable<TEntity> results = await daoFunc(compareType);
+                IEnumerable<TEntity> results = await daoFunc(compareType, maxGetCount);
                 if (options != null)
                     results = await GetNavigationPropertyByOptionsAsync(results, options);
                 return results;
@@ -24,11 +24,11 @@ namespace ProjectShop.Server.Application.Services
             }
         }
 
-        protected async Task<IEnumerable<TEntity>> GetByDateTimeRangeGenericAsync(Func<Task<IEnumerable<TEntity>>> daoFunc, TOptions? options, string errorMsg)
+        protected async Task<IEnumerable<TEntity>> GetByDateTimeRangeGenericAsync(Func<int?, Task<IEnumerable<TEntity>>> daoFunc, TOptions? options, string errorMsg, int? maxGetCount = null)
         {
             try
             {
-                IEnumerable<TEntity> results = await daoFunc();
+                IEnumerable<TEntity> results = await daoFunc(maxGetCount);
                 if (options != null)
                     results = await GetNavigationPropertyByOptionsAsync(results, options);
                 return results;
@@ -39,11 +39,11 @@ namespace ProjectShop.Server.Application.Services
             }
         }
 
-        protected async Task<IEnumerable<TEntity>> GetByMonthAndYearGenericAsync(Func<int, int, Task<IEnumerable<TEntity>>> daoFunc, int year, int month, TOptions? options, string errorMsg)
+        protected async Task<IEnumerable<TEntity>> GetByMonthAndYearGenericAsync(Func<int, int, int?, Task< IEnumerable<TEntity>>> daoFunc, int year, int month, TOptions? options, string errorMsg, int? maxGetCount = null)
         {
             try
             {
-                IEnumerable<TEntity> results = await daoFunc(month, year);
+                IEnumerable<TEntity> results = await daoFunc(month, year, maxGetCount);
                 if (options != null)
                     results = await GetNavigationPropertyByOptionsAsync(results, options);
                 return results;

@@ -20,13 +20,11 @@ namespace ProjectShop.Server.Application.Services.Account
         {
         }
 
-        public async Task<IEnumerable<AccountModel>> GetAllAsync(int? maxGetCount, AccountNavigationOptions? options)
+        public async Task<IEnumerable<AccountModel>> GetAllAsync(AccountNavigationOptions? options, int? maxGetCount)
         {
             try
             {
-                IEnumerable<AccountModel> accounts = maxGetCount.HasValue
-                    ? await _baseDAO.GetAllAsync(maxGetCount.Value)
-                    : await _baseDAO.GetAllAsync();
+                IEnumerable<AccountModel> accounts = await _baseDAO.GetAllAsync(GetValidMaxRecord(maxGetCount));
 
                 if (options != null)
                     accounts = await GetNavigationPropertyByOptionsAsync(accounts, options);
@@ -39,13 +37,11 @@ namespace ProjectShop.Server.Application.Services.Account
             }
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByStatusAsync(bool status, int? maxGetCount, AccountNavigationOptions? options)
+        public async Task<IEnumerable<AccountModel>> GetByStatusAsync(bool status, AccountNavigationOptions? options, int? maxGetCount)
         {
             try
             {
-                IEnumerable<AccountModel> accounts = maxGetCount.HasValue
-                    ? await _accountDAO.GetByStatusAsync(status, maxGetCount.Value)
-                    : await _accountDAO.GetByStatusAsync(status);
+                IEnumerable<AccountModel> accounts = await _accountDAO.GetByStatusAsync(status, GetValidMaxRecord(maxGetCount));
                 if (options != null)
                     accounts = await GetNavigationPropertyByOptionsAsync(accounts, options);
                 return accounts;
@@ -90,50 +86,50 @@ namespace ProjectShop.Server.Application.Services.Account
             }
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByCreatedDateMonthAndYearAsync(int year, int month, AccountNavigationOptions? options)
+        public async Task<IEnumerable<AccountModel>> GetByCreatedDateMonthAndYearAsync(int year, int month, AccountNavigationOptions? options, int? maxGetCount)
         {
             return await GetByMonthAndYearGenericAsync(
-                _accountDAO.GetByCreatedDateAsync, year, month, options, $"No accounts found created in {month}/{year}.");
+                _accountDAO.GetByCreatedDateAsync, year, month, options, $"No accounts found created in {month}/{year}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByCreatedYearAsync<TCompareType>(int year, TCompareType compareType, AccountNavigationOptions? options) where TCompareType : Enum
+        public async Task<IEnumerable<AccountModel>> GetByCreatedYearAsync<TCompareType>(int year, TCompareType compareType, AccountNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
         {
             return await GetByDateTimeGenericAsync(
-                (ct) => _accountDAO.GetByCreatedDateAsync(year, ct), compareType, options, $"No accounts found created in year {year} with comparison type {compareType}.");
+                (ct, maxGetCount) => _accountDAO.GetByCreatedDateAsync(year, ct, maxGetCount), compareType, options, $"No accounts found created in year {year} with comparison type {compareType}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByCreatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, AccountNavigationOptions? options)
+        public async Task<IEnumerable<AccountModel>> GetByCreatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, AccountNavigationOptions? options, int? maxGetCount)
         {
-            return await GetByDateTimeRangeGenericAsync(() => _accountDAO.GetByCreatedDateAsync(startDate, endDate), options, $"No accounts found created between {startDate} and {endDate}.");
+            return await GetByDateTimeRangeGenericAsync((maxGetCount) => _accountDAO.GetByCreatedDateAsync(startDate, endDate, maxGetCount), options, $"No accounts found created between {startDate} and {endDate}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByCreatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, AccountNavigationOptions? options) where TCompareType : Enum
+        public async Task<IEnumerable<AccountModel>> GetByCreatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, AccountNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
         {
             return await GetByDateTimeGenericAsync(
-                (ct) => _accountDAO.GetByCreatedDateAsync(dateTime, ct), compareType, options, $"No accounts found created at {dateTime} with comparison type {compareType}.");
+                (ct, maxGetCount) => _accountDAO.GetByCreatedDateAsync(dateTime, ct, maxGetCount), compareType, options, $"No accounts found created at {dateTime} with comparison type {compareType}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateMonthAndYearAsync(int year, int month, AccountNavigationOptions? options)
+        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateMonthAndYearAsync(int year, int month, AccountNavigationOptions? options, int? maxGetCount)
         {
             return await GetByMonthAndYearGenericAsync(
-                _accountDAO.GetByLastUpdatedDateAsync, year, month, options, $"No accounts found last updated in {month}/{year}.");
+                _accountDAO.GetByLastUpdatedDateAsync, year, month, options, $"No accounts found last updated in {month}/{year}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType, AccountNavigationOptions? options) where TCompareType : Enum
+        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType, AccountNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
         {
             return await GetByDateTimeGenericAsync(
-                (ct) => _accountDAO.GetByLastUpdatedDateAsync(year, ct), compareType, options, $"No accounts found last updated in year {year} with comparison type {compareType}.");
+                (ct, maxGetCount) => _accountDAO.GetByLastUpdatedDateAsync(year, ct, maxGetCount), compareType, options, $"No accounts found last updated in year {year} with comparison type {compareType}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, AccountNavigationOptions? options)
+        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, AccountNavigationOptions? options, int? maxGetCount)
         {
-            return await GetByDateTimeRangeGenericAsync(() => _accountDAO.GetByLastUpdatedDateAsync(startDate, endDate), options, $"No accounts found last updated between {startDate} and {endDate}.");
+            return await GetByDateTimeRangeGenericAsync((maxGet) => _accountDAO.GetByLastUpdatedDateAsync(startDate, endDate, maxGet), options, $"No accounts found last updated between {startDate} and {endDate}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, AccountNavigationOptions? options) where TCompareType : Enum
+        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, AccountNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
         {
             return await GetByDateTimeGenericAsync(
-                (ct) => _accountDAO.GetByLastUpdatedDateAsync(dateTime, ct), compareType, options, $"No accounts found last updated at {dateTime} with comparison type {compareType}.");
+                (ct, maxGetCount) => _accountDAO.GetByLastUpdatedDateAsync(dateTime, ct, maxGetCount), compareType, options, $"No accounts found last updated at {dateTime} with comparison type {compareType}.", GetValidMaxRecord(maxGetCount));
         }
     }
 }

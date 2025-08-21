@@ -13,13 +13,11 @@ namespace ProjectShop.Server.Application.Services.Roles
         {
         }
 
-        public async Task<IEnumerable<RoleModel>> GetAllAsync(int? maxGetCount, RoleNavigationOptions? options = null)
+        public async Task<IEnumerable<RoleModel>> GetAllAsync(RoleNavigationOptions? options, int? maxGetCount)
         {
             try
             {
-                IEnumerable<RoleModel> roles = maxGetCount.HasValue
-                   ? await _baseDAO.GetAllAsync(maxGetCount.Value)
-                   : await _baseDAO.GetAllAsync();
+                IEnumerable<RoleModel> roles = await _baseDAO.GetAllAsync(GetValidMaxRecord(maxGetCount));
 
                 if (options != null)
                     roles = await GetNavigationPropertyByOptionsAsync(roles, options);
@@ -31,55 +29,55 @@ namespace ProjectShop.Server.Application.Services.Roles
             }
         }
 
-        public async Task<IEnumerable<RoleModel>> GetByCreatedDateMonthAndYearAsync(int year, int month, RoleNavigationOptions? options = null)
+        public async Task<IEnumerable<RoleModel>> GetByCreatedDateMonthAndYearAsync(int year, int month, RoleNavigationOptions? options, int? maxGetCount)
         {
             return await GetByMonthAndYearGenericAsync(
-                _roleDAO.GetByMonthAndYearAsync, year, month, options, $"No roles found created in {month}/{year}.");
+                _roleDAO.GetByMonthAndYearAsync, year, month, options, $"No roles found created in {month}/{year}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<RoleModel>> GetByCreatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, RoleNavigationOptions? options = null) where TCompareType : Enum
+        public async Task<IEnumerable<RoleModel>> GetByCreatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, RoleNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
         {
             return await GetByDateTimeGenericAsync(
-                (ct) => _roleDAO.GetByDateTimeAsync(dateTime, ct), compareType, options, $"No roles found created at {dateTime} with comparison type {compareType}.");
+                (compareType, maxGetCount) => _roleDAO.GetByDateTimeAsync(dateTime, compareType, maxGetCount), compareType, options, $"No roles found created at {dateTime} with comparison type {compareType}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<RoleModel>> GetByCreatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, RoleNavigationOptions? options = null)
+        public async Task<IEnumerable<RoleModel>> GetByCreatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, RoleNavigationOptions? options, int? maxGetCount)
         {
             return await GetByDateTimeRangeGenericAsync(
-                () => _roleDAO.GetByDateTimeRangeAsync(startDate, endDate), options, $"No roles found created between {startDate} and {endDate}.");
+                (maxGetCount) => _roleDAO.GetByDateTimeRangeAsync(startDate, endDate, maxGetCount), options, $"No roles found created between {startDate} and {endDate}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<RoleModel>> GetByCreatedYearAsync<TCompareType>(int year, TCompareType compareType, RoleNavigationOptions? options = null) where TCompareType : Enum
+        public async Task<IEnumerable<RoleModel>> GetByCreatedYearAsync<TCompareType>(int year, TCompareType compareType, RoleNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
         {
             return await GetByDateTimeGenericAsync(
-                (ct) => _roleDAO.GetByYearAsync(year, ct), compareType, options, $"No roles found created in year {year} with comparison type {compareType}.");
+                (compareType, maxGetCount) => _roleDAO.GetByYearAsync(year, compareType, maxGetCount), compareType, options, $"No roles found created in year {year} with comparison type {compareType}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedDateMonthAndYearAsync(int year, int month, RoleNavigationOptions? options = null)
+        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedDateMonthAndYearAsync(int year, int month, RoleNavigationOptions? options, int? maxGetCount)
         {
             return await GetByMonthAndYearGenericAsync(
-                _roleDAO.GetByLastUpdatedMonthAndYearAsync, year, month, options, $"No roles found updated in {month}/{year}.");
+                _roleDAO.GetByLastUpdatedMonthAndYearAsync, year, month, options, $"No roles found updated in {month}/{year}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, RoleNavigationOptions? options = null) where TCompareType : Enum
+        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, RoleNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
         {
             return await GetByDateTimeGenericAsync(
-                (ct) => _roleDAO.GetByLastUpdatedDateAsync(dateTime, ct), compareType, options, $"No roles found updated at {dateTime} with comparison type {compareType}.");
+                (compareType, maxGetCount) => _roleDAO.GetByLastUpdatedDateAsync(dateTime, compareType, maxGetCount), compareType, options, $"No roles found updated at {dateTime} with comparison type {compareType}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, RoleNavigationOptions? options = null)
+        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, RoleNavigationOptions? options, int? maxGetCount)
         {
             return await GetByDateTimeRangeGenericAsync(
-                () => _roleDAO.GetByLastUpdatedDateTimeRangeAsync(startDate, endDate), options, $"No roles found updated between {startDate} and {endDate}.");
+                (maxGetCount) => _roleDAO.GetByLastUpdatedDateTimeRangeAsync(startDate, endDate, maxGetCount), options, $"No roles found updated between {startDate} and {endDate}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType, RoleNavigationOptions? options = null) where TCompareType : Enum
+        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType, RoleNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
         {
             return await GetByDateTimeGenericAsync(
-                (ct) => _roleDAO.GetByLastUpdatedYearAsync(year, ct), compareType, options, $"No roles found updated in year {year} with comparison type {compareType}.");
+                (compareType, maxGetCount) => _roleDAO.GetByLastUpdatedYearAsync(year, compareType, maxGetCount), compareType, options, $"No roles found updated in year {year} with comparison type {compareType}.", GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<RoleModel> GetByRoleIdAsync(uint roleId, RoleNavigationOptions? options = null)
+        public async Task<RoleModel> GetByRoleIdAsync(uint roleId, RoleNavigationOptions? options)
         {
             try
             {
@@ -96,7 +94,7 @@ namespace ProjectShop.Server.Application.Services.Roles
             }
         }
 
-        public async Task<RoleModel> GetByRoleNameAsync(string roleName, RoleNavigationOptions? options = null)
+        public async Task<RoleModel> GetByRoleNameAsync(string roleName, RoleNavigationOptions? options)
         {
             try
             {
@@ -113,13 +111,11 @@ namespace ProjectShop.Server.Application.Services.Roles
             }
         }
 
-        public async Task<IEnumerable<RoleModel>> GetByStatusAsync(bool status, int? maxGetCount, RoleNavigationOptions? options = null)
+        public async Task<IEnumerable<RoleModel>> GetByStatusAsync(bool status, RoleNavigationOptions? options, int? maxGetCount)
         {
             try
             {
-                IEnumerable<RoleModel> roles = maxGetCount.HasValue
-                    ? await _roleDAO.GetByStatusAsync(status, maxGetCount.Value)
-                    : await _roleDAO.GetByStatusAsync(status);
+                IEnumerable<RoleModel> roles = await _roleDAO.GetByStatusAsync(status, GetValidMaxRecord(maxGetCount));
                 if (options != null)
                     roles = await GetNavigationPropertyByOptionsAsync(roles, options);
                 return roles;
@@ -130,12 +126,12 @@ namespace ProjectShop.Server.Application.Services.Roles
             }
         }
 
-        public async Task<IEnumerable<RoleModel>> GetRelativeByRoleName(string roleName, int? maxGetCount, RoleNavigationOptions? options = null)
+        public async Task<IEnumerable<RoleModel>> GetRelativeByRoleName(string roleName, RoleNavigationOptions? options, int? maxGetCount)
         {
             try
             {
-                maxGetCount ??= 100;
-                IEnumerable<RoleModel> roles = await _roleDAO.GetByLikeStringAsync(roleName, maxGetCount.Value);
+    
+                IEnumerable<RoleModel> roles = await _roleDAO.GetByLikeStringAsync(roleName, GetValidMaxRecord(maxGetCount));
                 if (options != null)
                     roles = await GetNavigationPropertyByOptionsAsync(roles, options);
                 return roles;

@@ -19,6 +19,7 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddSingleton<IHashPassword, HashPaswordService>();
             services.AddSingleton<IClock, SystemClockService>();
             services.AddSingleton<IClock>(provider => new FakeClockService { UtcNow = new DateTime(2030, 12, 31) });
+            services.AddSingleton<IMaxGetRecord>(provider => new MaxGetRecordService { MaxGetRecord = 500 });
 
             string connectionString = AppConfigConnection.GetConnectionString();
             if (string.IsNullOrEmpty(connectionString))
