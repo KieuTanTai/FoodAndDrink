@@ -46,9 +46,9 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 maxCount ??= 100; // Giả sử mặc định là 100 nếu không có giá trị
 
                 if (status.HasValue)
-                    accounts = await _searchAccountService.GetByStatusAsync(status.Value, maxCount.Value, options);
+                    accounts = await _searchAccountService.GetByStatusAsync(status.Value, options, maxCount.Value);
                 else
-                    accounts = await _searchAccountService.GetAllAsync(maxCount.Value, options);
+                    accounts = await _searchAccountService.GetAllAsync(options, maxCount.Value);
                 return Ok(accounts); // trả json ra postman/browser
             }
             catch (Exception ex)
@@ -277,13 +277,13 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         // API test lấy danh sách tài khoản theo trạng thái
         [HttpGet("accounts-by-status/{status}")]
-        public async Task<IActionResult> GetAccountsByStatus(bool status, [FromQuery] AccountNavigationOptions? options)
+        public async Task<IActionResult> GetAccountsByStatus(bool status, [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxCount)
         {
             _logger.LogInformation($"Bắt đầu lấy danh sách tài khoản với trạng thái: {status}");
 
             try
             {
-                IEnumerable<AccountModel> accounts = await _searchAccountService.GetByStatusAsync(status, null, options);
+                IEnumerable<AccountModel> accounts = await _searchAccountService.GetByStatusAsync(status, options, maxCount);
                 _logger.LogInformation($"Số lượng tài khoản với trạng thái {status}: {accounts.Count()}");
                 return Ok(accounts);
             }
