@@ -160,7 +160,7 @@ namespace ProjectShop.Server.Application.Services.Account
             {
                 var rolesList = await _roleOfUserDAO.GetByAccountIdsAsync(accountIds) ?? Enumerable.Empty<RolesOfUserModel>();
                 return rolesList.GroupBy(role => role.AccountId)
-                    .ToDictionary(g => g.Key, g => (ICollection<RolesOfUserModel>)g.ToList());
+                    .ToDictionary(group => group.Key, group => (ICollection<RolesOfUserModel>)group.ToList());
             }
             catch
             {

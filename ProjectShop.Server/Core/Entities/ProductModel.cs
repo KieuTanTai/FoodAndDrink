@@ -41,7 +41,7 @@ namespace ProjectShop.Server.Core.Entities
         // Navigation properties
         public SupplierModel Supplier { get; set; } = null!;
         public ICollection<DetailCartModel> DetailCarts { get; set; } = new List<DetailCartModel>();
-        public ICollection<ProductLotModel> ProductLots { get; set; } = new List<ProductLotModel>();
+        public ICollection<DetailProductLotModel> DetailProductLot { get; set; } = new List<DetailProductLotModel>();
         public ICollection<ProductCategoriesModel> ProductCategories { get; set; } = new List<ProductCategoriesModel>();
         public ICollection<ProductImageModel> ProductImages { get; set; } = new List<ProductImageModel>();
         public ICollection<DetailSaleEventModel> DetailSaleEvents { get; set; } = new List<DetailSaleEventModel>();

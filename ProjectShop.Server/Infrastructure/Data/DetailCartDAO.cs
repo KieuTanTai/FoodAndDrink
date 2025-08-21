@@ -66,7 +66,13 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<IEnumerable<DetailCartModel>> GetByCartIdAsync(uint cartId, int? maxGetCount) 
             => await GetByInputAsync(cartId.ToString(), "cart_id", maxGetCount);
 
+        public async Task<IEnumerable<DetailCartModel>> GetByCartIdsAsync(IEnumerable<uint> cartIds, int? maxGetCount)
+            => await GetByInputsAsync(cartIds.Select(id => id.ToString()), "cart_id", maxGetCount);
+
         public async Task<IEnumerable<DetailCartModel>> GetByProductBarcodeAsync(string barcode, int? maxGetCount) 
             => await GetByInputAsync(barcode, "product_barcode", maxGetCount);
+
+        public async Task<IEnumerable<DetailCartModel>> GetByProductBarcodesAsync(IEnumerable<string> barcodes, int? maxGetCount)
+            => await GetByInputsAsync(barcodes, "product_barcode", maxGetCount);
     }
 }

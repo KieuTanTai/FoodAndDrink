@@ -46,5 +46,8 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<IEnumerable<ProductLotModel>> GetByProductBarcodeAsync(string barcode, int? maxGetCount) 
             => await GetByInputAsync(barcode, "product_barcode", maxGetCount);
+
+        public async Task<IEnumerable<ProductLotModel>> GetByProductBarcodesAsync(IEnumerable<string> barcodes, int? maxGetCount)
+            => await GetByInputsAsync(barcodes, "product_barcode", maxGetCount);
     }
 }

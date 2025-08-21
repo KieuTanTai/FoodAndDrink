@@ -37,8 +37,14 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<IEnumerable<DetailInvoiceModel>> GetByInvoiceIdAsync(uint invoiceId, int? maxGetCount) 
             => await GetByInputAsync(invoiceId.ToString(), "invoice_id", maxGetCount);
 
-        public async Task<IEnumerable<DetailInvoiceModel>> GetByProductBarcodeAsync(string barcode, int? maxGetCount) 
+        public async Task<IEnumerable<DetailInvoiceModel>> GetByProductBarcodeAsync(string barcode, int? maxGetCount)
             => await GetByInputAsync(barcode, "product_barcode", maxGetCount);
+
+        public async Task<IEnumerable<DetailInvoiceModel>> GetByProductBarcodesAsync(IEnumerable<string> barcodes, int? maxGetCount) 
+            => await GetByInputsAsync(barcodes, "product_barcode", maxGetCount);
+
+        public async Task<IEnumerable<DetailInvoiceModel>> GetByInvoiceIdsAsync(IEnumerable<uint> invoiceIds, int? maxGetCount) 
+            => await GetByInputsAsync(invoiceIds.Select(id => id.ToString()), "invoice_id", maxGetCount);
 
         public async Task<IEnumerable<DetailInvoiceModel>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice, int? maxGetCount) 
             => await GetByRangeDecimalAsync(minPrice, maxPrice, "detail_invoice_price", maxGetCount);

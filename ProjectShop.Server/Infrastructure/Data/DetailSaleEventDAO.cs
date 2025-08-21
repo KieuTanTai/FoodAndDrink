@@ -69,6 +69,9 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<IEnumerable<DetailSaleEventModel>> GetByProductBarcodeAsync(string productBarcode, int? maxGetCount) 
             => await GetByInputAsync(productBarcode, "product_barcode", maxGetCount);
 
+        public async Task<IEnumerable<DetailSaleEventModel>> GetByProductBarcodesAsync(IEnumerable<string> productBarcodes, int? maxGetCount) 
+            => await GetByInputsAsync(productBarcodes, "product_barcode", maxGetCount);
+
         public async Task<IEnumerable<DetailSaleEventModel>> GetByRangeDiscountAmountAsync(decimal minDiscountAmount, decimal maxDiscountAmount, int? maxGetCount) 
             => await GetByRangeDecimalAsync(minDiscountAmount, maxDiscountAmount, "discount_amount", maxGetCount);
 
@@ -83,5 +86,8 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<IEnumerable<DetailSaleEventModel>> GetBySaleEventIdAsync(uint saleEventId, int? maxGetCount) 
             => await GetByInputAsync(saleEventId.ToString(), "sale_event_id", maxGetCount);
+
+        public async Task<IEnumerable<DetailSaleEventModel>> GetBySaleEventIdsAsync(IEnumerable<uint> saleEventIds, int? maxGetCount) 
+            => await GetByInputsAsync(saleEventIds.Select(id => id.ToString()), "sale_event_id", maxGetCount);
     }
 }

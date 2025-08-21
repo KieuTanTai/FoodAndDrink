@@ -55,7 +55,7 @@ namespace ProjectShop.Server.Infrastructure.Data
         }
 
         // CAN'T WRITE LIKE DRY METHOD BECAUSE ITS CAN'T BE COVER MOST OF THE CASES
-        public async Task<DetailProductLotModel> GetByKeysAsync(DetailProductLotKey keys) 
+        public async Task<DetailProductLotModel> GetByKeysAsync(DetailProductLotKey keys)
             => await GetSingleByTwoIdAsync(ColumnIdName, SecondColumnIdName, keys.ProductLotId, keys.ProductBarcode);
 
         public async Task<IEnumerable<DetailProductLotModel>> GetByListKeysAsync(IEnumerable<DetailProductLotKey> keys, int? maxGetCount)
@@ -73,7 +73,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             try
             {
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                IEnumerable<DetailProductLotModel> results = await connection.QueryAsync<DetailProductLotModel>(query, new { Keys = keys, MaxGetCount = maxGetCount});
+                IEnumerable<DetailProductLotModel> results = await connection.QueryAsync<DetailProductLotModel>(query, new { Keys = keys, MaxGetCount = maxGetCount });
 
                 if (results == null || !results.Any())
                     throw new KeyNotFoundException($"No data found in {TableName} for {query} with parameters {keys}");
@@ -106,7 +106,10 @@ namespace ProjectShop.Server.Infrastructure.Data
             return await GetByDateTimeAsync("product_lot_mfg_date", EQueryTimeType.DATE_TIME, type, dateTime, maxGetCount);
         }
 
-        public async Task<IEnumerable<DetailProductLotModel>> GetByProductBarcode(string barcode, int? maxGetCount) 
+        public async Task<IEnumerable<DetailProductLotModel>> GetByProductBarcodeAsync(string barcode, int? maxGetCount)
             => await GetByInputAsync(barcode, "product_barcode", maxGetCount);
+
+        public async Task<IEnumerable<DetailProductLotModel>> GetByProductBarcodesAsync(IEnumerable<string> barcodes, int? maxGetCount)
+            => await GetByInputsAsync(barcodes, "product_barcode", maxGetCount);
     }
 }

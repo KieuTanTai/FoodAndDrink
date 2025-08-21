@@ -82,5 +82,8 @@ namespace ProjectShop.Server.Infrastructure.Data
         // -------------------- ProductBarcode --------------------
         public async Task<IEnumerable<ProductImageModel>> GetByProductBarcodeAsync(string productBarcode, int? maxGetCount)
             => await GetByInputAsync(productBarcode, "product_barcode", maxGetCount);
+        
+        public async Task<IEnumerable<ProductImageModel>> GetByProductBarcodesAsync(IEnumerable<string> productBarcodes, int? maxGetCount)
+            => await GetByInputsAsync(productBarcodes, "product_barcode", maxGetCount);
     }
 }
