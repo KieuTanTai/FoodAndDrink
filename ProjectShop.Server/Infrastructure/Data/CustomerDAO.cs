@@ -130,22 +130,18 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<CustomerModel?> GetByAccountIdAsync(uint accountId) => await GetSingleDataAsync(accountId.ToString(), "account_id");
 
-        public async Task<IEnumerable<CustomerModel>> GetByAccountIdsAsync(IEnumerable<uint> accountIds)
-            => await GetByInputsAsync(accountIds.Select(id => id.ToString()), "account_id");
+        public async Task<IEnumerable<CustomerModel>> GetByAccountIdsAsync(IEnumerable<uint> accountIds, int? maxGetCount = null)
+            => await GetByInputsAsync(accountIds.Select(id => id.ToString()), "account_id", maxGetCount);
 
-        public async Task<IEnumerable<CustomerModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "customer_name");
-
-        public async Task<IEnumerable<CustomerModel>> GetByLikeStringAsync(string input, int maxGetCount)
+        public async Task<IEnumerable<CustomerModel>> GetByLikeStringAsync(string input, int? maxGetCount)
             => await GetByLikeStringAsync(input, "customer_name", maxGetCount);
 
-        public async Task<IEnumerable<CustomerModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "customer_status");
 
-        public async Task<IEnumerable<CustomerModel>> GetByStatusAsync(bool status, int maxGetCount) 
+        public async Task<IEnumerable<CustomerModel>> GetByStatusAsync(bool status, int? maxGetCount)
             => await GetByInputAsync(GetTinyIntString(status), "customer_status", maxGetCount);
 
-        public async Task<IEnumerable<CustomerModel>> GetByGenderAsync(bool isMale) => await GetByInputAsync(isMale.ToString(), "customer_gender");
-
-        public async Task<IEnumerable<CustomerModel>> GetByGendersAsync(IEnumerable<bool> isMales) => await GetByInputsAsync(isMales.Select(isMale => isMale.ToString()), "customer_gender");
+        public async Task<IEnumerable<CustomerModel>> GetByGenderAsync(bool isMale, int? maxGetCount)
+            => await GetByInputAsync(isMale.ToString(), "customer_gender", maxGetCount);
 
         public async Task<CustomerModel?> GetByPhoneAsync(string phone) => await GetSingleDataAsync(phone, "customer_phone");
 
@@ -153,30 +149,33 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<CustomerModel?> GetByNameAsync(string name) => await GetSingleDataAsync(name, "customer_name");
 
-        public async Task<IEnumerable<CustomerModel>> GetByPhonesAsync(IEnumerable<string> phones) => await GetByInputsAsync(phones, "customer_phone");
+        public async Task<IEnumerable<CustomerModel>> GetByPhonesAsync(IEnumerable<string> phones, int? maxGetCount = null) 
+            => await GetByInputsAsync(phones, "customer_phone", maxGetCount);
 
-        public async Task<IEnumerable<CustomerModel>> GetByEmailsAsync(IEnumerable<string> emails) => await GetByInputsAsync(emails, "customer_email");
+        public async Task<IEnumerable<CustomerModel>> GetByEmailsAsync(IEnumerable<string> emails, int? maxGetCount = null) 
+            => await GetByInputsAsync(emails, "customer_email", maxGetCount);
 
-        public async Task<IEnumerable<CustomerModel>> GetByNamesAsync(IEnumerable<string> names) => await GetByInputsAsync(names, "customer_name");
+        public async Task<IEnumerable<CustomerModel>> GetByNamesAsync(IEnumerable<string> names, int? maxGetCount = null) 
+            => await GetByInputsAsync(names, "customer_name", maxGetCount);
 
-        public async Task<IEnumerable<CustomerModel>> GetByMonthAndYearAsync(int year, int month)
-            => await GetByDateTimeAsync("customer_birthday", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month));
+        public async Task<IEnumerable<CustomerModel>> GetByMonthAndYearAsync(int year, int month, int? maxGetCount)
+            => await GetByDateTimeAsync("customer_birthday", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month), maxGetCount);
 
-        public async Task<IEnumerable<CustomerModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<CustomerModel>> GetByYearAsync<TEnum>(int year, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type provided.");
-            return await GetByDateTimeAsync("customer_birthday", EQueryTimeType.YEAR, type, year);
+            return await GetByDateTimeAsync("customer_birthday", EQueryTimeType.YEAR, type, year, maxGetCount);
         }
 
-        public async Task<IEnumerable<CustomerModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate)
-            => await GetByDateTimeAsync("customer_birthday", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate));
+        public async Task<IEnumerable<CustomerModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+            => await GetByDateTimeAsync("customer_birthday", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate), maxGetCount);
 
-        public async Task<IEnumerable<CustomerModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<CustomerModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type provided.");
-            return await GetByDateTimeAsync("customer_birthday", EQueryTimeType.DATE_TIME, type, dateTime);
+            return await GetByDateTimeAsync("customer_birthday", EQueryTimeType.DATE_TIME, type, dateTime, maxGetCount);
         }
     }
 }

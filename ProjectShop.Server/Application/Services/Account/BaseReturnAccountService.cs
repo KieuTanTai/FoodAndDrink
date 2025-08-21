@@ -33,9 +33,6 @@ namespace ProjectShop.Server.Application.Services.Account
 
         protected override async Task<AccountModel> GetNavigationPropertyByOptionsAsync(AccountModel account, AccountNavigationOptions? options)
         {
-            if (account == null)
-                throw new InvalidOperationException("Account cannot be null for navigation property retrieval.");
-
             if (options == null)
                 return account;
 
@@ -53,9 +50,6 @@ namespace ProjectShop.Server.Application.Services.Account
 
         protected override async Task<IEnumerable<AccountModel>> GetNavigationPropertyByOptionsAsync(IEnumerable<AccountModel> accounts, AccountNavigationOptions? options)
         {
-            if (accounts == null || !accounts.Any())
-                throw new InvalidOperationException("No accounts provided for navigation property retrieval.");
-
             if (options == null)
                 return accounts;
 

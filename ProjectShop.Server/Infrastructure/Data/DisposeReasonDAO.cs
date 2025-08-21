@@ -28,9 +28,7 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        public async Task<IEnumerable<DisposeReasonModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "dispose_reason_name");
-
-        public async Task<IEnumerable<DisposeReasonModel>> GetByLikeStringAsync(string input, int maxGetCount)
+        public async Task<IEnumerable<DisposeReasonModel>> GetByLikeStringAsync(string input, int? maxGetCount)
             => await GetByLikeStringAsync(input, "dispose_reason_name", maxGetCount);
     }
 }

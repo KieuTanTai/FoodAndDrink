@@ -25,30 +25,42 @@ namespace ProjectShop.Server.Infrastructure.Data
                       VALUES (@InvoiceId, @SaleEventId); SELECT LAST_INSERT_ID();";
         }
 
-        public async Task<IEnumerable<InvoiceDiscountModel>> GetByInvoiceId(uint invoiceId) => await GetByInputAsync(invoiceId.ToString(), "invoice_id");
+        public async Task<IEnumerable<InvoiceDiscountModel>> GetByInvoiceId(uint invoiceId, int? maxGetCount) 
+            => await GetByInputAsync(invoiceId.ToString(), "invoice_id", maxGetCount);
 
-        public async Task<InvoiceDiscountModel> GetByKeysAsync(InvoiceDiscountKey keys) => await GetSingleByTwoIdAsync(ColumnIdName, SecondColumnIdName, keys.InvoiceId, keys.SaleEventId);
+        public async Task<InvoiceDiscountModel> GetByKeysAsync(InvoiceDiscountKey keys) 
+            => await GetSingleByTwoIdAsync(ColumnIdName, SecondColumnIdName, keys.InvoiceId, keys.SaleEventId);
 
-        public async Task<IEnumerable<InvoiceDiscountModel>> GetByListKeysAsync(IEnumerable<InvoiceDiscountKey> keys)
+        public async Task<IEnumerable<InvoiceDiscountModel>> GetByListKeysAsync(IEnumerable<InvoiceDiscountKey> keys, int? maxGetCount)
         {
+            if (keys == null || !keys.Any())
+                throw new ArgumentException("Keys collection cannot be null or empty.");
+            string query = $@"";
+            if (maxGetCount.HasValue && maxGetCount.Value > 0)
+                query = $@"SELECT * FROM {TableName} 
+                          WHERE (invoice_id, sale_event_id) IN @Keys 
+                          LIMIT @MaxGetCount";
+            else if (maxGetCount.HasValue && maxGetCount.Value <= 0)
+                throw new ArgumentOutOfRangeException(query, "maxGetCount must be greater than 0.");
+            else
+                query = $"SELECT * FROM {TableName} WHERE ({ColumnIdName}, {SecondColumnIdName}) IN @Keys";
+
             try
             {
-                if (keys == null || !keys.Any())
-                    throw new ArgumentException("Keys collection cannot be null or empty.");
-                string query = $@"SELECT * FROM {TableName} WHERE ({ColumnIdName}, {SecondColumnIdName}) IN @Keys";
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                IEnumerable<InvoiceDiscountModel> results = await connection.QueryAsync<InvoiceDiscountModel>(query, new { Keys = keys });
+                IEnumerable<InvoiceDiscountModel> results = await connection.QueryAsync<InvoiceDiscountModel>(query, new { Keys = keys, MaxGetCount = maxGetCount });
 
-                if (results == null || !results.Any())
-                    throw new KeyNotFoundException($"No data found in {TableName} for {query} with parameters {keys}");
-                return results;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving InvoiceDiscounts by keys: {ex.Message}", ex);
-            }
+                    if (results == null || !results.Any())
+                        throw new KeyNotFoundException($"No data found in {TableName} for {query} with parameters {keys}");
+                    return results;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Error retrieving InvoiceDiscounts by keys: {ex.Message}", ex);
+                }
         }
 
-        public async Task<IEnumerable<InvoiceDiscountModel>> GetBySaleEventId(uint saleEventId) => await GetByInputAsync(saleEventId.ToString(), "sale_event_id");
+        public async Task<IEnumerable<InvoiceDiscountModel>> GetBySaleEventId(uint saleEventId, int? maxGetCount) 
+            => await GetByInputAsync(saleEventId.ToString(), "sale_event_id", maxGetCount);
     }
 }

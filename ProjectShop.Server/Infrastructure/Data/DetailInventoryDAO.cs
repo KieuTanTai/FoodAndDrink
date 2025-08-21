@@ -18,18 +18,6 @@ namespace ProjectShop.Server.Infrastructure.Data
         {
         }
 
-        public Task<IEnumerable<DetailInventoryModel>> GetByYearLastUpdatedAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
-        {
-            if (compareType is not ECompareType type)
-                throw new ArgumentException("Invalid compare type provided.");
-            return GetByDateTimeAsync(
-                "detail_inventory_last_updated_date",
-                EQueryTimeType.YEAR,
-                type,
-                year
-            );
-        }
-
         protected override string GetInsertQuery()
         {
             return $@"INSERT INTO {TableName} (inventory_id, product_barcode, detail_inventory_quantity, 
@@ -45,43 +33,51 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE detail_inventory_id = @DetailInventoryId";
         }
 
-        public async Task<IEnumerable<DetailInventoryModel>> GetByDateTimeAddedAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<DetailInventoryModel>> GetByDateTimeAddedAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type provided.");
-            return await GetByDateTimeAsync("detail_inventory_added_date", EQueryTimeType.DATE_TIME, type, dateTime);
+            return await GetByDateTimeAsync("detail_inventory_added_date", EQueryTimeType.DATE_TIME, type, dateTime, maxGetCount);
         }
 
-        public async Task<IEnumerable<DetailInventoryModel>> GetByDateTimeLastUpdatedAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<DetailInventoryModel>> GetByDateTimeLastUpdatedAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type provided.");
-            return await GetByDateTimeAsync("detail_inventory_last_updated_date", EQueryTimeType.DATE_TIME, type, dateTime);
+            return await GetByDateTimeAsync("detail_inventory_last_updated_date", EQueryTimeType.DATE_TIME, type, dateTime, maxGetCount);
         }
 
-        public async Task<IEnumerable<DetailInventoryModel>> GetByDateTimeRangeAddedAsync(DateTime startDate, DateTime endDate)
-            => await GetByDateTimeAsync("detail_inventory_added_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate));
+        public async Task<IEnumerable<DetailInventoryModel>> GetByDateTimeRangeAddedAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+            => await GetByDateTimeAsync("detail_inventory_added_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate), maxGetCount);
 
-        public async Task<IEnumerable<DetailInventoryModel>> GetByDateTimeRangeLastUpdatedAsync(DateTime startDate, DateTime endDate)
-            => await GetByDateTimeAsync("detail_inventory_last_updated_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate));
+        public async Task<IEnumerable<DetailInventoryModel>> GetByDateTimeRangeLastUpdatedAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+            => await GetByDateTimeAsync("detail_inventory_last_updated_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate), maxGetCount);
 
-        public async Task<IEnumerable<DetailInventoryModel>> GetByInventoryId(uint inventoryId)
-            => await GetByInputAsync(inventoryId.ToString(), "inventory_id");
+        public async Task<IEnumerable<DetailInventoryModel>> GetByInventoryId(uint inventoryId, int? maxGetCount)
+            => await GetByInputAsync(inventoryId.ToString(), "inventory_id", maxGetCount);
 
-        public async Task<IEnumerable<DetailInventoryModel>> GetByMonthAndYearAddedAsync(int year, int month)
-            => await GetByDateTimeAsync("detail_inventory_added_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month));
+        public async Task<IEnumerable<DetailInventoryModel>> GetByMonthAndYearAddedAsync(int year, int month, int? maxGetCount)
+            => await GetByDateTimeAsync("detail_inventory_added_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month), maxGetCount);
 
-        public async Task<IEnumerable<DetailInventoryModel>> GetByMonthAndYearLastUpdatedAsync(int year, int month)
-            => await GetByDateTimeAsync("detail_inventory_last_updated_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month));
+        public async Task<IEnumerable<DetailInventoryModel>> GetByMonthAndYearLastUpdatedAsync(int year, int month, int? maxGetCount)
+            => await GetByDateTimeAsync("detail_inventory_last_updated_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month), maxGetCount);
 
-        public async Task<IEnumerable<DetailInventoryModel>> GetByProductBarcode(string barcode)
-            => await GetByInputAsync(barcode, "product_barcode");
+        public async Task<IEnumerable<DetailInventoryModel>> GetByProductBarcode(string barcode, int? maxGetCount)
+            => await GetByInputAsync(barcode, "product_barcode", maxGetCount);
 
-        public async Task<IEnumerable<DetailInventoryModel>> GetByYearAddedAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<DetailInventoryModel>> GetByYearAddedAsync<TEnum>(int year, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type provided.");
-            return await GetByDateTimeAsync("detail_inventory_added_date", EQueryTimeType.YEAR, type, year);
+            return await GetByDateTimeAsync("detail_inventory_added_date", EQueryTimeType.YEAR, type, year, maxGetCount);
         }
+
+        public Task<IEnumerable<DetailInventoryModel>> GetByYearLastUpdatedAsync<TEnum>(int year, TEnum compareType, int? maxGetCount) where TEnum : Enum
+        {
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid compare type provided.");
+            return GetByDateTimeAsync("detail_inventory_last_updated_date", EQueryTimeType.YEAR, type, year, maxGetCount);
+        }
+
     }
 }

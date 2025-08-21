@@ -1,11 +1,12 @@
 ﻿using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class CategoryDAO : BaseDAO<CategoryModel>, IGetByStatusAsync<CategoryModel>, IGetRelativeAsync<CategoryModel>
+    public class CategoryDAO : BaseDAO<CategoryModel>, ICategoryDAO<CategoryModel>
     {
         public CategoryDAO(
             IDbConnectionFactory connectionFactory,
@@ -34,14 +35,10 @@ namespace ProjectShop.Server.Infrastructure.Data
                 WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        public async Task<IEnumerable<CategoryModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "category_status");
-
-        public async Task<IEnumerable<CategoryModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "category_name");
-
-        public async Task<IEnumerable<CategoryModel>> GetByLikeStringAsync(string input, int maxGetCount)
+        public async Task<IEnumerable<CategoryModel>> GetByLikeStringAsync(string input, int? maxGetCount)
             => await GetByLikeStringAsync(input, "category_name", maxGetCount);
 
-        public async Task<IEnumerable<CategoryModel>> GetByStatusAsync(bool status, int maxGetCount)
+        public async Task<IEnumerable<CategoryModel>> GetByStatusAsync(bool status, int? maxGetCount)
             => await GetByInputAsync(GetTinyIntString(status), "category_status", maxGetCount);
     }
 }

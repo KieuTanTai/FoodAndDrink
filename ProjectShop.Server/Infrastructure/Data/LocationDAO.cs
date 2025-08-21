@@ -42,46 +42,58 @@ namespace ProjectShop.Server.Infrastructure.Data
               WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        public async Task<LocationModel?> GetByLocationNameAsync(string locationName) => await GetSingleDataAsync(locationName, "location_name");
+        public async Task<LocationModel?> GetByLocationNameAsync(string locationName) 
+            => await GetSingleDataAsync(locationName, "location_name");
 
-        public async Task<IEnumerable<LocationModel>> GetByLocationNamesAsync(IEnumerable<string> locationNames) => await GetByInputsAsync(locationNames, "location_name");
+        public async Task<IEnumerable<LocationModel>> GetByLocationNamesAsync(IEnumerable<string> locationNames, int? maxGetCount) 
+            => await GetByInputsAsync(locationNames, "location_name", maxGetCount);
 
-        public async Task<LocationModel?> GetByHouseNumberAsync(string houseNumber) => await GetSingleDataAsync(houseNumber, "location_house_number");
+        public async Task<LocationModel?> GetByHouseNumberAsync(string houseNumber) 
+            => await GetSingleDataAsync(houseNumber, "location_house_number");
 
-        public async Task<IEnumerable<LocationModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "location_name");
-
-        public async Task<IEnumerable<LocationModel>> GetByLikeStringAsync(string input, int maxGetCount)
+        public async Task<IEnumerable<LocationModel>> GetByLikeStringAsync(string input, int? maxGetCount)
             => await GetByLikeStringAsync(input, "location_name", maxGetCount);
 
-        public async Task<IEnumerable<LocationModel>> GetByLocationCitiesAsync(IEnumerable<uint> cityIds) => await GetByInputsAsync(cityIds.Select(locationCity => locationCity.ToString()), "location_city_id");
+        public async Task<IEnumerable<LocationModel>> GetByLocationCitiesAsync(IEnumerable<uint> cityIds, int? maxGetCount) 
+            => await GetByInputsAsync(cityIds.Select(locationCity => locationCity.ToString()), "location_city_id", maxGetCount);
 
-        public async Task<IEnumerable<LocationModel>> GetByLocationCityAsync(uint cityId) => await GetByInputAsync(cityId.ToString(), "location_city_id");
+        public async Task<IEnumerable<LocationModel>> GetByLocationCityAsync(uint cityId, int? maxGetCount) 
+            => await GetByInputAsync(cityId.ToString(), "location_city_id", maxGetCount);
 
-        public async Task<IEnumerable<LocationModel>> GetByLocationDistrictAsync(uint districtId) => await GetByInputAsync(districtId.ToString(), "location_district_id");
+        public async Task<IEnumerable<LocationModel>> GetByLocationDistrictAsync(uint districtId, int? maxGetCount) 
+            => await GetByInputAsync(districtId.ToString(), "location_district_id", maxGetCount);
 
-        public async Task<IEnumerable<LocationModel>> GetByLocationDistrictsAsync(IEnumerable<uint> districtIds) => await GetByInputsAsync(districtIds.Select(locationDistrict => locationDistrict.ToString()), "location_district_id");
+        public async Task<IEnumerable<LocationModel>> GetByLocationDistrictsAsync(IEnumerable<uint> districtIds, int? maxGetCount) 
+            => await GetByInputsAsync(districtIds.Select(locationDistrict => locationDistrict.ToString()), "location_district_id", maxGetCount);
 
-        public async Task<LocationModel?> GetByLocationEmailAsync(string email) => await GetSingleDataAsync(email, "location_email");
+        public async Task<LocationModel?> GetByLocationEmailAsync(string email) 
+            => await GetSingleDataAsync(email, "location_email");
 
-        public async Task<IEnumerable<LocationModel>> GetByLocationEmailsAsync(IEnumerable<string> emails) => await GetByInputsAsync(emails, "location_email");
+        public async Task<IEnumerable<LocationModel>> GetByLocationEmailsAsync(IEnumerable<string> emails, int? maxGetCount) 
+            => await GetByInputsAsync(emails, "location_email", maxGetCount);
 
-        public async Task<LocationModel?> GetByLocationPhoneAsync(string phone) => await GetSingleDataAsync(phone, "location_phone");
+        public async Task<LocationModel?> GetByLocationPhoneAsync(string phone) 
+            => await GetSingleDataAsync(phone, "location_phone");
 
-        public async Task<IEnumerable<LocationModel>> GetByLocationPhonesAsync(IEnumerable<string> phones) => await GetByInputsAsync(phones, "location_phone");
+        public async Task<IEnumerable<LocationModel>> GetByLocationPhonesAsync(IEnumerable<string> phones, int? maxGetCount) 
+            => await GetByInputsAsync(phones, "location_phone", maxGetCount);
 
-        public async Task<IEnumerable<LocationModel>> GetByLocationTypeIdAsync(uint typeId) => await GetByInputAsync(typeId.ToString(), "location_type_id");
+        public async Task<IEnumerable<LocationModel>> GetByLocationTypeIdAsync(uint typeId, int? maxGetCount) 
+            => await GetByInputAsync(typeId.ToString(), "location_type_id", maxGetCount);
 
-        public async Task<IEnumerable<LocationModel>> GetByLocationTypeIdsAsync(IEnumerable<uint> typeIds) => await GetByInputsAsync(typeIds.Select(locationType => locationType.ToString()), "location_type_id");
+        public async Task<IEnumerable<LocationModel>> GetByLocationTypeIdsAsync(IEnumerable<uint> typeIds, int? maxGetCount) 
+            => await GetByInputsAsync(typeIds.Select(locationType => locationType.ToString()), "location_type_id", maxGetCount);
 
-        public async Task<IEnumerable<LocationModel>> GetByLocationWardIdAsync(uint wardId) => await GetByInputAsync(wardId.ToString(), "location_ward_id");
+        public async Task<IEnumerable<LocationModel>> GetByLocationWardIdAsync(uint wardId, int? maxGetCount) 
+            => await GetByInputAsync(wardId.ToString(), "location_ward_id", maxGetCount);
 
-        public async Task<IEnumerable<LocationModel>> GetByLocationWardIdsAsync(IEnumerable<uint> wardIds) => await GetByInputsAsync(wardIds.Select(locationWard => locationWard.ToString()), "location_ward_id");
+        public async Task<IEnumerable<LocationModel>> GetByLocationWardIdsAsync(IEnumerable<uint> wardIds, int? maxGetCount) 
+            => await GetByInputsAsync(wardIds.Select(locationWard => locationWard.ToString()), "location_ward_id", maxGetCount);
 
-        public async Task<IEnumerable<LocationModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "location_status");
-
-        public async Task<IEnumerable<LocationModel>> GetByStatusAsync(bool status, int maxGetCount)
+        public async Task<IEnumerable<LocationModel>> GetByStatusAsync(bool status, int? maxGetCount)
             => await GetByInputAsync(GetTinyIntString(status), "location_status", maxGetCount);
 
-        public async Task<IEnumerable<LocationModel>> GetByStreetAsync(string streetName) => await GetByInputAsync(streetName, "location_street");
+        public async Task<IEnumerable<LocationModel>> GetByStreetAsync(string streetName, int? maxGetCount) 
+            => await GetByInputAsync(streetName, "location_street", maxGetCount);
     }
 }

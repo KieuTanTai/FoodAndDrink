@@ -34,13 +34,14 @@ namespace ProjectShop.Server.Infrastructure.Data
                 WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        public async Task<IEnumerable<CartModel>> GetByTotalPriceAsync(decimal minPrice, decimal maxPrice) => await GetByRangeDecimalAsync(minPrice, maxPrice, "cart_total_price");
+        public async Task<IEnumerable<CartModel>> GetByTotalPriceAsync(decimal minPrice, decimal maxPrice, int? maxGetCount) 
+            => await GetByRangeDecimalAsync(minPrice, maxPrice, "cart_total_price", maxGetCount);
 
-        public async Task<IEnumerable<CartModel>> GetByTotalPriceAsync<TEnum>(decimal price, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<CartModel>> GetByTotalPriceAsync<TEnum>(decimal price, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid comparison type provided.");
-            return await GetByTotalPriceAsync(price, type);
+            return await GetByTotalPriceAsync(price, type, maxGetCount);
         }
 
     }

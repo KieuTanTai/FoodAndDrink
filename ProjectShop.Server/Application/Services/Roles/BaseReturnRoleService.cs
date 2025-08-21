@@ -19,9 +19,6 @@ namespace ProjectShop.Server.Application.Services.Roles
 
         protected override async Task<RoleModel> GetNavigationPropertyByOptionsAsync(RoleModel role, RoleNavigationOptions? options)
         {
-            if (role == null)
-                throw new InvalidOperationException("Role cannot be null for navigation property retrieval.");
-
             if (options?.IsGetRolesOfUsers == true)
                 role.RolesOfUsers = await TryLoadRolesOfUsersAsync(role.RoleId);
 
@@ -30,9 +27,6 @@ namespace ProjectShop.Server.Application.Services.Roles
 
         protected override async Task<IEnumerable<RoleModel>> GetNavigationPropertyByOptionsAsync(IEnumerable<RoleModel> roles, RoleNavigationOptions? options)
         {
-            if (roles == null || !roles.Any())
-                throw new InvalidOperationException("Roles collection cannot be null or empty for navigation property retrieval.");
-
             if (options?.IsGetRolesOfUsers == true)
             {
                 IEnumerable<RoleModel> roleList = roles.ToList();

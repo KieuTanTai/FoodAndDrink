@@ -24,8 +24,10 @@ namespace ProjectShop.Server.Infrastructure.Data
         }
         // Implement other methods as needed
 
-        public async Task<IEnumerable<DetailInventoryMovementModel>> GetByMovementIdAsync(uint movementId) => await GetByInputAsync(movementId.ToString(), "inventory_movement_id");
+        public async Task<IEnumerable<DetailInventoryMovementModel>> GetByMovementIdAsync(uint movementId, int? maxGetCount) 
+            => await GetByInputAsync(movementId.ToString(), "inventory_movement_id", maxGetCount);
 
-        public Task<IEnumerable<DetailInventoryMovementModel>> GetByProductBarcodeAsync(string barcode) => GetByInputAsync(barcode, "product_barcode");
+        public Task<IEnumerable<DetailInventoryMovementModel>> GetByProductBarcodeAsync(string barcode, int? maxGetCount) 
+            => GetByInputAsync(barcode, "product_barcode", maxGetCount);
     }
 }

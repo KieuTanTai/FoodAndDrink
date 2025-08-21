@@ -30,14 +30,10 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        public async Task<IEnumerable<LocationTypeModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "location_type_name");
-
-        public async Task<IEnumerable<LocationTypeModel>> GetByLikeStringAsync(string input, int maxCountName)
+        public async Task<IEnumerable<LocationTypeModel>> GetByLikeStringAsync(string input, int? maxCountName)
             => await GetByLikeStringAsync(input, "location_type_name", maxCountName);
 
-        public async Task<IEnumerable<LocationTypeModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "location_type_status");
-    
-        public async Task<IEnumerable<LocationTypeModel>> GetByStatusAsync(bool status, int maxGetCount)
+        public async Task<IEnumerable<LocationTypeModel>> GetByStatusAsync(bool status, int? maxGetCount)
             => await GetByInputAsync(GetTinyIntString(status), "location_type_status", maxGetCount);
     }
 }

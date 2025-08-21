@@ -33,37 +33,40 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        public async Task<IEnumerable<DetailCartModel>> GetByMonthAndYearAsync(int year, int month)
-                    => await GetByDateTimeAsync("detail_cart_added_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month));
+        public async Task<IEnumerable<DetailCartModel>> GetByMonthAndYearAsync(int year, int month, int? maxGetCount)
+                    => await GetByDateTimeAsync("detail_cart_added_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month), maxGetCount);
 
-        public async Task<IEnumerable<DetailCartModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<DetailCartModel>> GetByYearAsync<TEnum>(int year, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type provided.");
-            return await GetByDateTimeAsync("detail_cart_added_date", EQueryTimeType.YEAR, type, year);
+            return await GetByDateTimeAsync("detail_cart_added_date", EQueryTimeType.YEAR, type, year, maxGetCount);
         }
 
-        public async Task<IEnumerable<DetailCartModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate)
-            => await GetByDateTimeAsync("detail_cart_added_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate));
+        public async Task<IEnumerable<DetailCartModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+            => await GetByDateTimeAsync("detail_cart_added_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate), maxGetCount);
 
-        public async Task<IEnumerable<DetailCartModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<DetailCartModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type provided.");
-            return await GetByDateTimeAsync("detail_cart_added_date", EQueryTimeType.DATE_TIME, type, dateTime);
+            return await GetByDateTimeAsync("detail_cart_added_date", EQueryTimeType.DATE_TIME, type, dateTime, maxGetCount);
         }
 
-        public async Task<IEnumerable<DetailCartModel>> GetByInputPriceAsync<TEnum>(decimal price, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<DetailCartModel>> GetByInputPriceAsync<TEnum>(decimal price, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type provided.");
-            return await GetByDecimalAsync(price, compareType, "detail_cart_price");
+            return await GetByDecimalAsync(price, compareType, "detail_cart_price", maxGetCount);
         }
 
-        public async Task<IEnumerable<DetailCartModel>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice) => await GetByRangeDecimalAsync(minPrice, maxPrice, "detail_cart_price");
+        public async Task<IEnumerable<DetailCartModel>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice, int? maxGetCount) 
+            => await GetByRangeDecimalAsync(minPrice, maxPrice, "detail_cart_price", maxGetCount);
 
-        public async Task<IEnumerable<DetailCartModel>> GetByCartId(uint cartId) => await GetByInputAsync(cartId.ToString(), "cart_id");
+        public async Task<IEnumerable<DetailCartModel>> GetByCartIdAsync(uint cartId, int? maxGetCount) 
+            => await GetByInputAsync(cartId.ToString(), "cart_id", maxGetCount);
 
-        public async Task<IEnumerable<DetailCartModel>> GetByProductBarcode(string barcode) => await GetByInputAsync(barcode, "product_barcode");
+        public async Task<IEnumerable<DetailCartModel>> GetByProductBarcodeAsync(string barcode, int? maxGetCount) 
+            => await GetByInputAsync(barcode, "product_barcode", maxGetCount);
     }
 }

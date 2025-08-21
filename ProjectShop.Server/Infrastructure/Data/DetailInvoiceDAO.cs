@@ -24,29 +24,30 @@ namespace ProjectShop.Server.Infrastructure.Data
                       VALUES (@InvoiceId, @ProductBarcode, @DetailInvoiceQuantity, @DetailInvoicePrice, @DetailInvoiceStatus); SELECT LAST_INSERT_ID();";
         }
 
-        public async Task<IEnumerable<DetailInvoiceModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "detail_invoice_status");
-
-        public async Task<IEnumerable<DetailInvoiceModel>> GetByStatusAsync(bool status, int maxGetCount)
+        public async Task<IEnumerable<DetailInvoiceModel>> GetByStatusAsync(bool status, int? maxGetCount)
             => await GetByInputAsync(GetTinyIntString(status), "detail_invoice_status", maxGetCount);
 
-        public async Task<IEnumerable<DetailInvoiceModel>> GetByInputPriceAsync<TEnum>(decimal price, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<DetailInvoiceModel>> GetByInputPriceAsync<TEnum>(decimal price, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type provided.");
-            return await GetByDecimalAsync(price, type, "detail_invoice_price");
+            return await GetByDecimalAsync(price, type, "detail_invoice_price", maxGetCount);
         }
 
-        public async Task<IEnumerable<DetailInvoiceModel>> GetByInvoiceIdAsync(uint invoiceId) => await GetByInputAsync(invoiceId.ToString(), "invoice_id");
+        public async Task<IEnumerable<DetailInvoiceModel>> GetByInvoiceIdAsync(uint invoiceId, int? maxGetCount) 
+            => await GetByInputAsync(invoiceId.ToString(), "invoice_id", maxGetCount);
 
-        public async Task<IEnumerable<DetailInvoiceModel>> GetByProductBarcodeAsync(string barcode) => await GetByInputAsync(barcode, "product_barcode");
+        public async Task<IEnumerable<DetailInvoiceModel>> GetByProductBarcodeAsync(string barcode, int? maxGetCount) 
+            => await GetByInputAsync(barcode, "product_barcode", maxGetCount);
 
-        public async Task<IEnumerable<DetailInvoiceModel>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice) => await GetByRangeDecimalAsync(minPrice, maxPrice, "detail_invoice_price");
+        public async Task<IEnumerable<DetailInvoiceModel>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice, int? maxGetCount) 
+            => await GetByRangeDecimalAsync(minPrice, maxPrice, "detail_invoice_price", maxGetCount);
 
-        public async Task<IEnumerable<DetailInvoiceModel>> GetByQuantityAsync<TEnum>(int quantity, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<DetailInvoiceModel>> GetByQuantityAsync<TEnum>(int quantity, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type provided.");
-            return await GetByInputAsync(quantity.ToString(), type, "detail_invoice_quantity");
+            return await GetByInputAsync(quantity.ToString(), type, "detail_invoice_quantity", maxGetCount);
         }
     }
 }

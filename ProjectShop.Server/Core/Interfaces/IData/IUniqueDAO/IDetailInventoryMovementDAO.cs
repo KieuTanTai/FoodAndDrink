@@ -2,7 +2,7 @@
 {
     public interface IDetailInventoryMovementDAO<TEntity> where TEntity : class
     {
-        Task<IEnumerable<TEntity>> GetByMovementIdAsync(uint movementId);
-        Task<IEnumerable<TEntity>> GetByProductBarcodeAsync(string barcode);
+        Task<IEnumerable<TEntity>> GetByMovementIdAsync(uint movementId, int? maxGetCount);
+        Task<IEnumerable<TEntity>> GetByProductBarcodeAsync(string barcode, int? maxGetCount);
     }
 }

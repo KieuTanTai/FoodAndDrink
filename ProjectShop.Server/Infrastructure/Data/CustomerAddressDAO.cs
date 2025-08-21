@@ -38,35 +38,54 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        public async Task<IEnumerable<CustomerAddressModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "customer_address_status");
 
-        public async Task<IEnumerable<CustomerAddressModel>> GetByStatusAsync(bool status, int maxGetCount)
+        public async Task<IEnumerable<CustomerAddressModel>> GetByStatusAsync(bool status, int? maxGetCount)
             => await GetByInputAsync(GetTinyIntString(status), "customer_address_status", maxGetCount);
 
-        public async Task<IEnumerable<CustomerAddressModel>> GetByStreetLikeAsync(string streetLike) => await GetByLikeStringAsync(streetLike, "customer_street");
+        public async Task<IEnumerable<CustomerAddressModel>> GetByStreetLikeAsync(string streetLike, int? maxGetCount) 
+            => await GetByLikeStringAsync(streetLike, "customer_street", maxGetCount);
 
-        public async Task<IEnumerable<CustomerAddressModel>> GetByCityIdAsync(uint cityId) => await GetByInputAsync(cityId.ToString(), "customer_city_id");
+        public async Task<IEnumerable<CustomerAddressModel>> GetByCityIdAsync(uint cityId, int? maxGetCount) 
+            => await GetByInputAsync(cityId.ToString(), "customer_city_id", maxGetCount);
 
-        public async Task<IEnumerable<CustomerAddressModel>> GetByCustomerIdAsync(string customerId) => await GetByInputAsync(customerId, "customer_id");
+        public async Task<IEnumerable<CustomerAddressModel>> GetByCustomerIdAsync(string customerId, int? maxGetCount) 
+            => await GetByInputAsync(customerId, "customer_id", maxGetCount);
 
-        public async Task<IEnumerable<CustomerAddressModel>> GetByDistrictIdAsync(uint districtId) => await GetByInputAsync(districtId.ToString(), "customer_district_id");
+        public async Task<IEnumerable<CustomerAddressModel>> GetByDistrictIdAsync(uint districtId, int? maxGetCount) 
+            => await GetByInputAsync(districtId.ToString(), "customer_district_id", maxGetCount);
+         
+        public async Task<IEnumerable<CustomerAddressModel>> GetByWardIdAsync(uint wardId, int? maxGetCount) 
+            => await GetByInputAsync(wardId.ToString(), "customer_ward_id", maxGetCount);
 
-        public async Task<IEnumerable<CustomerAddressModel>> GetByWardIdAsync(uint wardId) => await GetByInputAsync(wardId.ToString(), "customer_ward_id");
+        public async Task<IEnumerable<CustomerAddressModel>> GetByCityIdAndDistrictIdAsync(uint cityId, uint districtId, int? maxGetCount) 
+            => await GetByColNamesAsync(cityId, districtId, "customer_city_id", "customer_district_id", maxGetCount);
 
-        public async Task<IEnumerable<CustomerAddressModel>> GetByCityIdAndDistrictIdAsync(uint cityId, uint districtId) => await GetByColNamesAsync(cityId, districtId, "customer_city_id", "customer_district_id");
+        public async Task<IEnumerable<CustomerAddressModel>> GetByCityIdAndWardIdAsync(uint cityId, uint wardId, int? maxGetCount) 
+            => await GetByColNamesAsync(cityId, wardId, "customer_city_id", "customer_ward_id", maxGetCount);
 
-        public async Task<IEnumerable<CustomerAddressModel>> GetByCityIdAndWardIdAsync(uint cityId, uint wardId) => await GetByColNamesAsync(cityId, wardId, "customer_city_id", "customer_ward_id");
-
-        public async Task<IEnumerable<CustomerAddressModel>> GetByDistrictIdAndWardIdAsync(uint districtId, uint wardId) => await GetByColNamesAsync(districtId, wardId, "customer_district_id", "customer_ward_id");
+        public async Task<IEnumerable<CustomerAddressModel>> GetByDistrictIdAndWardIdAsync(uint districtId, uint wardId, int? maxGetCount) 
+            => await GetByColNamesAsync(districtId, wardId, "customer_district_id", "customer_ward_id", maxGetCount);
 
         // DRY
-        private async Task<IEnumerable<CustomerAddressModel>> GetByColNamesAsync(uint firstInput, uint secondInput, string firstColName, string secondColName)
+        private async Task<IEnumerable<CustomerAddressModel>> GetByColNamesAsync(uint firstInput, uint secondInput, string firstColName, string secondColName, int? maxGetCount = null)
         {
+            string query = $"";
+            if (maxGetCount.HasValue && maxGetCount.Value <= 0)
+                throw new ArgumentException("max get count must be greater than 0.");
+            else if (maxGetCount.HasValue && maxGetCount.Value > 0)
+                query = $@"
+                    SELECT * FROM {TableName} 
+                    WHERE {firstColName} = @FirstInput AND {secondColName} = @SecondInput 
+                    LIMIT @MaxGetCount";
+            else 
+                query = $@"
+                    SELECT * FROM {TableName} 
+                    WHERE {firstColName} = @FirstInput AND {secondColName} = @SecondInput";
             try
             {
-                string query = $"SELECT * FROM {TableName} WHERE {firstColName} = @FirstInput AND {secondColName} = @SecondInput";
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                IEnumerable<CustomerAddressModel> addresses = await connection.QueryAsync<CustomerAddressModel>(query, new { FirstInput = firstInput, SecondInput = secondInput });
+                IEnumerable<CustomerAddressModel> addresses = await connection.QueryAsync<CustomerAddressModel>(query, 
+                            new { FirstInput = firstInput, SecondInput = secondInput, MaxGetCount = maxGetCount });
                 return addresses;
             }
             catch (Exception ex)

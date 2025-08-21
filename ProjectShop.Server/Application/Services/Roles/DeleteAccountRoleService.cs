@@ -39,7 +39,7 @@ namespace ProjectShop.Server.Application.Services.Roles
         {
             try
             {
-                if (!await DoAllKeysExistAsync(Listkeys, _roleOfUserDAO.GetByListKeysAsync))
+                if (!await DoAllKeysExistAsync(Listkeys, _roleOfUserDAO.Ar))
                     throw new KeyNotFoundException("One or more specified account roles do not exist.");
                 // Delete the roles
                 int result = await _roleOfUserDAO.DeleteByListKeysAsync(Listkeys);

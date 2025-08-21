@@ -141,75 +141,91 @@ namespace ProjectShop.Server.Infrastructure.Data
                     FROM {TableName} WHERE {colName} {compareOperator} DATE_ADD(@Input, INTERVAL 1 DAY)";
         }
 
-        public async Task<EmployeeModel?> GetByHouseNumberAsync(string houseNumber) => await GetSingleDataAsync(houseNumber, "employee_house_number");
+        public async Task<EmployeeModel?> GetByHouseNumberAsync(string houseNumber)
+            => await GetSingleDataAsync(houseNumber, "employee_house_number");
 
-        public async Task<IEnumerable<EmployeeModel>> GetByHouseNumbersAsync(IEnumerable<string> houseNumbers) => await GetByInputsAsync(houseNumbers, "employee_house_number");
+        public async Task<IEnumerable<EmployeeModel>> GetByHouseNumbersAsync(IEnumerable<string> houseNumbers, int? maxGetCount)
+            => await GetByInputsAsync(houseNumbers, "employee_house_number", maxGetCount);
 
-        public async Task<IEnumerable<EmployeeModel>> GetByStreetAsync(string street) => await GetByInputAsync(street, "employee_street");
+        public async Task<IEnumerable<EmployeeModel>> GetByStreetAsync(string street, int? maxGetCount)
+            => await GetByInputAsync(street, "employee_street", maxGetCount);
 
-        public async Task<IEnumerable<EmployeeModel>> GetByStreetsAsync(IEnumerable<string> streets) => await GetByInputsAsync(streets, "employee_street");
+        public async Task<IEnumerable<EmployeeModel>> GetByStreetsAsync(IEnumerable<string> streets, int? maxGetCount)
+            => await GetByInputsAsync(streets, "employee_street", maxGetCount);
 
-        public async Task<IEnumerable<EmployeeModel>> GetByCityAsync(uint city) => await GetByInputAsync(city.ToString(), "employee_city_id");
+        public async Task<IEnumerable<EmployeeModel>> GetByCityAsync(uint city, int? maxGetCount)
+            => await GetByInputAsync(city.ToString(), "employee_city_id", maxGetCount);
 
-        public async Task<IEnumerable<EmployeeModel>> GetByCitiesAsync(IEnumerable<uint> cities) => await GetByInputsAsync(cities.Select(city => city.ToString()), "employee_city_id");
+        public async Task<IEnumerable<EmployeeModel>> GetByCitiesAsync(IEnumerable<uint> cities, int? maxGetCount)
+            => await GetByInputsAsync(cities.Select(city => city.ToString()), "employee_city_id", maxGetCount);
 
-        public async Task<IEnumerable<EmployeeModel>> GetByWardIdAsync(uint wardId) => await GetByInputAsync(wardId.ToString(), "employee_ward_id");
+        public async Task<IEnumerable<EmployeeModel>> GetByWardIdAsync(uint wardId, int? maxGetCount)
+            => await GetByInputAsync(wardId.ToString(), "employee_ward_id", maxGetCount);
 
-        public async Task<IEnumerable<EmployeeModel>> GetByWardIdsAsync(IEnumerable<uint> wardIds) => await GetByInputsAsync(wardIds.Select(wardId => wardId.ToString()), "employee_ward_id");
+        public async Task<IEnumerable<EmployeeModel>> GetByWardIdsAsync(IEnumerable<uint> wardIds, int? maxGetCount)
+            => await GetByInputsAsync(wardIds.Select(wardId => wardId.ToString()), "employee_ward_id", maxGetCount);
 
-        public async Task<IEnumerable<EmployeeModel>> GetByDistrictIdAsync(uint districtId) => await GetByInputAsync(districtId.ToString(), "employee_district_id");
+        public async Task<IEnumerable<EmployeeModel>> GetByDistrictIdAsync(uint districtId, int? maxGetCount)
+            => await GetByInputAsync(districtId.ToString(), "employee_district_id", maxGetCount);
 
-        public async Task<IEnumerable<EmployeeModel>> GetByDistrictIdsAsync(IEnumerable<uint> districtIds) => await GetByInputsAsync(districtIds.Select(districtId => districtId.ToString()), "employee_district_id");
+        public async Task<IEnumerable<EmployeeModel>> GetByDistrictIdsAsync(IEnumerable<uint> districtIds, int? maxGetCount)
+            => await GetByInputsAsync(districtIds.Select(districtId => districtId.ToString()), "employee_district_id", maxGetCount);
 
-        public async Task<IEnumerable<EmployeeModel>> GetByLocationIdAsync(uint locationId) => await GetByInputAsync(locationId.ToString(), "location_id");
+        public async Task<IEnumerable<EmployeeModel>> GetByLocationIdAsync(uint locationId, int? maxGetCount)
+            => await GetByInputAsync(locationId.ToString(), "location_id", maxGetCount);
 
-        public async Task<IEnumerable<EmployeeModel>> GetByLocationIdsAsync(IEnumerable<uint> locationIds) => await GetByInputsAsync(locationIds.Select(locationId => locationId.ToString()), "location_id");
+        public async Task<IEnumerable<EmployeeModel>> GetByLocationIdsAsync(IEnumerable<uint> locationIds, int? maxGetCount)
+            => await GetByInputsAsync(locationIds.Select(locationId => locationId.ToString()), "location_id", maxGetCount);
 
-        public async Task<EmployeeModel?> GetByAccountIdAsync(uint accountId) => await GetSingleDataAsync(accountId.ToString(), "account_id");
-        public async Task<IEnumerable<EmployeeModel>> GetByAccountIdsAsync(IEnumerable<uint> accountIds) 
-            => await GetByInputsAsync(accountIds.Select(accountId => accountId.ToString()), "account_id");
-        public async Task<EmployeeModel?> GetByPhoneAsync(string phone) => await GetSingleDataAsync(phone, "employee_phone");
+        public async Task<EmployeeModel?> GetByAccountIdAsync(uint accountId)
+            => await GetSingleDataAsync(accountId.ToString(), "account_id");
+        public async Task<IEnumerable<EmployeeModel>> GetByAccountIdsAsync(IEnumerable<uint> accountIds, int? maxGetCount)
+            => await GetByInputsAsync(accountIds.Select(accountId => accountId.ToString()), "account_id", maxGetCount);
+        public async Task<EmployeeModel?> GetByPhoneAsync(string phone)
+            => await GetSingleDataAsync(phone, "employee_phone");
 
-        public async Task<IEnumerable<EmployeeModel>> GetByPhonesAsync(IEnumerable<string> phones) => await GetByInputsAsync(phones, "employee_phone");
+        public async Task<IEnumerable<EmployeeModel>> GetByPhonesAsync(IEnumerable<string> phones, int? maxGetCount)
+            => await GetByInputsAsync(phones, "employee_phone", maxGetCount);
 
-        public async Task<IEnumerable<EmployeeModel>> GetByGenderAsync(bool isMale) => await GetByInputAsync(isMale.ToString(), "employee_gender");
+        public async Task<IEnumerable<EmployeeModel>> GetByGenderAsync(bool isMale, int? maxGetCount)
+            => await GetByInputAsync(isMale.ToString(), "employee_gender", maxGetCount);
 
-        public async Task<IEnumerable<EmployeeModel>> GetByGendersAsync(IEnumerable<bool> isMales) => await GetByInputsAsync(isMales.Select(isMale => isMale.ToString()), "employee_gender");
+        public async Task<EmployeeModel?> GetByEmailAsync(string email)
+            => await GetSingleDataAsync(email, "employee_email");
 
-        public async Task<EmployeeModel?> GetByEmailAsync(string email) => await GetSingleDataAsync(email, "employee_email");
+        public async Task<IEnumerable<EmployeeModel>> GetByEmailsAsync(IEnumerable<string> emails, int? maxGetCount)
+            => await GetByInputsAsync(emails, "employee_email", maxGetCount);
 
-        public async Task<IEnumerable<EmployeeModel>> GetByEmailsAsync(IEnumerable<string> emails) => await GetByInputsAsync(emails, "employee_email");
+        public async Task<EmployeeModel?> GetByNameAsync(string name)
+            => await GetSingleDataAsync(name, "employee_name");
 
-        public async Task<EmployeeModel?> GetByNameAsync(string name) => await GetSingleDataAsync(name, "employee_name");
+        public async Task<IEnumerable<EmployeeModel>> GetByNamesAsync(IEnumerable<string> names, int? maxGetCount)
+            => await GetByInputsAsync(names, "employee_name", maxGetCount);
 
-        public async Task<IEnumerable<EmployeeModel>> GetByNamesAsync(IEnumerable<string> names) => await GetByInputsAsync(names, "employee_name");
-
-        public async Task<IEnumerable<EmployeeModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "employee_status");
-
-        public async Task<IEnumerable<EmployeeModel>> GetByStatusAsync(bool status, int maxGetCount)
+        public async Task<IEnumerable<EmployeeModel>> GetByStatusAsync(bool status, int? maxGetCount)
             => await GetByInputAsync(GetTinyIntString(status), "employee_status", maxGetCount);
 
-        public async Task<IEnumerable<EmployeeModel>> GetByLikeStringAsync(string input) => await GetByLikeStringAsync(input, "employee_name");
-
-        public async Task<IEnumerable<EmployeeModel>> GetByLikeStringAsync(string input, int maxGetCount)
+        public async Task<IEnumerable<EmployeeModel>> GetByLikeStringAsync(string input, int? maxGetCount)
             => await GetByLikeStringAsync(input, "employee_name", maxGetCount);
 
-        public async Task<IEnumerable<EmployeeModel>> GetByMonthAndYearAsync(int year, int month) => await GetByDateTimeAsync("employee_birthday", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month));
+        public async Task<IEnumerable<EmployeeModel>> GetByMonthAndYearAsync(int year, int month, int? maxGetCount)
+            => await GetByDateTimeAsync("employee_birthday", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month), maxGetCount);
 
-        public async Task<IEnumerable<EmployeeModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<EmployeeModel>> GetByYearAsync<TEnum>(int year, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type for year comparison.");
-            return await GetByDateTimeAsync("employee_birthday", EQueryTimeType.YEAR, type, year);
+            return await GetByDateTimeAsync("employee_birthday", EQueryTimeType.YEAR, type, year, maxGetCount);
         }
 
-        public async Task<IEnumerable<EmployeeModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate) => await GetByDateTimeAsync("employee_birthday", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate));
+        public async Task<IEnumerable<EmployeeModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+            => await GetByDateTimeAsync("employee_birthday", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate), maxGetCount);
 
-        public async Task<IEnumerable<EmployeeModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<EmployeeModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type for date time comparison.");
-            return await GetByDateTimeAsync("employee_birthday", EQueryTimeType.DATE_TIME, type, dateTime);
+            return await GetByDateTimeAsync("employee_birthday", EQueryTimeType.DATE_TIME, type, dateTime, maxGetCount);
         }
     }
 }

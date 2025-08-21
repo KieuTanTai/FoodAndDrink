@@ -56,9 +56,8 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<IEnumerable<AccountModel>> GetByUserNameAsync(IEnumerable<string> userNames) => await GetByInputsAsync(userNames, "user_name");
         
-        public async Task<IEnumerable<AccountModel>> GetByStatusAsync(bool status) => await GetByInputAsync(GetTinyIntString(status), "account_status");
         
-        public async Task<IEnumerable<AccountModel>> GetByStatusAsync(bool status, int maxGetCount)
+        public async Task<IEnumerable<AccountModel>> GetByStatusAsync(bool status, int? maxGetCount)
             => await GetByInputAsync(GetTinyIntString(status), "account_status", maxGetCount);
 
         // ---- Public API cho Created Date ----

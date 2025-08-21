@@ -37,7 +37,8 @@
     <Folder Include="Application\Services\Account\AccountRoles\" />
     <Folder Include="Application\Services\Account\Customer\" />
     <Folder Include="Application\Services\Account\Employee\" />
-    <Folder Include="Application\Services\Product\" />
+    <Folder Include="Application\Services\Location\Inventory\" />
+    <Folder Include="Application\Services\Supplier\" />
     <Folder Include="Core\Entities\GetNavigationPropertyOptions\" />
     <Folder Include="Core\Interfaces\IServices\ICategory\" />
   </ItemGroup>

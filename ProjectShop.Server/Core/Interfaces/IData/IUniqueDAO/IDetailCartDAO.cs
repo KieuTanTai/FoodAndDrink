@@ -2,7 +2,7 @@
 {
     public interface IDetailCartDAO<TEntity> : IGetDataByDateTimeAsync<TEntity>, IGetByRangePriceAsync<TEntity> where TEntity : class
     {
-        Task<IEnumerable<TEntity>> GetByCartId(uint cartId);
-        Task<IEnumerable<TEntity>> GetByProductBarcode(string barcode);
+        Task<IEnumerable<TEntity>> GetByCartIdAsync(uint cartId, int? maxGetCount = null);
+        Task<IEnumerable<TEntity>> GetByProductBarcodeAsync(string barcode, int? maxGetCount = null);
     }
 }

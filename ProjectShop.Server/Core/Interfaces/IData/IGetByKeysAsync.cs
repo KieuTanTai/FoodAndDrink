@@ -4,6 +4,6 @@
     {
         //public string GetSingleDataString();
         Task<TEntity> GetByKeysAsync(TKey keys);
-        Task<IEnumerable<TEntity>> GetByListKeysAsync(IEnumerable<TKey> keys);
+        Task<IEnumerable<TEntity>> GetByListKeysAsync(IEnumerable<TKey> keys, int? maxGetCount = null);
     }
 }

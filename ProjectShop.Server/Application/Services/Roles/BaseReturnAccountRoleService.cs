@@ -5,7 +5,7 @@ using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 
 namespace ProjectShop.Server.Application.Services.Roles
 {
-    public class BaseReturnAccountRoleService : BaseGetByTimeService<RolesOfUserModel, RolesOfUserNavigationOptions>
+    public abstract class BaseReturnAccountRoleService : BaseGetByTimeService<RolesOfUserModel, RolesOfUserNavigationOptions>
     {
         protected readonly IDAO<RolesOfUserModel> _baseDAO;
         protected readonly IDAO<RoleModel> _baseRoleDAO;
@@ -21,9 +21,6 @@ namespace ProjectShop.Server.Application.Services.Roles
         }
         protected override async Task<RolesOfUserModel> GetNavigationPropertyByOptionsAsync(RolesOfUserModel role, RolesOfUserNavigationOptions? options)
         {
-            if (role == null)
-                throw new InvalidOperationException("Role cannot be null for navigation property retrieval.");
-            // Add any specific navigation property loading logic here if needed
             if (options?.IsGetRole == true)
                 role.Role = await TryLoadRoleAsync(role.RoleId);
 
@@ -33,9 +30,6 @@ namespace ProjectShop.Server.Application.Services.Roles
         }
         protected override async Task<IEnumerable<RolesOfUserModel>> GetNavigationPropertyByOptionsAsync(IEnumerable<RolesOfUserModel> roles, RolesOfUserNavigationOptions? options)
         {
-            if (roles == null || !roles.Any())
-                throw new InvalidOperationException("Roles collection cannot be null or empty for navigation property retrieval.");
-            // Add any specific navigation property loading logic here if needed
             if (options?.IsGetRole == true)
             {
                 var roleList = roles.ToList();

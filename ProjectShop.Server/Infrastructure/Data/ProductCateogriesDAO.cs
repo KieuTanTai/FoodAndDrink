@@ -39,9 +39,15 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"DELETE FROM {TableName} WHERE {colName} = @Input";
         }
 
-        public async Task<IEnumerable<ProductCategoriesModel>> GetByCategoryIdAsync(uint categoryId) => await GetByInputAsync(categoryId.ToString(), "category_id");
+        public async Task<IEnumerable<ProductCategoriesModel>> GetByCategoryIdAsync(uint categoryId, int? getMaxCount) 
+            => await GetByInputAsync(categoryId.ToString(), "category_id", getMaxCount);
+        public async Task<IEnumerable<ProductCategoriesModel>> GetByCategoryIdsAsync(IEnumerable<uint> categoryIds, int? getMaxCount)
+            => await GetByInputsAsync(categoryIds.Select(categoryId => categoryId.ToString()), "category_id", getMaxCount);
+        public async Task<IEnumerable<ProductCategoriesModel>> GetByProductBarcodeAsync(string productBarcode, int? maxGetCount) 
+            => await GetByInputAsync(productBarcode, "product_barcode", maxGetCount);
 
-        public async Task<IEnumerable<ProductCategoriesModel>> GetByProductBarcodeAsync(string productBarcode) => await GetByInputAsync(productBarcode, "product_barcode");
+        public async Task<IEnumerable<ProductCategoriesModel>> GetByProductBarcodesAsync(IEnumerable<string> productBarcodes, int? maxGetCount)
+            => await GetByInputsAsync(productBarcodes, "product_barcode", maxGetCount);
 
         public async Task<ProductCategoriesModel> GetByKeysAsync(ProductCategoriesKey keys) => await GetSingleByTwoIdAsync(ColumnIdName, SecondColumnIdName, keys.CategoryId, keys.ProductBarcode);
 

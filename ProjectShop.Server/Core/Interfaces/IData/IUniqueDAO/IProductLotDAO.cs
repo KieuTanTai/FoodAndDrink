@@ -2,6 +2,6 @@
 {
     public interface IProductLotDAO<TEntity> : IGetDataByDateTimeAsync<TEntity> where TEntity : class
     {
-        Task<IEnumerable<TEntity>> GetByProductBarcodeAsync(string barcode);
+        Task<IEnumerable<TEntity>> GetByProductBarcodeAsync(string barcode, int? maxGetCount = null);
     }
 }

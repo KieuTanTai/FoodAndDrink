@@ -26,38 +26,43 @@ namespace ProjectShop.Server.Infrastructure.Data
                               @DisposeQuantity, @DisposedDate); SELECT LAST_INSERT_ID();";
         }
 
-        public async Task<IEnumerable<DisposeProductModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<DisposeProductModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type for date time comparison.");
-            return await GetByDateTimeAsync("disposed_date", EQueryTimeType.DATE_TIME, type, dateTime);
+            return await GetByDateTimeAsync("disposed_date", EQueryTimeType.DATE_TIME, type, dateTime, maxGetCount);
         }
 
-        public async Task<IEnumerable<DisposeProductModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate)
-            => await GetByDateTimeAsync("disposed_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate));
+        public async Task<IEnumerable<DisposeProductModel>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+            => await GetByDateTimeAsync("disposed_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate), maxGetCount);
 
-        public async Task<IEnumerable<DisposeProductModel>> GetByEmployeeIdAsync(uint employeeId) => await GetByInputAsync(employeeId.ToString(), "dispose_by_employee_id");
+        public async Task<IEnumerable<DisposeProductModel>> GetByEmployeeIdAsync(uint employeeId, int? maxGetCount) 
+            => await GetByInputAsync(employeeId.ToString(), "dispose_by_employee_id", maxGetCount);
 
-        public async Task<IEnumerable<DisposeProductModel>> GetByLocationIdAsync(uint locationId) => await GetByInputAsync(locationId.ToString(), "location_id");
+        public async Task<IEnumerable<DisposeProductModel>> GetByLocationIdAsync(uint locationId, int? maxGetCount) 
+            => await GetByInputAsync(locationId.ToString(), "location_id", maxGetCount);
 
-        public async Task<IEnumerable<DisposeProductModel>> GetByMonthAndYearAsync(int year, int month) => await GetByDateTimeAsync("month_and_year", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month));
+        public async Task<IEnumerable<DisposeProductModel>> GetByMonthAndYearAsync(int year, int month, int? maxGetCount) 
+            => await GetByDateTimeAsync("month_and_year", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month), maxGetCount);
 
-        public async Task<IEnumerable<DisposeProductModel>> GetByProductBarcodeAsync(string barcode) => await GetByInputAsync(barcode, "product_barcode");
+        public async Task<IEnumerable<DisposeProductModel>> GetByProductBarcodeAsync(string barcode, int? maxGetCount) 
+            => await GetByInputAsync(barcode, "product_barcode", maxGetCount);
 
-        public async Task<IEnumerable<DisposeProductModel>> GetByQuantityIdAsync<TCompareType>(int quantity, TCompareType compareType) where TCompareType : Enum
+        public async Task<IEnumerable<DisposeProductModel>> GetByQuantityIdAsync<TCompareType>(int quantity, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type for quantity comparison.");
-            return await GetByInputAsync(quantity.ToString(), type, "dispose_quantity");
+            return await GetByInputAsync(quantity.ToString(), type, "dispose_quantity", maxGetCount);
         }
 
-        public async Task<IEnumerable<DisposeProductModel>> GetByReasonIdAsync(uint reasonId) => await GetByInputAsync(reasonId.ToString(), "dispose_reason_id");
+        public async Task<IEnumerable<DisposeProductModel>> GetByReasonIdAsync(uint reasonId, int? maxGetCount) 
+            => await GetByInputAsync(reasonId.ToString(), "dispose_reason_id", maxGetCount);
 
-        public async Task<IEnumerable<DisposeProductModel>> GetByYearAsync<TEnum>(int year, TEnum compareType) where TEnum : Enum
+        public async Task<IEnumerable<DisposeProductModel>> GetByYearAsync<TEnum>(int year, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)
                 throw new ArgumentException("Invalid compare type for year comparison.");
-            return await GetByDateTimeAsync("year", EQueryTimeType.YEAR, type, year);
+            return await GetByDateTimeAsync("year", EQueryTimeType.YEAR, type, year, maxGetCount);
         }
     }
 }

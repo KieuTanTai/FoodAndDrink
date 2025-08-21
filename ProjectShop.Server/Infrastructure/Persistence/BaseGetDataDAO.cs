@@ -25,39 +25,28 @@ namespace ProjectShop.Server.Infrastructure.Persistence
         protected string SecondColumnIdName { get; } = secondColumnIdName ?? string.Empty;
 
         // GET ALL
-        public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
+        public virtual async Task<IEnumerable<TEntity>> GetAllAsync(int? maxGetCount)
         {
-            try
-            {
-                string query = GetAllQuery();
-                using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query);
-                if (results == null || !results.Any())
-                    throw new KeyNotFoundException($"No data found in {TableName}");
-                return results;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving all data from {TableName}: {ex.Message}", ex);
-            }
-        }
+            string query = "";
+            if (maxGetCount.HasValue && maxGetCount.Value <= 0)
+                throw new ArgumentOutOfRangeException("Max get count must be greater than zero.", nameof(maxGetCount));
+            else if (maxGetCount.HasValue && maxGetCount.Value > 0)
+                query = $"{GetAllQuery()} LIMIT @MaxGetCount";
+            else
+                query = GetAllQuery();
 
-        public virtual async Task<IEnumerable<TEntity>> GetAllAsync(int maxGetCount)
-        {
-            if (maxGetCount <= 0)
-                throw new ArgumentException("Max get count must be greater than zero.", nameof(maxGetCount));
             try
             {
-                string query = $"{GetAllQuery()} LIMIT @MaxGetCount";
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { MaxGetCount = maxGetCount });
                 if (results == null || !results.Any())
-                    throw new KeyNotFoundException($"No data found in {TableName} with limit {maxGetCount}");
+                    throw new KeyNotFoundException($@"No data found in {TableName} with 
+                            {(maxGetCount.HasValue ? $"limit {maxGetCount.Value}" : "no limit")}");
                 return results;
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error retrieving all data from {TableName} with limit: {ex.Message}", ex);
+                throw new Exception($@"Error retrieving all data from {TableName}: {ex.Message}", ex);
             }
         }
 
@@ -66,10 +55,11 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             => await GetSingleDataAsync(input, ColumnIdName);
         public virtual async Task<IEnumerable<TEntity>> GetByInputsAsync(IEnumerable<string> inputs)
             => await GetByInputsAsync(inputs, ColumnIdName);
-        public virtual async Task<IEnumerable<TEntity>> GetByInputAsync(string input, int maxGetCount)
+        public virtual async Task<IEnumerable<TEntity>> GetByInputAsync(string input, int? maxGetCount)
             => await GetByInputAsync(input, ColumnIdName, maxGetCount);
-        public virtual async Task<IEnumerable<TEntity>> GetByInputsAsync(IEnumerable<string> inputs, int maxGetCount)
+        public virtual async Task<IEnumerable<TEntity>> GetByInputsAsync(IEnumerable<string> inputs, int? maxGetCount)
             => await GetByInputsAsync(inputs, ColumnIdName, maxGetCount);
+
         // DRY
         protected async Task<TEntity?> GetSingleDataAsync(string input, string colName)
         {
@@ -88,54 +78,51 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             }
         }
 
-        protected async Task<IEnumerable<TEntity>> GetByInputAsync(string input, string colName)
+        protected async Task<IEnumerable<TEntity>> GetByInputAsync(string input, string colName, int? maxGetCount)
         {
+            string query = "";
+            if (string.IsNullOrEmpty(input))
+                throw new ArgumentException("Input cannot be null or empty.", nameof(input));
+            if (maxGetCount.HasValue && maxGetCount.Value <= 0)
+                throw new ArgumentOutOfRangeException("Max get count must be greater than zero.", nameof(maxGetCount));
+            else if (maxGetCount.HasValue && maxGetCount.Value > 0)
+                query = $"{GetDataQuery(colName)} LIMIT @MaxGetCount";
+            else
+                query = GetDataQuery(colName);
+
             try
             {
-                string query = GetDataQuery(colName);
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Input = input });
+                IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Input = input, MaxGetCount = maxGetCount });
                 if (results == null || !results.Any())
-                    throw new KeyNotFoundException($"No data found in {TableName} for {colName} = {input}");
+                    throw new KeyNotFoundException($@"No data found in {TableName} for {colName} = {input} with 
+                            {(maxGetCount.HasValue ? $"limit {maxGetCount.Value}" : "no limit")}");
                 return results;
             }
             catch (Exception ex)
             {
-                // Handle exception (log it, rethrow it, etc.)
                 throw new Exception($"Error retrieving data by {input}: {ex.Message}", ex);
             }
         }
 
-        protected async Task<IEnumerable<TEntity>> GetByInputAsync(string input, string colName, int maxGetCount)
+        protected async Task<IEnumerable<TEntity>> GetByInputAsync(string input, ECompareType compareType, string colName, int? maxGetCount = null)
         {
+            string query = "";
             if (string.IsNullOrEmpty(input))
                 throw new ArgumentException("Input cannot be null or empty.", nameof(input));
-            if (maxGetCount <= 0)
-                throw new ArgumentException("Max get count must be greater than zero.", nameof(maxGetCount));
+            if (maxGetCount.HasValue && maxGetCount.Value <= 0)
+                throw new ArgumentOutOfRangeException("Max get count must be greater than zero.", nameof(maxGetCount));
+            else if (maxGetCount.HasValue && maxGetCount.Value > 0)
+                query = $"{GetDataQuery(colName, compareType)} LIMIT @MaxGetCount";
+            else
+                query = GetDataQuery(colName, compareType);
             try
             {
-                string query = $"{GetDataQuery(colName)} LIMIT @MaxGetCount";
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Input = input, MaxGetCount = maxGetCount });
                 if (results == null || !results.Any())
-                    throw new KeyNotFoundException($"No data found in {TableName} for {colName} = {input} with limit {maxGetCount}");
-                return results;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving data by {input} with limit: {ex.Message}", ex);
-            }
-        }
-
-        protected async Task<IEnumerable<TEntity>> GetByInputAsync(string input, ECompareType compareType, string colName)
-        {
-            try
-            {
-                string query = GetDataQuery(colName, compareType);
-                using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Input = input });
-                if (results == null || !results.Any())
-                    throw new KeyNotFoundException($"No data found in {TableName} for {colName} with comparison type {compareType} and input {input}");
+                    throw new KeyNotFoundException($"No data found in {TableName} for {colName} with comparison type {compareType} and " +
+                        $"input {input} with {(maxGetCount.HasValue ? $"limit {maxGetCount.Value}" : "no limit")}");
                 return results;
             }
             catch (Exception ex)
@@ -144,57 +131,53 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             }
         }
 
-        protected async Task<IEnumerable<TEntity>> GetByInputsAsync(IEnumerable<string> inputs, string colName)
+        protected async Task<IEnumerable<TEntity>> GetByInputsAsync(IEnumerable<string> inputs, string colName, int? maxGetCount = null)
         {
+            string query = $"";
             if (inputs == null || !inputs.Any())
                 throw new ArgumentException("Inputs cannot be null or empty.", nameof(inputs));
+            if (maxGetCount.HasValue && maxGetCount.Value <= 0)
+                throw new ArgumentOutOfRangeException("Max get count must be greater than zero.", nameof(maxGetCount));
+            else if (maxGetCount.HasValue && maxGetCount.Value > 0)
+                query = $"SELECT * FROM {TableName} WHERE {colName} IN @Inputs LIMIT @MaxGetCount";
+            else
+                query = $"SELECT * FROM {TableName} WHERE {colName} IN @Inputs";
+
             try
-            {
-                string query = $"SELECT * FROM {TableName} WHERE {colName} IN @Inputs";
-                using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Inputs = inputs });
-                if (results == null || !results.Any())
-                    throw new KeyNotFoundException($"No data found in {TableName} for inputs in column {colName}");
-                return results;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving data from {TableName} by inputs in column {ColumnIdName}: {ex.Message}", ex);
-            }
+                {
+                    using IDbConnection connection = await ConnectionFactory.CreateConnection();
+                    IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Inputs = inputs, MaxGetCount = maxGetCount });
+                    if (results == null || !results.Any())
+                        throw new KeyNotFoundException($"No data found in {TableName} for inputs in column {colName} with " +
+                            $"{(maxGetCount.HasValue ? $"limit {maxGetCount.Value}" : "no limit")}");
+                    return results;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Error retrieving data from {TableName} by inputs in column {ColumnIdName} with limit: {ex.Message}", ex);
+                }
         }
 
-        protected async Task<IEnumerable<TEntity>> GetByInputsAsync(IEnumerable<string> inputs, string colName, int maxGetCount)
+        protected async Task<IEnumerable<TEntity>> GetByLikeStringAsync(string input, string colName, int? maxGetCount = null)
         {
-            if (inputs == null || !inputs.Any())
-                throw new ArgumentException("Inputs cannot be null or empty.", nameof(inputs));
-            if (maxGetCount <= 0)
-                throw new ArgumentException("Max get count must be greater than zero.", nameof(maxGetCount));
-            try
-            {
-                string query = $"SELECT * FROM {TableName} WHERE {colName} IN @Inputs LIMIT @MaxGetCount";
-                using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Inputs = inputs, MaxGetCount = maxGetCount });
-                if (results == null || !results.Any())
-                    throw new KeyNotFoundException($"No data found in {TableName} for inputs in column {colName} with limit {maxGetCount}");
-                return results;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving data from {TableName} by inputs in column {ColumnIdName} with limit: {ex.Message}", ex);
-            }
-        }
+            string query = "";
+            if (maxGetCount.HasValue && maxGetCount.Value > 0)
+                query = $"{RelativeQuery(colName)} LIMIT @MaxGetCount";
+            else if (maxGetCount.HasValue && maxGetCount.Value <= 0)
+                throw new ArgumentOutOfRangeException("Max get count must be greater than zero.", nameof(maxGetCount));
+            else
+                query = RelativeQuery(colName);
 
-        protected async Task<IEnumerable<TEntity>> GetByLikeStringAsync(string input, string colName)
-        {
             try
             {
-                string query = RelativeQuery(colName);
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 if (!input.Contains('%'))
                     input = $"%{input}%";
-                IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Input = input });
+
+                IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Input = input, MaxGetCount = maxGetCount });
                 if (results == null || !results.Any())
-                    throw new KeyNotFoundException($"No data found in {TableName} for {colName} like {input}");
+                    throw new KeyNotFoundException($@"No data found in {TableName} for {colName} like {input} with 
+                        {(maxGetCount.HasValue ? $"limit {maxGetCount.Value}" : "no limit")}");
                 return results;
             }
             catch (Exception ex)
@@ -203,38 +186,22 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             }
         }
 
-        protected async Task<IEnumerable<TEntity>> GetByLikeStringAsync(string input, string colName, int maxGetCount)
+        protected async Task<IEnumerable<TEntity>> GetByDateTimeAsync(string colName, EQueryTimeType queryType, object param, int? maxGetCount = null)
         {
-            if (string.IsNullOrEmpty(input))
-                throw new ArgumentException("Input cannot be null or empty.", nameof(input));
-            if (maxGetCount <= 0)
-                throw new ArgumentException("Max get count must be greater than zero.", nameof(maxGetCount));
-            try
-            {
-                string query = $"{RelativeQuery(colName)} LIMIT @MaxGetCount";
-                using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Input = input, MaxGetCount = maxGetCount });
-                if (results == null || !results.Any())
-                    throw new KeyNotFoundException($"No data found in {TableName} for {colName} = {input} with limit {maxGetCount}");
-                return results;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving data by like string: {ex.Message}", ex);
-            }
-        }
+            string subQuery = "";
+            if (maxGetCount.HasValue && maxGetCount.Value <= 0)
+                throw new ArgumentOutOfRangeException("Max get count must be greater than zero.", nameof(maxGetCount));
+            else if (maxGetCount.HasValue && maxGetCount.Value > 0)
+                subQuery = $" LIMIT @MaxGetCount";
 
-        protected async Task<IEnumerable<TEntity>> GetByDateTimeAsync(string colName, EQueryTimeType queryType, object param)
-        {
-            string query = queryType switch
+                string query = queryType switch
             {
-                EQueryTimeType.MONTH_AND_YEAR => GetByMonthAndYear(colName),
-                EQueryTimeType.DATE_TIME_RANGE => GetByDateTimeRange(colName),
+                EQueryTimeType.MONTH_AND_YEAR => $"{GetByMonthAndYear(colName)} {subQuery}",
+                EQueryTimeType.DATE_TIME_RANGE => $"{GetByDateTimeRange(colName)} {subQuery}",
                 _ => throw new ArgumentException("Invalid query type")
             };
             try
             {
-
                 DynamicParameters DParam = new DynamicParameters();
                 if (queryType == EQueryTimeType.MONTH_AND_YEAR)
                 {
@@ -246,6 +213,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                     else
                         throw new ArgumentException("Invalid parameters for MONTH_AND_YEAR query type");
                 }
+
                 else if (queryType == EQueryTimeType.DATE_TIME_RANGE)
                 {
                     if (param is { } tuple && tuple is ValueTuple<DateTime, DateTime> range)
@@ -256,6 +224,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                     else
                         throw new ArgumentException("Invalid parameters for DATE_TIME_RANGE query type");
                 }
+                DParam.Add("MaxGetCount", maxGetCount);
 
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, param);
@@ -269,17 +238,22 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             }
         }
 
-        protected async Task<IEnumerable<TEntity>> GetByDateTimeAsync(string colName, EQueryTimeType queryType, ECompareType compareType, object param)
+        protected async Task<IEnumerable<TEntity>> GetByDateTimeAsync(string colName, EQueryTimeType queryType, ECompareType compareType, object param, int? maxGetCount = null)
         {
+            string subQuery = "";
+            if (maxGetCount.HasValue && maxGetCount.Value <= 0)
+                throw new ArgumentOutOfRangeException("Max get count must be greater than zero.", nameof(maxGetCount));
+            else if (maxGetCount.HasValue && maxGetCount.Value > 0)
+                subQuery = $" LIMIT @MaxGetCount";  
+
             string query = queryType switch
             {
-                EQueryTimeType.YEAR => GetByYear(colName, compareType),
-                EQueryTimeType.DATE_TIME => GetByDateTime(colName, compareType),
+                EQueryTimeType.YEAR => $"{GetByYear(colName, compareType)} {subQuery}",
+                EQueryTimeType.DATE_TIME => $"{GetByDateTime(colName, compareType)} {subQuery}",
                 _ => throw new ArgumentException("Invalid query type")
             };
             try
             {
-
                 DynamicParameters DParam = new DynamicParameters();
                 if (queryType == EQueryTimeType.YEAR)
                 {
@@ -295,6 +269,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                     else
                         throw new ArgumentException("Invalid parameters for DATE_TIME query type");
                 }
+                DParam.Add("MaxGetCount", maxGetCount);
 
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, DParam);
@@ -308,13 +283,20 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             }
         }
 
-        protected async Task<IEnumerable<TEntity>> GetByRangeDecimalAsync(decimal minDecimal, decimal maxDecimal, string colName)
+        protected async Task<IEnumerable<TEntity>> GetByRangeDecimalAsync(decimal minDecimal, decimal maxDecimal, string colName, int? maxGetCount = null)
         {
+            string query = "";
+            if (maxGetCount.HasValue && maxGetCount.Value <= 0)
+                throw new ArgumentOutOfRangeException("Max get count must be greater than zero.", nameof(maxGetCount));
+            else if (maxGetCount.HasValue && maxGetCount.Value > 0)
+                query = $"{GetRangeDecimalQuery(colName)} LIMIT @MaxGetCount";
+            else
+                query = GetRangeDecimalQuery(colName);
+
             try
             {
-                string query = GetRangeDecimalQuery(colName);
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { MinDecimal = minDecimal, MaxDecimal = maxDecimal });
+                IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { MinDecimal = minDecimal, MaxDecimal = maxDecimal, MaxGetCount = maxGetCount });
                 if (results == null || !results.Any())
                     throw new KeyNotFoundException($"No data found in {TableName} for decimal range {minDecimal} - {maxDecimal} in column {colName}");
                 return results;
@@ -325,15 +307,22 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             }
         }
 
-        protected async Task<IEnumerable<TEntity>> GetByDecimalAsync<TEnum>(decimal decimalValue, TEnum compareType, string colName) where TEnum : Enum
+        protected async Task<IEnumerable<TEntity>> GetByDecimalAsync<TEnum>(decimal decimalValue, TEnum compareType, string colName, int? maxGetCount = null) where TEnum : Enum
         {
             if (compareType is ECompareType type)
             {
+                string query = "";
+                if (maxGetCount.HasValue && maxGetCount.Value <= 0)
+                    throw new ArgumentOutOfRangeException("Max get count must be greater than zero.", nameof(maxGetCount));
+                else if (maxGetCount.HasValue && maxGetCount.Value > 0)
+                    query = $"{GetCompareDecimalQuery(colName, type)} LIMIT @MaxGetCount";
+                else
+                    query = GetCompareDecimalQuery(colName, type);
+
                 try
                 {
-                    string query = GetCompareDecimalQuery(colName, type);
                     using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                    IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Decimal = decimalValue });
+                    IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Decimal = decimalValue, MaxGetCount = maxGetCount });
                     if (results == null || !results.Any())
                         throw new KeyNotFoundException($"No data found in {TableName} for {colName} with decimal {decimalValue} and comparison type {type}");
                     return results;
