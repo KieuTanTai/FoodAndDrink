@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+﻿using Microsoft.AspNetCore.Mvc;
 using ProjectShop.Server.Core.Entities;
-using ProjectShop.Server.Core.Entities.GetNavigationPropertyOptions;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IServices.Role;
+using ProjectShop.Server.Core.ObjectValue.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.WebAPI.Controllers
 {
@@ -17,8 +16,8 @@ namespace ProjectShop.Server.WebAPI.Controllers
         private readonly ISearchAccountRoleService<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey> _searchAccountRoleService;
         private readonly ISearchRoleService<RoleModel, RoleNavigationOptions> _searchRoleService;
 
-        public RoleServiceController(ILogger<RoleServiceController> logger, IAddAccountRoleService<RolesOfUserModel, RolesOfUserKey> addAccountRoleService, 
-                IAddRoleService<RoleModel> addRoleService, IUpdateRoleService updateRoleService, IDeleteAccountRoleService<RolesOfUserKey> deleteAccountRoleService, ISearchAccountRoleService<RolesOfUserModel, RolesOfUserNavigationOptions, 
+        public RoleServiceController(ILogger<RoleServiceController> logger, IAddAccountRoleService<RolesOfUserModel, RolesOfUserKey> addAccountRoleService,
+                IAddRoleService<RoleModel> addRoleService, IUpdateRoleService updateRoleService, IDeleteAccountRoleService<RolesOfUserKey> deleteAccountRoleService, ISearchAccountRoleService<RolesOfUserModel, RolesOfUserNavigationOptions,
                 RolesOfUserKey> searchAccountRoleService, ISearchRoleService<RoleModel, RoleNavigationOptions> searchRoleService)
         {
             _logger = logger;
@@ -31,5 +30,43 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         //API test get list of roles
+        [HttpGet(Name = "roles")]
+        public async Task<IActionResult> GetRolesAsync([FromQuery] RoleNavigationOptions options, [FromQuery] int? maxGetCount)
+        {
+            try
+            {
+                var roles = await _searchRoleService.GetAllAsync(options, maxGetCount);
+                return Ok(roles);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving roles");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while retrieving roles.");
+            }
+        }
+
+        //API test get by DateTime
+        [HttpGet("byCreatedDate", Name = "rolesByCreatedDate")]
+        public async Task<IActionResult> GetRolesByCreatedDateAsync([FromQuery] DateTime dateTime, [FromQuery] ECompareType compareType,
+                                                            [FromQuery] RoleNavigationOptions options, [FromQuery] int? maxGetCount)
+        {
+            try
+            {
+                var roles = await _searchRoleService.GetByCreatedDateTimeAsync(dateTime, compareType, options, maxGetCount);
+                return Ok(roles);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving roles by date time");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while retrieving roles by date time.");
+            }
+        }
+
+        // DRY
+        private async Task<IEnumerable<RoleModel>> GetByMonthAndYearAsync(int year, int month, bool isCreated,
+            RoleNavigationOptions? options, int? maxGetCount)
+        {
+            return null;
+        }
     }
 }

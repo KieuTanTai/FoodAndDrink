@@ -7,12 +7,11 @@ namespace ProjectShop.Server.Infrastructure.Persistence
 {
     public abstract class BaseNoneUpdateDAO<TEntity>(
         IDbConnectionFactory connectionFactory,
-        IColumnService colService,
         IStringConverter converter,
-        IStringChecker checker,
+        ILogService logger,
         string tableName,
         string columnIdName,
-        string secondColumnIdName = "") : BaseGetDataDAO<TEntity>(connectionFactory, colService, converter, checker, tableName, columnIdName, secondColumnIdName), INoneUpdateDAO<TEntity> where TEntity : class
+        string secondColumnIdName = "") : BaseGetDataDAO<TEntity>(connectionFactory, converter, logger, tableName, columnIdName, secondColumnIdName), INoneUpdateDAO<TEntity> where TEntity : class
     {
 
         // INSERT ENTITY
@@ -26,16 +25,19 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 {
                     int result = await connection.ExecuteAsync(GetInsertQuery(), entity, transaction);
                     transaction.Commit();
+                    Logger.LogInfo<TEntity, BaseNoneUpdateDAO<TEntity>>($"Successfully inserted data into {TableName}");
                     return result;
                 }
                 catch (Exception ex)
                 {
                     transaction.Rollback();
+                    Logger.LogError<TEntity, BaseNoneUpdateDAO<TEntity>>($"Error inserting data into {TableName}", ex);
                     throw new Exception($"Error inserting data into {TableName}: {ex.Message}", ex);
                 }
             }
             catch (Exception ex)
             {
+                Logger.LogError<TEntity, BaseNoneUpdateDAO<TEntity>>($"Error creating connection for inserting data into {TableName}", ex);
                 throw new Exception($"Error creating connection for inserting data into {TableName}: {ex.Message}", ex);
             }
         }
@@ -52,16 +54,19 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                     foreach (TEntity entity in entities)
                         result += await connection.ExecuteAsync(GetInsertQuery(), entity, transaction);
                     transaction.Commit();
+                    Logger.LogInfo<TEntity, BaseNoneUpdateDAO<TEntity>>($"Successfully inserted multiple records into {TableName}");
                     return result;
                 }
                 catch (Exception ex)
                 {
                     transaction.Rollback();
+                    Logger.LogError<TEntity, BaseNoneUpdateDAO<TEntity>>($"Error inserting multiple records into {TableName}", ex);
                     throw new Exception($"Error inserting multiple records into {TableName}: {ex.Message}", ex);
                 }
             }
             catch (Exception ex)
             {
+                Logger.LogError<TEntity, BaseNoneUpdateDAO<TEntity>>($"Error creating connection for inserting multiple records into {TableName}", ex);
                 throw new Exception($"Error creating connection for inserting multiple records into {TableName}: {ex.Message}", ex);
             }
         }

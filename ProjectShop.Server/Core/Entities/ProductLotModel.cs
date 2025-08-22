@@ -16,6 +16,7 @@ namespace ProjectShop.Server.Core.Entities
 
         // Navigation properties
         public ICollection<InventoryModel> Inventories { get; set; } = new List<InventoryModel>();
+        public ICollection<DetailInventoryMovementModel> DetailInventoryMovements { get; set; } = new List<DetailInventoryMovementModel>();
         // End of Navigation properties
 
         public ProductLotModel(uint productLotId, uint inventoryId, DateTime productLotCreatedDate)

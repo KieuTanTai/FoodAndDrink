@@ -1,0 +1,12 @@
+namespace ProjectShop.Server.Core.ObjectValue.GetNavigationPropertyOptions;
+
+public class ProductNavigationOptions
+{
+    public bool IsGetSupplier { get; set; }
+    public bool IsGetDetailCarts { get; set; }
+    public bool IsGetDetailProductLots { get; set; }
+    public bool IsGetProductCategories { get; set; }
+    public bool IsGetProductImages { get; set; }
+    public bool IsGetDetailSaleEvents { get; set; }
+    public bool IsGetDetailInvoices { get; set; }
+}

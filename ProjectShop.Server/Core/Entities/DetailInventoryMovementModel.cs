@@ -13,19 +13,24 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'product_barcode' (VARCHAR(20))
         public string ProductBarcode { get; set; } = string.Empty;
 
+        // Corresponds to 'product_lot_id' (INT UNSIGNED)
+        public uint ProductLotId { get; set; }
+
         // Corresponds to 'detail_inventory_movement_quantity' (INT UNSIGNED)
         public uint DetailInventoryMovementQuantity { get; set; }
 
         // Navigation properties
         public ProductModel Product { get; set; } = null!;
         public InventoryMovementModel InventoryMovement { get; set; } = null!;
+        public ProductLotModel ProductLot { get; set; } = null!;
         // End of navigation properties
 
-        public DetailInventoryMovementModel(uint detailInventoryMovementId, uint inventoryMovementId, string productBarcode, uint detailInventoryMovementQuantity)
+        public DetailInventoryMovementModel(uint detailInventoryMovementId, uint inventoryMovementId, string productBarcode, uint productLotId, uint detailInventoryMovementQuantity)
         {
             DetailInventoryMovementId = detailInventoryMovementId;
             InventoryMovementId = inventoryMovementId;
             ProductBarcode = productBarcode;
+            ProductLotId = productLotId;
             DetailInventoryMovementQuantity = detailInventoryMovementQuantity;
         }
 

@@ -1,20 +1,21 @@
 ﻿using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
+using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IServices.Role;
 using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services.Roles
 {
-    public class DeleteAccountRoleService : BaseHelperService<RolesOfUserModel>, IDeleteAccountRoleService<RolesOfUserKey>
+    public class DeleteAccountRoleService : IDeleteAccountRoleService<RolesOfUserKey>
     {
-        private readonly IDAO<RolesOfUserModel> _baseDAO;
         private readonly IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> _roleOfUserDAO;
+        private readonly IBaseHelperService<RolesOfUserModel> _helper;
 
-        public DeleteAccountRoleService(IDAO<RolesOfUserModel> baseDAO, IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> roleOfUserDAO)
+        public DeleteAccountRoleService(IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> roleOfUserDAO, IBaseHelperService<RolesOfUserModel> helper)
         {
-            _baseDAO = baseDAO;
             _roleOfUserDAO = roleOfUserDAO;
+            _helper = helper;
         }
 
         public async Task<int> DeleteAccountRoleAsync(RolesOfUserKey keys)
@@ -22,7 +23,7 @@ namespace ProjectShop.Server.Application.Services.Roles
             try
             {
                 // Check if the role exists
-                if (!await IsExistObject(keys, _roleOfUserDAO.GetByKeysAsync))
+                if (!await _helper.IsExistObject(keys, _roleOfUserDAO.GetByKeysAsync))
                     throw new KeyNotFoundException("The specified account role does not exist.");
                 // Delete the role
                 int result = await _roleOfUserDAO.DeleteByKeysAsync(keys);
@@ -39,7 +40,7 @@ namespace ProjectShop.Server.Application.Services.Roles
         {
             try
             {
-                if (!await DoAllKeysExistAsync(Listkeys, _roleOfUserDAO.GetByListKeysAsync))
+                if (!await _helper.DoAllKeysExistAsync(Listkeys, _roleOfUserDAO.GetByListKeysAsync))
                     throw new KeyNotFoundException("One or more specified account roles do not exist.");
                 // Delete the roles
                 int result = await _roleOfUserDAO.DeleteByListKeysAsync(Listkeys);

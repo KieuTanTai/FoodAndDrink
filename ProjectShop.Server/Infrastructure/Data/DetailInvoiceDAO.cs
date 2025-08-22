@@ -11,10 +11,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public DetailInvoiceDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "detail_invoice", "detail_invoice_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "detail_invoice", "detail_invoice_id", string.Empty)
         {
         }
 

@@ -2,21 +2,25 @@
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
+using ProjectShop.Server.Core.Interfaces.IValidate;
 using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services.Account
 {
-    public class ForgotPasswordService : BaseHelperService<AccountModel>, IForgotPasswordService
+    public class ForgotPasswordService : IForgotPasswordService
     {
         private readonly IDAO<AccountModel> _baseDAO;
         private readonly IAccountDAO<AccountModel> _accountDAO;
+        private readonly IHashPassword _hashPassword;
 
         public ForgotPasswordService(
             IDAO<AccountModel> baseDAO,
-            IAccountDAO<AccountModel> accountDAO)
+            IAccountDAO<AccountModel> accountDAO,
+            IHashPassword hashPassword)
         {
             _baseDAO = baseDAO ?? throw new ArgumentNullException(nameof(baseDAO), "Base DAO cannot be null.");
             _accountDAO = accountDAO ?? throw new ArgumentNullException(nameof(accountDAO), "Account DAO cannot be null.");
+            _hashPassword = hashPassword ?? throw new ArgumentNullException(nameof(hashPassword), "Hash password service cannot be null.");
         }
 
         public async Task<int> UpdatePasswordAsync(string username, string password)
@@ -26,8 +30,8 @@ namespace ProjectShop.Server.Application.Services.Account
                 AccountModel? entity = await _accountDAO.GetByUserNameAsync(username);
                 if (entity == null)
                     throw new InvalidOperationException($"Account with username {username} does not exist.");
-                if (!await hashPassword.IsPasswordHashed(password))
-                    entity.Password = await hashPassword.HashPasswordAsync(password);
+                if (!await _hashPassword.IsPasswordHashed(password))
+                    entity.Password = await _hashPassword.HashPasswordAsync(password);
                 int affectedRows = await _baseDAO.UpdateAsync(entity);
                 if (affectedRows == 0)
                     throw new InvalidOperationException("Failed to update the account.");
@@ -63,8 +67,8 @@ namespace ProjectShop.Server.Application.Services.Account
         {
             int length = passwords.Count();
             for (int i = 0; i < length; i++)
-                if (!await hashPassword.IsPasswordHashed(passwords.ElementAt(i)))
-                    entities.ElementAt(i).Password = await hashPassword.HashPasswordAsync(passwords.ElementAt(i));
+                if (!await _hashPassword.IsPasswordHashed(passwords.ElementAt(i)))
+                    entities.ElementAt(i).Password = await _hashPassword.HashPasswordAsync(passwords.ElementAt(i));
             for (int i = 0; i < length; i++)
                 if (entities.ElementAt(i) == null)
                     throw new InvalidOperationException($"Account with username {entities.ElementAt(i).UserName} does not exist.");

@@ -9,10 +9,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public LocationTypeDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "location_type", "location_type_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "location_type", "location_type_id", string.Empty)
         {
         }
 

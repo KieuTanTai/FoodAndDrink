@@ -1,23 +1,30 @@
 ﻿using ProjectShop.Server.Core.Entities;
-using ProjectShop.Server.Core.Entities.GetNavigationPropertyOptions;
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
+using ProjectShop.Server.Core.Interfaces.IServices;
+using ProjectShop.Server.Core.Interfaces.IServices.Role;
+using ProjectShop.Server.Core.ObjectValue.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Application.Services.Roles
 {
-    public abstract class BaseReturnRoleService : BaseGetByTimeService<RoleModel, RoleNavigationOptions>
+    public class BaseReturnRoleService : IBaseGetNavigationPropertyService<RoleModel, RoleNavigationOptions>
     {
-        protected readonly IDAO<RoleModel> _baseDAO;
-        protected readonly IRoleDAO<RoleModel> _roleDAO;
-        protected readonly IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> _roleOfUserDAO;
-        protected BaseReturnRoleService(IDAO<RoleModel> baseDAO, IRoleDAO<RoleModel> roleDAO, IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> roleOfUserDAO)
+        private readonly IDAO<RoleModel> _baseDAO;
+        private readonly IRoleDAO<RoleModel> _roleDAO;
+        private readonly ISearchAccountRoleService<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey> _searchAccountRoleService;
+        public BaseReturnRoleService(
+            IDAO<RoleModel> baseDAO, 
+            IRoleDAO<RoleModel> roleDAO, 
+            ISearchAccountRoleService<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey> searchAccountRoleService)
         {
             _baseDAO = baseDAO;
             _roleDAO = roleDAO;
-            _roleOfUserDAO = roleOfUserDAO;
+            //_roleOfUserDAO = roleOfUserDAO;
+            _searchAccountRoleService = searchAccountRoleService 
+                ?? throw new ArgumentNullException(nameof(searchAccountRoleService), "Search Account Role Service cannot be null.");
         }
 
-        protected override async Task<RoleModel> GetNavigationPropertyByOptionsAsync(RoleModel role, RoleNavigationOptions? options)
+        public async Task<RoleModel> GetNavigationPropertyByOptionsAsync(RoleModel role, RoleNavigationOptions? options)
         {
             if (options?.IsGetRolesOfUsers == true)
                 role.RolesOfUsers = await TryLoadRolesOfUsersAsync(role.RoleId);
@@ -25,7 +32,7 @@ namespace ProjectShop.Server.Application.Services.Roles
             return role;
         }
 
-        protected override async Task<IEnumerable<RoleModel>> GetNavigationPropertyByOptionsAsync(IEnumerable<RoleModel> roles, RoleNavigationOptions? options)
+        public async Task<IEnumerable<RoleModel>> GetNavigationPropertyByOptionsAsync(IEnumerable<RoleModel> roles, RoleNavigationOptions? options)
         {
             if (options?.IsGetRolesOfUsers == true)
             {
@@ -49,7 +56,7 @@ namespace ProjectShop.Server.Application.Services.Roles
         {
             try
             {
-                var roles = await _roleOfUserDAO.GetByRoleIdAsync(roleId);
+                var roles = await _searchAccountRoleService.GetByRoleIdAsync(roleId);
                 return roles != null && roles.Any() ? roles.ToList() : new List<RolesOfUserModel>();
             }
             catch
@@ -63,7 +70,7 @@ namespace ProjectShop.Server.Application.Services.Roles
         {
             try
             {
-                var rolesList = await _roleOfUserDAO.GetByRoleIdsAsync(roleIds) ?? Enumerable.Empty<RolesOfUserModel>();
+                var rolesList = await _searchAccountRoleService.GetByRoleIdsAsync(roleIds) ?? Enumerable.Empty<RolesOfUserModel>();
                 // Group theo RoleId
                 return rolesList
                     .GroupBy(r => r.RoleId)

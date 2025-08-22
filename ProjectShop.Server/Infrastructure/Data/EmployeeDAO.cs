@@ -12,11 +12,25 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public EmployeeDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "employee", "employee_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "employee", "employee_id", string.Empty)
         {
+        }
+
+        protected override string GetByListInputQuery(string colName)
+        {
+            return $@"SELECT 
+                employee_id AS EmployeeId,
+                account_id AS AccountId,
+                employee_birthday AS Birthday,
+                employee_phone AS Phone,
+                employee_name AS Name,
+                employee_email AS Email,
+                employee_avatar_url AS AvatarUrl,
+                employee_gender AS Gender,
+                employee_status AS Status
+                FROM {TableName} WHERE {colName} IN @Inputs";
         }
 
         protected override string GetAllQuery()

@@ -1,37 +1,29 @@
-﻿using Dapper;
-using ProjectShop.Server.Core.Entities;
-using ProjectShop.Server.Core.Entities.GetNavigationPropertyOptions;
+﻿using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
+using ProjectShop.Server.Core.Interfaces.IServices;
+using ProjectShop.Server.Core.Interfaces.IServices.Role;
+using ProjectShop.Server.Core.ObjectValue.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Application.Services.Account
 {
-    public abstract class BaseReturnAccountService : BaseGetByTimeService<AccountModel, AccountNavigationOptions>
+    public class BaseReturnAccountService : IBaseGetNavigationPropertyService<AccountModel, AccountNavigationOptions>
     {
-        protected readonly IDAO<AccountModel> _baseDAO;
-        protected readonly IAccountDAO<AccountModel> _accountDAO;
-        protected readonly IPersonDAO<CustomerModel> _customerDAO;
-        protected readonly IPersonDAO<EmployeeModel> _employeeDAO;
-        protected readonly IEmployeeDAO<EmployeeModel> _specificEmpDAO;
-        protected readonly IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> _roleOfUserDAO;
+        private readonly IPersonDAO<CustomerModel> _customerDAO;
+        private readonly IEmployeeDAO<EmployeeModel> _specificEmpDAO;
+        private readonly ISearchAccountRoleService<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey> _roleOfUserService;
 
-        protected BaseReturnAccountService(
-            IDAO<AccountModel> baseDAO,
-            IAccountDAO<AccountModel> accountDAO,
+        public BaseReturnAccountService(
             IPersonDAO<CustomerModel> customerDAO,
-            IPersonDAO<EmployeeModel> employeeDAO,
             IEmployeeDAO<EmployeeModel> specificEmpDAO,
-            IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> roleOfUserDAO)
+            ISearchAccountRoleService<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey> roleOfUserDAO)
         {
-            _baseDAO = baseDAO ?? throw new ArgumentNullException(nameof(baseDAO));
-            _accountDAO = accountDAO ?? throw new ArgumentNullException(nameof(accountDAO));
             _customerDAO = customerDAO ?? throw new ArgumentNullException(nameof(customerDAO));
-            _employeeDAO = employeeDAO ?? throw new ArgumentNullException(nameof(employeeDAO));
             _specificEmpDAO = specificEmpDAO ?? throw new ArgumentNullException(nameof(specificEmpDAO));
-            _roleOfUserDAO = roleOfUserDAO ?? throw new ArgumentNullException(nameof(roleOfUserDAO));
+            _roleOfUserService = roleOfUserDAO ?? throw new ArgumentNullException(nameof(roleOfUserDAO));
         }
 
-        protected override async Task<AccountModel> GetNavigationPropertyByOptionsAsync(AccountModel account, AccountNavigationOptions? options)
+        public async Task<AccountModel> GetNavigationPropertyByOptionsAsync(AccountModel account, AccountNavigationOptions? options)
         {
             if (options == null)
                 return account;
@@ -48,7 +40,7 @@ namespace ProjectShop.Server.Application.Services.Account
             return account;
         }
 
-        protected override async Task<IEnumerable<AccountModel>> GetNavigationPropertyByOptionsAsync(IEnumerable<AccountModel> accounts, AccountNavigationOptions? options)
+        public async Task<IEnumerable<AccountModel>> GetNavigationPropertyByOptionsAsync(IEnumerable<AccountModel> accounts, AccountNavigationOptions? options)
         {
             if (options == null)
                 return accounts;
@@ -117,7 +109,7 @@ namespace ProjectShop.Server.Application.Services.Account
         {
             try
             {
-                var roles = await _roleOfUserDAO.GetByAccountIdAsync(accountId);
+                var roles = await _roleOfUserService.GetByAccountIdAsync(accountId);
                 return roles != null && roles.Any() ? roles.ToList() : new List<RolesOfUserModel>();
             }
             catch
@@ -128,10 +120,11 @@ namespace ProjectShop.Server.Application.Services.Account
 
         private async Task<IDictionary<uint, EmployeeModel>> TryLoadEmployeesAsync(IEnumerable<uint> accountIds)
         {
+            IEnumerable<EmployeeModel> employees = new List<EmployeeModel>();
             try
             {
-                return (await _specificEmpDAO.GetByAccountIdsAsync(accountIds))
-                    .ToDictionary(entity => entity.AccountId, entity => entity)
+                employees = (await _specificEmpDAO.GetByAccountIdsAsync(accountIds)) ?? Enumerable.Empty<EmployeeModel>();
+                return employees.ToDictionary(entity => entity.AccountId, entity => entity)
                     ?? new Dictionary<uint, EmployeeModel>();
             }
             catch
@@ -142,10 +135,12 @@ namespace ProjectShop.Server.Application.Services.Account
 
         private async Task<IDictionary<uint, CustomerModel>> TryLoadCustomersAsync(IEnumerable<uint> accountIds)
         {
+            IEnumerable<CustomerModel> customers = new List<CustomerModel>();
             try
             {
-                return (await _customerDAO.GetByAccountIdsAsync(accountIds))
-                    .ToDictionary(entity => entity.AccountId, entity => entity)
+                customers = await _customerDAO.GetByAccountIdsAsync(accountIds) ?? Enumerable.Empty<CustomerModel>();
+
+                return customers.ToDictionary(entity => entity.AccountId, entity => entity)
                     ?? new Dictionary<uint, CustomerModel>();
             }
             catch
@@ -158,7 +153,7 @@ namespace ProjectShop.Server.Application.Services.Account
         {
             try
             {
-                var rolesList = await _roleOfUserDAO.GetByAccountIdsAsync(accountIds) ?? Enumerable.Empty<RolesOfUserModel>();
+                var rolesList = await _roleOfUserService.GetByAccountIdsAsync(accountIds) ?? Enumerable.Empty<RolesOfUserModel>();
                 return rolesList.GroupBy(role => role.AccountId)
                     .ToDictionary(group => group.Key, group => (ICollection<RolesOfUserModel>)group.ToList());
             }

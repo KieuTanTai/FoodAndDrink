@@ -10,10 +10,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public CategoryDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "category", "category_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "category", "category_id", string.Empty)
         {
         }
 

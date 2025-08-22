@@ -9,10 +9,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public LocationDistrictDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "location_district", "location_district_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "location_district", "location_district_id", string.Empty)
         {
         }
 

@@ -1,16 +1,17 @@
 ﻿using ProjectShop.Server.Core.Entities;
-using ProjectShop.Server.Core.Entities.GetNavigationPropertyOptions;
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
+using ProjectShop.Server.Core.Interfaces.IServices;
+using ProjectShop.Server.Core.ObjectValue.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Application.Services.Roles
 {
-    public abstract class BaseReturnAccountRoleService : BaseGetByTimeService<RolesOfUserModel, RolesOfUserNavigationOptions>
+    public class BaseReturnAccountRoleService : IBaseGetNavigationPropertyService<RolesOfUserModel, RolesOfUserNavigationOptions>
     {
-        protected readonly IDAO<RolesOfUserModel> _baseDAO;
-        protected readonly IDAO<RoleModel> _baseRoleDAO;
-        protected readonly IDAO<AccountModel> _baseAccountDAO;
-        protected readonly IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> _roleOfUserDAO;
+        private readonly IDAO<RolesOfUserModel> _baseDAO;
+        private readonly IDAO<RoleModel> _baseRoleDAO;
+        private readonly IDAO<AccountModel> _baseAccountDAO;
+        private readonly IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> _roleOfUserDAO;
         public BaseReturnAccountRoleService(IDAO<RolesOfUserModel> baseDAO, IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> roleOfUserDAO,
             IDAO<RoleModel> baseRoleDAO, IDAO<AccountModel> baseAccountDAO)
         {
@@ -19,7 +20,7 @@ namespace ProjectShop.Server.Application.Services.Roles
             _baseRoleDAO = baseRoleDAO ?? throw new ArgumentNullException(nameof(baseRoleDAO));
             _baseAccountDAO = baseAccountDAO ?? throw new ArgumentNullException(nameof(baseAccountDAO));
         }
-        protected override async Task<RolesOfUserModel> GetNavigationPropertyByOptionsAsync(RolesOfUserModel role, RolesOfUserNavigationOptions? options)
+        public async Task<RolesOfUserModel> GetNavigationPropertyByOptionsAsync(RolesOfUserModel role, RolesOfUserNavigationOptions? options)
         {
             if (options?.IsGetRole == true)
                 role.Role = await TryLoadRoleAsync(role.RoleId);
@@ -28,7 +29,7 @@ namespace ProjectShop.Server.Application.Services.Roles
                 role.Account = await TryLoadAccountAsync(role.AccountId);
             return role;
         }
-        protected override async Task<IEnumerable<RolesOfUserModel>> GetNavigationPropertyByOptionsAsync(IEnumerable<RolesOfUserModel> roles, RolesOfUserNavigationOptions? options)
+        public async Task<IEnumerable<RolesOfUserModel>> GetNavigationPropertyByOptionsAsync(IEnumerable<RolesOfUserModel> roles, RolesOfUserNavigationOptions? options)
         {
             if (options?.IsGetRole == true)
             {

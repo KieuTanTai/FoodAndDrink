@@ -8,9 +8,8 @@ namespace ProjectShop.Server.Infrastructure.Persistence
 {
     public abstract class BaseGetDataDAO<TEntity>(
         IDbConnectionFactory connectionFactory,
-        IColumnService colService,
         IStringConverter converter,
-        IStringChecker checker,
+        ILogService logger,
         string tableName,
         string columnIdName,
         string secondColumnIdName = "") where TEntity : class
@@ -19,9 +18,8 @@ namespace ProjectShop.Server.Infrastructure.Persistence
         protected string TableName { get; } = tableName;
         protected string ColumnIdName { get; } = columnIdName;
 
-        protected IColumnService ColService { get; } = colService;
         protected IStringConverter Converter { get; } = converter;
-        protected IStringChecker Checker { get; } = checker;
+        protected ILogService Logger { get; } = logger;
         protected string SecondColumnIdName { get; } = secondColumnIdName ?? string.Empty;
 
         // GET ALL
@@ -42,11 +40,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 if (results == null || !results.Any())
                     throw new KeyNotFoundException($@"No data found in {TableName} with 
                             {(maxGetCount.HasValue ? $"limit {maxGetCount.Value}" : "no limit")}");
+                Logger.LogInfo<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Retrieved {results.Count()} records from {TableName}");
                 return results;
             }
             catch (Exception ex)
             {
-                throw new Exception($@"Error retrieving all data from {TableName}: {ex.Message}", ex);
+                Logger.LogError<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Error retrieving all data from {TableName}", ex);
+                throw new Exception($@"Error retrieving all data from {TableName}", ex);
             }
         }
 
@@ -70,10 +70,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 string query = GetDataQuery(colName);
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 TEntity? result = await connection.QueryFirstOrDefaultAsync<TEntity>(query, new { Input = input });
+
+                Logger.LogInfo<TEntity, BaseGetDataDAO<TEntity>>($"Retrieved data from {TableName} by {colName}: {input}");
                 return result ?? throw new KeyNotFoundException($"No data found in {TableName} for {colName} = {input}");
             }
             catch (Exception ex)
             {
+                Logger.LogError<TEntity, BaseGetDataDAO<TEntity>>($"Error retrieving data from {TableName} by {colName}", ex);
                 throw new Exception($"Error retrieving data from {TableName} by {ColumnIdName}: {ex.Message}", ex);
             }
         }
@@ -96,11 +99,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Input = input, MaxGetCount = maxGetCount });
                 if (results == null || !results.Any())
                     throw new KeyNotFoundException($@"No data found in {TableName} for {colName} = {input} with 
-                            {(maxGetCount.HasValue ? $"limit {maxGetCount.Value}" : "no limit")}");
+                        {(maxGetCount.HasValue ? $"limit {maxGetCount.Value}" : "no limit")}");
+                Logger.LogInfo<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Retrieved {results.Count()} records from {TableName} by {colName}: {input}");
                 return results;
             }
             catch (Exception ex)
             {
+                Logger.LogError<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Error retrieving data from {TableName} by {colName}", ex);
                 throw new Exception($"Error retrieving data by {input}: {ex.Message}", ex);
             }
         }
@@ -123,10 +128,12 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 if (results == null || !results.Any())
                     throw new KeyNotFoundException($"No data found in {TableName} for {colName} with comparison type {compareType} and " +
                         $"input {input} with {(maxGetCount.HasValue ? $"limit {maxGetCount.Value}" : "no limit")}");
+                Logger.LogInfo<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Retrieved {results.Count()} records from {TableName} by {colName} with comparison type {compareType}: {input}");
                 return results;
             }
             catch (Exception ex)
             {
+                Logger.LogError<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Error retrieving data from {TableName} by {colName} with comparison type {compareType}", ex);
                 throw new Exception($"Error retrieving data by {input} with comparison type {compareType}: {ex.Message}", ex);
             }
         }
@@ -139,23 +146,25 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             if (maxGetCount.HasValue && maxGetCount.Value <= 0)
                 throw new ArgumentOutOfRangeException("Max get count must be greater than zero.", nameof(maxGetCount));
             else if (maxGetCount.HasValue && maxGetCount.Value > 0)
-                query = $"SELECT * FROM {TableName} WHERE {colName} IN @Inputs LIMIT @MaxGetCount";
+                query = $"{GetByListInputQuery(colName)} LIMIT @MaxGetCount";
             else
-                query = $"SELECT * FROM {TableName} WHERE {colName} IN @Inputs";
+                query = $"{GetByListInputQuery(colName)}";
 
             try
-                {
-                    using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                    IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Inputs = inputs, MaxGetCount = maxGetCount });
-                    if (results == null || !results.Any())
-                        throw new KeyNotFoundException($"No data found in {TableName} for inputs in column {colName} with " +
-                            $"{(maxGetCount.HasValue ? $"limit {maxGetCount.Value}" : "no limit")}");
-                    return results;
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception($"Error retrieving data from {TableName} by inputs in column {ColumnIdName} with limit: {ex.Message}", ex);
-                }
+            {
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
+                IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Inputs = inputs, MaxGetCount = maxGetCount });
+                if (results == null || !results.Any())
+                    throw new KeyNotFoundException($"No data found in {TableName} for inputs in column {colName} with " +
+                        $"{(maxGetCount.HasValue ? $"limit {maxGetCount.Value}" : "no limit")}");
+                Logger.LogInfo<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Retrieved {results.Count()} records from {TableName} by inputs in column {colName}");
+                return results;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Error retrieving data from {TableName} by inputs in column {colName}", ex);
+                throw new Exception($"Error retrieving data from {TableName} by inputs in column {ColumnIdName} with limit: {ex.Message}", ex);
+            }
         }
 
         protected async Task<IEnumerable<TEntity>> GetByLikeStringAsync(string input, string colName, int? maxGetCount = null)
@@ -178,10 +187,12 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 if (results == null || !results.Any())
                     throw new KeyNotFoundException($@"No data found in {TableName} for {colName} like {input} with 
                         {(maxGetCount.HasValue ? $"limit {maxGetCount.Value}" : "no limit")}");
+                Logger.LogInfo<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Retrieved {results.Count()} records from {TableName} by relative search in column {colName}: {input}");
                 return results;
             }
             catch (Exception ex)
             {
+                Logger.LogError<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Error retrieving data from {TableName} by relative search in column {colName}", ex);
                 throw new Exception($"Error retrieving data by relative search: {ex.Message}", ex);
             }
         }
@@ -194,7 +205,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             else if (maxGetCount.HasValue && maxGetCount.Value > 0)
                 subQuery = $" LIMIT @MaxGetCount";
 
-                string query = queryType switch
+            string query = queryType switch
             {
                 EQueryTimeType.MONTH_AND_YEAR => $"{GetByMonthAndYear(colName)} {subQuery}",
                 EQueryTimeType.DATE_TIME_RANGE => $"{GetByDateTimeRange(colName)} {subQuery}",
@@ -230,10 +241,12 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, param);
                 if (results == null || !results.Any())
                     throw new KeyNotFoundException($"No data found in {TableName} for {colName} with the specified parameters");
+                Logger.LogInfo<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Retrieved {results.Count()} records from {TableName} by date/time query in column {colName}");
                 return results;
             }
             catch (Exception ex)
             {
+                Logger.LogError<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Error retrieving data from {TableName} by date/time query in column {colName}", ex);
                 throw new Exception($"Error retrieving data by {colName}: {ex.Message}", ex);
             }
         }
@@ -244,7 +257,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             if (maxGetCount.HasValue && maxGetCount.Value <= 0)
                 throw new ArgumentOutOfRangeException("Max get count must be greater than zero.", nameof(maxGetCount));
             else if (maxGetCount.HasValue && maxGetCount.Value > 0)
-                subQuery = $" LIMIT @MaxGetCount";  
+                subQuery = $" LIMIT @MaxGetCount";
 
             string query = queryType switch
             {
@@ -275,10 +288,12 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, DParam);
                 if (results == null || !results.Any())
                     throw new KeyNotFoundException($"No data found in {TableName} for {colName} with the specified parameters");
+                Logger.LogInfo<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Retrieved {results.Count()} records from {TableName} by date/time query in column {colName}");
                 return results;
             }
             catch (Exception ex)
             {
+                Logger.LogError<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Error retrieving data from {TableName} by date/time query in column {colName}", ex);
                 throw new Exception($"Error retrieving data by {colName}: {ex.Message}", ex);
             }
         }
@@ -299,10 +314,12 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { MinDecimal = minDecimal, MaxDecimal = maxDecimal, MaxGetCount = maxGetCount });
                 if (results == null || !results.Any())
                     throw new KeyNotFoundException($"No data found in {TableName} for decimal range {minDecimal} - {maxDecimal} in column {colName}");
+                Logger.LogInfo<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Retrieved {results.Count()} records from {TableName} by decimal range in column {colName}: {minDecimal} - {maxDecimal}");
                 return results;
             }
             catch (Exception ex)
             {
+                Logger.LogError<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Error retrieving data from {TableName} by decimal range in column {colName}", ex);
                 throw new Exception("Error retrieving data by total decimal range", ex);
             }
         }
@@ -325,10 +342,12 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                     IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Decimal = decimalValue, MaxGetCount = maxGetCount });
                     if (results == null || !results.Any())
                         throw new KeyNotFoundException($"No data found in {TableName} for {colName} with decimal {decimalValue} and comparison type {type}");
+                    Logger.LogInfo<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Retrieved {results.Count()} records from {TableName} by decimal in column {colName} with comparison type {type}: {decimalValue}");
                     return results;
                 }
                 catch (Exception ex)
                 {
+                    Logger.LogError<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Error retrieving data from {TableName} by decimal in column {colName} with comparison type {type}", ex);
                     throw new Exception("Error retrieving data by total decimal with comparison type", ex);
                 }
             }
@@ -344,10 +363,12 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 TEntity result = await connection.QueryFirstOrDefaultAsync<TEntity>(query, new { FirstInput = firstParam, SecondInput = secondParam })
                     ?? throw new KeyNotFoundException($"No data found in {TableName} for {firstColName} = {firstParam} and {secondColName} = {secondParam}");
+                Logger.LogInfo<TEntity, BaseGetDataDAO<TEntity>>($"Retrieved data from {TableName} by {firstColName} = {firstParam} and {secondColName} = {secondParam}");
                 return result;
             }
             catch (Exception ex)
             {
+                Logger.LogError<TEntity, BaseGetDataDAO<TEntity>>($"Error retrieving data from {TableName} by {firstColName} and {secondColName}", ex);
                 throw new Exception($"Error retrieving data by keys {firstParam} + {secondParam}: {ex.Message}", ex);
             }
         }
@@ -355,6 +376,11 @@ namespace ProjectShop.Server.Infrastructure.Persistence
         protected virtual string GetAllQuery()
         {
             return $"SELECT * FROM {TableName}";
+        }
+
+        protected virtual string GetByListInputQuery(string colName)
+        {
+            return $"SELECT * FROM {TableName} WHERE {colName} IN @Inputs";
         }
 
         protected virtual string GetDataQuery(string colName)
@@ -432,5 +458,74 @@ namespace ProjectShop.Server.Infrastructure.Persistence
         {
             return value ? "1" : "0";
         }
+
+#nullable enable
+        public virtual async Task<IEnumerable<TResult>?> QueryAsync<TResult>(string query, object? parameters = null)
+        {
+            try
+            {
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
+                IEnumerable<TResult> result = await connection.QueryAsync<TResult>(query, parameters);
+                return result.AsList();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError<IEnumerable<TResult>, BaseDAO<TEntity>>($"Error executing query: {query}", ex);
+                return default;
+            }
+        }
+
+        public virtual async Task<TResult?> QueryFirstOrDefaultAsync<TResult>(string query, object? parameters = null, IDbTransaction? transaction = null)
+        {
+            try
+            {
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
+                try
+                {
+                    TResult? result = await connection.QueryFirstOrDefaultAsync(query, parameters, transaction);
+                    transaction?.Commit();
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError<TResult, BaseDAO<TEntity>>($"Error executing query: {query}", ex);
+                    transaction?.Rollback();
+                    return default;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError<IEnumerable<TResult>, BaseDAO<TEntity>>($"Error executing query: {query}", ex);
+                return default;
+            }
+        }
+
+        public virtual async Task<bool> ExecuteAsync(string query, object? parameters = null, IDbTransaction? transaction = null)
+        {
+            try
+            {
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
+                try
+                {
+                    int affectedRows = await connection.ExecuteAsync(query, parameters, transaction);
+                    transaction?.Commit();
+                    return affectedRows > 0;
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError<IEnumerable<TEntity>, BaseDAO<TEntity>>($"Error executing query: {query}", ex);
+                    transaction?.Rollback();
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError<IEnumerable<TEntity>, BaseDAO<TEntity>>($"Error executing query: {query}", ex);
+                return false;
+            }
+        }
+
+#nullable disable
+
     }
 }

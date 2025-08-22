@@ -12,10 +12,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public ProductCateogriesDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "product_categories", "category_id", "product_barcode")
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "product_categories", "category_id", "product_barcode")
         {
         }
 
@@ -66,10 +65,12 @@ namespace ProjectShop.Server.Infrastructure.Data
                 IEnumerable<ProductCategoriesModel> results = await connection.QueryAsync<ProductCategoriesModel>(query, new { Keys = keys.Select(k => new { k.CategoryId, k.ProductBarcode }), MaxGetCount = maxGetCount });
                 if (results == null || !results.Any())
                     throw new KeyNotFoundException($"No records found in {TableName} for the provided keys.");
+                Logger.LogInfo<IEnumerable<ProductCategoriesModel>, ProductCateogriesDAO>($"Retrieved ProductCategories by keys successfully.");
                 return results;
             }
             catch (Exception ex)
             {
+                Logger.LogError<IEnumerable<ProductCategoriesModel>, ProductCateogriesDAO>($"Error retrieving data from {TableName} with keys: {ex.Message}", ex);
                 throw new Exception($"Error retrieving data from {TableName} with keys: {ex.Message}", ex);
             }
         }
@@ -80,10 +81,15 @@ namespace ProjectShop.Server.Infrastructure.Data
             {
                 string query = GetDeleteByKeysQuery();
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                return await connection.ExecuteAsync(query, keys);
+                int affectedRows = await connection.ExecuteAsync(query, keys);
+                if (affectedRows == 0)
+                    throw new KeyNotFoundException($"No records found in {TableName} for keys: {keys}");
+                Logger.LogInfo<int, ProductCateogriesDAO>($"Deleted {affectedRows} records from {TableName} with keys: {keys}");
+                return affectedRows;
             }
             catch (Exception ex)
             {
+                Logger.LogError<int, ProductCateogriesDAO>($"Error deleting data from {TableName} with keys {keys}: {ex.Message}", ex);
                 throw new Exception($"Error deleting data from {TableName} with keys {keys}: {ex.Message}", ex);
             }
         }
@@ -97,10 +103,15 @@ namespace ProjectShop.Server.Infrastructure.Data
             {
                 string query = GetDeleteQuery(colName);
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                return await connection.ExecuteAsync(query, new { Input = key });
+                int affectedRows = await connection.ExecuteAsync(query, new { Input = key });
+                if (affectedRows == 0)
+                    throw new KeyNotFoundException($"No records found in {TableName} for {colName}: {key}");
+                Logger.LogInfo<int, ProductCateogriesDAO>($"Deleted {affectedRows} records from {TableName} with {colName}: {key}");
+                return affectedRows;
             }
             catch (Exception ex)
             {
+                Logger.LogError<int, ProductCateogriesDAO>($"Error deleting data from {TableName} with key {key}: {ex.Message}", ex);
                 throw new Exception($"Error deleting data from {TableName} with key {key}: {ex.Message}", ex);
             }
         }

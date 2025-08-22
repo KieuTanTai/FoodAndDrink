@@ -12,10 +12,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public InvoiceDiscountDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "invoice_discount", "invoice_id", "sale_event_id")
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "invoice_discount", "invoice_id", "sale_event_id")
         {
         }
 
@@ -50,14 +49,16 @@ namespace ProjectShop.Server.Infrastructure.Data
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<InvoiceDiscountModel> results = await connection.QueryAsync<InvoiceDiscountModel>(query, new { Keys = keys, MaxGetCount = maxGetCount });
 
-                    if (results == null || !results.Any())
-                        throw new KeyNotFoundException($"No data found in {TableName} for {query} with parameters {keys}");
-                    return results;
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception($"Error retrieving InvoiceDiscounts by keys: {ex.Message}", ex);
-                }
+                if (results == null || !results.Any())
+                    throw new KeyNotFoundException($"No data found in {TableName} for {query} with parameters {keys}");
+                Logger.LogInfo<IEnumerable<InvoiceDiscountModel>, InvoiceDiscountDAO>($"Retrieved InvoiceDiscounts by keys successfully.");
+                return results;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError<IEnumerable<InvoiceDiscountModel>, InvoiceDiscountDAO>($"Error retrieving InvoiceDiscounts by keys: {ex.Message}", ex); 
+                throw new Exception($"Error retrieving InvoiceDiscounts by keys: {ex.Message}", ex);
+            }
         }
 
         public async Task<IEnumerable<InvoiceDiscountModel>> GetBySaleEventId(uint saleEventId, int? maxGetCount) 

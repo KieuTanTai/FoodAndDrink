@@ -15,9 +15,9 @@ namespace ProjectShop.Server.Infrastructure.Configuration
         {
             services.AddSingleton<IStringChecker, StringChecker>();
             services.AddSingleton<IStringConverter, StringConverter>();
-            services.AddSingleton<IColumnService, ColumnService>();
             services.AddSingleton<IHashPassword, HashPaswordService>();
             services.AddSingleton<IClock, SystemClockService>();
+            services.AddSingleton<ILogService, LogService>();
             services.AddSingleton<IClock>(provider => new FakeClockService { UtcNow = new DateTime(2030, 12, 31) });
             services.AddSingleton<IMaxGetRecord>(provider => new MaxGetRecordService { MaxGetRecord = 500 });
 
@@ -55,7 +55,6 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddTransient<IDAO<ProductModel>, ProductDAO>();
             services.AddTransient<IDAO<ProductImageModel>, ProductImageDAO>();
             services.AddTransient<INoneUpdateDAO<ProductLotModel>, ProductLotDAO>();
-            services.AddTransient<INoneUpdateDAO<ProductLotInventoryModel>, ProductLotInventoryDAO>();
             services.AddTransient<IDAO<RoleModel>, RoleDAO>();
             services.AddScoped<IDAO<RolesOfUserModel>, RoleOfUserDAO>();
             services.AddTransient<IDAO<SaleEventModel>, SaleEventDAO>();
@@ -100,7 +99,6 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddTransient<IProductDAO<ProductModel>, ProductDAO>();
             services.AddTransient<IProductImageDAO<ProductImageModel>, ProductImageDAO>();
             services.AddTransient<IProductLotDAO<ProductLotModel>, ProductLotDAO>();
-            services.AddTransient<IProductLotInventoryDAO<ProductLotInventoryModel, ProductLotInventoryKey>, ProductLotInventoryDAO>();
             services.AddTransient<IRoleDAO<RoleModel>, RoleDAO>();
             services.AddScoped<IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey>, RoleOfUserDAO>();
             services.AddTransient<ISaleEventDAO<SaleEventModel>, SaleEventDAO>();

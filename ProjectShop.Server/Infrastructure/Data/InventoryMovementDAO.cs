@@ -11,10 +11,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public InventoryMovementDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "inventory_movement", "inventory_movement_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "inventory_movement", "inventory_movement_id", string.Empty)
         {
         }
 

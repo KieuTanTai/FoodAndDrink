@@ -11,10 +11,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public SaleEventImageDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "sale_event_image", "sale_event_image_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "sale_event_image", "sale_event_image_id", string.Empty)
         {
         }
 

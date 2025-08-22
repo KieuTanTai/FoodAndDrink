@@ -1,23 +1,31 @@
 ﻿using ProjectShop.Server.Core.Entities;
-using ProjectShop.Server.Core.Entities.EntitiesRequest;
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
+using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
+using ProjectShop.Server.Core.Interfaces.IValidate;
+using ProjectShop.Server.Core.ObjectValue;
 using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services.Account
 {
-    public class SignupService : BaseHelperService<AccountModel>, ISignupService<AccountModel>
+    public class SignupService : ISignupService<AccountModel>
     {
         private readonly IDAO<AccountModel> _baseDAO;
         private readonly IAccountDAO<AccountModel> _accountDAO;
+        private readonly IBaseHelperService<AccountModel> _helper;
+        private readonly IHashPassword _hashPassword;
 
         public SignupService(
             IDAO<AccountModel> baseDAO,
-            IAccountDAO<AccountModel> accountDAO)
+            IAccountDAO<AccountModel> accountDAO,
+            IBaseHelperService<AccountModel> helper,
+            IHashPassword hashPassword)
         {
             _baseDAO = baseDAO ?? throw new ArgumentNullException(nameof(baseDAO), "Base DAO cannot be null.");
             _accountDAO = accountDAO ?? throw new ArgumentNullException(nameof(accountDAO), "Account DAO cannot be null.");
+            _helper = helper ?? throw new ArgumentNullException(nameof(helper), "Helper service cannot be null.");
+            _hashPassword = hashPassword ?? throw new ArgumentNullException(nameof(hashPassword), "Hash password service cannot be null.");
         }
 
         //NOTE: SIGNUP FUNCTIONALITY
@@ -25,11 +33,11 @@ namespace ProjectShop.Server.Application.Services.Account
         {
             try
             {
-                if (await IsExistObject(entity.UserName, _accountDAO.GetByUserNameAsync))
+                if (await _helper.IsExistObject(entity.UserName, _accountDAO.GetByUserNameAsync))
                     throw new InvalidOperationException($"Account with username {entity.UserName} already exists.");
-                if (!await hashPassword.IsPasswordValidAsync(entity.Password))
+                if (!await _hashPassword.IsPasswordValidAsync(entity.Password))
                     throw new ArgumentException("Password does not meet the required criteria.", nameof(entity.Password));
-                entity.Password = await hashPassword.HashPasswordAsync(entity.Password);
+                entity.Password = await _hashPassword.HashPasswordAsync(entity.Password);
                 int affectedRows = await _baseDAO.InsertAsync(entity);
                 if (affectedRows == 0)
                     throw new InvalidOperationException("Failed to insert the account.");
@@ -45,7 +53,7 @@ namespace ProjectShop.Server.Application.Services.Account
         {
             try
             {
-                var filteredEntities = await FilterValidEntities(entities, entity => entity.UserName, _accountDAO.GetByUserNameAsync);
+                var filteredEntities = await _helper.FilterValidEntities(entities, entity => entity.UserName, _accountDAO.GetByUserNameAsync);
                 filteredEntities.TryGetValue(filteredEntities.Keys.FirstOrDefault(), out var batchObjectResult);
                 if (batchObjectResult == null)
                     throw new InvalidOperationException("No valid accounts found to add.");
@@ -70,9 +78,9 @@ namespace ProjectShop.Server.Application.Services.Account
         {
             foreach (AccountModel entity in entities)
             {
-                if (!await hashPassword.IsPasswordValidAsync(entity.Password))
+                if (!await _hashPassword.IsPasswordValidAsync(entity.Password))
                     throw new ArgumentException($"Password for user {entity.UserName} does not meet the required criteria.", nameof(entity.Password));
-                entity.Password = await hashPassword.HashPasswordAsync(entity.Password);
+                entity.Password = await _hashPassword.HashPasswordAsync(entity.Password);
             }
             return entities;
         }

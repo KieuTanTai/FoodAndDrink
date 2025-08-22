@@ -13,10 +13,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public DetailProductLotDAO(
         IDbConnectionFactory connectionFactory,
-        IColumnService colService,
         IStringConverter converter,
-        IStringChecker checker)
-        : base(connectionFactory, colService, converter, checker, "detail_product_lot", "product_lot_id", "product_barcode")
+        ILogService logger)
+        : base(connectionFactory, converter, logger, "detail_product_lot", "product_lot_id", "product_barcode")
         {
         }
 
@@ -58,33 +57,6 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<DetailProductLotModel> GetByKeysAsync(DetailProductLotKey keys)
             => await GetSingleByTwoIdAsync(ColumnIdName, SecondColumnIdName, keys.ProductLotId, keys.ProductBarcode);
 
-        public async Task<IEnumerable<DetailProductLotModel>> GetByListKeysAsync(IEnumerable<DetailProductLotKey> keys, int? maxGetCount)
-        {
-            if (keys == null || !keys.Any())
-                throw new ArgumentException("Keys collection cannot be null or empty.");
-            string query = "";
-            if (maxGetCount.HasValue && maxGetCount.Value > 0)
-                query = $@"SELECT * FROM {TableName} WHERE (product_lot_id, product_barcode) IN @Keys LIMIT @MaxGetCount";
-            else if (maxGetCount.HasValue && maxGetCount.Value <= 0)
-                throw new ArgumentException("MaxGetCount must be greater than zero.");
-            else
-                query = $@"SELECT * FROM {TableName} WHERE (product_lot_id, product_barcode) IN @Keys";
-
-            try
-            {
-                using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                IEnumerable<DetailProductLotModel> results = await connection.QueryAsync<DetailProductLotModel>(query, new { Keys = keys, MaxGetCount = maxGetCount });
-
-                if (results == null || !results.Any())
-                    throw new KeyNotFoundException($"No data found in {TableName} for {query} with parameters {keys}");
-                return results;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error getting list of keys from {TableName}: {ex.Message}", ex);
-            }
-        }
-
         public async Task<IEnumerable<DetailProductLotModel>> GetByMFGDateAsync(int year, int month, int? maxGetCount)
             => await GetByDateTimeAsync("product_lot_mfg_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month), maxGetCount);
 
@@ -111,5 +83,34 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<IEnumerable<DetailProductLotModel>> GetByProductBarcodesAsync(IEnumerable<string> barcodes, int? maxGetCount)
             => await GetByInputsAsync(barcodes, "product_barcode", maxGetCount);
+
+        public async Task<IEnumerable<DetailProductLotModel>> GetByListKeysAsync(IEnumerable<DetailProductLotKey> keys, int? maxGetCount)
+        {
+            if (keys == null || !keys.Any())
+                throw new ArgumentException("Keys collection cannot be null or empty.");
+            string query = "";
+            if (maxGetCount.HasValue && maxGetCount.Value > 0)
+                query = $@"SELECT * FROM {TableName} WHERE (product_lot_id, product_barcode) IN @Keys LIMIT @MaxGetCount";
+            else if (maxGetCount.HasValue && maxGetCount.Value <= 0)
+                throw new ArgumentException("MaxGetCount must be greater than zero.");
+            else
+                query = $@"SELECT * FROM {TableName} WHERE (product_lot_id, product_barcode) IN @Keys";
+
+            try
+            {
+                using IDbConnection connection = await ConnectionFactory.CreateConnection();
+                IEnumerable<DetailProductLotModel> results = await connection.QueryAsync<DetailProductLotModel>(query, new { Keys = keys, MaxGetCount = maxGetCount });
+
+                if (results == null || !results.Any())
+                    throw new KeyNotFoundException($"No data found in {TableName} for {query} with parameters {keys}");
+                Logger.LogInfo<IEnumerable<DetailProductLotModel>, DetailProductLotDAO>($"Retrieved list of keys from {TableName} successfully.");
+                return results;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError<IEnumerable<DetailProductLotModel>, DetailProductLotDAO>($"Error getting list of keys from {TableName}: {ex.Message}", ex);
+                throw new Exception($"Error getting list of keys from {TableName}: {ex.Message}", ex);
+            }
+        }
     }
 }

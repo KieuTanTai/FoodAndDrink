@@ -11,10 +11,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public CartDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "cart", "cart_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "cart", "cart_id", string.Empty)
         {
         }
 

@@ -13,10 +13,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public AccountDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "account", "account_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "account", "account_id", string.Empty)
         {
         }
 
@@ -44,17 +43,20 @@ namespace ProjectShop.Server.Infrastructure.Data
                 AccountModel? result = await connection.QueryFirstOrDefaultAsync<AccountModel>(query, new { UserName = userName, Password = password });
                 if (result == null)
                     throw new InvalidOperationException($"Account with username {userName} and provided password not found.");
+                Logger.LogInfo<AccountModel, AccountDAO>($"Retrieved account with username {userName} and provided password successfully.");
                 return result;
             }
             catch (Exception ex)
             {
+                Logger.LogError<AccountModel, AccountDAO>($"Error retrieving account with username {userName} and provided password.", ex);
                 throw new InvalidOperationException($"An error occurred while retrieving account with username {userName}.", ex);
             }
         }
 
-        public async Task<AccountModel?> GetByUserNameAsync(string userName) => await GetSingleDataAsync(userName, "user_name");
+        public async Task<AccountModel?> GetByUserNameAsync(string userName)
+            => await GetSingleDataAsync(userName, "user_name");
 
-        public async Task<IEnumerable<AccountModel>> GetByUserNameAsync(IEnumerable<string> userNames, int? maxGetCount) 
+        public async Task<IEnumerable<AccountModel>> GetByUserNameAsync(IEnumerable<string> userNames, int? maxGetCount)
             => await GetByInputsAsync(userNames, "user_name", maxGetCount);
 
         public async Task<IEnumerable<AccountModel>> GetByStatusAsync(bool status, int? maxGetCount)

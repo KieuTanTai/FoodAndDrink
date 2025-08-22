@@ -11,11 +11,25 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public CustomerDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "customer", "customer_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "customer", "customer_id", string.Empty)
         {
+        }
+
+        protected override string GetByListInputQuery(string colName)
+        {
+            return $@"SELECT 
+                customer_id AS CustomerId,
+                account_id AS AccountId,
+                customer_birthday AS Birthday,
+                customer_phone AS Phone,
+                customer_name AS Name,
+                customer_email AS Email,
+                customer_avatar_url AS AvatarUrl,
+                customer_gender AS Gender,
+                customer_status AS Status
+                FROM {TableName} WHERE {colName} IN @Inputs";
         }
 
         protected override string GetAllQuery()
@@ -130,7 +144,7 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<CustomerModel?> GetByAccountIdAsync(uint accountId) => await GetSingleDataAsync(accountId.ToString(), "account_id");
 
-        public async Task<IEnumerable<CustomerModel>> GetByAccountIdsAsync(IEnumerable<uint> accountIds, int? maxGetCount = null)
+        public async Task<IEnumerable<CustomerModel>> GetByAccountIdsAsync(IEnumerable<uint> accountIds, int? maxGetCount)
             => await GetByInputsAsync(accountIds.Select(id => id.ToString()), "account_id", maxGetCount);
 
         public async Task<IEnumerable<CustomerModel>> GetByLikeStringAsync(string input, int? maxGetCount)
@@ -149,13 +163,13 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<CustomerModel?> GetByNameAsync(string name) => await GetSingleDataAsync(name, "customer_name");
 
-        public async Task<IEnumerable<CustomerModel>> GetByPhonesAsync(IEnumerable<string> phones, int? maxGetCount = null) 
+        public async Task<IEnumerable<CustomerModel>> GetByPhonesAsync(IEnumerable<string> phones, int? maxGetCount = null)
             => await GetByInputsAsync(phones, "customer_phone", maxGetCount);
 
-        public async Task<IEnumerable<CustomerModel>> GetByEmailsAsync(IEnumerable<string> emails, int? maxGetCount = null) 
+        public async Task<IEnumerable<CustomerModel>> GetByEmailsAsync(IEnumerable<string> emails, int? maxGetCount = null)
             => await GetByInputsAsync(emails, "customer_email", maxGetCount);
 
-        public async Task<IEnumerable<CustomerModel>> GetByNamesAsync(IEnumerable<string> names, int? maxGetCount = null) 
+        public async Task<IEnumerable<CustomerModel>> GetByNamesAsync(IEnumerable<string> names, int? maxGetCount = null)
             => await GetByInputsAsync(names, "customer_name", maxGetCount);
 
         public async Task<IEnumerable<CustomerModel>> GetByMonthAndYearAsync(int year, int month, int? maxGetCount)

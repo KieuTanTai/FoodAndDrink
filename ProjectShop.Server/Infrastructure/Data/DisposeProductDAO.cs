@@ -11,10 +11,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public DisposeProductDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "dispose_product", "dispose_product_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "dispose_product", "dispose_product_id", string.Empty)
         {
         }
 

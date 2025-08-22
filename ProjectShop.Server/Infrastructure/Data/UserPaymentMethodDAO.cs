@@ -13,10 +13,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public UserPaymentMethodDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "user_payment_method", "user_payment_method_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "user_payment_method", "user_payment_method_id", string.Empty)
         {
         }
 
@@ -98,10 +97,12 @@ namespace ProjectShop.Server.Infrastructure.Data
                 IEnumerable<UserPaymentMethodModel> results = await connection.QueryAsync<UserPaymentMethodModel>(query, new { Year = year, Month = month, MaxGetCount = maxGetCount});
                 if (results == null || !results.Any())
                     return Enumerable.Empty<UserPaymentMethodModel>();
+                Logger.LogInfo<IEnumerable<UserPaymentMethodModel>, UserPaymentMethodDAO>($"Retrieved payment methods by expiry year {year} and month {month} successfully.");
                 return results;
             }
             catch (Exception ex)
             {
+                Logger.LogError<IEnumerable<UserPaymentMethodModel>, UserPaymentMethodDAO>($"Error getting payment methods by expiry year {year} and month {month}: {ex.Message}", ex);
                 throw new Exception($"Error getting payment methods by expiry year and month: {ex.Message}", ex);
             }
         }

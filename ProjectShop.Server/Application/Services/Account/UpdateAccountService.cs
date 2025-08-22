@@ -1,20 +1,24 @@
 ﻿using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
+using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
+using ProjectShop.Server.Core.Interfaces.IValidate;
 using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services.Account
 {
-    public class UpdateAccountService : BaseHelperService<AccountModel>, IUpdateAccountService
+    public class UpdateAccountService :  IUpdateAccountService
     {
         private readonly IDAO<AccountModel> _baseDAO;
         private readonly IAccountDAO<AccountModel> _accountDAO;
+        private readonly IHashPassword _hashPassword;
 
-        public UpdateAccountService(IDAO<AccountModel> baseDAO, IAccountDAO<AccountModel> accountDAO)
+        public UpdateAccountService(IDAO<AccountModel> baseDAO, IAccountDAO<AccountModel> accountDAO, IHashPassword hashPassword)
         {
             _baseDAO = baseDAO ?? throw new ArgumentNullException(nameof(baseDAO), "Base DAO cannot be null.");
             _accountDAO = accountDAO ?? throw new ArgumentNullException(nameof(accountDAO), "Account DAO cannot be null.");
+            _hashPassword = hashPassword ?? throw new ArgumentNullException(nameof(hashPassword), "Hash password service cannot be null.");
         }
 
         public async Task<int> UpdateAccountStatusAsync(uint accountId, bool status)
@@ -48,8 +52,8 @@ namespace ProjectShop.Server.Application.Services.Account
                 AccountModel? account = await daoFunc(input);
                 if (account == null)
                     throw new InvalidOperationException($"Account with input {input} does not exist.");
-                if (!await hashPassword.IsPasswordValidAsync(newPassword))
-                    account.Password = await hashPassword.HashPasswordAsync(newPassword);
+                if (!await  _hashPassword.IsPasswordValidAsync(newPassword))
+                    account.Password = await _hashPassword.HashPasswordAsync(newPassword);
                 account.Password = newPassword; // Assuming password is already hashed before this call
                 int affectedRows = await _baseDAO.UpdateAsync(account);
                 return affectedRows;
@@ -72,8 +76,8 @@ namespace ProjectShop.Server.Application.Services.Account
                         if (!enumerator.MoveNext())
                             throw new InvalidOperationException("The number of new passwords does not match the number of accounts.");
                         AccountModel account = enumerator.Current;
-                        if (!await hashPassword.IsPasswordValidAsync(newPassword))
-                            account.Password = await hashPassword.HashPasswordAsync(newPassword);
+                        if (!await _hashPassword.IsPasswordValidAsync(newPassword))
+                            account.Password = await _hashPassword.HashPasswordAsync(newPassword);
                         account.Password = newPassword; // Assuming password is already hashed before this call
                     }
                 }

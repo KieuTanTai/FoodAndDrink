@@ -12,10 +12,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public InventoryDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "inventory", "inventory_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "inventory", "inventory_id", string.Empty)
         {
         }
 

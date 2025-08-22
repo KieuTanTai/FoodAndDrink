@@ -10,17 +10,16 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public DetailInventoryMovementDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "detail_inventory_movement", "detail_inventory_movement_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "detail_inventory_movement", "detail_inventory_movement_id", string.Empty)
         {
         }
 
         protected override string GetInsertQuery()
         {
-            return $@"INSERT INTO {TableName} (inventory_movement_id, product_barcode, detail_inventory_movement_quantity) 
-                      VALUES (@InventoryMovementId, @ProductBarcode, @DetailInventoryMovementQuantity); SELECT LAST_INSERT_ID();";
+            return $@"INSERT INTO {TableName} (inventory_movement_id, product_barcode, product_lot_id, detail_inventory_movement_quantity) 
+                      VALUES (@InventoryMovementId, @ProductBarcode, ProductLotId, @DetailInventoryMovementQuantity); SELECT LAST_INSERT_ID();";
         }
         // Implement other methods as needed
 
@@ -29,5 +28,11 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public Task<IEnumerable<DetailInventoryMovementModel>> GetByProductBarcodeAsync(string barcode, int? maxGetCount) 
             => GetByInputAsync(barcode, "product_barcode", maxGetCount);
+
+        public async Task<IEnumerable<DetailInventoryMovementModel>> GetByProductLotIdAsync(uint productLotId, int? maxGetCount)
+            => await GetByInputAsync(productLotId.ToString(), "product_lot_id", maxGetCount);
+
+        public async Task<IEnumerable<DetailInventoryMovementModel>> GetByProductLotIdsAsync(IEnumerable<uint> productLotIds, int? maxGetCount)
+            => await GetByInputsAsync(productLotIds.Select(id => id.ToString()), "product_lot_id", maxGetCount);
     }
 }

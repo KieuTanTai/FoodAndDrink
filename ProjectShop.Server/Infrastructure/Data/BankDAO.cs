@@ -9,10 +9,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public BankDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "bank", "bank_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "bank", "bank_id", string.Empty)
         {
         }
 

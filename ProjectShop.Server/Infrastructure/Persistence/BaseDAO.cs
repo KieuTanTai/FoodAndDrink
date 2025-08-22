@@ -7,12 +7,11 @@ namespace ProjectShop.Server.Infrastructure.Persistence
 {
     public abstract class BaseDAO<TEntity>(
         IDbConnectionFactory connectionFactory,
-        IColumnService colService,
         IStringConverter converter,
-        IStringChecker checker,
+        ILogService logger,
         string tableName,
         string columnIdName,
-        string secondColumnIdName = "") : BaseGetDataDAO<TEntity>(connectionFactory, colService, converter, checker, tableName, columnIdName, secondColumnIdName),
+        string secondColumnIdName = "") : BaseGetDataDAO<TEntity>(connectionFactory, converter, logger, tableName, columnIdName, secondColumnIdName),
         IDAO<TEntity> where TEntity : class
     {
 
@@ -28,16 +27,19 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 {
                     int result = await connection.ExecuteScalarAsync<int>(GetInsertQuery(), entity, transaction);
                     transaction.Commit();
+                    Logger.LogInfo<TEntity, BaseDAO<TEntity>>($"Successfully inserted data into {TableName}");
                     return result;
                 }
                 catch (Exception ex)
                 {
                     transaction.Rollback();
+                    Logger.LogError<TEntity, BaseDAO<TEntity>>($"Error inserting data into {TableName}", ex);
                     throw new Exception($"Error inserting data into {TableName}: {ex.Message}", ex);
                 }
             }
             catch (Exception ex)
             {
+                Logger.LogError<TEntity, BaseDAO<TEntity>>($"Error creating connection or transaction for {TableName}", ex);
                 throw new Exception($"Error creating connection or transaction for {TableName}: {ex.Message}", ex);
             }
         }
@@ -55,18 +57,20 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 {
                     string insertQuery = GetInsertQuery();
                     int affectedRows = await connection.ExecuteAsync(insertQuery, entities, transaction);
-
                     transaction.Commit();
+                    Logger.LogInfo<IEnumerable<TEntity>, BaseDAO<TEntity>>($"Successfully inserted multiple entities into {TableName}");
                     return affectedRows;
                 }
                 catch (Exception ex)
                 {
                     transaction.Rollback();
+                    Logger.LogError<IEnumerable<TEntity>, BaseDAO<TEntity>>($"Error inserting multiple entities into {TableName}", ex);
                     throw new Exception(TableName + $" Error inserting multiple entities: {ex.Message}", ex);
                 }
             }
             catch (Exception ex)
             {
+                Logger.LogError<IEnumerable<TEntity>, BaseDAO<TEntity>>($"Error creating connection or transaction for {TableName}", ex);
                 throw new Exception($"Error creating connection or transaction for {TableName}: {ex.Message}", ex);
             }
         }
@@ -82,16 +86,19 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 {
                     int affectedRows = await connection.ExecuteAsync(GetUpdateQuery(), entity, transaction);
                     transaction.Commit();
+                    Logger.LogInfo<TEntity, BaseDAO<TEntity>>($"Successfully updated data in {TableName}");
                     return affectedRows;
                 }
                 catch (Exception ex)
                 {
                     transaction.Rollback();
+                    Logger.LogError<TEntity, BaseDAO<TEntity>>($"Error updating data in {TableName}", ex);
                     throw new Exception($"Error updating data in {TableName}: {ex.Message}", ex);
                 }
             }
             catch (Exception ex)
             {
+                Logger.LogError<TEntity, BaseDAO<TEntity>>($"Error creating connection or transaction for {TableName}", ex);
                 throw new Exception($"Error creating connection or transaction for {TableName}: {ex.Message}", ex);
             }
         }
@@ -110,87 +117,23 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                     string updateQuery = GetUpdateQuery();
                     int affectedRows = await connection.ExecuteAsync(updateQuery, entities, transaction);
                     transaction.Commit();
+                    Logger.LogInfo<IEnumerable<TEntity>, BaseDAO<TEntity>>($"Successfully updated multiple entities in {TableName}");
                     return affectedRows;
                 }
                 catch (Exception ex)
                 {
                     transaction.Rollback();
+                    Logger.LogError<IEnumerable<TEntity>, BaseDAO<TEntity>>($"Error updating multiple entities in {TableName}", ex);
                     throw new Exception($"Error updating multiple entities in {TableName}: {ex.Message}", ex);
                 }
             }
             catch (Exception ex)
             {
+                Logger.LogError<IEnumerable<TEntity>, BaseDAO<TEntity>>($"Error creating connection or transaction for {TableName}", ex);
                 throw new Exception($"Error creating connection or transaction for {TableName}: {ex.Message}", ex);
             }
         }
 
-#nullable enable
-        public virtual async Task<IEnumerable<TResult>?> QueryAsync<TResult>(string query, object? parameters = null)
-        {
-            try
-            {
-                using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                IEnumerable<TResult> result = await connection.QueryAsync<TResult>(query, parameters);
-                return result.AsList();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return default;
-            }
-        }
-
-        public virtual async Task<TResult?> QueryFirstOrDefaultAsync<TResult>(string query, object? parameters = null, IDbTransaction? transaction = null)
-        {
-            try
-            {
-                using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                try
-                {
-                    TResult? result = await connection.QueryFirstOrDefaultAsync(query, parameters, transaction);
-                    transaction?.Commit();
-                    return result;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error Commit!\n{ex.StackTrace}");
-                    transaction?.Rollback();
-                    return default;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return default;
-            }
-        }
-
-        public virtual async Task<bool> ExecuteAsync(string query, object? parameters = null, IDbTransaction? transaction = null)
-        {
-            try
-            {
-                using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                try
-                {
-                    int affectedRows = await connection.ExecuteAsync(query, parameters, transaction);
-                    transaction?.Commit();
-                    return affectedRows > 0;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error Commit!\n{ex.StackTrace}");
-                    transaction?.Rollback();
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return false;
-            }
-        }
-
-#nullable disable
         protected abstract string GetInsertQuery();
         protected abstract string GetUpdateQuery();
     }

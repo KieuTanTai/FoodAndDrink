@@ -11,10 +11,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public ProductLotDAO(
         IDbConnectionFactory connectionFactory,
-        IColumnService colService,
         IStringConverter converter,
-        IStringChecker checker)
-        : base(connectionFactory, colService, converter, checker, "product_lot", "product_lot_id", string.Empty)
+        ILogService logger)
+        : base(connectionFactory, converter, logger, "product_lot", "product_lot_id", string.Empty)
         {
         }
 

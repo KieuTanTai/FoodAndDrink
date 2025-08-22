@@ -7,7 +7,7 @@ using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services.Roles
 {
-    public class UpdateRoleService : BaseHelperService<RoleModel>, IUpdateRoleService
+    public class UpdateRoleService : IUpdateRoleService
     {
         private readonly IDAO<RoleModel> _baseDAO;
 

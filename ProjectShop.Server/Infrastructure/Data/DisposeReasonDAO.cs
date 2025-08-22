@@ -9,10 +9,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public DisposeReasonDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "dispose_reason", "dispose_reason_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "dispose_reason", "dispose_reason_id", string.Empty)
         {
         }
         protected override string GetInsertQuery()

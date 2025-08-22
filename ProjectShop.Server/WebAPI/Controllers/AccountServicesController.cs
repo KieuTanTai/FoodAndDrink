@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using ProjectShop.Server.Core.Entities;
-using ProjectShop.Server.Core.Entities.EntitiesRequest;
-using ProjectShop.Server.Core.Entities.GetNavigationPropertyOptions;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
+using ProjectShop.Server.Core.ObjectValue;
+using ProjectShop.Server.Core.ObjectValue.GetNavigationPropertyOptions;
 using System.Security.Claims;
 
 namespace ProjectShop.Server.WebAPI.Controllers
@@ -43,12 +43,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
                     _logger.LogWarning("maxCount phải lớn hơn 0.");
                     return BadRequest("maxCount must be greater than 0.");
                 }
-                maxCount ??= 100; // Giả sử mặc định là 100 nếu không có giá trị
 
                 if (status.HasValue)
-                    accounts = await _searchAccountService.GetByStatusAsync(status.Value, options, maxCount.Value);
+                    accounts = await _searchAccountService.GetByStatusAsync(status.Value, options, maxCount);
                 else
-                    accounts = await _searchAccountService.GetAllAsync(options, maxCount.Value);
+                    accounts = await _searchAccountService.GetAllAsync(options, maxCount);
                 return Ok(accounts); // trả json ra postman/browser
             }
             catch (Exception ex)

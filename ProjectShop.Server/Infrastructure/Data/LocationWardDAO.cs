@@ -9,10 +9,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public LocationWardDAO(
                     IDbConnectionFactory connectionFactory,
-                    IColumnService colService,
                     IStringConverter converter,
-                    IStringChecker checker)
-                    : base(connectionFactory, colService, converter, checker, "location_ward", "location_ward_id", string.Empty)
+                    ILogService logger)
+                    : base(connectionFactory, converter, logger, "location_ward", "location_ward_id", string.Empty)
         {
         }
 

@@ -1,27 +1,30 @@
 ﻿using ProjectShop.Server.Core.Entities;
-using ProjectShop.Server.Core.Entities.EntitiesRequest;
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
+using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IServices.Role;
+using ProjectShop.Server.Core.ObjectValue;
 using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services.Roles
 {
-    public class AddRoleService : BaseHelperService<RoleModel>, IAddRoleService<RoleModel>
+    public class AddRoleService : IAddRoleService<RoleModel>
     {
         private readonly IDAO<RoleModel> _baseDAO;
         private readonly IRoleDAO<RoleModel> _roleDAO;
-        public AddRoleService(IDAO<RoleModel> baseDAO, IRoleDAO<RoleModel> rolDAO)
+        private readonly IBaseHelperService<RoleModel> _helper;
+        public AddRoleService(IDAO<RoleModel> baseDAO, IRoleDAO<RoleModel> rolDAO, IBaseHelperService<RoleModel> helper)
         {
             _baseDAO = baseDAO ?? throw new ArgumentNullException(nameof(baseDAO), "Base DAO cannot be null.");
             _roleDAO = rolDAO ?? throw new ArgumentNullException(nameof(rolDAO), "Role DAO cannot be null.");
+            _helper = helper ?? throw new ArgumentNullException(nameof(helper), "Helper service cannot be null.");
         }
 
         public async Task<int> AddRoleAsync(RoleModel role)
         {
             try
             {
-                if (await IsExistObject(role.RoleId.ToString(), _baseDAO.GetSingleDataAsync))
+                if (await _helper.IsExistObject(role.RoleId.ToString(), _baseDAO.GetSingleDataAsync))
                     throw new InvalidOperationException("Role already exists.");
                 // Add the new role
                 int result = await _baseDAO.InsertAsync(role);
@@ -37,7 +40,7 @@ namespace ProjectShop.Server.Application.Services.Roles
         {
             try
             {
-                var filteredRoles = await FilterValidEntities(roles, (entity) => entity.RoleName, _roleDAO.GetByRoleNamesAsync);
+                var filteredRoles = await _helper.FilterValidEntities(roles, (entity) => entity.RoleName, _roleDAO.GetByRoleNamesAsync);
                 filteredRoles.TryGetValue(filteredRoles.Keys.FirstOrDefault(), out var batchObjectResult);
                 if (batchObjectResult == null)
                     throw new InvalidOperationException("No valid roles found to add.");

@@ -13,10 +13,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public RoleOfUserDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "roles_of_user", "id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "roles_of_user", "id", string.Empty)
         {
         }
 
@@ -72,10 +71,14 @@ namespace ProjectShop.Server.Infrastructure.Data
 
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<RolesOfUserModel> result = await connection.QueryAsync<RolesOfUserModel>(query, parameters);
-                return result.AsList();
+                if (result == null || !result.Any())
+                    throw new KeyNotFoundException($"No RolesOfUserModel found for the provided keys.");
+                Logger.LogInfo<IEnumerable<RolesOfUserModel>, RoleOfUserDAO>($"Retrieved RolesOfUserModels by list of keys successfully.");
+                return result;
             }
             catch (Exception ex)
             {
+                Logger.LogError<IEnumerable<RolesOfUserModel>, RoleOfUserDAO>($"Error retrieving RolesOfUserModels by list of keys: {ex.Message}", ex);
                 throw new Exception($"Error retrieving RolesOfUserModels by list of keys: {ex.Message}", ex);
             }
         }
@@ -89,10 +92,12 @@ namespace ProjectShop.Server.Infrastructure.Data
                 int rowsAffected = await connection.ExecuteAsync(query, keys);
                 if (rowsAffected == 0)
                     throw new KeyNotFoundException($"No RolesOfUserModel found for AccountId: {keys.AccountId} and RoleId: {keys.RoleId}");
+                Logger.LogInfo<int, RoleOfUserDAO>($"Deleted RolesOfUserModel by keys successfully. Rows affected: {rowsAffected}");
                 return rowsAffected;
             }
             catch (Exception ex)
             {
+                Logger.LogError<int, RoleOfUserDAO>($"Error deleting RolesOfUserModel by keys: {ex.Message}", ex);
                 throw new Exception($"Error deleting RolesOfUserModel by keys: {ex.Message}", ex);
             }
         }
@@ -152,10 +157,12 @@ namespace ProjectShop.Server.Infrastructure.Data
                 int rowsAffected = await connection.ExecuteAsync(query, new { Input = id });
                 if (rowsAffected == 0)
                     throw new KeyNotFoundException($"No RolesOfUserModel found with {colName}: {id}");
+                Logger.LogInfo<int, RoleOfUserDAO>($"Deleted RolesOfUserModel by single id successfully. Rows affected: {rowsAffected}");
                 return rowsAffected;
             }
             catch (Exception ex)
             {
+                Logger.LogError<int, RoleOfUserDAO>($"Error deleting RolesOfUserModel by single id: {ex.Message}", ex);
                 throw new Exception($"Error deleting RolesOfUserModel by single id: {ex.Message}", ex);
             }
         }
@@ -169,10 +176,12 @@ namespace ProjectShop.Server.Infrastructure.Data
                 int rowsAffected = await connection.ExecuteAsync(query, new { Input = ids });
                 if (rowsAffected == 0)
                     throw new KeyNotFoundException($"No RolesOfUserModel found for the provided {colName} values.");
+                Logger.LogInfo<int, RoleOfUserDAO>($"Deleted RolesOfUserModel by list of ids successfully. Rows affected: {rowsAffected}");
                 return rowsAffected;
             }
             catch (Exception ex)
             {
+                Logger.LogError<int, RoleOfUserDAO>($"Error deleting RolesOfUserModel by list of ids: {ex.Message}", ex);
                 throw new Exception($"Error deleting RolesOfUserModel by list of ids: {ex.Message}", ex);
             }
         }
@@ -186,10 +195,12 @@ namespace ProjectShop.Server.Infrastructure.Data
                 int rowsAffected = await connection.ExecuteAsync(query, keys);
                 if (rowsAffected == 0)
                     throw new KeyNotFoundException("No RolesOfUserModel found for the provided keys.");
+                Logger.LogInfo<int, RoleOfUserDAO>($"Deleted RolesOfUserModel by list of keys successfully. Rows affected: {rowsAffected}");
                 return rowsAffected;
             }
             catch (Exception ex)
             {
+                Logger.LogError<int, RoleOfUserDAO>($"Error deleting RolesOfUserModel by list of keys: {ex.Message}", ex);
                 throw new Exception($"Error deleting RolesOfUserModel by list of keys: {ex.Message}", ex);
             }
         }

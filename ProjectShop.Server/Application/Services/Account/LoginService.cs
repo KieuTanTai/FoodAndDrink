@@ -1,24 +1,30 @@
 ﻿using ProjectShop.Server.Core.Entities;
-using ProjectShop.Server.Core.Entities.GetNavigationPropertyOptions;
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IEntities;
+using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
+using ProjectShop.Server.Core.Interfaces.IServices.Role;
+using ProjectShop.Server.Core.Interfaces.IValidate;
+using ProjectShop.Server.Core.ObjectValue.GetNavigationPropertyOptions;
 using System.Security.Claims;
 using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services.Account
 {
-    public class LoginService : BaseReturnAccountService, ILoginService<AccountModel, AccountNavigationOptions>
+    public class LoginService : ILoginService<AccountModel, AccountNavigationOptions>
     {
-        public LoginService(
-            IDAO<AccountModel> baseDAO,
-            IAccountDAO<AccountModel> accountDAO,
-            IPersonDAO<CustomerModel> customerDAO,
-            IPersonDAO<EmployeeModel> employeeDAO,
-            IEmployeeDAO<EmployeeModel> specificEmpDAO,
-            IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> roleOfUserDAO) : base(baseDAO, accountDAO, customerDAO, employeeDAO, specificEmpDAO, roleOfUserDAO)
+        private readonly IAccountDAO<AccountModel> _accountDAO;
+        private readonly IHashPassword _hashPassword;
+        private readonly IBaseGetNavigationPropertyService<AccountModel, AccountNavigationOptions> _navigationService;
+
+        public LoginService(IAccountDAO<AccountModel> accountDAO, IHashPassword hashPassword,
+            IBaseGetNavigationPropertyService<AccountModel, AccountNavigationOptions> navigationService
+        )
         {
+            _accountDAO = accountDAO;
+            _hashPassword = hashPassword;
+            _navigationService = navigationService;
         }
 
         public async Task<AccountModel> HandleLoginAsync(string userName, string password, AccountNavigationOptions? options)
@@ -30,10 +36,10 @@ namespace ProjectShop.Server.Application.Services.Account
                 if (!account.AccountStatus)
                     throw new InvalidOperationException("Account is inactive.");
                 string accountPassword = account.Password;
-                if (!await hashPassword.ComparePasswords(accountPassword, password))
+                if (!await _hashPassword.ComparePasswords(accountPassword, password))
                     throw new InvalidOperationException("Incorrect password.");
                 if (options != null)
-                    account = await GetNavigationPropertyByOptionsAsync(account, options);
+                    account = await _navigationService.GetNavigationPropertyByOptionsAsync(account, options);
                 //_currentAccountLogin.SetAccount(account);
                 return account;
             }

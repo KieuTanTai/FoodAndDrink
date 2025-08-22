@@ -1,28 +1,29 @@
 ﻿using ProjectShop.Server.Core.Entities;
-using ProjectShop.Server.Core.Entities.GetNavigationPropertyOptions;
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
+using ProjectShop.Server.Core.Interfaces.IServices;
+using ProjectShop.Server.Core.ObjectValue.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Application.Services.Product
 {
-    public abstract class BaseReturnProductService : BaseGetByTimeService<ProductModel, ProductNavigationOptions>
+    public class BaseReturnProductService : IBaseGetNavigationPropertyService<ProductModel, ProductNavigationOptions>
     {
-        protected readonly IDAO<ProductModel> _baseDAO;
-        protected readonly IDAO<SupplierModel> _baseSupplierDAO;
-        protected readonly IDAO<DetailCartModel> _baseDetailCartDAO;
-        protected readonly IDAO<DetailProductLotModel> _baseDetailProductLotDAO;
-        protected readonly IDAO<ProductImageModel> _baseProductImageDAO;
-        protected readonly IDAO<DetailSaleEventModel> _baseDetailSaleEventDAO;
-        protected readonly IDAO<ProductCategoriesModel> _baseProductCategoriesDAO;
-        protected readonly IDAO<DetailInvoiceModel> _baseDetailInvoiceDAO;
-        protected readonly IProductDAO<ProductModel> _productDAO;
-        protected readonly ISupplierDAO<SupplierModel> _supplierDAO;
-        protected readonly IDetailCartDAO<DetailCartModel> _detailCartDAO;
-        protected readonly IDetailProductLotDAO<DetailProductLotModel, DetailProductLotKey> _detailProductLotDAO;
-        protected readonly IProductImageDAO<ProductImageModel> _productImageDAO;
-        protected readonly IDetailSaleEventDAO<DetailSaleEventModel> _detailSaleEventDAO;
-        protected readonly IDetailInvoiceDAO<DetailInvoiceModel> _detailInvoiceDAO;
-        protected readonly IProductCategoriesDAO<ProductCategoriesModel, ProductCategoriesKey> _productCategoriesDAO;
+        private readonly IDAO<ProductModel> _baseDAO;
+        private readonly IDAO<SupplierModel> _baseSupplierDAO;
+        private readonly IDAO<DetailCartModel> _baseDetailCartDAO;
+        private readonly INoneUpdateDAO<DetailProductLotModel> _baseDetailProductLotDAO;
+        private readonly IDAO<ProductImageModel> _baseProductImageDAO;
+        private readonly INoneUpdateDAO<DetailSaleEventModel> _baseDetailSaleEventDAO;
+        private readonly IDAO<ProductCategoriesModel> _baseProductCategoriesDAO;
+        private readonly INoneUpdateDAO<DetailInvoiceModel> _baseDetailInvoiceDAO;
+        private readonly IProductDAO<ProductModel> _productDAO;
+        private readonly ISupplierDAO<SupplierModel> _supplierDAO;
+        private readonly IDetailCartDAO<DetailCartModel> _detailCartDAO;
+        private readonly IDetailProductLotDAO<DetailProductLotModel, DetailProductLotKey> _detailProductLotDAO;
+        private readonly IProductImageDAO<ProductImageModel> _productImageDAO;
+        private readonly IDetailSaleEventDAO<DetailSaleEventModel> _detailSaleEventDAO;
+        private readonly IDetailInvoiceDAO<DetailInvoiceModel> _detailInvoiceDAO;
+        private readonly IProductCategoriesDAO<ProductCategoriesModel, ProductCategoriesKey> _productCategoriesDAO;
 
         public BaseReturnProductService(
             IDAO<ProductModel> baseDAO,
@@ -31,15 +32,15 @@ namespace ProjectShop.Server.Application.Services.Product
             ISupplierDAO<SupplierModel> supplierDAO,
             IDAO<DetailCartModel> baseDetailCartDAO,
             IDetailCartDAO<DetailCartModel> detailCartDAO,
-            IDAO<DetailProductLotModel> baseDetailProductLotDAO,
+            INoneUpdateDAO<DetailProductLotModel> baseDetailProductLotDAO,
             IDetailProductLotDAO<DetailProductLotModel, DetailProductLotKey> detailProductLotDAO,
             IDAO<ProductImageModel> baseProductImageDAO,
             IProductImageDAO<ProductImageModel> productImageDAO,
-            IDAO<DetailSaleEventModel> baseDetailSaleEventDAO,
+            INoneUpdateDAO<DetailSaleEventModel> baseDetailSaleEventDAO,
             IDetailSaleEventDAO<DetailSaleEventModel> detailSaleEventDAO,
             IDAO<ProductCategoriesModel> baseProductCategoriesDAO,
             IProductCategoriesDAO<ProductCategoriesModel, ProductCategoriesKey> productCategoriesDAO,
-            IDAO<DetailInvoiceModel> baseDetailInvoiceDAO,
+            INoneUpdateDAO<DetailInvoiceModel> baseDetailInvoiceDAO,
             IDetailInvoiceDAO<DetailInvoiceModel> detailInvoiceDAO)
         {
             _baseDAO = baseDAO ?? throw new ArgumentNullException(nameof(baseDAO));
@@ -60,7 +61,7 @@ namespace ProjectShop.Server.Application.Services.Product
             _detailInvoiceDAO = detailInvoiceDAO ?? throw new ArgumentNullException(nameof(detailInvoiceDAO));
         }
 
-        protected override async Task<ProductModel> GetNavigationPropertyByOptionsAsync(ProductModel product, ProductNavigationOptions? options)
+        public async Task<ProductModel> GetNavigationPropertyByOptionsAsync(ProductModel product, ProductNavigationOptions? options)
         {
             if (options == null)
                 return product;
@@ -81,7 +82,7 @@ namespace ProjectShop.Server.Application.Services.Product
             return product;
         }
 
-        protected override async Task<IEnumerable<ProductModel>> GetNavigationPropertyByOptionsAsync(IEnumerable<ProductModel> products, ProductNavigationOptions? options)
+        public async Task<IEnumerable<ProductModel>> GetNavigationPropertyByOptionsAsync(IEnumerable<ProductModel> products, ProductNavigationOptions? options)
         {
             if (options == null)
                 return products;

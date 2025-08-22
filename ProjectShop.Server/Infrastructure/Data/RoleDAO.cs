@@ -11,10 +11,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public RoleDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "role", "role_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "role", "role_id", string.Empty)
         {
         }
 

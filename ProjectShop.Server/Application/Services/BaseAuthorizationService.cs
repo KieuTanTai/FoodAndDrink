@@ -1,6 +1,8 @@
-﻿namespace ProjectShop.Server.Application.Services
+﻿using ProjectShop.Server.Core.Interfaces.IServices;
+
+namespace ProjectShop.Server.Application.Services
 {
-    public abstract class BaseAuthorizationService
+    public class BaseAuthorizationService : IBaseAuthorizationService
     {
         // TODO: Build authorization logic
     }

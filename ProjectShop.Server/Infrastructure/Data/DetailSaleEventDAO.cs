@@ -11,10 +11,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public DetailSaleEventDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "detail_sale_event", "detail_sale_event_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "detail_sale_event", "detail_sale_event_id", string.Empty)
         {
         }
 

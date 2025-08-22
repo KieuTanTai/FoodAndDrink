@@ -12,10 +12,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public CustomerAddressDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "customer_address", "customer_address_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "customer_address", "customer_address_id", string.Empty)
         {
         }
 
@@ -86,11 +85,12 @@ namespace ProjectShop.Server.Infrastructure.Data
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<CustomerAddressModel> addresses = await connection.QueryAsync<CustomerAddressModel>(query, 
                             new { FirstInput = firstInput, SecondInput = secondInput, MaxGetCount = maxGetCount });
+                Logger.LogInfo<CustomerAddressModel, CustomerAddressDAO>($"Retrieved customer addresses by column names: {firstColName} and {secondColName} successfully.");
                 return addresses;
             }
             catch (Exception ex)
             {
-                // Handle exception (log it, rethrow it, etc.)
+                Logger.LogError<CustomerAddressModel, CustomerAddressDAO>($"Error retrieving customer addresses by column names: {ex.Message}", ex);
                 throw new Exception($"Error retrieving customer addresses by column names: {ex.Message}", ex);
             }
         }

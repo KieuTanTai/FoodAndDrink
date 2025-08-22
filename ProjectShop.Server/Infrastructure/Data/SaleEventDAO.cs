@@ -13,10 +13,9 @@ namespace ProjectShop.Server.Infrastructure.Data
     {
         public SaleEventDAO(
             IDbConnectionFactory connectionFactory,
-            IColumnService colService,
             IStringConverter converter,
-            IStringChecker checker)
-            : base(connectionFactory, colService, converter, checker, "sale_event", "sale_event_id", string.Empty)
+            ILogService logger)
+            : base(connectionFactory, converter, logger, "sale_event", "sale_event_id", string.Empty)
         {
         }
 
@@ -112,10 +111,12 @@ namespace ProjectShop.Server.Infrastructure.Data
                 IEnumerable<SaleEventModel> result = await connection.QueryAsync<SaleEventModel>(query, new { StartDate = startDate, EndDate = endDate, MaxGetCount = maxGetCount});
                 if (result == null || !result.Any())
                     throw new Exception("No SaleEvents found for the given date range.");
+                Logger.LogInfo<IEnumerable<SaleEventModel>, SaleEventDAO>($"Retrieved SaleEvents by start and end date range successfully.");
                 return result;
             }
             catch (Exception ex)
             {
+                Logger.LogError<IEnumerable<SaleEventModel>, SaleEventDAO>($"Error getting SaleEvents by start and end date range: {ex.Message}", ex);
                 throw new Exception($"Error getting SaleEvents by start and end date range: {ex.Message}", ex);
             }
         }
