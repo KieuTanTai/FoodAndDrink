@@ -1,110 +1,160 @@
 ﻿using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IData;
-using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IServices;
+using ProjectShop.Server.Core.Interfaces.IValidate;
+using ProjectShop.Server.Core.ObjectValue;
 using ProjectShop.Server.Core.ObjectValue.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Application.Services.Roles
 {
     public class BaseReturnAccountRoleService : IBaseGetNavigationPropertyService<RolesOfUserModel, RolesOfUserNavigationOptions>
     {
-        private readonly IDAO<RolesOfUserModel> _baseDAO;
         private readonly IDAO<RoleModel> _baseRoleDAO;
         private readonly IDAO<AccountModel> _baseAccountDAO;
-        private readonly IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> _roleOfUserDAO;
-        public BaseReturnAccountRoleService(IDAO<RolesOfUserModel> baseDAO, IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> roleOfUserDAO,
-            IDAO<RoleModel> baseRoleDAO, IDAO<AccountModel> baseAccountDAO)
-        {
-            _baseDAO = baseDAO ?? throw new ArgumentNullException(nameof(baseDAO));
-            _roleOfUserDAO = roleOfUserDAO ?? throw new ArgumentNullException(nameof(roleOfUserDAO));
-            _baseRoleDAO = baseRoleDAO ?? throw new ArgumentNullException(nameof(baseRoleDAO));
-            _baseAccountDAO = baseAccountDAO ?? throw new ArgumentNullException(nameof(baseAccountDAO));
-        }
-        public async Task<RolesOfUserModel> GetNavigationPropertyByOptionsAsync(RolesOfUserModel role, RolesOfUserNavigationOptions? options)
-        {
-            if (options?.IsGetRole == true)
-                role.Role = await TryLoadRoleAsync(role.RoleId);
+        private readonly ILogService _logger;
+        private readonly IServiceResultFactory<BaseReturnAccountRoleService> _serviceResultFactory;
 
-            if (options?.IsGetAccount == true)
-                role.Account = await TryLoadAccountAsync(role.AccountId);
-            return role;
-        }
-        public async Task<IEnumerable<RolesOfUserModel>> GetNavigationPropertyByOptionsAsync(IEnumerable<RolesOfUserModel> roles, RolesOfUserNavigationOptions? options)
+        public BaseReturnAccountRoleService(IDAO<RoleModel> baseRoleDAO, IDAO<AccountModel> baseAccountDAO, ILogService logger, IServiceResultFactory<BaseReturnAccountRoleService> serviceResultFactory)
         {
+            _baseRoleDAO = baseRoleDAO;
+            _baseAccountDAO = baseAccountDAO;
+            _logger = logger;
+            _serviceResultFactory = serviceResultFactory;
+        }
+
+        public async Task<ServiceResult<RolesOfUserModel>> GetNavigationPropertyByOptionsAsync(RolesOfUserModel role, RolesOfUserNavigationOptions? options)
+        {
+            List<JsonLogEntry> logEntries = new();
             if (options?.IsGetRole == true)
             {
-                var roleList = roles.ToList();
+                ServiceResult<RoleModel> result = await TryLoadRoleAsync(role.RoleId);
+                logEntries.AddRange(result.LogEntries!);
+                role.Role = result.Data!;
+            }
+
+            if (options?.IsGetAccount == true)
+            {
+                ServiceResult<AccountModel> result = await TryLoadAccountAsync(role.AccountId);
+                logEntries.AddRange(result.LogEntries!);
+                role.Account = result.Data!;
+            }
+            logEntries.Add(_logger.JsonLogInfo<RolesOfUserModel, BaseReturnAccountRoleService>("GetNavigationPropertyByOptionsAsync completed."));
+            return _serviceResultFactory.CreateServiceResult(role, logEntries);
+        }
+
+        public async Task<ServiceResults<RolesOfUserModel>> GetNavigationPropertyByOptionsAsync(IEnumerable<RolesOfUserModel> roles, RolesOfUserNavigationOptions? options)
+        {
+            var roleList = roles.ToList();
+            List<JsonLogEntry> logEntries = new();
+            if (options?.IsGetRole == true)
+            {
                 var roleIds = roleList.Select(r => r.RoleId).ToList();
                 var rolesDict = await TryLoadRolesAsyncs(roleIds);
                 foreach (var role in roleList)
                 {
-                    rolesDict.TryGetValue(role.RoleId, out var loadedRole);
-                    role.Role = loadedRole ?? new RoleModel();
+                    rolesDict.TryGetValue(role.RoleId, out var serviceResult);
+                    logEntries.AddRange(serviceResult!.LogEntries!);
+                    if (serviceResult.Data!.RoleId == 0)
+                        break;
+                    role.Role = serviceResult.Data!;
                 }
             }
 
             if (options?.IsGetAccount == true)
             {
-                var roleList = roles.ToList();
                 var accountIds = roleList.Select(r => r.AccountId).ToList();
                 var accountsDict = await TryLoadAccountsAsyncs(accountIds);
                 foreach (var role in roleList)
                 {
-                    accountsDict.TryGetValue(role.AccountId, out var loadedAccount);
-                    role.Account = loadedAccount ?? new AccountModel();
+                    accountsDict.TryGetValue(role.AccountId, out var serviceResult);
+                    logEntries.AddRange(serviceResult!.LogEntries!);
+                    if (serviceResult.Data!.AccountId == 0)
+                        break;
+                    role.Account = serviceResult.Data!;
                 }
             }
-
-            return roles;
+            logEntries.Add(_logger.JsonLogInfo<RolesOfUserModel, BaseReturnAccountRoleService>("GetNavigationPropertyByOptionsAsync completed."));
+            return _serviceResultFactory.CreateServiceResults(roleList, logEntries);
         }
 
-        private async Task<RoleModel> TryLoadRoleAsync(uint roleId)
+        private async Task<ServiceResult<RoleModel>> TryLoadRoleAsync(uint roleId)
         {
             try
             {
-                return await _baseRoleDAO.GetSingleDataAsync(roleId.ToString()) ?? new();
+                RoleModel? roleModel = await _baseRoleDAO.GetSingleDataAsync(roleId.ToString());
+                bool isExists = roleModel != null;
+                roleModel ??= new RoleModel();
+                string message = isExists ? "Role loaded successfully." : "Role not found.";
+                return _serviceResultFactory.CreateServiceResult(message, roleModel, isExists);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new();
-            }
-        }
-
-        private async Task<AccountModel> TryLoadAccountAsync(uint accountId)
-        {
-            try
-            {
-                return await _baseAccountDAO.GetSingleDataAsync(accountId.ToString()) ?? new();
-            }
-            catch (Exception)
-            {
-                return new();
+                return _serviceResultFactory.CreateServiceResult("Error loading role.", new RoleModel(), false, ex);
             }
         }
 
-        private async Task<IDictionary<uint, RoleModel>> TryLoadRolesAsyncs(IEnumerable<uint> roleIds)
+        private async Task<ServiceResult<AccountModel>> TryLoadAccountAsync(uint accountId)
         {
             try
             {
-                return (await _baseRoleDAO.GetByInputsAsync(roleIds.Select(id => id.ToString())))
-                    .ToDictionary(role => role.RoleId, role => role) ?? new Dictionary<uint, RoleModel>();
+                AccountModel? accountModel = await _baseAccountDAO.GetSingleDataAsync(accountId.ToString());
+                bool isExists = accountModel != null;
+                accountModel ??= new AccountModel();
+                string message = isExists ? "Account loaded successfully." : "Account not found.";
+                return _serviceResultFactory.CreateServiceResult(message, accountModel, isExists);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new Dictionary<uint, RoleModel>();
+                return _serviceResultFactory.CreateServiceResult("Error loading account.", new AccountModel(), false, ex);
             }
         }
 
-        private async Task<IDictionary<uint, AccountModel>> TryLoadAccountsAsyncs(IEnumerable<uint> accountIds)
+        private async Task<IDictionary<uint, ServiceResult<RoleModel>>> TryLoadRolesAsyncs(IEnumerable<uint> roleIds)
+        {
+            uint firstRoleId = roleIds.FirstOrDefault();
+            try
+            {
+                IEnumerable<RoleModel> roles = await _baseRoleDAO.GetByInputsAsync(roleIds.Select(id => id.ToString())) ?? Enumerable.Empty<RoleModel>();
+                if (!roles.Any())
+                {
+                    return new Dictionary<uint, ServiceResult<RoleModel>>
+                    {
+                        [firstRoleId] = _serviceResultFactory.CreateServiceResult("No roles found.", new RoleModel(), false)
+                    };
+                }
+
+                return roles.ToDictionary(role => role.RoleId, role => _serviceResultFactory.CreateServiceResult("Role loaded successfully.", role, true));
+            }
+            catch (Exception ex)
+            {
+                return new Dictionary<uint, ServiceResult<RoleModel>>
+                {
+                    [firstRoleId] = _serviceResultFactory.CreateServiceResult("Error loading roles.", new RoleModel(), false, ex)
+                };
+            }
+        }
+
+        private async Task<IDictionary<uint, ServiceResult<AccountModel>>> TryLoadAccountsAsyncs(IEnumerable<uint> accountIds)
         {
             try
             {
-                return (await _baseAccountDAO.GetByInputsAsync(accountIds.Select(id => id.ToString())))
-                    .ToDictionary(account => account.AccountId, account => account) ?? new Dictionary<uint, AccountModel>();
+                IEnumerable<AccountModel> accounts = await _baseAccountDAO.GetByInputsAsync(accountIds.Select(id => id.ToString())) ?? Enumerable.Empty<AccountModel>();
+                if (!accounts.Any())
+                {
+                    uint firstAccountId = accountIds.FirstOrDefault();
+                    return new Dictionary<uint, ServiceResult<AccountModel>>
+                    {
+                        [firstAccountId] = _serviceResultFactory.CreateServiceResult("No accounts found.", new AccountModel(), false)
+                    };
+                }
+                return accounts.ToDictionary(account => account.AccountId, account => _serviceResultFactory.CreateServiceResult("Account loaded successfully.", account, true));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new Dictionary<uint, AccountModel>();
+                return new Dictionary<uint, ServiceResult<AccountModel>>
+                {
+                    [accountIds.FirstOrDefault()] = _serviceResultFactory.CreateServiceResult("Error loading accounts.", new AccountModel(), false, ex)
+                };
             }
         }
     }

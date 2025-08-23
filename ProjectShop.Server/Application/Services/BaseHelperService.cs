@@ -7,11 +7,11 @@ namespace TLGames.Application.Services
     public class BaseHelperService<TEntity> : IBaseHelperService<TEntity>
         where TEntity : class
     {
-        private readonly IHashPassword hashPassword;
-        private readonly IStringConverter converter;
-        private readonly IClock clock;
-        private readonly IMaxGetRecord maxGetRecord;
-        private readonly ILogService logger;
+        private readonly IHashPassword _hashPassword;
+        private readonly IStringConverter _converter;
+        private readonly IClock _clock;
+        private readonly IMaxGetRecord _maxGetRecord;
+        private readonly ILogService _logger;
 
         public BaseHelperService(
             IHashPassword hashPassword,
@@ -20,11 +20,11 @@ namespace TLGames.Application.Services
             IMaxGetRecord maxGetRecord,
             ILogService logger)
         {
-            this.hashPassword = hashPassword;
-            this.converter = converter;
-            this.clock = clock;
-            this.maxGetRecord = maxGetRecord;
-            this.logger = logger;
+            _clock = clock;
+            _logger = logger;
+            _converter = converter;
+            _hashPassword = hashPassword;
+            _maxGetRecord = maxGetRecord;
         }
 
         public async Task<bool> IsExistObject(string input, Func<string, Task<TEntity?>> daoFunc)
@@ -36,7 +36,7 @@ namespace TLGames.Application.Services
             }
             catch (Exception ex)
             {
-                logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object with input: {input}", ex);
+                _logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object with input: {input}", ex);
                 return false;
             }
         }
@@ -50,7 +50,7 @@ namespace TLGames.Application.Services
             }
             catch (Exception ex)
             {
-                logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object with input: {input}", ex);
+                _logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object with input: {input}", ex);
                 return false;
             }
         }
@@ -64,7 +64,7 @@ namespace TLGames.Application.Services
             }
             catch (Exception ex)
             {
-                logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object with key: {keys}", ex);
+                _logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object with key: {keys}", ex);
                 return false;
             }
         }
@@ -80,7 +80,7 @@ namespace TLGames.Application.Services
             }
             catch (Exception ex)
             {
-                logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object!", ex);
+                _logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object!", ex);
                 return false;
             }
         }
@@ -96,7 +96,7 @@ namespace TLGames.Application.Services
             }
             catch (Exception ex)
             {
-                logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object!", ex);
+                _logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object!", ex);
                 return false;
             }
         }
@@ -112,7 +112,7 @@ namespace TLGames.Application.Services
             }
             catch (Exception ex)
             {
-                logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object!", ex);
+                _logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object!", ex);
                 return false;
             }
         }
@@ -128,7 +128,7 @@ namespace TLGames.Application.Services
             }
             catch (Exception ex)
             {
-                logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object!", ex);
+                _logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object!", ex);
                 return true;
             }
         }
@@ -144,7 +144,7 @@ namespace TLGames.Application.Services
             }
             catch (Exception ex)
             {
-                logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object!", ex);
+                _logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object!", ex);
                 return true;
             }
         }
@@ -160,7 +160,7 @@ namespace TLGames.Application.Services
             }
             catch (Exception ex)
             {
-                logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object!", ex);
+                _logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object!", ex);
                 return true;
             }
         }
@@ -169,10 +169,10 @@ namespace TLGames.Application.Services
         {
             if (maxGetCount.HasValue && maxGetCount.Value <= 0)
                 return 200;
-            return maxGetCount > maxGetRecord.MaxGetRecord ? maxGetRecord.MaxGetRecord : maxGetCount;
+            return maxGetCount > _maxGetRecord.MaxGetRecord ? _maxGetRecord.MaxGetRecord : maxGetCount;
         }
 
-        public async Task<Dictionary<uint, BatchObjectResult<TEntity>>> FilterValidEntities(
+        public async Task<Dictionary<uint, ServiceResults<TEntity>>> FilterValidEntities(
             IEnumerable<TEntity> entities,
             Func<TEntity, string> fieldSelector,
             Func<IEnumerable<string>, int?, Task<IEnumerable<TEntity>>> daoFunc)
@@ -185,41 +185,36 @@ namespace TLGames.Application.Services
 
                 var existingFieldSet = new HashSet<string>(existingEntities.Select(fieldSelector), StringComparer.OrdinalIgnoreCase);
 
-                var validEntities = entityList
+                var data = entityList
                     .Where(entity => !existingFieldSet.Contains(fieldSelector(entity)))
                     .ToList();
 
-                var batchItemResults = entityList.Select(entity => new BatchItemResult<TEntity>
+                var logEntries = entityList.Select(entity =>
                 {
-                    Input = entity,
-                    IsSuccess = !existingFieldSet.Contains(fieldSelector(entity)),
-                    ErrorMessage = existingFieldSet.Contains(fieldSelector(entity)) ? "already exists!" : ""
+                    bool isContains = existingFieldSet.Contains(fieldSelector(entity));
+                    if (isContains)
+                        return _logger.JsonLogWarning<TEntity, BaseHelperService<TEntity>>("Failure", new Exception("already exists!"));
+                    return _logger.JsonLogInfo<TEntity, BaseHelperService<TEntity>>("Success");
                 }).ToList();
 
-                return new Dictionary<uint, BatchObjectResult<TEntity>>
+                return new Dictionary<uint, ServiceResults<TEntity>>
                 {
-                    { 0, new BatchObjectResult<TEntity> { ValidEntities = validEntities.ToList(), BatchResults = batchItemResults } }
+                    { 0, new ServiceResults<TEntity> { LogEntries = logEntries, Data = data } }
                 };
             }
             catch (Exception ex)
             {
-                logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object for filter!", ex);
+                _logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object for filter!", ex);
+                List<JsonLogEntry> logEntries = new List<JsonLogEntry> { _logger.JsonLogError<TEntity, BaseHelperService<TEntity>>($"An error occurred while filtering valid entities.", ex) };
 
-                var batchItemResults = entities.Select(entity => new BatchItemResult<TEntity>
+                return new Dictionary<uint, ServiceResults<TEntity>>
                 {
-                    Input = entity,
-                    IsSuccess = false,
-                    ErrorMessage = "An error occurred while filtering valid entities."
-                }).ToList();
-
-                return new Dictionary<uint, BatchObjectResult<TEntity>>
-                {
-                    { 0, new BatchObjectResult<TEntity> { ValidEntities = new List<TEntity>(), BatchResults = batchItemResults } }
+                    { 0, new ServiceResults<TEntity> { LogEntries = logEntries, Data = new List<TEntity>() } }
                 };
             }
         }
 
-        public async Task<Dictionary<uint, BatchObjectResult<TEntity>>> FilterValidEntities<TKey>(
+        public async Task<Dictionary<uint, ServiceResults<TEntity>>> FilterValidEntities<TKey>(
             IEnumerable<TEntity> entities,
             Func<TEntity, TKey> fieldSelector,
             Func<IEnumerable<TKey>, int?, Task<IEnumerable<TEntity>>> daoFunc) where TKey : struct
@@ -232,36 +227,32 @@ namespace TLGames.Application.Services
 
                 var existingFieldSet = new HashSet<TKey>(existingEntities.Select(fieldSelector), EqualityComparer<TKey>.Default);
 
-                var validEntities = entityList
+                var data = entityList
                     .Where(entity => !existingFieldSet.Contains(fieldSelector(entity)))
                     .ToList();
 
-                var batchItemResults = entityList.Select(entity => new BatchItemResult<TEntity>
+                var logEntries = entityList.Select(entity =>
                 {
-                    Input = entity,
-                    IsSuccess = !existingFieldSet.Contains(fieldSelector(entity)),
-                    ErrorMessage = existingFieldSet.Contains(fieldSelector(entity)) ? "already exists!" : ""
+                    bool isContains = existingFieldSet.Contains(fieldSelector(entity));
+                    if (isContains)
+                        return _logger.JsonLogWarning<TEntity, BaseHelperService<TEntity>>("Failure", new Exception("already exists!"));
+                    return _logger.JsonLogInfo<TEntity, BaseHelperService<TEntity>>("Success");
                 }).ToList();
 
-                return new Dictionary<uint, BatchObjectResult<TEntity>>
+                return new Dictionary<uint, ServiceResults<TEntity>>
                 {
-                    { 0, new BatchObjectResult<TEntity> { ValidEntities = validEntities.ToList(), BatchResults = batchItemResults } }
+                    { 0, new ServiceResults<TEntity> { LogEntries = logEntries, Data = data } }
                 };
             }
             catch (Exception ex)
             {
-                logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object for filter!", ex);
+                _logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object for filter!", ex);
 
-                var batchItemResults = entities.Select(entity => new BatchItemResult<TEntity>
-                {
-                    Input = entity,
-                    IsSuccess = false,
-                    ErrorMessage = "An error occurred while filtering valid entities."
-                }).ToList();
+                List<JsonLogEntry> logEntries = new List<JsonLogEntry> { _logger.JsonLogError<TEntity, BaseHelperService<TEntity>>($"An error occurred while filtering valid entities.", ex) };
 
-                return new Dictionary<uint, BatchObjectResult<TEntity>>
+                return new Dictionary<uint, ServiceResults<TEntity>>
                 {
-                    { 0, new BatchObjectResult<TEntity> { ValidEntities = new List<TEntity>(), BatchResults = batchItemResults } }
+                    { 0, new ServiceResults<TEntity> { LogEntries = logEntries, Data = new List<TEntity>() } }
                 };
             }
         }

@@ -1,9 +1,12 @@
-﻿using ProjectShop.Server.Core.Entities;
+﻿using Org.BouncyCastle.Ocsp;
+using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
 using ProjectShop.Server.Core.Interfaces.IServices.Role;
+using ProjectShop.Server.Core.Interfaces.IValidate;
+using ProjectShop.Server.Core.ObjectValue;
 using ProjectShop.Server.Core.ObjectValue.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Application.Services.Account
@@ -19,133 +22,145 @@ namespace ProjectShop.Server.Application.Services.Account
         private readonly IBaseHelperService<AccountModel> _helper;
         private readonly IBaseGetByTimeService<AccountModel, AccountNavigationOptions> _byTimeService;
         private readonly IBaseGetNavigationPropertyService<AccountModel, AccountNavigationOptions> _navigationService;
+        private readonly ILogService _logger;
+        private readonly IServiceResultFactory<SearchAccountService> _serviceResultFactory;
 
         public SearchAccountService(IDAO<AccountModel> baseDAO, IAccountDAO<AccountModel> accountDAO, IPersonDAO<CustomerModel> customerDAO, 
+            ILogService logger,
+            IBaseHelperService<AccountModel> helper,
             IPersonDAO<EmployeeModel> employeeDAO, IEmployeeDAO<EmployeeModel> specificEmpDAO,
             ISearchAccountRoleService<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey> searchAccountRoleService,
-            IBaseHelperService<AccountModel> helper,
             IBaseGetByTimeService<AccountModel, AccountNavigationOptions> byTimeService,
-            IBaseGetNavigationPropertyService<AccountModel, AccountNavigationOptions> navigationService
-        )
+            IBaseGetNavigationPropertyService<AccountModel, AccountNavigationOptions> navigationService,
+            IServiceResultFactory<SearchAccountService> serviceResultFactory)
         {
+            _helper = helper;
+            _logger = logger;
             _baseDAO = baseDAO;
             _accountDAO = accountDAO;
             _customerDAO = customerDAO;
             _employeeDAO = employeeDAO;
-            _specificEmpDAO = specificEmpDAO;
-            _searchAccountRoleService = searchAccountRoleService;
-            _helper = helper;
             _byTimeService = byTimeService;
+            _specificEmpDAO = specificEmpDAO;
             _navigationService = navigationService;
+            _serviceResultFactory = serviceResultFactory;
+            _searchAccountRoleService = searchAccountRoleService;
         }
 
-        public async Task<IEnumerable<AccountModel>> GetAllAsync(AccountNavigationOptions? options, int? maxGetCount)
+        public async Task<ServiceResults<AccountModel>> GetAllAsync(AccountNavigationOptions? options, int? maxGetCount)
         {
+            ServiceResults<AccountModel> results = new ServiceResults<AccountModel>();
             try
             {
                 IEnumerable<AccountModel> accounts = await _baseDAO.GetAllAsync(_helper.GetValidMaxRecord(maxGetCount));
 
                 if (options != null)
-                    accounts = await _navigationService.GetNavigationPropertyByOptionsAsync(accounts, options);
-                return accounts;
+                    results = await _navigationService.GetNavigationPropertyByOptionsAsync(accounts, options);
+                results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<AccountModel, SearchAccountService>($"Retrieved all accounts with maxGetCount={maxGetCount}, options={options}."));
+                return results;
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($@"Unable to get accounts with the current parameters 
-                                        (maxGetCount={maxGetCount}, options={options}).", ex);
+                return _serviceResultFactory.CreateServiceResults<AccountModel>("An error occurred while retrieving all accounts.", Enumerable.Empty<AccountModel>(), false, ex);
             }
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByStatusAsync(bool status, AccountNavigationOptions? options, int? maxGetCount)
+        public async Task<ServiceResults<AccountModel>> GetByStatusAsync(bool status, AccountNavigationOptions? options, int? maxGetCount)
         {
+            ServiceResults<AccountModel> results = new ServiceResults<AccountModel>();
             try
             {
                 IEnumerable<AccountModel> accounts = await _accountDAO.GetByStatusAsync(status, _helper.GetValidMaxRecord(maxGetCount));
                 if (options != null)
-                    accounts = await _navigationService.GetNavigationPropertyByOptionsAsync(accounts, options);
-                return accounts;
+                    results = await _navigationService.GetNavigationPropertyByOptionsAsync(accounts, options);
+                results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<AccountModel, SearchAccountService>($"Retrieved accounts by status={status} with maxGetCount={maxGetCount}, options={options}."));
+                return results;
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("An error occurred while retrieving accounts by status with a limit.", ex);
+                return _serviceResultFactory.CreateServiceResults<AccountModel>($"An error occurred while retrieving accounts by status={status}.", Enumerable.Empty<AccountModel>(), false, ex);
             }
         }
 
-        public async Task<AccountModel> GetByUserNameAsync(string userName, AccountNavigationOptions? options)
+        public async Task<ServiceResult<AccountModel>> GetByUserNameAsync(string userName, AccountNavigationOptions? options)
         {
+            ServiceResult<AccountModel> result = new ServiceResult<AccountModel>();
             try
             {
                 AccountModel? account = await _accountDAO.GetByUserNameAsync(userName);
                 if (account == null)
-                    throw new InvalidOperationException($"No account found with username: {userName}.");
+                    return _serviceResultFactory.CreateServiceResult<AccountModel>($"No account found with username: {userName}.", new AccountModel(), false);
                 if (options != null)
-                    account = await _navigationService.GetNavigationPropertyByOptionsAsync(account, options);
-                return account;
+                    result = await _navigationService.GetNavigationPropertyByOptionsAsync(account, options);
+                result.LogEntries = result.LogEntries!.Append(_logger.JsonLogInfo<AccountModel, SearchAccountService>($"Retrieved account by username={userName} with options={options}."));
+                return result;
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("An error occurred while retrieving account by username.", ex);
+                return _serviceResultFactory.CreateServiceResult<AccountModel>($"An error occurred while retrieving account by username: {userName}.", new AccountModel(), false, ex);
             }
         }
 
-        public async Task<AccountModel> GetByAccountIdAsync(uint accountId, AccountNavigationOptions? options)
+        public async Task<ServiceResult<AccountModel>> GetByAccountIdAsync(uint accountId, AccountNavigationOptions? options)
         {
+            ServiceResult<AccountModel> result = new ServiceResult<AccountModel>();
             try
             {
                 AccountModel? account = await _baseDAO.GetSingleDataAsync(accountId.ToString());
                 if (account == null)
-                    throw new InvalidOperationException($"No account found with ID: {accountId}.");
+                    return _serviceResultFactory.CreateServiceResult<AccountModel>($"No account found with ID: {accountId}.", new AccountModel(), false);
                 if (options != null)
-                    account = await _navigationService.GetNavigationPropertyByOptionsAsync(account, options);
-                return account;
+                    result = await _navigationService.GetNavigationPropertyByOptionsAsync(account, options);
+                result.LogEntries = result.LogEntries!.Append(_logger.JsonLogInfo<AccountModel, SearchAccountService>($"Retrieved account by ID={accountId} with options={options}."));
+                return result;
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("An error occurred while retrieving account by ID.", ex);
+                return _serviceResultFactory.CreateServiceResult<AccountModel>($"An error occurred while retrieving account by ID: {accountId}.", new AccountModel(), false, ex);
             }
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByCreatedDateMonthAndYearAsync(int year, int month, AccountNavigationOptions? options, int? maxGetCount)
+        public async Task<ServiceResults<AccountModel>> GetByCreatedDateMonthAndYearAsync(int year, int month, AccountNavigationOptions? options, int? maxGetCount)
         {
             return await _byTimeService.GetByMonthAndYearGenericAsync(
                 _accountDAO.GetByCreatedDateAsync, year, month, options, $"No accounts found created in {month}/{year}.", _helper.GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByCreatedYearAsync<TCompareType>(int year, TCompareType compareType, AccountNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
+        public async Task<ServiceResults<AccountModel>> GetByCreatedYearAsync<TCompareType>(int year, TCompareType compareType, AccountNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
         {
             return await _byTimeService.GetByDateTimeGenericAsync(
                 (ct, maxGetCount) => _accountDAO.GetByCreatedDateAsync(year, ct, maxGetCount), compareType, options, $"No accounts found created in year {year} with comparison type {compareType}.", _helper.GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByCreatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, AccountNavigationOptions? options, int? maxGetCount)
+        public async Task<ServiceResults<AccountModel>> GetByCreatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, AccountNavigationOptions? options, int? maxGetCount)
         {
             return await _byTimeService.GetByDateTimeRangeGenericAsync((maxGetCount) => _accountDAO.GetByCreatedDateAsync(startDate, endDate, maxGetCount), options, $"No accounts found created between {startDate} and {endDate}.", _helper.GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByCreatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, AccountNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
+        public async Task<ServiceResults<AccountModel>> GetByCreatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, AccountNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
         {
             return await _byTimeService.GetByDateTimeGenericAsync(
                 (ct, maxGetCount) => _accountDAO.GetByCreatedDateAsync(dateTime, ct, maxGetCount), compareType, options, $"No accounts found created at {dateTime} with comparison type {compareType}.", _helper.GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateMonthAndYearAsync(int year, int month, AccountNavigationOptions? options, int? maxGetCount)
+        public async Task<ServiceResults<AccountModel>> GetByLastUpdatedDateMonthAndYearAsync(int year, int month, AccountNavigationOptions? options, int? maxGetCount)
         {
             return await _byTimeService.GetByMonthAndYearGenericAsync(
                 _accountDAO.GetByLastUpdatedDateAsync, year, month, options, $"No accounts found last updated in {month}/{year}.", _helper.GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType, AccountNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
+        public async Task<ServiceResults<AccountModel>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType, AccountNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
         {
             return await _byTimeService.GetByDateTimeGenericAsync(
                 (ct, maxGetCount) => _accountDAO.GetByLastUpdatedDateAsync(year, ct, maxGetCount), compareType, options, $"No accounts found last updated in year {year} with comparison type {compareType}.", _helper.GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, AccountNavigationOptions? options, int? maxGetCount)
+        public async Task<ServiceResults<AccountModel>> GetByLastUpdatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, AccountNavigationOptions? options, int? maxGetCount)
         {
             return await _byTimeService.GetByDateTimeRangeGenericAsync((maxGet) => _accountDAO.GetByLastUpdatedDateAsync(startDate, endDate, maxGet), options, $"No accounts found last updated between {startDate} and {endDate}.", _helper.GetValidMaxRecord(maxGetCount));
         }
 
-        public async Task<IEnumerable<AccountModel>> GetByLastUpdatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, AccountNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
+        public async Task<ServiceResults<AccountModel>> GetByLastUpdatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, AccountNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
         {
             return await _byTimeService.GetByDateTimeGenericAsync(
                 (ct, maxGetCount) => _accountDAO.GetByLastUpdatedDateAsync(dateTime, ct, maxGetCount), compareType, options, $"No accounts found last updated at {dateTime} with comparison type {compareType}.", _helper.GetValidMaxRecord(maxGetCount));

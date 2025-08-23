@@ -1,12 +1,14 @@
-﻿namespace ProjectShop.Server.Core.Interfaces.IServices.Role
+﻿using ProjectShop.Server.Core.ObjectValue;
+
+namespace ProjectShop.Server.Core.Interfaces.IServices.Role
 {
     public interface IDeleteAccountRoleService<TKey> where TKey : struct
     {
-        Task<int> DeleteAccountRoleAsync(TKey keys);
-        Task<int> DeleteByAccountIdAsync(uint accountId);
-        Task<int> DeleteByAccountIdsAsync(IEnumerable<uint> accountIds);
-        Task<int> DeleteAccountRolesAsync(IEnumerable<TKey> Listkeys);
-        Task<int> DeleteByRoleIdAsync(uint roleId);
-        Task<int> DeleteByRoleIdsAsync(IEnumerable<uint> roleIds);
+        Task<JsonLogEntry> DeleteAccountRoleAsync(TKey keys);
+        Task<JsonLogEntry> DeleteByAccountIdAsync(uint accountId);
+        Task<IEnumerable<JsonLogEntry>> DeleteByAccountIdsAsync(IEnumerable<uint> accountIds);
+        Task<IEnumerable<JsonLogEntry>> DeleteAccountRolesAsync(IEnumerable<TKey> Listkeys);
+        Task<JsonLogEntry> DeleteByRoleIdAsync(uint roleId);
+        Task<IEnumerable<JsonLogEntry>> DeleteByRoleIdsAsync(IEnumerable<uint> roleIds);
     }
 }

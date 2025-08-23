@@ -1,8 +1,10 @@
-﻿namespace ProjectShop.Server.Core.Interfaces.IServices.IAccount
+﻿using ProjectShop.Server.Core.ObjectValue;
+
+namespace ProjectShop.Server.Core.Interfaces.IServices.IAccount
 {
     public interface IForgotPasswordService
     {
-        Task<int> UpdatePasswordAsync(string username, string newPassword);
-        Task<int> UpdatePasswordAsync(List<string> usernames, List<string> newPasswords);
+        Task<JsonLogEntry> UpdatePasswordAsync(string username, string newPassword);
+        Task<IEnumerable<JsonLogEntry>> UpdatePasswordAsync(List<string> usernames, List<string> newPasswords);
     }
 }

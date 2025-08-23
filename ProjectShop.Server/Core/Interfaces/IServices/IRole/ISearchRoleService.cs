@@ -1,19 +1,21 @@
-﻿namespace ProjectShop.Server.Core.Interfaces.IServices.Role
+﻿using ProjectShop.Server.Core.ObjectValue;
+
+namespace ProjectShop.Server.Core.Interfaces.IServices.Role
 {
     public interface ISearchRoleService<TEntity, TOption> where TEntity : class where TOption : class
     {
-        Task<IEnumerable<TEntity>> GetAllAsync(TOption? options = null, int? maxGetCount = null);
-        Task<TEntity> GetByRoleNameAsync(string roleName, TOption? options = null);
-        Task<IEnumerable<TEntity>> GetRelativeByRoleName(string roleName, TOption? options = null, int? maxGetCount = null);
-        Task<TEntity> GetByRoleIdAsync(uint roleId, TOption? options = null);
-        Task<IEnumerable<TEntity>> GetByCreatedDateMonthAndYearAsync(int year, int month, TOption? options = null, int? maxGetCount = null);
-        Task<IEnumerable<TEntity>> GetByCreatedYearAsync<TCompareType>(int year, TCompareType compareType, TOption? options = null, int? maxGetCount = null) where TCompareType : Enum;
-        Task<IEnumerable<TEntity>> GetByCreatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, TOption? options = null, int? maxGetCount = null);
-        Task<IEnumerable<TEntity>> GetByCreatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, TOption? options = null, int? maxGetCount = null) where TCompareType : Enum;
-        Task<IEnumerable<TEntity>> GetByLastUpdatedDateMonthAndYearAsync(int year, int month, TOption? options = null, int? maxGetCount = null);
-        Task<IEnumerable<TEntity>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType, TOption? options = null, int? maxGetCount = null) where TCompareType : Enum;
-        Task<IEnumerable<TEntity>> GetByLastUpdatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, TOption? options = null, int? maxGetCount = null);
-        Task<IEnumerable<TEntity>> GetByLastUpdatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, TOption? options = null, int? maxGetCount = null) where TCompareType : Enum;
-        Task<IEnumerable<TEntity>> GetByStatusAsync(bool status, TOption? options = null, int? maxGetCount = null);
+        Task<ServiceResults<TEntity>> GetAllAsync(TOption? options = null, int? maxGetCount = null);
+        Task<ServiceResult<TEntity>> GetByRoleNameAsync(string roleName, TOption? options = null);
+        Task<ServiceResults<TEntity>> GetRelativeByRoleName(string roleName, TOption? options = null, int? maxGetCount = null);
+        Task<ServiceResult<TEntity>> GetByRoleIdAsync(uint roleId, TOption? options = null);
+        Task<ServiceResults<TEntity>> GetByCreatedDateMonthAndYearAsync(int year, int month, TOption? options = null, int? maxGetCount = null);
+        Task<ServiceResults<TEntity>> GetByCreatedYearAsync<TCompareType>(int year, TCompareType compareType, TOption? options = null, int? maxGetCount = null) where TCompareType : Enum;
+        Task<ServiceResults<TEntity>> GetByCreatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, TOption? options = null, int? maxGetCount = null);
+        Task<ServiceResults<TEntity>> GetByCreatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, TOption? options = null, int? maxGetCount = null) where TCompareType : Enum;
+        Task<ServiceResults<TEntity>> GetByLastUpdatedDateMonthAndYearAsync(int year, int month, TOption? options = null, int? maxGetCount = null);
+        Task<ServiceResults<TEntity>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType, TOption? options = null, int? maxGetCount = null) where TCompareType : Enum;
+        Task<ServiceResults<TEntity>> GetByLastUpdatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, TOption? options = null, int? maxGetCount = null);
+        Task<ServiceResults<TEntity>> GetByLastUpdatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, TOption? options = null, int? maxGetCount = null) where TCompareType : Enum;
+        Task<ServiceResults<TEntity>> GetByStatusAsync(bool status, TOption? options = null, int? maxGetCount = null);
     }
 }

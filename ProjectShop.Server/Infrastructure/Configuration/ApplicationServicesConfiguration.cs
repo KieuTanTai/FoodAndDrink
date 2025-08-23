@@ -19,6 +19,7 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddTransient(typeof(IBaseAuthorizationService), typeof(BaseAuthorizationService));
             services.AddTransient(typeof(IBaseHelperService<>), typeof(BaseHelperService<>));
             services.AddTransient(typeof(IBaseGetByTimeService<,>), typeof(BaseGetByTimeService<,>));
+            services.AddTransient(typeof(IServiceResultFactory<>), typeof(ServiceResultFactory<>));
 
             // NOTE: ACCOUNT SERVICES
             services.AddTransient<ISearchAccountService<AccountModel, AccountNavigationOptions>, SearchAccountService>();

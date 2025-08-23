@@ -18,12 +18,12 @@ namespace ProjectShop.Server.Core.Interfaces.IServices
 
         int? GetValidMaxRecord(int? maxGetCount);
 
-        Task<Dictionary<uint, BatchObjectResult<TEntity>>> FilterValidEntities(
+        Task<Dictionary<uint, ServiceResults<TEntity>>> FilterValidEntities(
             IEnumerable<TEntity> entities,
             Func<TEntity, string> fieldSelector,
             Func<IEnumerable<string>, int?, Task<IEnumerable<TEntity>>> daoFunc);
 
-        Task<Dictionary<uint, BatchObjectResult<TEntity>>> FilterValidEntities<TKey>(
+        Task<Dictionary<uint, ServiceResults<TEntity>>> FilterValidEntities<TKey>(
             IEnumerable<TEntity> entities,
             Func<TEntity, TKey> fieldSelector,
             Func<IEnumerable<TKey>, int?, Task<IEnumerable<TEntity>>> daoFunc) where TKey : struct;

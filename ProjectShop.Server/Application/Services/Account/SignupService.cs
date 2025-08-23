@@ -5,7 +5,6 @@ using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ObjectValue;
-using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services.Account
 {
@@ -15,62 +14,72 @@ namespace ProjectShop.Server.Application.Services.Account
         private readonly IAccountDAO<AccountModel> _accountDAO;
         private readonly IBaseHelperService<AccountModel> _helper;
         private readonly IHashPassword _hashPassword;
+        private readonly ILogService _logger;
+        private readonly IServiceResultFactory<SignupService> _serviceResultFactory;
 
         public SignupService(
             IDAO<AccountModel> baseDAO,
             IAccountDAO<AccountModel> accountDAO,
             IBaseHelperService<AccountModel> helper,
-            IHashPassword hashPassword)
+            IHashPassword hashPassword, ILogService logger, IServiceResultFactory<SignupService> serviceResultFactory)
         {
-            _baseDAO = baseDAO ?? throw new ArgumentNullException(nameof(baseDAO), "Base DAO cannot be null.");
-            _accountDAO = accountDAO ?? throw new ArgumentNullException(nameof(accountDAO), "Account DAO cannot be null.");
-            _helper = helper ?? throw new ArgumentNullException(nameof(helper), "Helper service cannot be null.");
-            _hashPassword = hashPassword ?? throw new ArgumentNullException(nameof(hashPassword), "Hash password service cannot be null.");
+            _logger = logger;
+            _baseDAO = baseDAO;
+            _accountDAO = accountDAO;
+            _helper = helper;
+            _hashPassword = hashPassword;
+            _serviceResultFactory = serviceResultFactory;
         }
 
         //NOTE: SIGNUP FUNCTIONALITY
-        public async Task<int> AddAccountAsync(AccountModel entity)
+        public async Task<ServiceResult<AccountModel>> AddAccountAsync(AccountModel entity)
         {
+            List<JsonLogEntry> logEntries = new List<JsonLogEntry>();
             try
             {
                 if (await _helper.IsExistObject(entity.UserName, _accountDAO.GetByUserNameAsync))
-                    throw new InvalidOperationException($"Account with username {entity.UserName} already exists.");
+                    return _serviceResultFactory.CreateServiceResult<AccountModel>("Account with the same username already exists.", entity, false);
                 if (!await _hashPassword.IsPasswordValidAsync(entity.Password))
-                    throw new ArgumentException("Password does not meet the required criteria.", nameof(entity.Password));
+                    return _serviceResultFactory.CreateServiceResult<AccountModel>("Password does not meet the required criteria.", entity, false);
+
                 entity.Password = await _hashPassword.HashPasswordAsync(entity.Password);
                 int affectedRows = await _baseDAO.InsertAsync(entity);
-                if (affectedRows == 0)
-                    throw new InvalidOperationException("Failed to insert the account.");
-                return affectedRows;
+                if (affectedRows <= 0)
+                    logEntries.Add(_logger.JsonLogWarning<AccountModel, SignupService>($"Failed to insert the account for username: {entity.UserName}."));
+                logEntries.Add(_logger.JsonLogInfo<AccountModel, SignupService>($"Account inserted successfully for username: {entity.UserName}.", affectedRows: affectedRows));
+                return _serviceResultFactory.CreateServiceResult<AccountModel>(entity, logEntries);
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("An error occurred while inserting the account.", ex);
+                logEntries.Add(_logger.JsonLogError<AccountModel, SignupService>("An error occurred while inserting the account.", ex));
+                return _serviceResultFactory.CreateServiceResult<AccountModel>(entity, logEntries);
             }
         }
 
-        public async Task<IEnumerable<BatchItemResult<AccountModel>>> AddAccountsAsync(IEnumerable<AccountModel> entities)
+        public async Task<ServiceResults<AccountModel>> AddAccountsAsync(IEnumerable<AccountModel> entities)
         {
             try
             {
                 var filteredEntities = await _helper.FilterValidEntities(entities, entity => entity.UserName, _accountDAO.GetByUserNameAsync);
-                filteredEntities.TryGetValue(filteredEntities.Keys.FirstOrDefault(), out var batchObjectResult);
-                if (batchObjectResult == null)
-                    throw new InvalidOperationException("No valid accounts found to add.");
-                if (!batchObjectResult.ValidEntities.Any())
-                    throw new InvalidOperationException("No valid accounts found to add.");
+                filteredEntities.TryGetValue(filteredEntities.Keys.FirstOrDefault(), out var serviceResults);
+                if (!serviceResults!.Data!.Any())
+                    return _serviceResultFactory.CreateServiceResults<AccountModel>(new List<AccountModel>(), serviceResults.LogEntries!.Append(_logger.JsonLogWarning<AccountModel, SignupService>("No valid accounts to insert after filtering.", null)));
 
                 // Hash passwords for valid entities
-                var validEntities = batchObjectResult.ValidEntities;
-                validEntities = await HashPasswordAsync(validEntities);
+                var validEntities = serviceResults.Data;
+                validEntities = await HashPasswordAsync(validEntities!);
                 int affectedRows = await _baseDAO.InsertAsync(validEntities);
-                if (affectedRows == 0)
-                    throw new InvalidOperationException("Failed to insert the accounts.");
-                return batchObjectResult.BatchResults;
+                if (affectedRows <= 0)
+                    serviceResults.LogEntries = serviceResults.LogEntries!.Append(_logger.JsonLogWarning<AccountModel, SignupService>("Failed to insert the accounts."));
+                serviceResults.LogEntries = serviceResults.LogEntries!.Append(_logger.JsonLogInfo<AccountModel, SignupService>($"Accounts inserted successfully.", affectedRows: affectedRows));
+                return serviceResults;
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("An error occurred while inserting multiple accounts.", ex);
+                return _serviceResultFactory.CreateServiceResults<AccountModel>(new List<AccountModel>(), new List<JsonLogEntry>
+                {
+                    _logger.JsonLogError<AccountModel, SignupService>("An error occurred while inserting multiple accounts.", ex)
+                });
             }
         }
 

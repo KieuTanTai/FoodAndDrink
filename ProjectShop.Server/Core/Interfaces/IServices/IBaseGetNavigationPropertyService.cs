@@ -1,10 +1,10 @@
-﻿using static Dapper.SqlMapper;
+﻿using ProjectShop.Server.Core.ObjectValue;
 
 namespace ProjectShop.Server.Core.Interfaces.IServices
 {
     public interface IBaseGetNavigationPropertyService<TEntity, TOptions> where TEntity : class where TOptions : class
     {
-        Task<TEntity> GetNavigationPropertyByOptionsAsync(TEntity entity, TOptions? options);
-        Task<IEnumerable<TEntity>> GetNavigationPropertyByOptionsAsync(IEnumerable<TEntity> entities, TOptions? options);
+        Task<ServiceResult<TEntity>> GetNavigationPropertyByOptionsAsync(TEntity entity, TOptions options);
+        Task<ServiceResults<TEntity>> GetNavigationPropertyByOptionsAsync(IEnumerable<TEntity> entities, TOptions options);
     }
 }

@@ -8,10 +8,12 @@
 
         public object? Entity { get; set; }
 
-        public string? ErrorName { get; set; }
-
         public string? Message { get; set; }
 
+        public string? ErrorName { get; set; }
+
         public string? ErrorMessage { get; set; }
+
+        public int? AffectedRows { get; set; }
     }
 }

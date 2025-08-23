@@ -42,6 +42,13 @@ namespace ProjectShop.Server.Core.Entities
             AddedDate = addedDate;
         }
 
+        public RolesOfUserModel(uint accountId, uint roleId)
+        {
+            AccountId = accountId;
+            RoleId = roleId;
+            AddedDate = DateTime.UtcNow;
+        }
+
         public RolesOfUserModel()
         {
         }

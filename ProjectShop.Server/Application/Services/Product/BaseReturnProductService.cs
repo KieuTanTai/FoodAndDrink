@@ -2,6 +2,8 @@
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IServices;
+using ProjectShop.Server.Core.Interfaces.IValidate;
+using ProjectShop.Server.Core.ObjectValue;
 using ProjectShop.Server.Core.ObjectValue.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Application.Services.Product
@@ -24,78 +26,108 @@ namespace ProjectShop.Server.Application.Services.Product
         private readonly IDetailSaleEventDAO<DetailSaleEventModel> _detailSaleEventDAO;
         private readonly IDetailInvoiceDAO<DetailInvoiceModel> _detailInvoiceDAO;
         private readonly IProductCategoriesDAO<ProductCategoriesModel, ProductCategoriesKey> _productCategoriesDAO;
+        private readonly ILogService _logger;
+        private readonly IServiceResultFactory<BaseReturnProductService> _serviceResultFactory;
 
-        public BaseReturnProductService(
-            IDAO<ProductModel> baseDAO,
-            IProductDAO<ProductModel> productDAO,
-            IDAO<SupplierModel> baseSupplierDAO,
-            ISupplierDAO<SupplierModel> supplierDAO,
-            IDAO<DetailCartModel> baseDetailCartDAO,
-            IDetailCartDAO<DetailCartModel> detailCartDAO,
-            INoneUpdateDAO<DetailProductLotModel> baseDetailProductLotDAO,
-            IDetailProductLotDAO<DetailProductLotModel, DetailProductLotKey> detailProductLotDAO,
-            IDAO<ProductImageModel> baseProductImageDAO,
-            IProductImageDAO<ProductImageModel> productImageDAO,
-            INoneUpdateDAO<DetailSaleEventModel> baseDetailSaleEventDAO,
-            IDetailSaleEventDAO<DetailSaleEventModel> detailSaleEventDAO,
-            IDAO<ProductCategoriesModel> baseProductCategoriesDAO,
-            IProductCategoriesDAO<ProductCategoriesModel, ProductCategoriesKey> productCategoriesDAO,
-            INoneUpdateDAO<DetailInvoiceModel> baseDetailInvoiceDAO,
-            IDetailInvoiceDAO<DetailInvoiceModel> detailInvoiceDAO)
+        public BaseReturnProductService(IDAO<ProductModel> baseDAO, IDAO<SupplierModel> baseSupplierDAO, IDAO<DetailCartModel> baseDetailCartDAO, INoneUpdateDAO<DetailProductLotModel> baseDetailProductLotDAO,
+            IDAO<ProductImageModel> baseProductImageDAO, INoneUpdateDAO<DetailSaleEventModel> baseDetailSaleEventDAO, IDAO<ProductCategoriesModel> baseProductCategoriesDAO,
+            INoneUpdateDAO<DetailInvoiceModel> baseDetailInvoiceDAO, IProductDAO<ProductModel> productDAO, ISupplierDAO<SupplierModel> supplierDAO, IDetailCartDAO<DetailCartModel> detailCartDAO,
+            IDetailProductLotDAO<DetailProductLotModel, DetailProductLotKey> detailProductLotDAO, IProductImageDAO<ProductImageModel> productImageDAO, IDetailSaleEventDAO<DetailSaleEventModel> detailSaleEventDAO,
+            IDetailInvoiceDAO<DetailInvoiceModel> detailInvoiceDAO, IProductCategoriesDAO<ProductCategoriesModel, ProductCategoriesKey> productCategoriesDAO,
+            ILogService logger, IServiceResultFactory<BaseReturnProductService> serviceResultFactory)
         {
-            _baseDAO = baseDAO ?? throw new ArgumentNullException(nameof(baseDAO));
-            _productDAO = productDAO ?? throw new ArgumentNullException(nameof(productDAO));
-            _baseSupplierDAO = baseSupplierDAO ?? throw new ArgumentNullException(nameof(baseSupplierDAO));
-            _supplierDAO = supplierDAO ?? throw new ArgumentNullException(nameof(supplierDAO));
-            _baseDetailCartDAO = baseDetailCartDAO ?? throw new ArgumentNullException(nameof(baseDetailCartDAO));
-            _detailCartDAO = detailCartDAO ?? throw new ArgumentNullException(nameof(detailCartDAO));
-            _baseDetailProductLotDAO = baseDetailProductLotDAO ?? throw new ArgumentNullException(nameof(baseDetailProductLotDAO));
-            _detailProductLotDAO = detailProductLotDAO ?? throw new ArgumentNullException(nameof(detailProductLotDAO));
-            _baseProductImageDAO = baseProductImageDAO ?? throw new ArgumentNullException(nameof(baseProductImageDAO));
-            _productImageDAO = productImageDAO ?? throw new ArgumentNullException(nameof(productImageDAO));
-            _baseDetailSaleEventDAO = baseDetailSaleEventDAO ?? throw new ArgumentNullException(nameof(baseDetailSaleEventDAO));
-            _detailSaleEventDAO = detailSaleEventDAO ?? throw new ArgumentNullException(nameof(detailSaleEventDAO));
-            _baseProductCategoriesDAO = baseProductCategoriesDAO ?? throw new ArgumentNullException(nameof(baseProductCategoriesDAO));
-            _productCategoriesDAO = productCategoriesDAO ?? throw new ArgumentNullException(nameof(productCategoriesDAO));
-            _baseDetailInvoiceDAO = baseDetailInvoiceDAO ?? throw new ArgumentNullException(nameof(baseDetailInvoiceDAO));
-            _detailInvoiceDAO = detailInvoiceDAO ?? throw new ArgumentNullException(nameof(detailInvoiceDAO));
+            _baseDAO = baseDAO;
+            _baseSupplierDAO = baseSupplierDAO;
+            _baseDetailCartDAO = baseDetailCartDAO;
+            _baseDetailProductLotDAO = baseDetailProductLotDAO;
+            _baseProductImageDAO = baseProductImageDAO;
+            _baseDetailSaleEventDAO = baseDetailSaleEventDAO;
+            _baseProductCategoriesDAO = baseProductCategoriesDAO;
+            _baseDetailInvoiceDAO = baseDetailInvoiceDAO;
+            _productDAO = productDAO;
+            _supplierDAO = supplierDAO;
+            _detailCartDAO = detailCartDAO;
+            _detailProductLotDAO = detailProductLotDAO;
+            _productImageDAO = productImageDAO;
+            _detailSaleEventDAO = detailSaleEventDAO;
+            _detailInvoiceDAO = detailInvoiceDAO;
+            _productCategoriesDAO = productCategoriesDAO;
+            _logger = logger;
+            _serviceResultFactory = serviceResultFactory;
         }
 
-        public async Task<ProductModel> GetNavigationPropertyByOptionsAsync(ProductModel product, ProductNavigationOptions? options)
+        public async Task<ServiceResult<ProductModel>> GetNavigationPropertyByOptionsAsync(ProductModel product, ProductNavigationOptions options)
         {
-            if (options == null)
-                return product;
+            List<JsonLogEntry> logEntries = new();
             if (options.IsGetSupplier)
-                product.Supplier = await TryLoadSupplierAsync(product.SupplierId);
+            {
+                ServiceResult<SupplierModel> result = await TryLoadSupplierAsync(product.SupplierId);
+                logEntries.AddRange(result.LogEntries!);
+                product.Supplier = result.Data!;
+            }
+
             if (options.IsGetProductCategories)
-                product.ProductCategories = await TryLoadProductCategoriesAsync(product.ProductBarcode);
+            {
+                ServiceResults<ProductCategoriesModel> results = await TryLoadProductCategoriesAsync(product.ProductBarcode);
+                logEntries.AddRange(results.LogEntries!);
+                product.ProductCategories = (ICollection<ProductCategoriesModel>)results.Data!;
+
+            }
+
             if (options.IsGetDetailCarts)
-                product.DetailCarts = await TryLoadDetailCartsAsync(product.ProductBarcode);
+            {
+                ServiceResults<DetailCartModel> results = await TryLoadDetailCartsAsync(product.ProductBarcode);
+                logEntries.AddRange(results.LogEntries!);
+                product.DetailCarts = (ICollection<DetailCartModel>)results.Data!;
+            }
+
             if (options.IsGetDetailProductLots)
-                product.DetailProductLot = await TryLoadDetailProductLotsAsync(product.ProductBarcode);
+            {
+                ServiceResults<DetailProductLotModel> results = await TryLoadDetailProductLotsAsync(product.ProductBarcode);
+                logEntries.AddRange(results.LogEntries!);
+                product.DetailProductLot = (ICollection<DetailProductLotModel>)results.Data!;
+            }
+
             if (options.IsGetProductImages)
-                product.ProductImages = await TryLoadProductImagesAsync(product.ProductBarcode);
+            {
+                ServiceResults<ProductImageModel> results = await TryLoadProductImagesAsync(product.ProductBarcode);
+                logEntries.AddRange(results.LogEntries!);
+                product.ProductImages = (ICollection<ProductImageModel>)results.Data!;
+            }
+
             if (options.IsGetDetailSaleEvents)
-                product.DetailSaleEvents = await TryLoadDetailSaleEventsAsync(product.ProductBarcode);
+            {
+                ServiceResults<DetailSaleEventModel> results = await TryLoadDetailSaleEventsAsync(product.ProductBarcode);
+                logEntries.AddRange(results.LogEntries!);
+                product.DetailSaleEvents = (ICollection<DetailSaleEventModel>)results.Data!;
+            }
+
             if (options.IsGetDetailInvoices)
-                product.DetailInvoices = await TryLoadDetailInvoicesAsync(product.ProductBarcode);
-            return product;
+            {
+                ServiceResults<DetailInvoiceModel> results = await TryLoadDetailInvoicesAsync(product.ProductBarcode);
+                logEntries.AddRange(results.LogEntries!);
+                product.DetailInvoices = (ICollection<DetailInvoiceModel>)results.Data!;
+            }
+            logEntries.Add(_logger.JsonLogInfo<ProductModel, BaseReturnProductService>("Completed loading navigation properties for product."));
+            return _serviceResultFactory.CreateServiceResult<ProductModel>(product, logEntries);
         }
 
-        public async Task<IEnumerable<ProductModel>> GetNavigationPropertyByOptionsAsync(IEnumerable<ProductModel> products, ProductNavigationOptions? options)
+        public async Task<ServiceResults<ProductModel>> GetNavigationPropertyByOptionsAsync(IEnumerable<ProductModel> products, ProductNavigationOptions options)
         {
-            if (options == null)
-                return products;
             var productList = products.ToList();
             var productBarcodes = productList.Select(p => p.ProductBarcode).Distinct();
+            List<JsonLogEntry> logEntries = new();
             if (options.IsGetSupplier)
             {
                 var supplierIds = productList.Select(p => p.SupplierId).Distinct();
                 var suppliers = await TryLoadSuppliersAsync(supplierIds);
                 foreach (var product in productList)
                 {
-                    suppliers.TryGetValue(product.SupplierId, out var supplier);
-                    product.Supplier = supplier ?? new();
+                    suppliers.TryGetValue(product.SupplierId, out var serviceResult);
+                    logEntries.AddRange(serviceResult!.LogEntries!);
+                    if (serviceResult.Data!.SupplierId == 0)
+                        break;
+                    product.Supplier = serviceResult.Data!;
                 }
             }
 
@@ -104,8 +136,11 @@ namespace ProjectShop.Server.Application.Services.Product
                 var productCategories = await TryLoadProductCategoriesAsyncs(productBarcodes);
                 foreach (var product in productList)
                 {
-                    productCategories.TryGetValue(product.ProductBarcode, out var categories);
-                    product.ProductCategories = categories ?? new List<ProductCategoriesModel>();
+                    productCategories.TryGetValue(product.ProductBarcode, out var serviceResults);
+                    logEntries.AddRange(serviceResults!.LogEntries!);
+                    if (!serviceResults.Data!.Any())
+                        break;
+                    product.ProductCategories = (ICollection<ProductCategoriesModel>)serviceResults.Data!;
                 }
             }
 
@@ -114,8 +149,11 @@ namespace ProjectShop.Server.Application.Services.Product
                 var detailCarts = await TryLoadDetailCartsAsync(productBarcodes);
                 foreach (var product in productList)
                 {
-                    detailCarts.TryGetValue(product.ProductBarcode, out var carts);
-                    product.DetailCarts = carts ?? new List<DetailCartModel>();
+                    detailCarts.TryGetValue(product.ProductBarcode, out var serviceResults);
+                    logEntries.AddRange(serviceResults!.LogEntries!);
+                    if (!serviceResults.Data!.Any())
+                        break;
+                    product.DetailCarts = (ICollection<DetailCartModel>)serviceResults.Data!;
                 }
             }
 
@@ -124,8 +162,11 @@ namespace ProjectShop.Server.Application.Services.Product
                 var detailProductLots = await TryLoadDetailProductLotsAsync(productBarcodes);
                 foreach (var product in productList)
                 {
-                    detailProductLots.TryGetValue(product.ProductBarcode, out var lots);
-                    product.DetailProductLot = lots ?? new List<DetailProductLotModel>();
+                    detailProductLots.TryGetValue(product.ProductBarcode, out var serviceResults);
+                    logEntries.AddRange(serviceResults!.LogEntries!);
+                    if (!serviceResults.Data!.Any())
+                        break;
+                    product.DetailProductLot = (ICollection<DetailProductLotModel>)serviceResults.Data!;
                 }
             }
 
@@ -134,9 +175,12 @@ namespace ProjectShop.Server.Application.Services.Product
                 var productImages = await TryLoadProductImagesAsync(productBarcodes);
                 foreach (var product in productList)
                 {
-                    productImages.TryGetValue(product.ProductBarcode, out var images);
-                    product.ProductImages = images ?? new List<ProductImageModel>();
-                }   
+                    productImages.TryGetValue(product.ProductBarcode, out var serviceResults);
+                    logEntries.AddRange(serviceResults!.LogEntries!);
+                    if (!serviceResults.Data!.Any())
+                        break;
+                    product.ProductImages = (ICollection<ProductImageModel>)serviceResults.Data!;
+                }
             }
 
             if (options.IsGetDetailSaleEvents)
@@ -144,8 +188,11 @@ namespace ProjectShop.Server.Application.Services.Product
                 var detailSaleEvents = await TryLoadDetailSaleEventsAsync(productBarcodes);
                 foreach (var product in productList)
                 {
-                    detailSaleEvents.TryGetValue(product.ProductBarcode, out var details);
-                    product.DetailSaleEvents = details ?? new List<DetailSaleEventModel>();
+                    detailSaleEvents.TryGetValue(product.ProductBarcode, out var serviceResults);
+                    logEntries.AddRange(serviceResults!.LogEntries!);
+                    if (!serviceResults.Data!.Any())
+                        break;
+                    product.DetailSaleEvents = (ICollection<DetailSaleEventModel>)serviceResults.Data!;
                 }
             }
 
@@ -154,194 +201,280 @@ namespace ProjectShop.Server.Application.Services.Product
                 var detailInvoices = await TryLoadDetailInvoicesAsync(productBarcodes);
                 foreach (var product in productList)
                 {
-                    detailInvoices.TryGetValue(product.ProductBarcode, out var details);
-                    product.DetailInvoices = details ?? new List<DetailInvoiceModel>();
+                    detailInvoices.TryGetValue(product.ProductBarcode, out var serviceResults);
+                    logEntries.AddRange(serviceResults!.LogEntries!);
+                    if (!serviceResults.Data!.Any())
+                        break;
+                    product.DetailInvoices = (ICollection<DetailInvoiceModel>)serviceResults.Data!;
                 }
             }
-
-            return productList;
+            logEntries.Add(_logger.JsonLogInfo<ProductModel, BaseReturnProductService>("Completed loading navigation properties for products."));
+            return _serviceResultFactory.CreateServiceResults<ProductModel>(productList, logEntries);
         }
 
-        private async Task<SupplierModel> TryLoadSupplierAsync(uint supplierId)
+        private async Task<ServiceResult<SupplierModel>> TryLoadSupplierAsync(uint supplierId)
         {
             try
             {
                 SupplierModel? supplier = await _baseSupplierDAO.GetSingleDataAsync(supplierId.ToString());
-                return supplier ?? new SupplierModel(); // Hoặc throw exception nếu cần
+                return supplier != null
+                    ? _serviceResultFactory.CreateServiceResult<SupplierModel>($"Loaded supplier with ID: {supplierId}", supplier, true)
+                    : _serviceResultFactory.CreateServiceResult<SupplierModel>($"No supplier found with ID: {supplierId}.", new SupplierModel(), false);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new SupplierModel(); // Hoặc throw exception nếu cần
+                return _serviceResultFactory.CreateServiceResult<SupplierModel>($"Error loading supplier with ID: {supplierId}.", new SupplierModel(), false, ex);
             }
         }
 
-        private async Task<ICollection<ProductCategoriesModel>> TryLoadProductCategoriesAsync(string productBarcode)
+        private async Task<ServiceResults<ProductCategoriesModel>> TryLoadProductCategoriesAsync(string productBarcode)
         {
             try
             {
-                return (await _productCategoriesDAO.GetByProductBarcodeAsync(productBarcode)).ToList();
+                var categories = await _productCategoriesDAO.GetByProductBarcodeAsync(productBarcode) ?? Enumerable.Empty<ProductCategoriesModel>();
+                return categories.Any()
+                    ? _serviceResultFactory.CreateServiceResults<ProductCategoriesModel>($"Loaded product categories for barcode: {productBarcode}", categories, true)
+                    : _serviceResultFactory.CreateServiceResults<ProductCategoriesModel>($"No product categories found for barcode: {productBarcode}.", new List<ProductCategoriesModel>(), false);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new List<ProductCategoriesModel>(); // Hoặc throw exception nếu cần
+                return _serviceResultFactory.CreateServiceResults<ProductCategoriesModel>($"Error loading product categories for barcode: {productBarcode}.", new List<ProductCategoriesModel>(), false, ex);
             }
         }
 
-        private async Task<ICollection<DetailCartModel>> TryLoadDetailCartsAsync(string productBarcode)
+        private async Task<ServiceResults<DetailCartModel>> TryLoadDetailCartsAsync(string productBarcode)
         {
             try
             {
-                return (await _detailCartDAO.GetByProductBarcodeAsync(productBarcode)).ToList();
+                var detailCarts = await _detailCartDAO.GetByProductBarcodeAsync(productBarcode) ?? Enumerable.Empty<DetailCartModel>();
+                return detailCarts.Any()
+                    ? _serviceResultFactory.CreateServiceResults<DetailCartModel>($"Loaded detail carts for barcode: {productBarcode}", detailCarts, true)
+                    : _serviceResultFactory.CreateServiceResults<DetailCartModel>($"No detail carts found for barcode: {productBarcode}.", new List<DetailCartModel>(), false);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new List<DetailCartModel>(); // Hoặc throw exception nếu cần
+                return _serviceResultFactory.CreateServiceResults<DetailCartModel>($"Error loading detail carts for barcode: {productBarcode}.", new List<DetailCartModel>(), false, ex);
             }
         }
 
-        private async Task<ICollection<DetailProductLotModel>> TryLoadDetailProductLotsAsync(string productBarcode)
+        private async Task<ServiceResults<DetailProductLotModel>> TryLoadDetailProductLotsAsync(string productBarcode)
         {
             try
             {
-                return (await _detailProductLotDAO.GetByProductBarcodeAsync(productBarcode)).ToList();
+                var detailProductLots = await _detailProductLotDAO.GetByProductBarcodeAsync(productBarcode) ?? Enumerable.Empty<DetailProductLotModel>();
+                return detailProductLots.Any()
+                    ? _serviceResultFactory.CreateServiceResults<DetailProductLotModel>($"Loaded detail product lots for barcode: {productBarcode}", detailProductLots, true)
+                    : _serviceResultFactory.CreateServiceResults<DetailProductLotModel>($"No detail product lots found for barcode: {productBarcode}.", new List<DetailProductLotModel>(), false);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new List<DetailProductLotModel>(); // Hoặc throw exception nếu cần
+                return _serviceResultFactory.CreateServiceResults<DetailProductLotModel>($"Error loading detail product lots for barcode: {productBarcode}.", new List<DetailProductLotModel>(), false, ex);
             }
         }
 
-        private async Task<ICollection<ProductImageModel>> TryLoadProductImagesAsync(string productBarcode)
+        private async Task<ServiceResults<ProductImageModel>> TryLoadProductImagesAsync(string productBarcode)
         {
             try
             {
-                return (await _productImageDAO.GetByProductBarcodeAsync(productBarcode)).ToList();
+                var productImages = await _productImageDAO.GetByProductBarcodeAsync(productBarcode) ?? Enumerable.Empty<ProductImageModel>();
+                return productImages.Any()
+                    ? _serviceResultFactory.CreateServiceResults<ProductImageModel>($"Loaded product images for barcode: {productBarcode}", productImages, true)
+                    : _serviceResultFactory.CreateServiceResults<ProductImageModel>($"No product images found for barcode: {productBarcode}.", new List<ProductImageModel>(), false);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new List<ProductImageModel>(); // Hoặc throw exception nếu cần
+                return _serviceResultFactory.CreateServiceResults<ProductImageModel>($"Error loading product images for barcode: {productBarcode}.", new List<ProductImageModel>(), false, ex);
             }
         }
 
-        private async Task<ICollection<DetailSaleEventModel>> TryLoadDetailSaleEventsAsync(string productBarcode)
+        private async Task<ServiceResults<DetailSaleEventModel>> TryLoadDetailSaleEventsAsync(string productBarcode)
         {
             try
             {
-                return (await _detailSaleEventDAO.GetByProductBarcodeAsync(productBarcode)).ToList();
+                var detailSaleEvents = await _detailSaleEventDAO.GetByProductBarcodeAsync(productBarcode) ?? Enumerable.Empty<DetailSaleEventModel>();
+                return detailSaleEvents.Any()
+                    ? _serviceResultFactory.CreateServiceResults<DetailSaleEventModel>($"Loaded detail sale events for barcode: {productBarcode}", detailSaleEvents, true)
+                    : _serviceResultFactory.CreateServiceResults<DetailSaleEventModel>($"No detail sale events found for barcode: {productBarcode}.", new List<DetailSaleEventModel>(), false);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new List<DetailSaleEventModel>(); // Hoặc throw exception nếu cần
+                return _serviceResultFactory.CreateServiceResults<DetailSaleEventModel>($"Error loading detail sale events for barcode: {productBarcode}.", new List<DetailSaleEventModel>(), false, ex);
             }
         }
 
-        private async Task<ICollection<DetailInvoiceModel>> TryLoadDetailInvoicesAsync(string productBarcode)
+        private async Task<ServiceResults<DetailInvoiceModel>> TryLoadDetailInvoicesAsync(string productBarcode)
         {
             try
             {
-                return (await _detailInvoiceDAO.GetByProductBarcodeAsync(productBarcode)).ToList();
+                var detailInvoices = await _detailInvoiceDAO.GetByProductBarcodeAsync(productBarcode) ?? Enumerable.Empty<DetailInvoiceModel>();
+                return detailInvoices.Any()
+                    ? _serviceResultFactory.CreateServiceResults<DetailInvoiceModel>($"Loaded detail invoices for barcode: {productBarcode}", detailInvoices, true)
+                    : _serviceResultFactory.CreateServiceResults<DetailInvoiceModel>($"No detail invoices found for barcode: {productBarcode}.", new List<DetailInvoiceModel>(), false);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new List<DetailInvoiceModel>(); // Hoặc throw exception nếu cần
+                return _serviceResultFactory.CreateServiceResults<DetailInvoiceModel>($"Error loading detail invoices for barcode: {productBarcode}.", new List<DetailInvoiceModel>(), false, ex);
             }
         }
 
-        private async Task<IDictionary<uint, SupplierModel>> TryLoadSuppliersAsync(IEnumerable<uint> supplierIds)
+        private async Task<IDictionary<uint, ServiceResult<SupplierModel>>> TryLoadSuppliersAsync(IEnumerable<uint> supplierIds)
         {
+            uint firstId = supplierIds.FirstOrDefault();
             try
             {
-                return (await _baseSupplierDAO.GetByInputsAsync(supplierIds.Select(supplierId => supplierId.ToString())))
-                    .ToDictionary(supplier => supplier.SupplierId, supplier => supplier) ?? new Dictionary<uint, SupplierModel>();
+                IEnumerable<SupplierModel> suppliers = await _baseSupplierDAO.GetByInputsAsync(supplierIds.Select(id => id.ToString())) ?? Enumerable.Empty<SupplierModel>();
+                if (!suppliers.Any())
+                    return new Dictionary<uint, ServiceResult<SupplierModel>>
+                    {
+                        [firstId] = _serviceResultFactory.CreateServiceResult<SupplierModel>($"No suppliers found for the provided IDs.", new SupplierModel(), false)
+                    };
+                return suppliers.ToDictionary(supplier => supplier.SupplierId, supplier => _serviceResultFactory.CreateServiceResult<SupplierModel>($"Loaded supplier: {supplier.SupplierId}", supplier, true));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new Dictionary<uint, SupplierModel>(); // Hoặc throw exception nếu cần
+                return new Dictionary<uint, ServiceResult<SupplierModel>>
+                {
+                    [firstId] = _serviceResultFactory.CreateServiceResult<SupplierModel>($"Error loading suppliers for the provided IDs.", new SupplierModel(), false, ex)
+                };
             }
         }
 
-        private async Task<IDictionary<string, ICollection<ProductCategoriesModel>>> TryLoadProductCategoriesAsyncs(IEnumerable<string> productBarcodes)
+        private async Task<IDictionary<string, ServiceResults<ProductCategoriesModel>>> TryLoadProductCategoriesAsyncs(IEnumerable<string> productBarcodes)
         {
+            string firstBarcode = productBarcodes.FirstOrDefault() ?? string.Empty;
             try
             {
                 var categories = (await _productCategoriesDAO.GetByProductBarcodesAsync(productBarcodes)) ?? Enumerable.Empty<ProductCategoriesModel>();
+                if (!categories.Any())
+                    return new Dictionary<string, ServiceResults<ProductCategoriesModel>>
+                    {
+                        [firstBarcode] = _serviceResultFactory.CreateServiceResults<ProductCategoriesModel>($"No product categories found for the provided barcodes.", new List<ProductCategoriesModel>(), false)
+                    };
                 return categories.GroupBy(category => category.ProductBarcode)
-                                 .ToDictionary(group => group.Key, group => (ICollection<ProductCategoriesModel>)group.ToList());
+                                 .ToDictionary(group => group.Key, group => _serviceResultFactory.CreateServiceResults<ProductCategoriesModel>($"Loaded product categories for barcode: {group.Key}", group, true));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new Dictionary<string, ICollection<ProductCategoriesModel>>(); // Hoặc throw exception nếu cần
+                return new Dictionary<string, ServiceResults<ProductCategoriesModel>>
+                {
+                    [firstBarcode] = _serviceResultFactory.CreateServiceResults<ProductCategoriesModel>($"Error loading product categories for barcodes: {string.Join(", ", productBarcodes)}.", new List<ProductCategoriesModel>(), false, ex)
+                };
             }
 
         }
 
-        private async Task<IDictionary<string, ICollection<DetailCartModel>>> TryLoadDetailCartsAsync(IEnumerable<string> productBarcodes)
+        private async Task<IDictionary<string, ServiceResults<DetailCartModel>>> TryLoadDetailCartsAsync(IEnumerable<string> productBarcodes)
         {
+            string firstBarcode = productBarcodes.FirstOrDefault() ?? string.Empty;
             try
             {
                 var detailCarts = (await _detailCartDAO.GetByProductBarcodesAsync(productBarcodes)) ?? Enumerable.Empty<DetailCartModel>();
+                if (!detailCarts.Any())
+                    return new Dictionary<string, ServiceResults<DetailCartModel>>
+                    {
+                        [firstBarcode] = _serviceResultFactory.CreateServiceResults<DetailCartModel>($"No detail carts found for the provided barcodes.", new List<DetailCartModel>(), false)
+                    };
                 return detailCarts.GroupBy(cart => cart.ProductBarcode)
-                                  .ToDictionary(group => group.Key, group => (ICollection<DetailCartModel>)group.ToList());
+                                  .ToDictionary(group => group.Key, group => _serviceResultFactory.CreateServiceResults<DetailCartModel>($"Loaded detail carts for barcode: {group.Key}", group, true));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new Dictionary<string, ICollection<DetailCartModel>>(); // Hoặc throw exception nếu cần
+                return new Dictionary<string, ServiceResults<DetailCartModel>>
+                {
+                    [firstBarcode] = _serviceResultFactory.CreateServiceResults<DetailCartModel>($"Error loading detail carts for barcodes: {string.Join(", ", productBarcodes)}.", new List<DetailCartModel>(), false, ex)
+                };
             }
         }
 
-        private async Task<IDictionary<string, ICollection<DetailProductLotModel>>> TryLoadDetailProductLotsAsync(IEnumerable<string> productBarcodes)
+        private async Task<IDictionary<string, ServiceResults<DetailProductLotModel>>> TryLoadDetailProductLotsAsync(IEnumerable<string> productBarcodes)
         {
+            string firstBarcode = productBarcodes.FirstOrDefault() ?? string.Empty;
             try
             {
                 var detailProductLots = (await _detailProductLotDAO.GetByProductBarcodesAsync(productBarcodes)) ?? Enumerable.Empty<DetailProductLotModel>();
+                if (!detailProductLots.Any())
+                    return new Dictionary<string, ServiceResults<DetailProductLotModel>>
+                    {
+                        [firstBarcode] = _serviceResultFactory.CreateServiceResults<DetailProductLotModel>($"No detail product lots found for the provided barcodes.", new List<DetailProductLotModel>(), false)
+                    };
                 return detailProductLots.GroupBy(lot => lot.ProductBarcode)
-                                        .ToDictionary(group => group.Key, group => (ICollection<DetailProductLotModel>)group.ToList());
+                                        .ToDictionary(group => group.Key, group => _serviceResultFactory.CreateServiceResults<DetailProductLotModel>($"Loaded detail product lots for barcode: {group.Key}", group, true));
             }
             catch (Exception)
             {
-                return new Dictionary<string, ICollection<DetailProductLotModel>>(); // Hoặc throw exception nếu cần
+                return new Dictionary<string, ServiceResults<DetailProductLotModel>>
+                {
+                    [firstBarcode] = _serviceResultFactory.CreateServiceResults<DetailProductLotModel>($"Error loading detail product lots for barcodes: {string.Join(", ", productBarcodes)}.", new List<DetailProductLotModel>(), false)
+                };
             }
         }
 
-        private async Task<IDictionary<string, ICollection<ProductImageModel>>> TryLoadProductImagesAsync(IEnumerable<string> productBarcodes)
+        private async Task<IDictionary<string, ServiceResults<ProductImageModel>>> TryLoadProductImagesAsync(IEnumerable<string> productBarcodes)
         {
+            string firstBarcode = productBarcodes.FirstOrDefault() ?? string.Empty;
             try
             {
                 var productImages = (await _productImageDAO.GetByProductBarcodesAsync(productBarcodes)) ?? Enumerable.Empty<ProductImageModel>();
+                if (!productImages.Any())
+                    return new Dictionary<string, ServiceResults<ProductImageModel>>
+                    {
+                        [firstBarcode] = _serviceResultFactory.CreateServiceResults<ProductImageModel>($"No product images found for the provided barcodes.", new List<ProductImageModel>(), false)
+                    };
                 return productImages.GroupBy(image => image.ProductBarcode)
-                                    .ToDictionary(group => group.Key, group => (ICollection<ProductImageModel>)group.ToList());
+                                    .ToDictionary(group => group.Key, group => _serviceResultFactory.CreateServiceResults<ProductImageModel>($"Loaded product image for barcode: {group.Key}", group, true));
             }
             catch (Exception)
             {
-                return new Dictionary<string, ICollection<ProductImageModel>>(); // Hoặc throw exception nếu cần
+                return new Dictionary<string, ServiceResults<ProductImageModel>>
+                {
+                    [firstBarcode] = _serviceResultFactory.CreateServiceResults<ProductImageModel>($"Error loading product images for barcodes: {string.Join(", ", productBarcodes)}.", new List<ProductImageModel>(), false)
+                };
             }
         }
 
-        private async Task<IDictionary<string, ICollection<DetailSaleEventModel>>> TryLoadDetailSaleEventsAsync(IEnumerable<string> productBarcodes)
+        private async Task<IDictionary<string, ServiceResults<DetailSaleEventModel>>> TryLoadDetailSaleEventsAsync(IEnumerable<string> productBarcodes)
         {
+            string firstBarcode = productBarcodes.FirstOrDefault() ?? string.Empty;
             try
             {
                 var detailSaleEvents = (await _detailSaleEventDAO.GetByProductBarcodesAsync(productBarcodes)) ?? Enumerable.Empty<DetailSaleEventModel>();
+                if (!detailSaleEvents.Any())
+                    return new Dictionary<string, ServiceResults<DetailSaleEventModel>>
+                    {
+                        [firstBarcode] = _serviceResultFactory.CreateServiceResults<DetailSaleEventModel>($"No detail sale events found for the provided barcodes.", new List<DetailSaleEventModel>(), false)
+                    };
                 return detailSaleEvents.GroupBy(eventModel => eventModel.ProductBarcode)
-                                       .ToDictionary(group => group.Key, group => (ICollection<DetailSaleEventModel>)group.ToList());
+                                       .ToDictionary(group => group.Key, group => _serviceResultFactory.CreateServiceResults($"Loaded detail sale events for barcode: {group.Key}", group, true));
             }
             catch (Exception)
             {
-                return new Dictionary<string, ICollection<DetailSaleEventModel>>();
+                return new Dictionary<string, ServiceResults<DetailSaleEventModel>>
+                {
+                    [firstBarcode] = _serviceResultFactory.CreateServiceResults<DetailSaleEventModel>($"Error loading detail sale events for barcodes: {string.Join(", ", productBarcodes)}.", new List<DetailSaleEventModel>(), false)
+                };
             }
         }
 
-        private async Task<IDictionary<string, ICollection<DetailInvoiceModel>>> TryLoadDetailInvoicesAsync(IEnumerable<string> productBarcodes)
+        private async Task<IDictionary<string, ServiceResults<DetailInvoiceModel>>> TryLoadDetailInvoicesAsync(IEnumerable<string> productBarcodes)
         {
+            string firstBarcode = productBarcodes.FirstOrDefault() ?? string.Empty;
             try
             {
                 var detailInvoices = (await _detailInvoiceDAO.GetByProductBarcodesAsync(productBarcodes)) ?? Enumerable.Empty<DetailInvoiceModel>();
+                if (!detailInvoices.Any())
+                    return new Dictionary<string, ServiceResults<DetailInvoiceModel>>
+                    {
+                        [firstBarcode] = _serviceResultFactory.CreateServiceResults<DetailInvoiceModel>($"No detail invoices found for the provided barcodes.", new List<DetailInvoiceModel>(), false)
+                    };
                 return detailInvoices.GroupBy(invoice => invoice.ProductBarcode)
-                                     .ToDictionary(group => group.Key, group => (ICollection<DetailInvoiceModel>)group.ToList());
+                                     .ToDictionary(group => group.Key, group => _serviceResultFactory.CreateServiceResults<DetailInvoiceModel>($"Loaded detail invoice for barcode: {group.Key}", group, true));
             }
             catch (Exception)
             {
-                return new Dictionary<string, ICollection<DetailInvoiceModel>>(); // Hoặc throw exception nếu cần
+                return new Dictionary<string, ServiceResults<DetailInvoiceModel>>
+                {
+                    [firstBarcode] = _serviceResultFactory.CreateServiceResults<DetailInvoiceModel>($"Error loading detail invoices for barcodes: {string.Join(", ", productBarcodes)}.", new List<DetailInvoiceModel>(), false)
+                };
             }
         }
     }
