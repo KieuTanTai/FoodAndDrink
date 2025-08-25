@@ -63,10 +63,10 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         // DRY
-        private async Task<IEnumerable<RoleModel>> GetByMonthAndYearAsync(int year, int month, bool isCreated,
-            RoleNavigationOptions? options, int? maxGetCount)
-        {
-            return null;
-        }
+        //private async Task<IEnumerable<RoleModel>> GetByMonthAndYearAsync(int year, int month, bool isCreated,
+        //    RoleNavigationOptions? options, int? maxGetCount)
+        //{
+        //    return null;
+        //}
     }
 }

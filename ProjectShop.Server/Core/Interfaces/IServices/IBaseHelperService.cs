@@ -6,7 +6,7 @@ namespace ProjectShop.Server.Core.Interfaces.IServices
     {
         Task<bool> IsExistObject(string input, Func<string, Task<TEntity?>> daoFunc);
         Task<bool> IsExistObject(uint input, Func<uint, Task<TEntity?>> daoFunc);
-        Task<bool> IsExistObject<TKey>(TKey keys, Func<TKey, Task<TEntity>> daoFunc) where TKey : struct;
+        Task<bool> IsExistObject<TKey>(TKey keys, Func<TKey, Task<TEntity?>> daoFunc) where TKey : struct;
 
         Task<bool> DoAllIdsExistAsync(IEnumerable<string> ids, Func<IEnumerable<string>, Task<IEnumerable<TEntity>>> daoFunc);
         Task<bool> DoAllIdsExistAsync(IEnumerable<uint> ids, Func<IEnumerable<uint>, Task<IEnumerable<TEntity>>> daoFunc);

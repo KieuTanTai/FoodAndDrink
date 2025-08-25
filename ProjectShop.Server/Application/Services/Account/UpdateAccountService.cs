@@ -54,12 +54,13 @@ namespace ProjectShop.Server.Application.Services.Account
             {
                 AccountModel? account = await daoFunc(input);
                 if (account == null)
-                    throw new InvalidOperationException($"Account with input {input} does not exist.");
+                    return _logger.JsonLogWarning<AccountModel, UpdateAccountService>($"Account with input {input} does not exist.", null);
+
                 if (!await  _hashPassword.IsPasswordValidAsync(newPassword))
                     account.Password = await _hashPassword.HashPasswordAsync(newPassword);
                 account.Password = newPassword;
                 int affectedRows = await _baseDAO.UpdateAsync(account);
-                if (affectedRows <= 0) 
+                if (affectedRows == 0) 
                     return _logger.JsonLogWarning<AccountModel, UpdateAccountService>($"Failed to update the account password for {input}.");
                 return _logger.JsonLogInfo<AccountModel, UpdateAccountService>($"Updated password for account {input}.", affectedRows : affectedRows);
             }
@@ -75,6 +76,12 @@ namespace ProjectShop.Server.Application.Services.Account
             try
             {
                 IEnumerable<AccountModel> accounts = await daoFunc(inputs, null);
+                if (accounts == null || !accounts.Any())
+                {
+                    logEntries.Add(_logger.JsonLogWarning<AccountModel, UpdateAccountService>("No accounts found for the provided inputs."));
+                    return logEntries;
+                }
+
                 using (var enumerator = accounts.GetEnumerator())
                 {
                     foreach (string newPassword in newPasswords)
@@ -93,7 +100,7 @@ namespace ProjectShop.Server.Application.Services.Account
                     }
                 }
                 int affectedRows = await _baseDAO.UpdateAsync(accounts);
-                if (affectedRows <= 0)
+                if (affectedRows == 0)
                 {
                     logEntries.Add(_logger.JsonLogWarning<AccountModel, UpdateAccountService>("Failed to update passwords for multiple accounts."));
                     return logEntries;
@@ -104,7 +111,8 @@ namespace ProjectShop.Server.Application.Services.Account
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("An error occurred while updating the account passwords.", ex);
+                logEntries.Add(_logger.JsonLogError<AccountModel, UpdateAccountService>("An error occurred while updating the account passwords.", ex));
+                return logEntries;
             }
         }
 
@@ -115,9 +123,10 @@ namespace ProjectShop.Server.Application.Services.Account
                 AccountModel? account = await daoFunc(input);
                 if (account == null)
                     return _logger.JsonLogWarning<AccountModel, UpdateAccountService>($"Account with input {input} does not exist.", null);
+
                 account.AccountStatus = status;
                 int affectedRows = await _baseDAO.UpdateAsync(account);
-                if (affectedRows <= 0)
+                if (affectedRows == 0)
                     return _logger.JsonLogWarning<AccountModel, UpdateAccountService>($"Failed to update the account status for {input}.");
                 return _logger.JsonLogInfo<AccountModel, UpdateAccountService>($"Updated status for account {input}.", affectedRows: affectedRows);
             }
@@ -133,13 +142,19 @@ namespace ProjectShop.Server.Application.Services.Account
             try
             {
                 IEnumerable<AccountModel> accounts = await daoFunc(inputs, null);
+                if (accounts == null || !accounts.Any())
+                {
+                    logEntries.Add(_logger.JsonLogWarning<AccountModel, UpdateAccountService>("No accounts found for the provided inputs."));
+                    return logEntries;
+                }
+
                 foreach (AccountModel account in accounts)
                 {
                     account.AccountStatus = status;
                     logEntries.Add(_logger.JsonLogInfo<AccountModel, UpdateAccountService>($"Prepared status update for account {account.UserName}."));
                 }
                 int affectedRows = await _baseDAO.UpdateAsync(accounts);
-                if (affectedRows <= 0)
+                if (affectedRows == 0)
                 {
                     logEntries.Add(_logger.JsonLogWarning<AccountModel, UpdateAccountService>("Failed to update statuses for multiple accounts."));
                     return logEntries;

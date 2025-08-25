@@ -6,9 +6,9 @@ namespace ProjectShop.Server.Core.Interfaces.IServices.Role
     {
         Task<JsonLogEntry> DeleteAccountRoleAsync(TKey keys);
         Task<JsonLogEntry> DeleteByAccountIdAsync(uint accountId);
-        Task<IEnumerable<JsonLogEntry>> DeleteByAccountIdsAsync(IEnumerable<uint> accountIds);
-        Task<IEnumerable<JsonLogEntry>> DeleteAccountRolesAsync(IEnumerable<TKey> Listkeys);
+        Task<JsonLogEntry> DeleteByAccountIdsAsync(IEnumerable<uint> accountIds);
+        Task<JsonLogEntry> DeleteAccountRolesAsync(IEnumerable<TKey> Listkeys);
         Task<JsonLogEntry> DeleteByRoleIdAsync(uint roleId);
-        Task<IEnumerable<JsonLogEntry>> DeleteByRoleIdsAsync(IEnumerable<uint> roleIds);
+        Task<JsonLogEntry> DeleteByRoleIdsAsync(IEnumerable<uint> roleIds);
     }
 }

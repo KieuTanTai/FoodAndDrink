@@ -109,8 +109,6 @@ namespace ProjectShop.Server.Infrastructure.Data
             {
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<SaleEventModel> result = await connection.QueryAsync<SaleEventModel>(query, new { StartDate = startDate, EndDate = endDate, MaxGetCount = maxGetCount});
-                if (result == null || !result.Any())
-                    throw new Exception("No SaleEvents found for the given date range.");
                 Logger.LogInfo<IEnumerable<SaleEventModel>, SaleEventDAO>($"Retrieved SaleEvents by start and end date range successfully.");
                 return result;
             }

@@ -26,6 +26,13 @@ namespace ProjectShop.Server.Application.Services
             try
             {
                 IEnumerable<TEntity> entities = await daoFunc(compareType, maxGetCount);
+                if (entities == null || !entities.Any())
+                {
+                    JsonLogEntry log = _logger.JsonLogInfo<TEntity, BaseGetByTimeService<TEntity, TOptions>>($"No entities found with {typeof(TCompareType).Name}: {compareType}.");
+                    results.LogEntries = results.LogEntries!.Append(log);
+                    return results;
+                }
+
                 if (options != null)
                     results = await _navigationPropertyService.GetNavigationPropertyByOptionsAsync(entities, options);
                 JsonLogEntry logEntry = _logger.JsonLogInfo<TEntity, BaseGetByTimeService<TEntity, TOptions>>($"Successfully retrieved entities with {typeof(TCompareType).Name}: {compareType}.");
@@ -45,6 +52,13 @@ namespace ProjectShop.Server.Application.Services
             try
             {
                 IEnumerable<TEntity> entities = await daoFunc(maxGetCount);
+                if (entities == null || !entities.Any())
+                {
+                    JsonLogEntry log = _logger.JsonLogInfo<TEntity, BaseGetByTimeService<TEntity, TOptions>>("No entities found within the specified date range.");
+                    results.LogEntries = results.LogEntries!.Append(log);
+                    return results;
+                }
+
                 if (options != null)
                     results = await _navigationPropertyService.GetNavigationPropertyByOptionsAsync(entities, options);
                 results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<TEntity, BaseGetByTimeService<TEntity, TOptions>>("Successfully retrieved entities within the specified date range."));
@@ -63,6 +77,13 @@ namespace ProjectShop.Server.Application.Services
             try
             {
                 IEnumerable<TEntity> entities = await daoFunc(month, year, maxGetCount);
+                if (entities == null || !entities.Any())
+                {
+                    JsonLogEntry log = _logger.JsonLogInfo<TEntity, BaseGetByTimeService<TEntity, TOptions>>($"No entities found for {month}/{year}.");
+                    results.LogEntries = results.LogEntries!.Append(log);
+                    return results;
+                }
+
                 if (options != null)
                     results = await _navigationPropertyService.GetNavigationPropertyByOptionsAsync(entities, options);
                 results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<TEntity, BaseGetByTimeService<TEntity, TOptions>>($"Successfully retrieved entities for {month}/{year}."));

@@ -322,8 +322,8 @@ namespace ProjectShop.Server.Application.Services.Product
             uint firstId = supplierIds.FirstOrDefault();
             try
             {
-                IEnumerable<SupplierModel> suppliers = await _baseSupplierDAO.GetByInputsAsync(supplierIds.Select(id => id.ToString())) ?? Enumerable.Empty<SupplierModel>();
-                if (!suppliers.Any())
+                IEnumerable<SupplierModel> suppliers = await _baseSupplierDAO.GetByInputsAsync(supplierIds.Select(id => id.ToString()));
+                if (suppliers == null || !suppliers.Any())
                     return new Dictionary<uint, ServiceResult<SupplierModel>>
                     {
                         [firstId] = _serviceResultFactory.CreateServiceResult<SupplierModel>($"No suppliers found for the provided IDs.", new SupplierModel(), false)
@@ -344,8 +344,8 @@ namespace ProjectShop.Server.Application.Services.Product
             string firstBarcode = productBarcodes.FirstOrDefault() ?? string.Empty;
             try
             {
-                var categories = (await _productCategoriesDAO.GetByProductBarcodesAsync(productBarcodes)) ?? Enumerable.Empty<ProductCategoriesModel>();
-                if (!categories.Any())
+                var categories = (await _productCategoriesDAO.GetByProductBarcodesAsync(productBarcodes));
+                if (categories == null || !categories.Any())
                     return new Dictionary<string, ServiceResults<ProductCategoriesModel>>
                     {
                         [firstBarcode] = _serviceResultFactory.CreateServiceResults<ProductCategoriesModel>($"No product categories found for the provided barcodes.", new List<ProductCategoriesModel>(), false)
@@ -368,8 +368,8 @@ namespace ProjectShop.Server.Application.Services.Product
             string firstBarcode = productBarcodes.FirstOrDefault() ?? string.Empty;
             try
             {
-                var detailCarts = (await _detailCartDAO.GetByProductBarcodesAsync(productBarcodes)) ?? Enumerable.Empty<DetailCartModel>();
-                if (!detailCarts.Any())
+                var detailCarts = (await _detailCartDAO.GetByProductBarcodesAsync(productBarcodes));
+                if (detailCarts == null || !detailCarts.Any())
                     return new Dictionary<string, ServiceResults<DetailCartModel>>
                     {
                         [firstBarcode] = _serviceResultFactory.CreateServiceResults<DetailCartModel>($"No detail carts found for the provided barcodes.", new List<DetailCartModel>(), false)
@@ -391,8 +391,8 @@ namespace ProjectShop.Server.Application.Services.Product
             string firstBarcode = productBarcodes.FirstOrDefault() ?? string.Empty;
             try
             {
-                var detailProductLots = (await _detailProductLotDAO.GetByProductBarcodesAsync(productBarcodes)) ?? Enumerable.Empty<DetailProductLotModel>();
-                if (!detailProductLots.Any())
+                var detailProductLots = (await _detailProductLotDAO.GetByProductBarcodesAsync(productBarcodes));
+                if (detailProductLots == null || !detailProductLots.Any())
                     return new Dictionary<string, ServiceResults<DetailProductLotModel>>
                     {
                         [firstBarcode] = _serviceResultFactory.CreateServiceResults<DetailProductLotModel>($"No detail product lots found for the provided barcodes.", new List<DetailProductLotModel>(), false)
@@ -414,8 +414,8 @@ namespace ProjectShop.Server.Application.Services.Product
             string firstBarcode = productBarcodes.FirstOrDefault() ?? string.Empty;
             try
             {
-                var productImages = (await _productImageDAO.GetByProductBarcodesAsync(productBarcodes)) ?? Enumerable.Empty<ProductImageModel>();
-                if (!productImages.Any())
+                var productImages = (await _productImageDAO.GetByProductBarcodesAsync(productBarcodes));
+                if (productImages == null || !productImages.Any())
                     return new Dictionary<string, ServiceResults<ProductImageModel>>
                     {
                         [firstBarcode] = _serviceResultFactory.CreateServiceResults<ProductImageModel>($"No product images found for the provided barcodes.", new List<ProductImageModel>(), false)
@@ -437,8 +437,8 @@ namespace ProjectShop.Server.Application.Services.Product
             string firstBarcode = productBarcodes.FirstOrDefault() ?? string.Empty;
             try
             {
-                var detailSaleEvents = (await _detailSaleEventDAO.GetByProductBarcodesAsync(productBarcodes)) ?? Enumerable.Empty<DetailSaleEventModel>();
-                if (!detailSaleEvents.Any())
+                var detailSaleEvents = (await _detailSaleEventDAO.GetByProductBarcodesAsync(productBarcodes));
+                if (detailSaleEvents == null || !detailSaleEvents.Any())
                     return new Dictionary<string, ServiceResults<DetailSaleEventModel>>
                     {
                         [firstBarcode] = _serviceResultFactory.CreateServiceResults<DetailSaleEventModel>($"No detail sale events found for the provided barcodes.", new List<DetailSaleEventModel>(), false)
@@ -460,8 +460,8 @@ namespace ProjectShop.Server.Application.Services.Product
             string firstBarcode = productBarcodes.FirstOrDefault() ?? string.Empty;
             try
             {
-                var detailInvoices = (await _detailInvoiceDAO.GetByProductBarcodesAsync(productBarcodes)) ?? Enumerable.Empty<DetailInvoiceModel>();
-                if (!detailInvoices.Any())
+                var detailInvoices = (await _detailInvoiceDAO.GetByProductBarcodesAsync(productBarcodes));
+                if (detailInvoices == null || !detailInvoices.Any())
                     return new Dictionary<string, ServiceResults<DetailInvoiceModel>>
                     {
                         [firstBarcode] = _serviceResultFactory.CreateServiceResults<DetailInvoiceModel>($"No detail invoices found for the provided barcodes.", new List<DetailInvoiceModel>(), false)

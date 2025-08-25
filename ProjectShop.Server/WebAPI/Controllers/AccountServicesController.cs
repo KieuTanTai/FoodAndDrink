@@ -35,7 +35,8 @@ namespace ProjectShop.Server.WebAPI.Controllers
         public async Task<IActionResult> GetAccounts([FromQuery] int? maxCount, [FromQuery] bool? status, [FromQuery] AccountNavigationOptions? options)
         {
             _logger.LogInformation("Bắt đầu lấy danh sách account.");
-            IEnumerable<AccountModel> accounts;
+            //IEnumerable<AccountModel> accounts;
+            ServiceResults<AccountModel> serviceResults = new ServiceResults<AccountModel>();
             try
             {
                 if (maxCount.HasValue && maxCount.Value <= 0)
@@ -45,10 +46,10 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 }
 
                 if (status.HasValue)
-                    accounts = await _searchAccountService.GetByStatusAsync(status.Value, options, maxCount);
+                    serviceResults = await _searchAccountService.GetByStatusAsync(status.Value, options, maxCount);
                 else
-                    accounts = await _searchAccountService.GetAllAsync(options, maxCount);
-                return Ok(accounts); // trả json ra postman/browser
+                    serviceResults = await _searchAccountService.GetAllAsync(options, maxCount);
+                return Ok(serviceResults); // trả json ra postman/browser
             }
             catch (Exception ex)
             {
@@ -66,12 +67,14 @@ namespace ProjectShop.Server.WebAPI.Controllers
             _logger.LogInformation("Bắt đầu quá trình đăng nhập.");
             try
             {
-                AccountModel? account = await _loginAccountService.HandleLoginAsync(request.Email, request.Password, options);
+                ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
+                serviceResult = await _loginAccountService.HandleLoginAsync(request.Email, request.Password, options);
+                AccountModel account = serviceResult.Data!;
                 // Set claims principal for the current user
                 ClaimsPrincipal principal = BuildClaimsPrincipal(account);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
                 _logger.LogInformation($"Đăng nhập thành công. {account.UserName}");
-                return Ok(account);
+                return Ok(serviceResult);
             }
             catch (Exception ex)
             {
@@ -95,10 +98,12 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
             try
             {
-                int result = await _signupService.AddAccountAsync(new AccountModel(request.Email, request.Password));
+                ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
+                serviceResult = await _signupService.AddAccountAsync(new AccountModel(request.Email, request.Password));
+                uint result = serviceResult.Data!.AccountId;
                 _logger.LogInformation($"Đăng ký thành công. {request.Email}");
                 // Có thể trả về CreatedAtAction nếu muốn, ở đây dùng Ok cho đơn giản
-                return Ok(new { AccountId = result });
+                return Ok(serviceResult);
             }
             catch (Exception ex)
             {
@@ -120,9 +125,9 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
             try
             {
-                int result = await _updateAccountStatusService.UpdateAccountStatusAsync(request.AccountId, request.Status);
-                _logger.LogInformation($"Cập nhật trạng thái tài khoản thành công. AccountId: {request.AccountId}, Status: {request.Status}");
-                return Ok();
+                JsonLogEntry logEntry = await _updateAccountStatusService.UpdateAccountStatusAsync(request.AccountId, request.Status);
+                _logger.LogInformation($"Cập nhật trạng thái thành công. AccountId: {request.AccountId}, New Status: {request.Status}");
+                return Ok(logEntry);
             }
             catch (Exception ex)
             {
@@ -144,9 +149,9 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
             try
             {
-                int result = await _updateAccountStatusService.UpdateAccountPasswordAsync(request.AccountId, request.NewPassword);
+                JsonLogEntry logEntry = await _updateAccountStatusService.UpdateAccountPasswordAsync(request.AccountId, request.NewPassword);
                 _logger.LogInformation($"Cập nhật mật khẩu thành công. AccountId: {request.AccountId}");
-                return Ok();
+                return Ok(logEntry);
             }
             catch (Exception ex)
             {
@@ -169,9 +174,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
             try
             {
-                AccountModel? currentAccount = await _searchAccountService.GetByUserNameAsync(userName, options);
+                ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
+                serviceResult = await _searchAccountService.GetByUserNameAsync(userName, options);
+                AccountModel currentAccount = serviceResult.Data!;
                 _logger.LogInformation($"Thông tin tài khoản hiện tại: {currentAccount.UserName}");
-                return Ok(currentAccount);
+                return Ok(serviceResult);
             }
             catch (Exception ex)
             {
@@ -194,8 +201,10 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
             try
             {
+                ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
                 AccountNavigationOptions options = new() { IsGetRolesOfUsers = true };
-                AccountModel? account = await _searchAccountService.GetByUserNameAsync(userName, options);
+                serviceResult = await _searchAccountService.GetByUserNameAsync(userName, options);
+                AccountModel? account = serviceResult.Data!;
                 IEnumerable<RolesOfUserModel> roles = account.RolesOfUsers;
                 _logger.LogInformation($"Số lượng quyền của người dùng hiện tại: {roles.Count()}");
                 return Ok(roles);
@@ -220,9 +229,9 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
             try
             {
-                AccountModel? currentAccount = await _searchAccountService.GetByAccountIdAsync(accountId, options);
-                _logger.LogInformation($"Thông tin tài khoản hiện tại: {currentAccount.UserName}");
-                return Ok(currentAccount);
+                ServiceResult<AccountModel> serviceResult = await _searchAccountService.GetByAccountIdAsync(accountId, options);
+                _logger.LogInformation($"Thông tin tài khoản hiện tại: {serviceResult.Data!.UserName}");
+                return Ok(serviceResult);
             }
             catch (Exception ex)
             {
@@ -263,9 +272,9 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
             try
             {
-                AccountModel? account = await _searchAccountService.GetByUserNameAsync(username, options);
-                _logger.LogInformation($"Thông tin tài khoản: {account.UserName}");
-                return Ok(account);
+                ServiceResult<AccountModel> serviceResult = await _searchAccountService.GetByUserNameAsync(username, options);
+                _logger.LogInformation($"Thông tin tài khoản: {serviceResult.Data!.UserName}");
+                return Ok(serviceResult);
             }
             catch (Exception ex)
             {
@@ -282,9 +291,9 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
             try
             {
-                IEnumerable<AccountModel> accounts = await _searchAccountService.GetByStatusAsync(status, options, maxCount);
-                _logger.LogInformation($"Số lượng tài khoản với trạng thái {status}: {accounts.Count()}");
-                return Ok(accounts);
+                ServiceResults<AccountModel> serviceResults = await _searchAccountService.GetByStatusAsync(status, options, maxCount);
+                _logger.LogInformation($"Số lượng tài khoản với trạng thái {status}: {serviceResults.Data!.Count()}");
+                return Ok(serviceResults);
             }
             catch (Exception ex)
             {

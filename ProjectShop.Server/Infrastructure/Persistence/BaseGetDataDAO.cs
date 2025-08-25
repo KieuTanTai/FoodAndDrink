@@ -37,9 +37,6 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             {
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { MaxGetCount = maxGetCount });
-                if (results == null || !results.Any())
-                    throw new KeyNotFoundException($@"No data found in {TableName} with 
-                            {(maxGetCount.HasValue ? $"limit {maxGetCount.Value}" : "no limit")}");
                 Logger.LogInfo<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Retrieved {results.Count()} records from {TableName}");
                 return results;
             }
@@ -70,9 +67,8 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 string query = GetDataQuery(colName);
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 TEntity? result = await connection.QueryFirstOrDefaultAsync<TEntity>(query, new { Input = input });
-
                 Logger.LogInfo<TEntity, BaseGetDataDAO<TEntity>>($"Retrieved data from {TableName} by {colName}: {input}");
-                return result ?? throw new KeyNotFoundException($"No data found in {TableName} for {colName} = {input}");
+                return result;
             }
             catch (Exception ex)
             {
@@ -97,9 +93,6 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             {
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Input = input, MaxGetCount = maxGetCount });
-                if (results == null || !results.Any())
-                    throw new KeyNotFoundException($@"No data found in {TableName} for {colName} = {input} with 
-                        {(maxGetCount.HasValue ? $"limit {maxGetCount.Value}" : "no limit")}");
                 Logger.LogInfo<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Retrieved {results.Count()} records from {TableName} by {colName}: {input}");
                 return results;
             }
@@ -125,9 +118,6 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             {
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Input = input, MaxGetCount = maxGetCount });
-                if (results == null || !results.Any())
-                    throw new KeyNotFoundException($"No data found in {TableName} for {colName} with comparison type {compareType} and " +
-                        $"input {input} with {(maxGetCount.HasValue ? $"limit {maxGetCount.Value}" : "no limit")}");
                 Logger.LogInfo<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Retrieved {results.Count()} records from {TableName} by {colName} with comparison type {compareType}: {input}");
                 return results;
             }
@@ -154,9 +144,6 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             {
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Inputs = inputs, MaxGetCount = maxGetCount });
-                if (results == null || !results.Any())
-                    throw new KeyNotFoundException($"No data found in {TableName} for inputs in column {colName} with " +
-                        $"{(maxGetCount.HasValue ? $"limit {maxGetCount.Value}" : "no limit")}");
                 Logger.LogInfo<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Retrieved {results.Count()} records from {TableName} by inputs in column {colName}");
                 return results;
             }
@@ -184,9 +171,6 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                     input = $"%{input}%";
 
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Input = input, MaxGetCount = maxGetCount });
-                if (results == null || !results.Any())
-                    throw new KeyNotFoundException($@"No data found in {TableName} for {colName} like {input} with 
-                        {(maxGetCount.HasValue ? $"limit {maxGetCount.Value}" : "no limit")}");
                 Logger.LogInfo<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Retrieved {results.Count()} records from {TableName} by relative search in column {colName}: {input}");
                 return results;
             }
@@ -239,8 +223,6 @@ namespace ProjectShop.Server.Infrastructure.Persistence
 
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, param);
-                if (results == null || !results.Any())
-                    throw new KeyNotFoundException($"No data found in {TableName} for {colName} with the specified parameters");
                 Logger.LogInfo<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Retrieved {results.Count()} records from {TableName} by date/time query in column {colName}");
                 return results;
             }
@@ -286,8 +268,6 @@ namespace ProjectShop.Server.Infrastructure.Persistence
 
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, DParam);
-                if (results == null || !results.Any())
-                    throw new KeyNotFoundException($"No data found in {TableName} for {colName} with the specified parameters");
                 Logger.LogInfo<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Retrieved {results.Count()} records from {TableName} by date/time query in column {colName}");
                 return results;
             }
@@ -312,8 +292,6 @@ namespace ProjectShop.Server.Infrastructure.Persistence
             {
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { MinDecimal = minDecimal, MaxDecimal = maxDecimal, MaxGetCount = maxGetCount });
-                if (results == null || !results.Any())
-                    throw new KeyNotFoundException($"No data found in {TableName} for decimal range {minDecimal} - {maxDecimal} in column {colName}");
                 Logger.LogInfo<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Retrieved {results.Count()} records from {TableName} by decimal range in column {colName}: {minDecimal} - {maxDecimal}");
                 return results;
             }
@@ -340,8 +318,6 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 {
                     using IDbConnection connection = await ConnectionFactory.CreateConnection();
                     IEnumerable<TEntity> results = await connection.QueryAsync<TEntity>(query, new { Decimal = decimalValue, MaxGetCount = maxGetCount });
-                    if (results == null || !results.Any())
-                        throw new KeyNotFoundException($"No data found in {TableName} for {colName} with decimal {decimalValue} and comparison type {type}");
                     Logger.LogInfo<IEnumerable<TEntity>, BaseGetDataDAO<TEntity>>($"Retrieved {results.Count()} records from {TableName} by decimal in column {colName} with comparison type {type}: {decimalValue}");
                     return results;
                 }
@@ -355,14 +331,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 throw new ArgumentException("Invalid comparison type", nameof(compareType));
         }
 
-        protected async Task<TEntity> GetSingleByTwoIdAsync(string firstColName, string secondColName, object firstParam, object secondParam)
+        protected async Task<TEntity?> GetSingleByTwoIdAsync(string firstColName, string secondColName, object firstParam, object secondParam)
         {
             try
             {
                 string query = GetByTwoIdQuery(firstColName, secondColName);
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
-                TEntity result = await connection.QueryFirstOrDefaultAsync<TEntity>(query, new { FirstInput = firstParam, SecondInput = secondParam })
-                    ?? throw new KeyNotFoundException($"No data found in {TableName} for {firstColName} = {firstParam} and {secondColName} = {secondParam}");
+                TEntity? result = await connection.QueryFirstOrDefaultAsync<TEntity>(query, new { FirstInput = firstParam, SecondInput = secondParam });
                 Logger.LogInfo<TEntity, BaseGetDataDAO<TEntity>>($"Retrieved data from {TableName} by {firstColName} = {firstParam} and {secondColName} = {secondParam}");
                 return result;
             }

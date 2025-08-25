@@ -53,6 +53,8 @@ namespace ProjectShop.Server.Application.Services.Account
             try
             {
                 IEnumerable<AccountModel> accounts = await _baseDAO.GetAllAsync(_helper.GetValidMaxRecord(maxGetCount));
+                if (accounts == null || !accounts.Any())
+                    return _serviceResultFactory.CreateServiceResults<AccountModel>("No accounts found.", Enumerable.Empty<AccountModel>(), true);
 
                 if (options != null)
                     results = await _navigationService.GetNavigationPropertyByOptionsAsync(accounts, options);
@@ -71,6 +73,9 @@ namespace ProjectShop.Server.Application.Services.Account
             try
             {
                 IEnumerable<AccountModel> accounts = await _accountDAO.GetByStatusAsync(status, _helper.GetValidMaxRecord(maxGetCount));
+                if (accounts == null || !accounts.Any())
+                    return _serviceResultFactory.CreateServiceResults<AccountModel>($"No accounts found with status={status}.", Enumerable.Empty<AccountModel>(), true);
+
                 if (options != null)
                     results = await _navigationService.GetNavigationPropertyByOptionsAsync(accounts, options);
                 results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<AccountModel, SearchAccountService>($"Retrieved accounts by status={status} with maxGetCount={maxGetCount}, options={options}."));
@@ -90,6 +95,7 @@ namespace ProjectShop.Server.Application.Services.Account
                 AccountModel? account = await _accountDAO.GetByUserNameAsync(userName);
                 if (account == null)
                     return _serviceResultFactory.CreateServiceResult<AccountModel>($"No account found with username: {userName}.", new AccountModel(), false);
+
                 if (options != null)
                     result = await _navigationService.GetNavigationPropertyByOptionsAsync(account, options);
                 result.LogEntries = result.LogEntries!.Append(_logger.JsonLogInfo<AccountModel, SearchAccountService>($"Retrieved account by username={userName} with options={options}."));
@@ -109,6 +115,7 @@ namespace ProjectShop.Server.Application.Services.Account
                 AccountModel? account = await _baseDAO.GetSingleDataAsync(accountId.ToString());
                 if (account == null)
                     return _serviceResultFactory.CreateServiceResult<AccountModel>($"No account found with ID: {accountId}.", new AccountModel(), false);
+
                 if (options != null)
                     result = await _navigationService.GetNavigationPropertyByOptionsAsync(account, options);
                 result.LogEntries = result.LogEntries!.Append(_logger.JsonLogInfo<AccountModel, SearchAccountService>($"Retrieved account by ID={accountId} with options={options}."));

@@ -37,7 +37,9 @@ namespace ProjectShop.Server.Application.Services.Account
             ServiceResult<AccountModel> result = new ServiceResult<AccountModel>();
             try
             {
-                AccountModel? account = await _accountDAO.GetByUserNameAsync(userName) ?? throw new InvalidOperationException("Account not found.");
+                AccountModel? account = await _accountDAO.GetByUserNameAsync(userName);
+                if (account == null)
+                    return _serviceResultFactory.CreateServiceResult<AccountModel>($"Account with username '{userName}' not found.", new AccountModel(), false);
                 // validate account status and password
                 if (!account.AccountStatus)
                     return _serviceResultFactory.CreateServiceResult<AccountModel>($"Account is inactive.", new AccountModel(), false);

@@ -50,7 +50,7 @@ namespace ProjectShop.Server.Infrastructure.Data
             return $@"DELETE FROM {TableName} WHERE {colName} = @Input";
         }
 
-        public async Task<RolesOfUserModel> GetByKeysAsync(RolesOfUserKey keys)
+        public async Task<RolesOfUserModel?> GetByKeysAsync(RolesOfUserKey keys)
             => await GetSingleByTwoIdAsync("account_id", "role_id", keys.AccountId, keys.RoleId);
 
         public async Task<IEnumerable<RolesOfUserModel>> GetByListKeysAsync(IEnumerable<RolesOfUserKey> listKeys, int? maxGetCount)
@@ -71,8 +71,6 @@ namespace ProjectShop.Server.Infrastructure.Data
 
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<RolesOfUserModel> result = await connection.QueryAsync<RolesOfUserModel>(query, parameters);
-                if (result == null || !result.Any())
-                    throw new KeyNotFoundException($"No RolesOfUserModel found for the provided keys.");
                 Logger.LogInfo<IEnumerable<RolesOfUserModel>, RoleOfUserDAO>($"Retrieved RolesOfUserModels by list of keys successfully.");
                 return result;
             }
@@ -90,8 +88,6 @@ namespace ProjectShop.Server.Infrastructure.Data
                 string query = GetDeleteByKeysQuery();
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 int rowsAffected = await connection.ExecuteAsync(query, keys);
-                if (rowsAffected == 0)
-                    throw new KeyNotFoundException($"No RolesOfUserModel found for AccountId: {keys.AccountId} and RoleId: {keys.RoleId}");
                 Logger.LogInfo<int, RoleOfUserDAO>($"Deleted RolesOfUserModel by keys successfully. Rows affected: {rowsAffected}");
                 return rowsAffected;
             }
@@ -155,8 +151,6 @@ namespace ProjectShop.Server.Infrastructure.Data
                 string query = GetDeleteByIdQuery(colName);
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 int rowsAffected = await connection.ExecuteAsync(query, new { Input = id });
-                if (rowsAffected == 0)
-                    throw new KeyNotFoundException($"No RolesOfUserModel found with {colName}: {id}");
                 Logger.LogInfo<int, RoleOfUserDAO>($"Deleted RolesOfUserModel by single id successfully. Rows affected: {rowsAffected}");
                 return rowsAffected;
             }
@@ -174,8 +168,6 @@ namespace ProjectShop.Server.Infrastructure.Data
                 string query = GetDeleteByIdQuery(colName);
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 int rowsAffected = await connection.ExecuteAsync(query, new { Input = ids });
-                if (rowsAffected == 0)
-                    throw new KeyNotFoundException($"No RolesOfUserModel found for the provided {colName} values.");
                 Logger.LogInfo<int, RoleOfUserDAO>($"Deleted RolesOfUserModel by list of ids successfully. Rows affected: {rowsAffected}");
                 return rowsAffected;
             }
@@ -193,8 +185,6 @@ namespace ProjectShop.Server.Infrastructure.Data
                 string query = GetDeleteByKeysQuery();
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 int rowsAffected = await connection.ExecuteAsync(query, keys);
-                if (rowsAffected == 0)
-                    throw new KeyNotFoundException("No RolesOfUserModel found for the provided keys.");
                 Logger.LogInfo<int, RoleOfUserDAO>($"Deleted RolesOfUserModel by list of keys successfully. Rows affected: {rowsAffected}");
                 return rowsAffected;
             }

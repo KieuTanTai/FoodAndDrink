@@ -37,7 +37,7 @@ namespace ProjectShop.Server.Application.Services.Account
                 if (!await _hashPassword.IsPasswordHashed(password))
                     entity.Password = await _hashPassword.HashPasswordAsync(password);
                 int affectedRows = await _baseDAO.UpdateAsync(entity);
-                if (affectedRows <= 0)
+                if (affectedRows == 0)
                     return _logger.JsonLogWarning<AccountModel, ForgotPasswordService>($"Failed to update the account with username {username}.");
                 return _logger.JsonLogInfo<AccountModel, ForgotPasswordService>($"Successfully updated the password for account with username {username}.", affectedRows: affectedRows);
             }
@@ -61,7 +61,7 @@ namespace ProjectShop.Server.Application.Services.Account
 
                 entities = await PasswordMapping(entities, passwords);
                 int affectedRows = await _baseDAO.UpdateAsync(entities);
-                if (affectedRows <= 0)
+                if (affectedRows == 0)
                 {
                     logEntries.Add(_logger.JsonLogWarning<AccountModel, ForgotPasswordService>("Failed to update passwords for multiple accounts."));
                     return logEntries;

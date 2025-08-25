@@ -27,7 +27,7 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<IEnumerable<InvoiceDiscountModel>> GetByInvoiceId(uint invoiceId, int? maxGetCount) 
             => await GetByInputAsync(invoiceId.ToString(), "invoice_id", maxGetCount);
 
-        public async Task<InvoiceDiscountModel> GetByKeysAsync(InvoiceDiscountKey keys) 
+        public async Task<InvoiceDiscountModel?> GetByKeysAsync(InvoiceDiscountKey keys) 
             => await GetSingleByTwoIdAsync(ColumnIdName, SecondColumnIdName, keys.InvoiceId, keys.SaleEventId);
 
         public async Task<IEnumerable<InvoiceDiscountModel>> GetByListKeysAsync(IEnumerable<InvoiceDiscountKey> keys, int? maxGetCount)
@@ -48,9 +48,6 @@ namespace ProjectShop.Server.Infrastructure.Data
             {
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<InvoiceDiscountModel> results = await connection.QueryAsync<InvoiceDiscountModel>(query, new { Keys = keys, MaxGetCount = maxGetCount });
-
-                if (results == null || !results.Any())
-                    throw new KeyNotFoundException($"No data found in {TableName} for {query} with parameters {keys}");
                 Logger.LogInfo<IEnumerable<InvoiceDiscountModel>, InvoiceDiscountDAO>($"Retrieved InvoiceDiscounts by keys successfully.");
                 return results;
             }

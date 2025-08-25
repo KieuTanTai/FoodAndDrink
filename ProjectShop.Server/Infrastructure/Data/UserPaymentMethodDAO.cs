@@ -95,8 +95,6 @@ namespace ProjectShop.Server.Infrastructure.Data
             {
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<UserPaymentMethodModel> results = await connection.QueryAsync<UserPaymentMethodModel>(query, new { Year = year, Month = month, MaxGetCount = maxGetCount});
-                if (results == null || !results.Any())
-                    return Enumerable.Empty<UserPaymentMethodModel>();
                 Logger.LogInfo<IEnumerable<UserPaymentMethodModel>, UserPaymentMethodDAO>($"Retrieved payment methods by expiry year {year} and month {month} successfully.");
                 return results;
             }

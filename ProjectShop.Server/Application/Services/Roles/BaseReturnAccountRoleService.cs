@@ -114,8 +114,8 @@ namespace ProjectShop.Server.Application.Services.Roles
             uint firstRoleId = roleIds.FirstOrDefault();
             try
             {
-                IEnumerable<RoleModel> roles = await _baseRoleDAO.GetByInputsAsync(roleIds.Select(id => id.ToString())) ?? Enumerable.Empty<RoleModel>();
-                if (!roles.Any())
+                IEnumerable<RoleModel> roles = await _baseRoleDAO.GetByInputsAsync(roleIds.Select(id => id.ToString()));
+                if (roles == null || !roles.Any())
                 {
                     return new Dictionary<uint, ServiceResult<RoleModel>>
                     {
@@ -138,8 +138,8 @@ namespace ProjectShop.Server.Application.Services.Roles
         {
             try
             {
-                IEnumerable<AccountModel> accounts = await _baseAccountDAO.GetByInputsAsync(accountIds.Select(id => id.ToString())) ?? Enumerable.Empty<AccountModel>();
-                if (!accounts.Any())
+                IEnumerable<AccountModel> accounts = await _baseAccountDAO.GetByInputsAsync(accountIds.Select(id => id.ToString()));
+                if (accounts == null || !accounts.Any())
                 {
                     uint firstAccountId = accountIds.FirstOrDefault();
                     return new Dictionary<uint, ServiceResult<AccountModel>>

@@ -41,8 +41,6 @@ namespace ProjectShop.Server.Infrastructure.Data
                              WHERE user_name = @UserName AND password = @Password";
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 AccountModel? result = await connection.QueryFirstOrDefaultAsync<AccountModel>(query, new { UserName = userName, Password = password });
-                if (result == null)
-                    throw new InvalidOperationException($"Account with username {userName} and provided password not found.");
                 Logger.LogInfo<AccountModel, AccountDAO>($"Retrieved account with username {userName} and provided password successfully.");
                 return result;
             }

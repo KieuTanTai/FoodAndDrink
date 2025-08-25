@@ -54,7 +54,7 @@ namespace ProjectShop.Server.Infrastructure.Data
         }
 
         // CAN'T WRITE LIKE DRY METHOD BECAUSE ITS CAN'T BE COVER MOST OF THE CASES
-        public async Task<DetailProductLotModel> GetByKeysAsync(DetailProductLotKey keys)
+        public async Task<DetailProductLotModel?> GetByKeysAsync(DetailProductLotKey keys)
             => await GetSingleByTwoIdAsync(ColumnIdName, SecondColumnIdName, keys.ProductLotId, keys.ProductBarcode);
 
         public async Task<IEnumerable<DetailProductLotModel>> GetByMFGDateAsync(int year, int month, int? maxGetCount)
@@ -100,9 +100,6 @@ namespace ProjectShop.Server.Infrastructure.Data
             {
                 using IDbConnection connection = await ConnectionFactory.CreateConnection();
                 IEnumerable<DetailProductLotModel> results = await connection.QueryAsync<DetailProductLotModel>(query, new { Keys = keys, MaxGetCount = maxGetCount });
-
-                if (results == null || !results.Any())
-                    throw new KeyNotFoundException($"No data found in {TableName} for {query} with parameters {keys}");
                 Logger.LogInfo<IEnumerable<DetailProductLotModel>, DetailProductLotDAO>($"Retrieved list of keys from {TableName} successfully.");
                 return results;
             }

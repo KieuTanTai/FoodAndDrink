@@ -50,9 +50,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence
                 using IDbTransaction transaction = connection.BeginTransaction();
                 try
                 {
-                    int result = 0;
-                    foreach (TEntity entity in entities)
-                        result += await connection.ExecuteAsync(GetInsertQuery(), entity, transaction);
+                    int result = await connection.ExecuteAsync(GetInsertQuery(), entities, transaction);
                     transaction.Commit();
                     Logger.LogInfo<TEntity, BaseNoneUpdateDAO<TEntity>>($"Successfully inserted multiple records into {TableName}");
                     return result;

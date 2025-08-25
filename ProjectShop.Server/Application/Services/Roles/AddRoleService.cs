@@ -56,7 +56,7 @@ namespace ProjectShop.Server.Application.Services.Roles
 
                 // insert
                 int affectedRows = await _baseDAO.InsertAsync(serviceResults.Data!);
-                if (affectedRows <= 0)
+                if (affectedRows == 0)
                     return _serviceResultFactory.CreateServiceResults<RoleModel>("Failed to add roles.", serviceResults.Data!, false);
                 return _serviceResultFactory.CreateServiceResults<RoleModel>("Roles added successfully.", serviceResults.Data!, true, affectedRows: affectedRows);
 

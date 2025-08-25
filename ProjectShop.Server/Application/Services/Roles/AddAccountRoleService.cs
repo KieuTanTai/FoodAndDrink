@@ -34,7 +34,7 @@ namespace ProjectShop.Server.Application.Services.Roles
                     return _serviceResultFactory.CreateServiceResult<RolesOfUserModel>($"The account role with AccountId {keys.AccountId} and RoleId {keys.RoleId} already exists.", new RolesOfUserModel(keys.AccountId, keys.RoleId), false);
                 // Add the new account role
                 int affectedRows = await _baseDAO.InsertAsync(new RolesOfUserModel { AccountId = keys.AccountId, RoleId = keys.RoleId });
-                if (affectedRows <= 0)
+                if (affectedRows == 0)
                     return _serviceResultFactory.CreateServiceResult<RolesOfUserModel>($"Failed to add account role with AccountId {keys.AccountId} and RoleId {keys.RoleId}.", new RolesOfUserModel(keys.AccountId, keys.RoleId), false);
                 return _serviceResultFactory.CreateServiceResult<RolesOfUserModel>($"Successfully added account role with AccountId {keys.AccountId} and RoleId {keys.RoleId}.", new RolesOfUserModel(keys.AccountId, keys.RoleId), true, affectedRows : affectedRows);
             }
@@ -58,7 +58,7 @@ namespace ProjectShop.Server.Application.Services.Roles
 
                 // Insert
                 int affectedRows = await _baseDAO.InsertAsync(serviceResults.Data!);
-                if (affectedRows <= 0)
+                if (affectedRows == 0)
                     return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("Failed to add account roles.", serviceResults.Data!, false);
                 return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>($"Successfully added account roles.", serviceResults.Data!, true, affectedRows : affectedRows);
             }

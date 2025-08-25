@@ -44,7 +44,7 @@ namespace ProjectShop.Server.Application.Services.Account
 
                 entity.Password = await _hashPassword.HashPasswordAsync(entity.Password);
                 int affectedRows = await _baseDAO.InsertAsync(entity);
-                if (affectedRows <= 0)
+                if (affectedRows == 0)
                     logEntries.Add(_logger.JsonLogWarning<AccountModel, SignupService>($"Failed to insert the account for username: {entity.UserName}."));
                 logEntries.Add(_logger.JsonLogInfo<AccountModel, SignupService>($"Account inserted successfully for username: {entity.UserName}.", affectedRows: affectedRows));
                 return _serviceResultFactory.CreateServiceResult<AccountModel>(entity, logEntries);
@@ -69,7 +69,7 @@ namespace ProjectShop.Server.Application.Services.Account
                 var validEntities = serviceResults.Data;
                 validEntities = await HashPasswordAsync(validEntities!);
                 int affectedRows = await _baseDAO.InsertAsync(validEntities);
-                if (affectedRows <= 0)
+                if (affectedRows == 0)
                     serviceResults.LogEntries = serviceResults.LogEntries!.Append(_logger.JsonLogWarning<AccountModel, SignupService>("Failed to insert the accounts."));
                 serviceResults.LogEntries = serviceResults.LogEntries!.Append(_logger.JsonLogInfo<AccountModel, SignupService>($"Accounts inserted successfully.", affectedRows: affectedRows));
                 return serviceResults;
