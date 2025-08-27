@@ -133,5 +133,28 @@ namespace ProjectShop.Server.Infrastructure.Data
                 return await GetByDateTimeAsync("payment_method_added_date", EQueryTimeType.YEAR, ct, year, maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
+
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetByExpiryMonthAndYearAsync(int year, int month, int? maxGetCount = null)
+            => await GetByDateTimeAsync("payment_method_expiry_year", EQueryTimeType.MONTH_AND_YEAR, (year, month), maxGetCount);
+
+        public async Task<IEnumerable<UserPaymentMethodModel>> GEtByMonthAndYearLastUpdatedDateAsync(int year, int month, int? maxGetCount = null)
+            => await GetByDateTimeAsync("payment_method_last_updated_date", EQueryTimeType.MONTH_AND_YEAR, (year, month), maxGetCount);
+
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetByYearLastUpdatedDateAsync<TEnum>(int year, TEnum compareType, int? maxGetCount = null) where TEnum : Enum
+        {
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid compare type", nameof(compareType));
+            return await GetByDateTimeAsync("payment_method_last_updated_date", EQueryTimeType.YEAR, type, year, maxGetCount);   
+        }
+
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetByLastUpdatedDateRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount = null)
+            => await GetByDateTimeAsync("payment_method_last_updated_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate), maxGetCount);
+
+        public async Task<IEnumerable<UserPaymentMethodModel>> GetByLastUpdatedDateAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount = null) where TEnum : Enum
+        {
+            if (compareType is not ECompareType type)
+                throw new ArgumentException("Invalid compare type", nameof(compareType));
+            return await GetByDateTimeAsync("payment_method_last_updated_date", EQueryTimeType.DATE_TIME, type, dateTime, maxGetCount);
+        }
     }
 }

@@ -22,8 +22,6 @@ namespace ProjectShop.Server.Application.Services.Roles
         public SearchAccountRoleService(
             IDAO<RolesOfUserModel> baseDAO,
             IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> roleOfUserDAO,
-            IDAO<RoleModel> baseRoleDAO,
-            IDAO<AccountModel> baseAccountDAO,
             IBaseHelperService<RolesOfUserModel> helper,
             IBaseGetNavigationPropertyService<RolesOfUserModel, RolesOfUserNavigationOptions> navigationService,
             IBaseGetByTimeService<RolesOfUserModel, RolesOfUserNavigationOptions> byTimeService,
@@ -44,20 +42,16 @@ namespace ProjectShop.Server.Application.Services.Roles
             {
                 IEnumerable<RolesOfUserModel> roles = await _baseDAO.GetAllAsync(_helper.GetValidMaxRecord(maxGetCount));
                 if (roles == null || !roles.Any())
-                {
-                    IEnumerable<JsonLogEntry> logEntries = Enumerable.Empty<JsonLogEntry>();
-                    logEntries = logEntries.Append(_logger.JsonLogWarning<RolesOfUserModel, SearchAccountRoleService>("No roles found in the database."));
-                    return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>(Enumerable.Empty<RolesOfUserModel>(), logEntries);
-                }
-                ServiceResults<RolesOfUserModel> results = new ServiceResults<RolesOfUserModel>();
+                    return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("No roles found in the database.", [], false);
+                ServiceResults<RolesOfUserModel> results = new();
                 if (options != null)
                     results = await _navigationService.GetNavigationPropertyByOptionsAsync(roles, options);
-                results.LogEntries!.Append(_logger.JsonLogInfo<RolesOfUserModel, SearchAccountRoleService>($"Retrieved {roles.Count()} roles from the database."));
+                results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<RolesOfUserModel, SearchAccountRoleService>($"Retrieved {roles.Count()} roles from the database."));
                 return results;
             }
             catch (Exception ex)
             {
-                return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("An error occurred while retrieving all roles.", Enumerable.Empty<RolesOfUserModel>(), false, ex);
+                return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("An error occurred while retrieving all roles.", [], false, ex);
             }
         }
 
@@ -67,20 +61,16 @@ namespace ProjectShop.Server.Application.Services.Roles
             {
                 IEnumerable<RolesOfUserModel> roles = await _roleOfUserDAO.GetByAccountIdAsync(accountId, _helper.GetValidMaxRecord(maxGetCount));
                 if (roles == null || !roles.Any())
-                {
-                    IEnumerable<JsonLogEntry> logEntries = Enumerable.Empty<JsonLogEntry>();
-                    logEntries = logEntries.Append(_logger.JsonLogWarning<RolesOfUserModel, SearchAccountRoleService>($"No roles found for account ID {accountId}."));
-                    return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>(Enumerable.Empty<RolesOfUserModel>(), logEntries);
-                }
-                ServiceResults<RolesOfUserModel> results = new ServiceResults<RolesOfUserModel> { Data = roles };
+                    return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("No roles found in the database.", [], false);
+                ServiceResults<RolesOfUserModel> results = new() { Data = roles };
                 if (options != null)
                     results = await _navigationService.GetNavigationPropertyByOptionsAsync(roles, options);
-                results.LogEntries = (results.LogEntries ?? Enumerable.Empty<JsonLogEntry>()).Append(_logger.JsonLogInfo<RolesOfUserModel, SearchAccountRoleService>($"Retrieved {roles.Count()} roles for account ID {accountId}."));
+                results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<RolesOfUserModel, SearchAccountRoleService>($"Retrieved {roles.Count()} roles for account ID {accountId}."));
                 return results;
             }
             catch (Exception ex)
             {
-                return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("An error occurred while retrieving roles by account ID.", Enumerable.Empty<RolesOfUserModel>(), false, ex);
+                return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("An error occurred while retrieving roles by account ID.", [], false, ex);
             }
         }
 
@@ -90,20 +80,16 @@ namespace ProjectShop.Server.Application.Services.Roles
             {
                 IEnumerable<RolesOfUserModel> roles = await _roleOfUserDAO.GetByAccountIdsAsync(accountIds, _helper.GetValidMaxRecord(maxGetCount));
                 if (roles == null || !roles.Any())
-                {
-                    IEnumerable<JsonLogEntry> logEntries = Enumerable.Empty<JsonLogEntry>();
-                    logEntries = logEntries.Append(_logger.JsonLogWarning<RolesOfUserModel, SearchAccountRoleService>($"No roles found for account IDs {string.Join(", ", accountIds)}."));
-                    return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>(Enumerable.Empty<RolesOfUserModel>(), logEntries);
-                }
-                ServiceResults<RolesOfUserModel> results = new ServiceResults<RolesOfUserModel> { Data = roles };
+                    return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("No roles found for provided account IDs.", [], false);
+                ServiceResults<RolesOfUserModel> results = new() { Data = roles };
                 if (options != null)
                     results = await _navigationService.GetNavigationPropertyByOptionsAsync(roles, options);
-                results.LogEntries = (results.LogEntries ?? Enumerable.Empty<JsonLogEntry>()).Append(_logger.JsonLogInfo<RolesOfUserModel, SearchAccountRoleService>($"Retrieved {roles.Count()} roles for account IDs."));
+                results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<RolesOfUserModel, SearchAccountRoleService>($"Retrieved {roles.Count()} roles for account IDs."));
                 return results;
             }
             catch (Exception ex)
             {
-                return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("An error occurred while retrieving roles by account IDs.", Enumerable.Empty<RolesOfUserModel>(), false, ex);
+                return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("An error occurred while retrieving roles by account IDs.", [], false, ex);
             }
         }
 
@@ -139,7 +125,7 @@ namespace ProjectShop.Server.Application.Services.Roles
                 if (rolesOfUser == null)
                     return _serviceResultFactory.CreateServiceResult<RolesOfUserModel>("No role found for provided keys.", new RolesOfUserModel(), false);
 
-                ServiceResult<RolesOfUserModel> result = new ServiceResult<RolesOfUserModel>();
+                ServiceResult<RolesOfUserModel> result = new();
                 if (options != null)
                     result = await _navigationService.GetNavigationPropertyByOptionsAsync(rolesOfUser, options);
                 result.LogEntries = result.LogEntries!.Append(_logger.JsonLogInfo<RolesOfUserModel, SearchAccountRoleService>($"Retrieved role for provided keys."));
@@ -157,21 +143,17 @@ namespace ProjectShop.Server.Application.Services.Roles
             {
                 IEnumerable<RolesOfUserModel> rolesOfUsers = await _roleOfUserDAO.GetByListKeysAsync(listKeys, _helper.GetValidMaxRecord(maxGetCount));
                 if (rolesOfUsers == null || !rolesOfUsers.Any())
-                {
-                    IEnumerable<JsonLogEntry> logEntries = Enumerable.Empty<JsonLogEntry>();
-                    logEntries = logEntries.Append(_logger.JsonLogWarning<RolesOfUserModel, SearchAccountRoleService>($"No roles found for provided keys."));
-                    return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>(Enumerable.Empty<RolesOfUserModel>(), logEntries);
-                }
+                    return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("No roles found for provided account IDs.", [], false);
 
-                ServiceResults<RolesOfUserModel> results = new ServiceResults<RolesOfUserModel> { Data = rolesOfUsers };
+                ServiceResults<RolesOfUserModel> results = new() { Data = rolesOfUsers };
                 if (options != null)
                     results = await _navigationService.GetNavigationPropertyByOptionsAsync(rolesOfUsers, options);
-                results.LogEntries = (results.LogEntries ?? Enumerable.Empty<JsonLogEntry>()).Append(_logger.JsonLogInfo<RolesOfUserModel, SearchAccountRoleService>($"Retrieved {rolesOfUsers.Count()} roles for provided keys."));
+                results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<RolesOfUserModel, SearchAccountRoleService>($"Retrieved {rolesOfUsers.Count()} roles for provided keys."));
                 return results;
             }
             catch (Exception ex)
             {
-                return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("An error occurred while retrieving the role by keys.", Enumerable.Empty<RolesOfUserModel>(), false, ex);
+                return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("An error occurred while retrieving the role by keys.", [], false, ex);
             }
         }
 
@@ -181,21 +163,17 @@ namespace ProjectShop.Server.Application.Services.Roles
             {
                 IEnumerable<RolesOfUserModel> rolesOfUserModels = await _roleOfUserDAO.GetByRoleIdAsync(roleId, _helper.GetValidMaxRecord(maxGetCount));
                 if (rolesOfUserModels == null || !rolesOfUserModels.Any())
-                {
-                    IEnumerable<JsonLogEntry> logEntries = Enumerable.Empty<JsonLogEntry>();
-                    logEntries = logEntries.Append(_logger.JsonLogWarning<RolesOfUserModel, SearchAccountRoleService>($"No roles found for role ID {roleId}."));
-                    return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>(Enumerable.Empty<RolesOfUserModel>(), logEntries);
-                }
+                    return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("No roles found for provided account IDs.", [], false);
 
-                ServiceResults<RolesOfUserModel> results = new ServiceResults<RolesOfUserModel> { Data = rolesOfUserModels };
+                ServiceResults<RolesOfUserModel> results = new() { Data = rolesOfUserModels };
                 if (options != null)
                     results = await _navigationService.GetNavigationPropertyByOptionsAsync(rolesOfUserModels, options);
-                results.LogEntries = (results.LogEntries ?? Enumerable.Empty<JsonLogEntry>()).Append(_logger.JsonLogInfo<RolesOfUserModel, SearchAccountRoleService>($"Retrieved {rolesOfUserModels.Count()} roles for role ID {roleId}."));
+                results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<RolesOfUserModel, SearchAccountRoleService>($"Retrieved {rolesOfUserModels.Count()} roles for role ID {roleId}."));
                 return results;
             }
             catch (Exception ex)
             {
-                return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("An error occurred while retrieving roles by role ID.", Enumerable.Empty<RolesOfUserModel>(), false, ex);
+                return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("An error occurred while retrieving roles by role ID.", [], false, ex);
             }
         }
 
@@ -205,21 +183,17 @@ namespace ProjectShop.Server.Application.Services.Roles
             {
                 IEnumerable<RolesOfUserModel> rolesOfUserModels = await _roleOfUserDAO.GetByRoleIdsAsync(roleIds, _helper.GetValidMaxRecord(maxGetCount));
                 if (rolesOfUserModels == null || !rolesOfUserModels.Any())
-                {
-                    IEnumerable<JsonLogEntry> logEntries = Enumerable.Empty<JsonLogEntry>();
-                    logEntries = logEntries.Append(_logger.JsonLogWarning<RolesOfUserModel, SearchAccountRoleService>($"No roles found for role IDs {string.Join(", ", roleIds)}."));
-                    return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>(Enumerable.Empty<RolesOfUserModel>(), logEntries);
-                }
+                    return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("No roles found for provided account IDs.", [], false);
 
-                ServiceResults<RolesOfUserModel> results = new ServiceResults<RolesOfUserModel> { Data = rolesOfUserModels };
+                ServiceResults<RolesOfUserModel> results = new() { Data = rolesOfUserModels };
                 if (options != null)
                     results = await _navigationService.GetNavigationPropertyByOptionsAsync(rolesOfUserModels, options);
-                results.LogEntries = (results.LogEntries ?? Enumerable.Empty<JsonLogEntry>()).Append(_logger.JsonLogInfo<RolesOfUserModel, SearchAccountRoleService>($"Retrieved {rolesOfUserModels.Count()} roles for role IDs."));
+                results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<RolesOfUserModel, SearchAccountRoleService>($"Retrieved {rolesOfUserModels.Count()} roles for role IDs."));
                 return results;
             }
             catch (Exception ex)
             {
-                return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("An error occurred while retrieving roles by role IDs.", Enumerable.Empty<RolesOfUserModel>(), false, ex);
+                return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("An error occurred while retrieving roles by role IDs.", [], false, ex);
             }
         }
     }

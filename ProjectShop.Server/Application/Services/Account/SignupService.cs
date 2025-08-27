@@ -34,7 +34,7 @@ namespace ProjectShop.Server.Application.Services.Account
         //NOTE: SIGNUP FUNCTIONALITY
         public async Task<ServiceResult<AccountModel>> AddAccountAsync(AccountModel entity)
         {
-            List<JsonLogEntry> logEntries = new List<JsonLogEntry>();
+            List<JsonLogEntry> logEntries = [];
             try
             {
                 if (await _helper.IsExistObject(entity.UserName, _accountDAO.GetByUserNameAsync))
@@ -63,7 +63,7 @@ namespace ProjectShop.Server.Application.Services.Account
                 var filteredEntities = await _helper.FilterValidEntities(entities, entity => entity.UserName, _accountDAO.GetByUserNameAsync);
                 filteredEntities.TryGetValue(filteredEntities.Keys.FirstOrDefault(), out var serviceResults);
                 if (!serviceResults!.Data!.Any())
-                    return _serviceResultFactory.CreateServiceResults<AccountModel>(new List<AccountModel>(), serviceResults.LogEntries!.Append(_logger.JsonLogWarning<AccountModel, SignupService>("No valid accounts to insert after filtering.", null)));
+                    return _serviceResultFactory.CreateServiceResults<AccountModel>([], serviceResults.LogEntries!.Append(_logger.JsonLogWarning<AccountModel, SignupService>("No valid accounts to insert after filtering.", null)));
 
                 // Hash passwords for valid entities
                 var validEntities = serviceResults.Data;
@@ -76,10 +76,10 @@ namespace ProjectShop.Server.Application.Services.Account
             }
             catch (Exception ex)
             {
-                return _serviceResultFactory.CreateServiceResults<AccountModel>(new List<AccountModel>(), new List<JsonLogEntry>
-                {
+                return _serviceResultFactory.CreateServiceResults<AccountModel>([],
+                [
                     _logger.JsonLogError<AccountModel, SignupService>("An error occurred while inserting multiple accounts.", ex)
-                });
+                ]);
             }
         }
 
@@ -88,7 +88,7 @@ namespace ProjectShop.Server.Application.Services.Account
             foreach (AccountModel entity in entities)
             {
                 if (!await _hashPassword.IsPasswordValidAsync(entity.Password))
-                    throw new ArgumentException($"Password for user {entity.UserName} does not meet the required criteria.", nameof(entity.Password));
+                    throw new ArgumentException(nameof(entity.Password), $"Password for user {entity.UserName} does not meet the required criteria.");
                 entity.Password = await _hashPassword.HashPasswordAsync(entity.Password);
             }
             return entities;

@@ -59,13 +59,13 @@ namespace ProjectShop.Server.Infrastructure.Data
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
+        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedDateRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
             => await GetByDateTimeAsync("role_last_updated_date", EQueryTimeType.DATE_TIME_RANGE, (startDate, endDate), maxGetCount);
 
-        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedMonthAndYearAsync(int month, int year, int? maxGetCount)
+        public async Task<IEnumerable<RoleModel>> GetByMonthAndYearLastUpdatedDateAsync(int month, int year, int? maxGetCount)
             => await GetByDateTimeAsync("role_last_updated_date", EQueryTimeType.MONTH_AND_YEAR, (year, month), maxGetCount);
 
-        public async Task<IEnumerable<RoleModel>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
+        public async Task<IEnumerable<RoleModel>> GetByYearLastUpdatedDateAsync<TCompareType>(int year, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
         {
             if (compareType is ECompareType ct)
                 return await GetByDateTimeAsync("role_last_updated_date", EQueryTimeType.YEAR, ct, year, maxGetCount);

@@ -1,6 +1,7 @@
 ﻿using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ObjectValue;
+using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Application.Services
 {
@@ -12,29 +13,29 @@ namespace ProjectShop.Server.Application.Services
             _logger = logger;
         }
 
-        public ServiceResult<TEntity> CreateServiceResult<TEntity>(string message, TEntity entity, bool isSuccess, Exception? ex, int? affectedRows) where TEntity : class
+        public ServiceResult<TEntity> CreateServiceResult<TEntity>(string message, TEntity entity, bool isSuccess, Exception? ex, int? affectedRows, [CallerMemberName] string? methodCall = null) where TEntity : class
         {
             List<JsonLogEntry> logEntries = new List<JsonLogEntry>();
             if (isSuccess)
             {
                 if (affectedRows == null)
-                    logEntries.Add(_logger.JsonLogInfo<TEntity, TEntityCall>(message));
+                    logEntries.Add(_logger.JsonLogInfo<TEntity, TEntityCall>(message, methodCall: methodCall));
                 else
-                    logEntries.Add(_logger.JsonLogInfo<TEntity, TEntityCall>(message, affectedRows: affectedRows));
+                    logEntries.Add(_logger.JsonLogInfo<TEntity, TEntityCall>(message, affectedRows: affectedRows, methodCall: methodCall));
             }
             else if (ex == null)
             {
                 if (affectedRows == null)
-                    logEntries.Add(_logger.JsonLogWarning<TEntity, TEntityCall>(message));
+                    logEntries.Add(_logger.JsonLogWarning<TEntity, TEntityCall>(message, methodCall: methodCall));
                 else
-                    logEntries.Add(_logger.JsonLogWarning<TEntity, TEntityCall>(message, null, affectedRows: affectedRows));
+                    logEntries.Add(_logger.JsonLogWarning<TEntity, TEntityCall>(message, null, affectedRows: affectedRows, methodCall: methodCall   ));
             }
             else
             {
                 if (affectedRows == null)
-                    logEntries.Add(_logger.JsonLogError<TEntity, TEntityCall>(message, ex));
+                    logEntries.Add(_logger.JsonLogError<TEntity, TEntityCall>(message, ex, methodCall: methodCall));
                 else
-                    logEntries.Add(_logger.JsonLogError<TEntity, TEntityCall>(message, ex, affectedRows: affectedRows));
+                    logEntries.Add(_logger.JsonLogError<TEntity, TEntityCall>(message, ex, affectedRows: affectedRows, methodCall: methodCall));
             }
             return new ServiceResult<TEntity>
             {
@@ -43,29 +44,29 @@ namespace ProjectShop.Server.Application.Services
             };
         }
 
-        public ServiceResults<TEntity> CreateServiceResults<TEntity>(string message, IEnumerable<TEntity> entities, bool isSuccess, Exception? ex, int? affectedRows) where TEntity : class
+        public ServiceResults<TEntity> CreateServiceResults<TEntity>(string message, IEnumerable<TEntity> entities, bool isSuccess, Exception? ex, int? affectedRows, [CallerMemberName] string? methodCall = null) where TEntity : class
         {
             List<JsonLogEntry> logEntries = new List<JsonLogEntry>();
             if (isSuccess)
             {
                 if (affectedRows == null)
-                    logEntries.Add(_logger.JsonLogInfo<TEntity, TEntityCall>(message));
+                    logEntries.Add(_logger.JsonLogInfo<TEntity, TEntityCall>(message, methodCall: methodCall));
                 else
-                    logEntries.Add(_logger.JsonLogInfo<TEntity, TEntityCall>(message, affectedRows: affectedRows));
+                    logEntries.Add(_logger.JsonLogInfo<TEntity, TEntityCall>(message, affectedRows: affectedRows, methodCall: methodCall));
             }
             else if (ex == null)
             {
                 if (affectedRows == null)
-                    logEntries.Add(_logger.JsonLogWarning<TEntity, TEntityCall>(message));
+                    logEntries.Add(_logger.JsonLogWarning<TEntity, TEntityCall>(message, methodCall: methodCall));
                 else
-                    logEntries.Add(_logger.JsonLogWarning<TEntity, TEntityCall>(message, null, affectedRows: affectedRows));
+                    logEntries.Add(_logger.JsonLogWarning<TEntity, TEntityCall>(message, null, affectedRows: affectedRows, methodCall: methodCall));
             }
             else
             {
                 if (affectedRows == null)
-                    logEntries.Add(_logger.JsonLogError<TEntity, TEntityCall>(message, ex));
+                    logEntries.Add(_logger.JsonLogError<TEntity, TEntityCall>(message, ex, methodCall: methodCall));
                 else
-                    logEntries.Add(_logger.JsonLogError<TEntity, TEntityCall>(message, ex, affectedRows: affectedRows));
+                    logEntries.Add(_logger.JsonLogError<TEntity, TEntityCall>(message, ex, affectedRows: affectedRows, methodCall: methodCall));
             }
             return new ServiceResults<TEntity>
             {

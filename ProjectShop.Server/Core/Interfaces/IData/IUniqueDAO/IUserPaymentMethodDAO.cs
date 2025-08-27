@@ -13,6 +13,10 @@
         Task<IEnumerable<TEntity>> GetAllByLastFourDigitAsync(string lastFourDigit, int? maxGetCount = null);
         Task<IEnumerable<TEntity>> GetByExpiryYearAsync<TCompareType>(int year, TCompareType compareType, int? maxGetCount = null) where TCompareType : Enum;
         Task<IEnumerable<TEntity>> GetByExpiryMonthAsync<TCompareType>(int month, TCompareType compareType, int? maxGetCount = null) where TCompareType : Enum;
-        Task<IEnumerable<TEntity>> GetByExpiryYearAndMonthAsync(int year, int month, int? maxGetCount = null);
+        Task<IEnumerable<TEntity>> GetByExpiryMonthAndYearAsync(int year, int month, int? maxGetCount = null);
+        Task<IEnumerable<TEntity>> GEtByMonthAndYearLastUpdatedDateAsync(int year, int month, int? maxGetCount = null);
+        Task<IEnumerable<TEntity>> GetByYearLastUpdatedDateAsync<TEnum>(int year, TEnum compareType, int? maxGetCount = null) where TEnum : Enum;
+        Task<IEnumerable<TEntity>> GetByLastUpdatedDateRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount = null);
+        Task<IEnumerable<TEntity>> GetByLastUpdatedDateAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount = null) where TEnum : Enum;
     }
 }

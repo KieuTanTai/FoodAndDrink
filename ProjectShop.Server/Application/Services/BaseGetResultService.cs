@@ -1,0 +1,47 @@
+﻿using ProjectShop.Server.Core.Interfaces.IServices;
+using ProjectShop.Server.Core.Interfaces.IValidate;
+using ProjectShop.Server.Core.ObjectValue;
+using System.Runtime.CompilerServices;
+
+namespace ProjectShop.Server.Application.Services
+{
+    public class BaseGetResultService<TEntity, TOptions, TRootEntityCall> : IServiceGetSingle<TEntity, TOptions>
+        where TEntity : class, new()
+        where TOptions : class
+        where TRootEntityCall : class
+    {
+        private readonly ILogService _logger;
+        private readonly IBaseHelperService<TEntity> _baseHelperService;
+        private readonly IServiceResultFactory<TRootEntityCall> _serviceResultFactory;
+        private readonly IBaseGetNavigationPropertyService<TEntity, TOptions> _navigationService;
+
+        public BaseGetResultService(ILogService logger, IBaseHelperService<TEntity> baseHelperService,
+            IServiceResultFactory<TRootEntityCall> serviceResultFactory, IBaseGetNavigationPropertyService<TEntity, TOptions> navigationService)
+        {
+            _logger = logger;
+            _baseHelperService = baseHelperService;
+            _serviceResultFactory = serviceResultFactory;
+            _navigationService = navigationService;
+        }
+
+        public async Task<ServiceResult<TEntity>> QueryAsync<TParam>(TParam param, Func<TParam, Task<TEntity?>> queryFunc, TOptions? options = null, [CallerMemberName] string? methodCall = null)
+        {
+            ServiceResult<TEntity> result = new();
+            try
+            {
+                TEntity? entity = await queryFunc(param);
+                if (entity == null)
+                    return _serviceResultFactory.CreateServiceResult<TEntity>($"No Entity found with param: {param}.", new TEntity(), false, methodCall: methodCall);
+
+                if (options != null)
+                    result = await _navigationService.GetNavigationPropertyByOptionsAsync(entity, options);
+                result.LogEntries = result.LogEntries!.Append(_logger.JsonLogInfo<TEntity, TRootEntityCall>($"Retrieved entity by param = {param} with options={options}.", methodCall: methodCall));
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return _serviceResultFactory.CreateServiceResult<TEntity>($"An error occurred while retrieving entity by param: {param}.", new TEntity(), false, ex, methodCall: methodCall);
+            }
+        }
+    }
+}

@@ -1,4 +1,5 @@
 ﻿using ProjectShop.Server.Core.ObjectValue;
+using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Core.Interfaces.IServices
 {
@@ -11,13 +12,13 @@ namespace ProjectShop.Server.Core.Interfaces.IServices
             TCompareType compareType,
             TOptions? options,
             string errorMsg,
-            int? maxGetCount = null) where TCompareType : Enum;
+            int? maxGetCount = null, [CallerMemberName] string? methodCall = null) where TCompareType : Enum;
 
         Task<ServiceResults<TEntity>> GetByDateTimeRangeGenericAsync(
             Func<int?, Task<IEnumerable<TEntity>>> daoFunc,
             TOptions? options,
             string errorMsg,
-            int? maxGetCount = null);
+            int? maxGetCount = null, [CallerMemberName] string? methodCall = null);
 
         Task<ServiceResults<TEntity>> GetByMonthAndYearGenericAsync(
             Func<int, int, int?, Task<IEnumerable<TEntity>>> daoFunc,
@@ -25,6 +26,6 @@ namespace ProjectShop.Server.Core.Interfaces.IServices
             int month,
             TOptions? options,
             string errorMsg,
-            int? maxGetCount = null);
+            int? maxGetCount = null, [CallerMemberName] string? methodCall = null);
     }
 }

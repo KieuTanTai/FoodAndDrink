@@ -28,7 +28,6 @@ namespace ProjectShop.Server.Application.Services.Account
 
         public async Task<JsonLogEntry> UpdatePasswordAsync(string username, string password)
         {
-            JsonLogEntry logEntry = new JsonLogEntry();
             try
             {
                 AccountModel? entity = await _accountDAO.GetByUserNameAsync(username);
@@ -49,7 +48,7 @@ namespace ProjectShop.Server.Application.Services.Account
 
         public async Task<IEnumerable<JsonLogEntry>> UpdatePasswordAsync(List<string> usernames, List<string> passwords)
         {
-            List<JsonLogEntry> logEntries = new List<JsonLogEntry>();
+            List<JsonLogEntry> logEntries = [];
             try
             {
                 IEnumerable<AccountModel> entities = await _accountDAO.GetByUserNameAsync(usernames);

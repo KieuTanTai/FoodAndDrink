@@ -142,14 +142,14 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<IEnumerable<ProductModel>> GetByLastUpdatedDateRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
             => await GetByDateTimeAsync("product_last_updated_date", EQueryTimeType.DATE_TIME, new Tuple<DateTime, DateTime>(startDate, endDate), maxGetCount);
 
-        public Task<IEnumerable<ProductModel>> GetByLastUpdateYearAsync<TCompareType>(int year, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
+        public Task<IEnumerable<ProductModel>> GetByYearLastUpdatedDateAsync<TCompareType>(int year, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
         {
             if (compareType is not ECompareType type)
-                throw new ArgumentException("Invalid enum type for GetByLastUpdateYearAsync");
+                throw new ArgumentException("Invalid enum type for GetByYearLastUpdatedDateAsync");
             return GetByDateTimeAsync("product_last_updated_date", EQueryTimeType.YEAR, type, year, maxGetCount);
         }
 
-        public Task<IEnumerable<ProductModel>> GetByLastUpdateMonthAndYearAsync(int year, int month, int? maxGetCount)
+        public Task<IEnumerable<ProductModel>> GetByMonthAndYearLastUpdatedDateAsync(int year, int month, int? maxGetCount)
             => GetByDateTimeAsync("product_last_updated_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month), maxGetCount);
     }
 }

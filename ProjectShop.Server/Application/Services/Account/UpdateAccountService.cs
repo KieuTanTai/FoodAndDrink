@@ -1,15 +1,13 @@
 ﻿using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
-using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ObjectValue;
-using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services.Account
 {
-    public class UpdateAccountService :  IUpdateAccountService
+    public class UpdateAccountService : IUpdateAccountService
     {
         private readonly IDAO<AccountModel> _baseDAO;
         private readonly IAccountDAO<AccountModel> _accountDAO;
@@ -18,10 +16,10 @@ namespace ProjectShop.Server.Application.Services.Account
 
         public UpdateAccountService(IDAO<AccountModel> baseDAO, IAccountDAO<AccountModel> accountDAO, IHashPassword hashPassword, ILogService logger)
         {
+            _logger = logger;
             _baseDAO = baseDAO;
             _accountDAO = accountDAO;
             _hashPassword = hashPassword;
-            _logger = logger;
         }
 
         public async Task<JsonLogEntry> UpdateAccountStatusAsync(uint accountId, bool status)
@@ -56,13 +54,13 @@ namespace ProjectShop.Server.Application.Services.Account
                 if (account == null)
                     return _logger.JsonLogWarning<AccountModel, UpdateAccountService>($"Account with input {input} does not exist.", null);
 
-                if (!await  _hashPassword.IsPasswordValidAsync(newPassword))
+                if (!await _hashPassword.IsPasswordValidAsync(newPassword))
                     account.Password = await _hashPassword.HashPasswordAsync(newPassword);
                 account.Password = newPassword;
                 int affectedRows = await _baseDAO.UpdateAsync(account);
-                if (affectedRows == 0) 
+                if (affectedRows == 0)
                     return _logger.JsonLogWarning<AccountModel, UpdateAccountService>($"Failed to update the account password for {input}.");
-                return _logger.JsonLogInfo<AccountModel, UpdateAccountService>($"Updated password for account {input}.", affectedRows : affectedRows);
+                return _logger.JsonLogInfo<AccountModel, UpdateAccountService>($"Updated password for account {input}.", affectedRows: affectedRows);
             }
             catch (Exception ex)
             {
@@ -72,7 +70,7 @@ namespace ProjectShop.Server.Application.Services.Account
 
         private async Task<IEnumerable<JsonLogEntry>> UpdateAccountPasswordAsync(IEnumerable<string> inputs, IEnumerable<string> newPasswords, Func<IEnumerable<string>, int?, Task<IEnumerable<AccountModel>>> daoFunc)
         {
-            List<JsonLogEntry> logEntries = new List<JsonLogEntry>();
+            List<JsonLogEntry> logEntries = [];
             try
             {
                 IEnumerable<AccountModel> accounts = await daoFunc(inputs, null);
@@ -138,7 +136,7 @@ namespace ProjectShop.Server.Application.Services.Account
 
         private async Task<IEnumerable<JsonLogEntry>> UpdateAccountStatusAsync(IEnumerable<string> inputs, bool status, Func<IEnumerable<string>, int?, Task<IEnumerable<AccountModel>>> daoFunc)
         {
-            List<JsonLogEntry> logEntries = new List<JsonLogEntry>();
+            List<JsonLogEntry> logEntries = [];
             try
             {
                 IEnumerable<AccountModel> accounts = await daoFunc(inputs, null);

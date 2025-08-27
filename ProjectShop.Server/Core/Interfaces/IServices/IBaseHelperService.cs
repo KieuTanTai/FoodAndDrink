@@ -1,4 +1,5 @@
 ﻿using ProjectShop.Server.Core.ObjectValue;
+using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Core.Interfaces.IServices
 {
@@ -21,11 +22,11 @@ namespace ProjectShop.Server.Core.Interfaces.IServices
         Task<Dictionary<uint, ServiceResults<TEntity>>> FilterValidEntities(
             IEnumerable<TEntity> entities,
             Func<TEntity, string> fieldSelector,
-            Func<IEnumerable<string>, int?, Task<IEnumerable<TEntity>>> daoFunc);
+            Func<IEnumerable<string>, int?, Task<IEnumerable<TEntity>>> daoFunc, [CallerMemberName] string? methodCall = null);
 
         Task<Dictionary<uint, ServiceResults<TEntity>>> FilterValidEntities<TKey>(
             IEnumerable<TEntity> entities,
             Func<TEntity, TKey> fieldSelector,
-            Func<IEnumerable<TKey>, int?, Task<IEnumerable<TEntity>>> daoFunc) where TKey : struct;
+            Func<IEnumerable<TKey>, int?, Task<IEnumerable<TEntity>>> daoFunc, [CallerMemberName] string? methodCall = null) where TKey : struct;
     }
 }

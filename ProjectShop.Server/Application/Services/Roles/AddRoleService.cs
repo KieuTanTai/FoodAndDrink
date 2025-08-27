@@ -52,7 +52,7 @@ namespace ProjectShop.Server.Application.Services.Roles
                 var filteredRoles = await _helper.FilterValidEntities(roles, (entity) => entity.RoleName, _roleDAO.GetByRoleNamesAsync);
                 filteredRoles.TryGetValue(filteredRoles.Keys.FirstOrDefault(), out var serviceResults);
                 if (!serviceResults!.Data!.Any())
-                    return _serviceResultFactory.CreateServiceResults<RoleModel>("No valid roles found to add.", Array.Empty<RoleModel>(), false);
+                    return _serviceResultFactory.CreateServiceResults<RoleModel>("No valid roles found to add.", [], false);
 
                 // insert
                 int affectedRows = await _baseDAO.InsertAsync(serviceResults.Data!);
@@ -64,7 +64,7 @@ namespace ProjectShop.Server.Application.Services.Roles
             catch (Exception ex)
             {
                 _logger.LogError<IEnumerable<RoleModel>, AddRoleService>("An error occurred while adding the roles.", ex);
-                return _serviceResultFactory.CreateServiceResults<RoleModel>("An error occurred while adding the roles.", Array.Empty<RoleModel>(), false, ex);
+                return _serviceResultFactory.CreateServiceResults<RoleModel>("An error occurred while adding the roles.", [], false, ex);
             }
         }
     }

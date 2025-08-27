@@ -4,6 +4,7 @@ using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ObjectValue;
 using ProjectShop.Server.Core.ObjectValue.GetNavigationPropertyOptions;
+using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Application.Services.Roles
 {
@@ -22,19 +23,19 @@ namespace ProjectShop.Server.Application.Services.Roles
             _serviceResultFactory = serviceResultFactory;
         }
 
-        public async Task<ServiceResult<RolesOfUserModel>> GetNavigationPropertyByOptionsAsync(RolesOfUserModel role, RolesOfUserNavigationOptions? options)
+        public async Task<ServiceResult<RolesOfUserModel>> GetNavigationPropertyByOptionsAsync(RolesOfUserModel role, RolesOfUserNavigationOptions? options, [CallerMemberName] string? methodCall = null)
         {
-            List<JsonLogEntry> logEntries = new();
+            List<JsonLogEntry> logEntries = [];
             if (options?.IsGetRole == true)
             {
-                ServiceResult<RoleModel> result = await TryLoadRoleAsync(role.RoleId);
+                ServiceResult<RoleModel> result = await TryLoadRoleAsync(role.RoleId, methodCall);
                 logEntries.AddRange(result.LogEntries!);
                 role.Role = result.Data!;
             }
 
             if (options?.IsGetAccount == true)
             {
-                ServiceResult<AccountModel> result = await TryLoadAccountAsync(role.AccountId);
+                ServiceResult<AccountModel> result = await TryLoadAccountAsync(role.AccountId, methodCall);
                 logEntries.AddRange(result.LogEntries!);
                 role.Account = result.Data!;
             }
@@ -42,14 +43,14 @@ namespace ProjectShop.Server.Application.Services.Roles
             return _serviceResultFactory.CreateServiceResult(role, logEntries);
         }
 
-        public async Task<ServiceResults<RolesOfUserModel>> GetNavigationPropertyByOptionsAsync(IEnumerable<RolesOfUserModel> roles, RolesOfUserNavigationOptions? options)
+        public async Task<ServiceResults<RolesOfUserModel>> GetNavigationPropertyByOptionsAsync(IEnumerable<RolesOfUserModel> roles, RolesOfUserNavigationOptions? options, [CallerMemberName] string? methodCall = null)
         {
             var roleList = roles.ToList();
-            List<JsonLogEntry> logEntries = new();
+            List<JsonLogEntry> logEntries = [];
             if (options?.IsGetRole == true)
             {
                 var roleIds = roleList.Select(r => r.RoleId).ToList();
-                var rolesDict = await TryLoadRolesAsyncs(roleIds);
+                var rolesDict = await TryLoadRolesAsyncs(roleIds, methodCall);
                 foreach (var role in roleList)
                 {
                     rolesDict.TryGetValue(role.RoleId, out var serviceResult);
@@ -63,7 +64,7 @@ namespace ProjectShop.Server.Application.Services.Roles
             if (options?.IsGetAccount == true)
             {
                 var accountIds = roleList.Select(r => r.AccountId).ToList();
-                var accountsDict = await TryLoadAccountsAsyncs(accountIds);
+                var accountsDict = await TryLoadAccountsAsyncs(accountIds, methodCall);
                 foreach (var role in roleList)
                 {
                     accountsDict.TryGetValue(role.AccountId, out var serviceResult);
@@ -77,7 +78,7 @@ namespace ProjectShop.Server.Application.Services.Roles
             return _serviceResultFactory.CreateServiceResults(roleList, logEntries);
         }
 
-        private async Task<ServiceResult<RoleModel>> TryLoadRoleAsync(uint roleId)
+        private async Task<ServiceResult<RoleModel>> TryLoadRoleAsync(uint roleId, [CallerMemberName] string? methodCall = null)
         {
             try
             {
@@ -85,15 +86,15 @@ namespace ProjectShop.Server.Application.Services.Roles
                 bool isExists = roleModel != null;
                 roleModel ??= new RoleModel();
                 string message = isExists ? "Role loaded successfully." : "Role not found.";
-                return _serviceResultFactory.CreateServiceResult(message, roleModel, isExists);
+                return _serviceResultFactory.CreateServiceResult(message, roleModel, isExists, methodCall: methodCall);
             }
             catch (Exception ex)
             {
-                return _serviceResultFactory.CreateServiceResult("Error loading role.", new RoleModel(), false, ex);
+                return _serviceResultFactory.CreateServiceResult("Error loading role.", new RoleModel(), false, ex, methodCall: methodCall);
             }
         }
 
-        private async Task<ServiceResult<AccountModel>> TryLoadAccountAsync(uint accountId)
+        private async Task<ServiceResult<AccountModel>> TryLoadAccountAsync(uint accountId, [CallerMemberName] string? methodCall = null)
         {
             try
             {
@@ -101,15 +102,15 @@ namespace ProjectShop.Server.Application.Services.Roles
                 bool isExists = accountModel != null;
                 accountModel ??= new AccountModel();
                 string message = isExists ? "Account loaded successfully." : "Account not found.";
-                return _serviceResultFactory.CreateServiceResult(message, accountModel, isExists);
+                return _serviceResultFactory.CreateServiceResult(message, accountModel, isExists, methodCall: methodCall);
             }
             catch (Exception ex)
             {
-                return _serviceResultFactory.CreateServiceResult("Error loading account.", new AccountModel(), false, ex);
+                return _serviceResultFactory.CreateServiceResult("Error loading account.", new AccountModel(), false, ex, methodCall: methodCall);
             }
         }
 
-        private async Task<IDictionary<uint, ServiceResult<RoleModel>>> TryLoadRolesAsyncs(IEnumerable<uint> roleIds)
+        private async Task<IDictionary<uint, ServiceResult<RoleModel>>> TryLoadRolesAsyncs(IEnumerable<uint> roleIds, [CallerMemberName] string? methodCall = null)
         {
             uint firstRoleId = roleIds.FirstOrDefault();
             try
@@ -119,22 +120,22 @@ namespace ProjectShop.Server.Application.Services.Roles
                 {
                     return new Dictionary<uint, ServiceResult<RoleModel>>
                     {
-                        [firstRoleId] = _serviceResultFactory.CreateServiceResult("No roles found.", new RoleModel(), false)
+                        [firstRoleId] = _serviceResultFactory.CreateServiceResult("No roles found.", new RoleModel(), false, methodCall: methodCall)
                     };
                 }
 
-                return roles.ToDictionary(role => role.RoleId, role => _serviceResultFactory.CreateServiceResult("Role loaded successfully.", role, true));
+                return roles.ToDictionary(role => role.RoleId, role => _serviceResultFactory.CreateServiceResult("Role loaded successfully.", role, true, methodCall: methodCall));
             }
             catch (Exception ex)
             {
                 return new Dictionary<uint, ServiceResult<RoleModel>>
                 {
-                    [firstRoleId] = _serviceResultFactory.CreateServiceResult("Error loading roles.", new RoleModel(), false, ex)
+                    [firstRoleId] = _serviceResultFactory.CreateServiceResult("Error loading roles.", new RoleModel(), false, ex, methodCall: methodCall)
                 };
             }
         }
 
-        private async Task<IDictionary<uint, ServiceResult<AccountModel>>> TryLoadAccountsAsyncs(IEnumerable<uint> accountIds)
+        private async Task<IDictionary<uint, ServiceResult<AccountModel>>> TryLoadAccountsAsyncs(IEnumerable<uint> accountIds, [CallerMemberName] string? methodCall = null)
         {
             try
             {
@@ -144,16 +145,16 @@ namespace ProjectShop.Server.Application.Services.Roles
                     uint firstAccountId = accountIds.FirstOrDefault();
                     return new Dictionary<uint, ServiceResult<AccountModel>>
                     {
-                        [firstAccountId] = _serviceResultFactory.CreateServiceResult("No accounts found.", new AccountModel(), false)
+                        [firstAccountId] = _serviceResultFactory.CreateServiceResult("No accounts found.", new AccountModel(), false, methodCall: methodCall)
                     };
                 }
-                return accounts.ToDictionary(account => account.AccountId, account => _serviceResultFactory.CreateServiceResult("Account loaded successfully.", account, true));
+                return accounts.ToDictionary(account => account.AccountId, account => _serviceResultFactory.CreateServiceResult("Account loaded successfully.", account, true, methodCall: methodCall));
             }
             catch (Exception ex)
             {
                 return new Dictionary<uint, ServiceResult<AccountModel>>
                 {
-                    [accountIds.FirstOrDefault()] = _serviceResultFactory.CreateServiceResult("Error loading accounts.", new AccountModel(), false, ex)
+                    [accountIds.FirstOrDefault()] = _serviceResultFactory.CreateServiceResult("Error loading accounts.", new AccountModel(), false, ex, methodCall: methodCall)
                 };
             }
         }

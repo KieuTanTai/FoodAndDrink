@@ -39,7 +39,7 @@ namespace ProjectShop.Server.Application.Services.Roles
 
                 role.RoleName = newName;
                 int affectedRows = await _baseDAO.UpdateAsync(role);
-                if (affectedRows <= 0)
+                if (affectedRows == 0)
                     return _logger.JsonLogWarning<RoleModel, UpdateRoleService>($"Failed to update the role name for {input}.");
                 return _logger.JsonLogInfo<RoleModel, UpdateRoleService>($"Successfully updated the role name for {input}.", affectedRows: affectedRows);
             }
@@ -74,7 +74,7 @@ namespace ProjectShop.Server.Application.Services.Roles
                     }
                 }
                 int affectedRows = await _baseDAO.UpdateAsync(roles);
-                if (affectedRows <= 0)
+                if (affectedRows == 0)
                 {
                     logEntries.Add(_logger.JsonLogWarning<RoleModel, UpdateRoleService>($"Failed to update role names for multiple roles."));
                     return logEntries;
@@ -99,7 +99,7 @@ namespace ProjectShop.Server.Application.Services.Roles
 
                 role.RoleStatus = status;
                 int affectedRows = await _baseDAO.UpdateAsync(role);
-                if (affectedRows <= 0)
+                if (affectedRows == 0)
                     return _logger.JsonLogWarning<RoleModel, UpdateRoleService>($"Failed to update the role status for {input}.");
                 return _logger.JsonLogInfo<RoleModel, UpdateRoleService>($"Successfully updated the role status for {input}.", affectedRows: affectedRows);
             }
@@ -124,7 +124,7 @@ namespace ProjectShop.Server.Application.Services.Roles
                 foreach (RoleModel role in roles)
                     role.RoleStatus = status;
                 int affectedRows = await _baseDAO.UpdateAsync(roles);
-                if (affectedRows <= 0)
+                if (affectedRows == 0)
                 {
                     logEntries.Add(_logger.JsonLogWarning<RoleModel, UpdateRoleService>($"Failed to update role statuses for multiple roles."));
                     return logEntries;

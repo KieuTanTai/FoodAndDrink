@@ -1,6 +1,7 @@
 ﻿using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ObjectValue;
+using System.Runtime.CompilerServices;
 
 namespace TLGames.Application.Services
 {
@@ -177,7 +178,7 @@ namespace TLGames.Application.Services
 
         public async Task<Dictionary<uint, ServiceResults<TEntity>>> FilterValidEntities(IEnumerable<TEntity> entities,
             Func<TEntity, string> fieldSelector,
-            Func<IEnumerable<string>, int?, Task<IEnumerable<TEntity>>> daoFunc)
+            Func<IEnumerable<string>, int?, Task<IEnumerable<TEntity>>> daoFunc, [CallerMemberName] string? methodCall = null)
         {
             try
             {
@@ -188,9 +189,9 @@ namespace TLGames.Application.Services
                 if (existingEntities == null || !existingEntities.Any())
                     return new Dictionary<uint, ServiceResults<TEntity>>
                     {
-                        { 0, _serviceResultFactory.CreateServiceResults<TEntity>(entityList, entityList.Select(_ => _logger.JsonLogInfo<TEntity, BaseHelperService<TEntity>>("Success")).ToList()) }
+                        { 0, _serviceResultFactory.CreateServiceResults<TEntity>(entityList, [.. entityList.Select(_ => _logger.JsonLogInfo<TEntity, BaseHelperService<TEntity>>("Success", methodCall: methodCall))]) }
                     };
-                existingEntities = existingEntities.ToList();
+                existingEntities = [.. existingEntities];
 
                 var existingFieldSet = new HashSet<string>(existingEntities.Select(fieldSelector), StringComparer.OrdinalIgnoreCase);
                 var data = entityList
@@ -205,12 +206,12 @@ namespace TLGames.Application.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object for filter!", ex);
-                List<JsonLogEntry> logEntries = new List<JsonLogEntry> { _logger.JsonLogError<TEntity, BaseHelperService<TEntity>>($"An error occurred while filtering valid entities.", ex) };
+                _logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object for filter!", ex, methodCall);
+                List<JsonLogEntry> logEntries = [_logger.JsonLogError<TEntity, BaseHelperService<TEntity>>($"An error occurred while filtering valid entities.", ex, methodCall: methodCall)];
 
                 return new Dictionary<uint, ServiceResults<TEntity>>
                 {
-                    { 0, _serviceResultFactory.CreateServiceResults<TEntity>(Enumerable.Empty<TEntity>(), logEntries) }
+                    { 0, _serviceResultFactory.CreateServiceResults<TEntity>([], logEntries) }
                 };
             }
         }
@@ -218,7 +219,7 @@ namespace TLGames.Application.Services
         public async Task<Dictionary<uint, ServiceResults<TEntity>>> FilterValidEntities<TKey>(
             IEnumerable<TEntity> entities,
             Func<TEntity, TKey> fieldSelector,
-            Func<IEnumerable<TKey>, int?, Task<IEnumerable<TEntity>>> daoFunc) where TKey : struct
+            Func<IEnumerable<TKey>, int?, Task<IEnumerable<TEntity>>> daoFunc, [CallerMemberName] string? methodCall = null) where TKey : struct
         {
             try
             {
@@ -229,9 +230,9 @@ namespace TLGames.Application.Services
                 if (existingEntities == null || !existingEntities.Any())
                     return new Dictionary<uint, ServiceResults<TEntity>>
                         {
-                            { 0, _serviceResultFactory.CreateServiceResults<TEntity>(entityList, entityList.Select(_ => _logger.JsonLogInfo<TEntity, BaseHelperService<TEntity>>("Success")).ToList()) }
+                            { 0, _serviceResultFactory.CreateServiceResults<TEntity>(entityList, [.. entityList.Select(_ => _logger.JsonLogInfo<TEntity, BaseHelperService<TEntity>>("Success", methodCall: methodCall))]) }
                         };
-                existingEntities = existingEntities.ToList();
+                existingEntities = [.. existingEntities];
 
                 var existingFieldSet = new HashSet<TKey>(existingEntities.Select(fieldSelector), EqualityComparer<TKey>.Default);
                 var data = entityList
@@ -246,35 +247,37 @@ namespace TLGames.Application.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object for filter!", ex);
-                List<JsonLogEntry> logEntries = new List<JsonLogEntry> { _logger.JsonLogError<TEntity, BaseHelperService<TEntity>>($"An error occurred while filtering valid entities.", ex) };
+                _logger.LogError<TEntity, BaseHelperService<TEntity>>($"Error checking existence of object for filter!", ex, methodCall);
+                List<JsonLogEntry> logEntries = [_logger.JsonLogError<TEntity, BaseHelperService<TEntity>>($"An error occurred while filtering valid entities.", ex, methodCall: methodCall)];
 
                 return new Dictionary<uint, ServiceResults<TEntity>>
                 {
-                    { 0, _serviceResultFactory.CreateServiceResults<TEntity>(Enumerable.Empty<TEntity>(), logEntries) }
+                    { 0, _serviceResultFactory.CreateServiceResults<TEntity>([], logEntries) }
                 };
             }
         }
 
-        private IEnumerable<JsonLogEntry> CreateLogsByFilterEntities<TEntityModel, TServiceCall>(IEnumerable<TEntityModel> entities, HashSet<string> existingFieldSet, Func<TEntityModel, string> fieldSelector)
+        private IEnumerable<JsonLogEntry> CreateLogsByFilterEntities<TEntityModel, TServiceCall>
+            (IEnumerable<TEntityModel> entities, HashSet<string> existingFieldSet, Func<TEntityModel, string> fieldSelector, [CallerMemberName] string? methodCall = null)
         {
             return entities.Select(entity =>
             {
                 bool isContains = existingFieldSet.Contains(fieldSelector(entity));
                 if (isContains)
-                    return _logger.JsonLogWarning<TEntityModel, TServiceCall>("Failure", new Exception("already exists!"));
-                return _logger.JsonLogInfo<TEntityModel, TServiceCall>("Success");
+                    return _logger.JsonLogWarning<TEntityModel, TServiceCall>("Failure", new Exception("already exists!"), methodCall: methodCall);
+                return _logger.JsonLogInfo<TEntityModel, TServiceCall>("Success", methodCall: methodCall);
             });
         }
 
-        private IEnumerable<JsonLogEntry> CreateLogsByFilterEntities<TEntityModel, TServiceCall, TKey>(IEnumerable<TEntityModel> entities, HashSet<TKey> existingFieldSet, Func<TEntityModel, TKey> fieldSelector) where TKey : struct
+        private IEnumerable<JsonLogEntry> CreateLogsByFilterEntities<TEntityModel, TServiceCall, TKey>
+            (IEnumerable<TEntityModel> entities, HashSet<TKey> existingFieldSet, Func<TEntityModel, TKey> fieldSelector, [CallerMemberName] string? methodCall = null) where TKey : struct
         {
             return entities.Select(entity =>
             {
                 bool isContains = existingFieldSet.Contains(fieldSelector(entity));
                 if (isContains)
-                    return _logger.JsonLogWarning<TEntityModel, TServiceCall>("Failure", new Exception("already exists!"));
-                return _logger.JsonLogInfo<TEntityModel, TServiceCall>("Success");
+                    return _logger.JsonLogWarning<TEntityModel, TServiceCall>("Failure", new Exception("already exists!"), methodCall: methodCall);
+                return _logger.JsonLogInfo<TEntityModel, TServiceCall>("Success", methodCall: methodCall);
             });
         }
     }

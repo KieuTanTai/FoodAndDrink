@@ -61,17 +61,17 @@ namespace ProjectShop.Server.Infrastructure.Data
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<IEnumerable<ProductImageModel>> GetByRangeLastUpdatedDateAsync<TCompareType>(DateTime firstTime, DateTime secondTime, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
+        public async Task<IEnumerable<ProductImageModel>> GetByLastUpdatedDateRangeAsync<TCompareType>(DateTime firstTime, DateTime secondTime, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
         {
             if (compareType is ECompareType ct)
                 return await GetByDateTimeAsync("product_image_last_updated_date", EQueryTimeType.DATE_TIME_RANGE, ct, (firstTime, secondTime), maxGetCount);
             throw new ArgumentException("Invalid compare type", nameof(compareType));
         }
 
-        public async Task<IEnumerable<ProductImageModel>> GetByLastUpdatedMonthAndYearAsync(int month, int year, int? maxGetCount)
+        public async Task<IEnumerable<ProductImageModel>> GetByMonthAndYearLastUpdatedDateAsync(int month, int year, int? maxGetCount)
             => await GetByDateTimeAsync("product_image_last_updated_date", EQueryTimeType.MONTH_AND_YEAR, (year, month), maxGetCount);
 
-        public async Task<IEnumerable<ProductImageModel>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
+        public async Task<IEnumerable<ProductImageModel>> GetByYearLastUpdatedDateAsync<TCompareType>(int year, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
         {
             if (compareType is ECompareType ct)
                 return await GetByDateTimeAsync("product_image_last_updated_date", EQueryTimeType.YEAR, ct, year, maxGetCount);
@@ -81,7 +81,7 @@ namespace ProjectShop.Server.Infrastructure.Data
         // -------------------- ProductBarcode --------------------
         public async Task<IEnumerable<ProductImageModel>> GetByProductBarcodeAsync(string productBarcode, int? maxGetCount)
             => await GetByInputAsync(productBarcode, "product_barcode", maxGetCount);
-        
+
         public async Task<IEnumerable<ProductImageModel>> GetByProductBarcodesAsync(IEnumerable<string> productBarcodes, int? maxGetCount)
             => await GetByInputsAsync(productBarcodes, "product_barcode", maxGetCount);
     }

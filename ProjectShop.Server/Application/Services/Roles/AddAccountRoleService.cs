@@ -54,7 +54,7 @@ namespace ProjectShop.Server.Application.Services.Roles
                     => new RolesOfUserKey(entity.AccountId, entity.RoleId), _roleOfUserDAO.GetByListKeysAsync);
                 filteredEntities.TryGetValue(filteredEntities.Keys.FirstOrDefault(), out var serviceResults);
                 if (!serviceResults!.Data!.Any())
-                    return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("No valid account roles to add.", new List<RolesOfUserModel>(), false);
+                    return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("No valid account roles to add.", [], false);
 
                 // Insert
                 int affectedRows = await _baseDAO.InsertAsync(serviceResults.Data!);
@@ -65,7 +65,7 @@ namespace ProjectShop.Server.Application.Services.Roles
             catch (Exception ex)
             {
                 _logger.LogError<RolesOfUserModel, AddAccountRoleService>("An error occurred while adding account roles.", ex);
-                return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("An error occurred while adding account roles.", new List<RolesOfUserModel>(), false);
+                return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("An error occurred while adding account roles.", [], false);
             }
         }
     }
