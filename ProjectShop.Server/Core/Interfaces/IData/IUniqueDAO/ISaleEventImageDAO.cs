@@ -4,8 +4,8 @@
     {
         Task<IEnumerable<TEntity>> GetBySaleEventIdAsync(uint saleEventId, int? maxGetCount = null);
         Task<IEnumerable<TEntity>> GetByLastUpdatedDateAsync<TCompareType>(DateTime lastUpdated, TCompareType compareType, int? maxGetCount = null) where TCompareType : Enum;
-        Task<IEnumerable<TEntity>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType, int? maxGetCount = null) where TCompareType : Enum;
-        Task<IEnumerable<TEntity>> GetByLastUpdatedMonthAndYearAsync(int month, int year, int? maxGetCount = null);
-        Task<IEnumerable<TEntity>> GetByLastUpdatedDateTimeRangeAsync(DateTime start, DateTime end, int? maxGetCount = null);
+        Task<IEnumerable<TEntity>> GetByYearLastUpdatedDateAsync<TCompareType>(int year, TCompareType compareType, int? maxGetCount = null) where TCompareType : Enum;
+        Task<IEnumerable<TEntity>> GetByMonthAndYearLastUpdatedDateAsync(int month, int year, int? maxGetCount = null);
+        Task<IEnumerable<TEntity>> GetByLastUpdatedDateRangeAsync(DateTime start, DateTime end, int? maxGetCount = null);
     }
 }

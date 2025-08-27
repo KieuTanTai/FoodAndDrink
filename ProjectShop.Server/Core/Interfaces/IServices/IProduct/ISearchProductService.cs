@@ -5,6 +5,7 @@ namespace ProjectShop.Server.Core.Interfaces.IServices.IProduct
 {
     public interface ISearchProductService<TEntity, TOptions> where TEntity : class where TOptions : class
     {
+        Task<ServiceResults<TEntity>> GetAllAsync(TOptions? options = null, int? maxGetCount = null);
         Task<ServiceResults<TEntity>> GetAllByEnumAsync(EProductUnit unit, TOptions? options = null, int? maxGetCount = null);
 
         Task<ServiceResults<TEntity>> GetByCategoryIdAsync(uint categoryId, TOptions? options = null, int? maxGetCount = null);
