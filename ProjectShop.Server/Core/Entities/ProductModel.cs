@@ -46,6 +46,11 @@ namespace ProjectShop.Server.Core.Entities
         public ICollection<ProductImageModel> ProductImages { get; set; } = new List<ProductImageModel>();
         public ICollection<DetailSaleEventModel> DetailSaleEvents { get; set; } = new List<DetailSaleEventModel>();
         public ICollection<DetailInvoiceModel> DetailInvoices { get; set; } = new List<DetailInvoiceModel>();
+
+        // NEW
+        public ICollection<DetailInventoryMovementModel> DetailInventoryMovements { get; set; } = new List<DetailInventoryMovementModel>();
+        public ICollection<DetailInventoryModel> DetailInventories { get; set; } = new List<DetailInventoryModel>();
+        public ICollection<DisposeProductModel> DisposeProducts { get; set; } = new List<DisposeProductModel>();
         // End of navigation properties
 
         public ProductModel(string productBarcode, uint supplierId, string productName, decimal productNetWeight, string productWeightRange, EProductUnit productUnit, decimal productBasePrice,

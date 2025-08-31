@@ -2,7 +2,7 @@
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IServices.Role;
-using ProjectShop.Server.Core.ObjectValue.GetNavigationPropertyOptions;
+using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.WebAPI.Controllers
 {

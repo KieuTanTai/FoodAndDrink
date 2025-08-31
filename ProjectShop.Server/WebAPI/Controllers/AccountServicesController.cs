@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
-using ProjectShop.Server.Core.ObjectValue;
-using ProjectShop.Server.Core.ObjectValue.GetNavigationPropertyOptions;
+using ProjectShop.Server.Core.ValueObjects;
+using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 using System.Security.Claims;
 
 namespace ProjectShop.Server.WebAPI.Controllers

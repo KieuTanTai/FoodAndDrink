@@ -52,8 +52,11 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<IEnumerable<DetailInventoryModel>> GetByLastUpdatedDateRangeAsync(DateTime startDate, DateTime endDate, int? maxGetCount)
             => await GetByDateTimeAsync("detail_inventory_last_updated_date", EQueryTimeType.DATE_TIME_RANGE, new Tuple<DateTime, DateTime>(startDate, endDate), maxGetCount);
 
-        public async Task<IEnumerable<DetailInventoryModel>> GetByInventoryId(uint inventoryId, int? maxGetCount)
+        public async Task<IEnumerable<DetailInventoryModel>> GetByInventoryIdAsync(uint inventoryId, int? maxGetCount)
             => await GetByInputAsync(inventoryId.ToString(), "inventory_id", maxGetCount);
+
+        public async Task<IEnumerable<DetailInventoryModel>> GetByInventoryIdsAsync(IEnumerable<uint> inventoryIds, int? maxGetCount)
+            => await GetByInputsAsync(inventoryIds.Select(id => id.ToString()), "inventory_id", maxGetCount);
 
         public async Task<IEnumerable<DetailInventoryModel>> GetByMonthAndYearAsync(int year, int month, int? maxGetCount)
             => await GetByDateTimeAsync("detail_inventory_added_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month), maxGetCount);
@@ -61,8 +64,11 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<IEnumerable<DetailInventoryModel>> GetByMonthAndYearLastUpdatedDateAsync(int year, int month, int? maxGetCount)
             => await GetByDateTimeAsync("detail_inventory_last_updated_date", EQueryTimeType.MONTH_AND_YEAR, new Tuple<int, int>(year, month), maxGetCount);
 
-        public async Task<IEnumerable<DetailInventoryModel>> GetByProductBarcode(string barcode, int? maxGetCount)
+        public async Task<IEnumerable<DetailInventoryModel>> GetByProductBarcodeAsync(string barcode, int? maxGetCount)
             => await GetByInputAsync(barcode, "product_barcode", maxGetCount);
+
+        public async Task<IEnumerable<DetailInventoryModel>> GetByProductBarcodesAsync(IEnumerable<string> barcodes, int? maxGetCount)
+            => await GetByInputsAsync(barcodes, "product_barcode", maxGetCount);
 
         public async Task<IEnumerable<DetailInventoryModel>> GetByYearAsync<TEnum>(int year, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {

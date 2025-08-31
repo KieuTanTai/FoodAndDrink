@@ -47,6 +47,18 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<IEnumerable<DisposeProductModel>> GetByProductBarcodeAsync(string barcode, int? maxGetCount) 
             => await GetByInputAsync(barcode, "product_barcode", maxGetCount);
 
+        public async Task<IEnumerable<DisposeProductModel>> GetByProductBarcodesAsync(IEnumerable<string> barcodes, int? maxGetCount) 
+            => await GetByInputsAsync(barcodes, "product_barcode", maxGetCount);
+
+        public async Task<IEnumerable<DisposeProductModel>> GetByEmployeeIdsAsync(IEnumerable<uint> employeeIds, int? maxGetCount)
+            => await GetByInputsAsync(employeeIds.Select(id => id.ToString()), "dispose_by_employee_id", maxGetCount);
+
+        public async Task<IEnumerable<DisposeProductModel>> GetByLocationIdsAsync(IEnumerable<uint> locationIds, int? maxGetCount)
+            => await GetByInputsAsync(locationIds.Select(id => id.ToString()), "location_id", maxGetCount);
+
+        public async Task<IEnumerable<DisposeProductModel>> GetByReasonIdsAsync(IEnumerable<uint> reasonIds, int? maxGetCount)
+            => await GetByInputsAsync(reasonIds.Select(id => id.ToString()), "dispose_reason_id", maxGetCount);
+
         public async Task<IEnumerable<DisposeProductModel>> GetByQuantityIdAsync<TCompareType>(int quantity, TCompareType compareType, int? maxGetCount) where TCompareType : Enum
         {
             if (compareType is not ECompareType type)

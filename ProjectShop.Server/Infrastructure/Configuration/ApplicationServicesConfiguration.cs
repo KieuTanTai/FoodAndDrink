@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
 using ProjectShop.Server.Core.Interfaces.IServices.Role;
-using ProjectShop.Server.Core.ObjectValue.GetNavigationPropertyOptions;
+using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Infrastructure.Configuration

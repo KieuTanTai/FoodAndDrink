@@ -1,5 +1,5 @@
 ﻿using ProjectShop.Server.Core.Interfaces.IValidate;
-using ProjectShop.Server.Core.ObjectValue;
+using ProjectShop.Server.Core.ValueObjects;
 using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Infrastructure.Services

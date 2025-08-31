@@ -3,8 +3,8 @@ using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IServices.Role;
-using ProjectShop.Server.Core.ObjectValue;
-using ProjectShop.Server.Core.ObjectValue.GetNavigationPropertyOptions;
+using ProjectShop.Server.Core.ValueObjects;
+using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Application.Services.Roles
 {

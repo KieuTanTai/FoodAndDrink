@@ -39,7 +39,7 @@
     <Folder Include="Application\Services\Account\Employee\" />
     <Folder Include="Application\Services\Location\Inventory\" />
     <Folder Include="Application\Services\Supplier\" />
-    <Folder Include="Core\ObjectValue\GetNavigationPropertyOptions\" />
+    <Folder Include="Core\ValueObjects\GetNavigationPropertyOptions\" />
     <Folder Include="Core\Interfaces\IServices\ICategory\" />
   </ItemGroup>
 

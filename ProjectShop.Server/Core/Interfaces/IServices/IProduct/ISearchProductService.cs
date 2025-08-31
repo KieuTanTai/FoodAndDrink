@@ -1,5 +1,5 @@
 ﻿using ProjectShop.Server.Core.Enums;
-using ProjectShop.Server.Core.ObjectValue;
+using ProjectShop.Server.Core.ValueObjects;
 
 namespace ProjectShop.Server.Core.Interfaces.IServices.IProduct
 {

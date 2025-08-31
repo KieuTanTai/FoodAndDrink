@@ -23,10 +23,10 @@ namespace ProjectShop.Server.Infrastructure.Data
         }
         // Implement other methods as needed
 
-        public async Task<IEnumerable<DetailInventoryMovementModel>> GetByMovementIdAsync(uint movementId, int? maxGetCount) 
+        public async Task<IEnumerable<DetailInventoryMovementModel>> GetByMovementIdAsync(uint movementId, int? maxGetCount)
             => await GetByInputAsync(movementId.ToString(), "inventory_movement_id", maxGetCount);
 
-        public Task<IEnumerable<DetailInventoryMovementModel>> GetByProductBarcodeAsync(string barcode, int? maxGetCount) 
+        public Task<IEnumerable<DetailInventoryMovementModel>> GetByProductBarcodeAsync(string barcode, int? maxGetCount)
             => GetByInputAsync(barcode, "product_barcode", maxGetCount);
 
         public async Task<IEnumerable<DetailInventoryMovementModel>> GetByProductLotIdAsync(uint productLotId, int? maxGetCount)
@@ -34,5 +34,11 @@ namespace ProjectShop.Server.Infrastructure.Data
 
         public async Task<IEnumerable<DetailInventoryMovementModel>> GetByProductLotIdsAsync(IEnumerable<uint> productLotIds, int? maxGetCount)
             => await GetByInputsAsync(productLotIds.Select(id => id.ToString()), "product_lot_id", maxGetCount);
+
+        public async Task<IEnumerable<DetailInventoryMovementModel>> GetByMovementIdsAsync(IEnumerable<uint> movementIds, int? maxGetCount)
+            => await GetByInputsAsync(movementIds.Select(id => id.ToString()), "inventory_movement_id", maxGetCount);
+
+        public async Task<IEnumerable<DetailInventoryMovementModel>> GetByProductBarcodesAsync(IEnumerable<string> barcodes, int? maxGetCount)
+            => await GetByInputsAsync(barcodes, "product_barcode", maxGetCount);
     }
 }
