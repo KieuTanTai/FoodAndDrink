@@ -2,7 +2,7 @@
 
 namespace ProjectShop.Server.Application.Services
 {
-    public class BaseAuthorizationService : IBaseAuthorizationService
+    public class BaseAuthorizationService : IBaseAuthorizationServices
     {
         // TODO: Build authorization logic
     }

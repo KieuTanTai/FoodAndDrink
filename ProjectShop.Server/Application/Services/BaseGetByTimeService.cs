@@ -5,15 +5,15 @@ using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Application.Services
 {
-    public class BaseGetByTimeService<TEntity, TOptions> : IBaseGetByTimeService<TEntity, TOptions>
+    public class BaseGetByTimeService<TEntity, TOptions> : IBaseGetByTimeServices<TEntity, TOptions>
         where TEntity : class
         where TOptions : class
     {
         private readonly ILogService _logger;
-        private readonly IBaseGetNavigationPropertyService<TEntity, TOptions> _navigationPropertyService;
+        private readonly IBaseGetNavigationPropertyServices<TEntity, TOptions> _navigationPropertyService;
         private readonly IServiceResultFactory<BaseGetByTimeService<TEntity, TOptions>> _serviceResultFactory;
 
-        public BaseGetByTimeService(IBaseGetNavigationPropertyService<TEntity, TOptions> navigationPropertyService, ILogService logger, IServiceResultFactory<BaseGetByTimeService<TEntity, TOptions>> serviceResultFactory)
+        public BaseGetByTimeService(IBaseGetNavigationPropertyServices<TEntity, TOptions> navigationPropertyService, ILogService logger, IServiceResultFactory<BaseGetByTimeService<TEntity, TOptions>> serviceResultFactory)
         {
             _logger = logger;
             _navigationPropertyService = navigationPropertyService;

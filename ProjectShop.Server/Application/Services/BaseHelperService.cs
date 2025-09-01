@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace TLGames.Application.Services
 {
-    public class BaseHelperService<TEntity> : IBaseHelperService<TEntity>
+    public class BaseHelperService<TEntity> : IBaseHelperServices<TEntity>
         where TEntity : class
     {
         private readonly IHashPassword _hashPassword;

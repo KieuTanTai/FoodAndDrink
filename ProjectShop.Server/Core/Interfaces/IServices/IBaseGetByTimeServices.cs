@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Core.Interfaces.IServices
 {
-    public interface IBaseGetByTimeService<TEntity, TOptions>
+    public interface IBaseGetByTimeServices<TEntity, TOptions>
         where TEntity : class
         where TOptions : class
     {

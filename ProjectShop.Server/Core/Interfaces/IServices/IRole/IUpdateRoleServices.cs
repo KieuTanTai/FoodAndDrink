@@ -2,7 +2,7 @@
 
 namespace ProjectShop.Server.Core.Interfaces.IServices.Role
 {
-    public interface IUpdateRoleService
+    public interface IUpdateRoleServices
     {
         Task<JsonLogEntry> UpdateRoleStatusAsync(uint roleId, bool status);
         Task<JsonLogEntry> UpdateRoleNameAsync(uint roleId, string roleName);

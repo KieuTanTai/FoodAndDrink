@@ -392,13 +392,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence
 
         protected virtual string GetByDateTimeRange(string colName)
         {
-            return $"SELECT * FROM {TableName} WHERE {colName} >= @FirstTime AND {colName} < DATE_ADD(@SecondTime, INTERVAL 1 DAY)";
+            return $"SELECT * FROM {TableName} WHERE {colName} >= @FirstTime AND {colName} < @SecondTime";
         }
 
         protected virtual string GetByDateTime(string colName, ECompareType compareType)
         {
             string type = GetStringType(compareType);
-            return $"SELECT * FROM {TableName} WHERE {colName} {type} DATE_ADD(@Input, INTERVAL 1 DAY)";
+            return $"SELECT * FROM {TableName} WHERE {colName} {type} @Input";
         }
 
         protected virtual string GetCompareDecimalQuery(string colName, ECompareType compareType)

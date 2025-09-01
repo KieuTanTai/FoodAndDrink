@@ -5,18 +5,18 @@ using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Application.Services
 {
-    public class BaseGetResultService<TEntity, TOptions, TServiceCall> : IServiceGetSingle<TEntity, TOptions, TServiceCall>
+    public class BaseGetResultService<TEntity, TOptions, TServiceCall> : IGetSingleServices<TEntity, TOptions, TServiceCall>
         where TEntity : class, new()
         where TOptions : class
         where TServiceCall : class
     {
         private readonly ILogService _logger;
         private readonly IServiceResultFactory<TServiceCall> _serviceResultFactory;
-        private readonly IBaseGetNavigationPropertyService<TEntity, TOptions> _navigationService;
+        private readonly IBaseGetNavigationPropertyServices<TEntity, TOptions> _navigationService;
 
         public BaseGetResultService(ILogService logger,
             IServiceResultFactory<TServiceCall> serviceResultFactory,
-            IBaseGetNavigationPropertyService<TEntity, TOptions> navigationService)
+            IBaseGetNavigationPropertyServices<TEntity, TOptions> navigationService)
         {
             _logger = logger;
             _serviceResultFactory = serviceResultFactory;

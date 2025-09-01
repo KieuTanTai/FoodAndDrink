@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
 using ProjectShop.Server.Core.ValueObjects;
 using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
@@ -15,19 +16,22 @@ namespace ProjectShop.Server.WebAPI.Controllers
     public class AccountServicesController : ControllerBase
     {
         private readonly ILogger<AccountServicesController> _logger;
-        private readonly ILoginService<AccountModel, AccountNavigationOptions> _loginAccountService;
-        private readonly ISignupService<AccountModel> _signupService;
-        private readonly IUpdateAccountService _updateAccountStatusService;
-        private readonly ISearchAccountService<AccountModel, AccountNavigationOptions> _searchAccountService;
+        private readonly ILoginServices<AccountModel, AccountNavigationOptions> _loginAccountServices;
+        private readonly ISignupServices<AccountModel> _signupServices;
+        private readonly IUpdateAccountServices _updateAccountStatusServices;
+        private readonly ISearchAccountServices<AccountModel, AccountNavigationOptions> _searchAccountServices;
 
-        public AccountServicesController(ILogger<AccountServicesController> logger, ILoginService<AccountModel, AccountNavigationOptions> loginAccountService,
-                ISignupService<AccountModel> signupService, IUpdateAccountService updateAccountStatusService, ISearchAccountService<AccountModel, AccountNavigationOptions> searchAccountService)
+        public AccountServicesController(ILogger<AccountServicesController> logger,
+            ILoginServices<AccountModel, AccountNavigationOptions> loginAccountServices,
+            ISignupServices<AccountModel> signupServices,
+            IUpdateAccountServices updateAccountStatusServices,
+            ISearchAccountServices<AccountModel, AccountNavigationOptions> searchAccountServices)
         {
             _logger = logger;
-            _loginAccountService = loginAccountService;
-            _signupService = signupService;
-            _updateAccountStatusService = updateAccountStatusService;
-            _searchAccountService = searchAccountService;
+            _loginAccountServices = loginAccountServices;
+            _signupServices = signupServices;
+            _updateAccountStatusServices = updateAccountStatusServices;
+            _searchAccountServices = searchAccountServices;
         }
 
         // API test lấy danh sách account
@@ -46,9 +50,9 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 }
 
                 if (status.HasValue)
-                    serviceResults = await _searchAccountService.GetByStatusAsync(status.Value, options, maxCount);
+                    serviceResults = await _searchAccountServices.GetByStatusAsync(status.Value, options, maxCount);
                 else
-                    serviceResults = await _searchAccountService.GetAllAsync(options, maxCount);
+                    serviceResults = await _searchAccountServices.GetAllAsync(options, maxCount);
                 return Ok(serviceResults); // trả json ra postman/browser
             }
             catch (Exception ex)
@@ -57,6 +61,235 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 return Ok(new List<AccountModel>());
             }
 
+        }
+
+        [HttpGet("by-status")]
+        public async Task<IActionResult> GetByStatusAsync([FromQuery] bool status, [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxGetCount)
+        {
+            try
+            {
+                var result = await _searchAccountServices.GetByStatusAsync(status, options, maxGetCount);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving accounts by status {status}");
+                return StatusCode(500, "An error occurred while retrieving accounts by status.");
+            }
+        }
+
+        [HttpGet("by-username")]
+        public async Task<IActionResult> GetByUserNameAsync([FromQuery] string userName, [FromQuery] AccountNavigationOptions? options)
+        {
+            try
+            {
+                var result = await _searchAccountServices.GetByUserNameAsync(userName, options);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving account by username {userName}");
+                return StatusCode(500, "An error occurred while retrieving account by username.");
+            }
+        }
+
+        [HttpGet("{accountId}")]
+        public async Task<IActionResult> GetByAccountIdAsync([FromRoute] uint accountId, [FromQuery] AccountNavigationOptions? options)
+        {
+            try
+            {
+                var result = await _searchAccountServices.GetByAccountIdAsync(accountId, options);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving account by id {accountId}");
+                return StatusCode(500, "An error occurred while retrieving account by id.");
+            }
+        }
+
+        [HttpGet("created/by-month-year")]
+        public async Task<IActionResult> GetByCreatedDateMonthAndYearAsync([FromQuery] int year, [FromQuery] int month,
+            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxGetCount)
+        {
+            try
+            {
+                var result = await _searchAccountServices.GetByCreatedDateMonthAndYearAsync(year, month, options, maxGetCount);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving accounts created in {month}/{year}");
+                return StatusCode(500, "An error occurred while retrieving accounts by created month/year.");
+            }
+        }
+
+        [HttpGet("created/by-year")]
+        public async Task<IActionResult> GetByCreatedYearAsync([FromQuery] int year, [FromQuery] ECompareType compareType,
+            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxGetCount)
+        {
+            try
+            {
+                var result = await _searchAccountServices.GetByCreatedYearAsync(year, compareType, options, maxGetCount);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving accounts by created year {year} and compareType {compareType}");
+                return StatusCode(500, "An error occurred while retrieving accounts by created year.");
+            }
+        }
+
+        [HttpGet("created/by-date-range")]
+        public async Task<IActionResult> GetByCreatedDateTimeRangeAsync([FromQuery] DateTime startDate, [FromQuery] DateTime endDate,
+            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxGetCount)
+        {
+            try
+            {
+                var result = await _searchAccountServices.GetByCreatedDateTimeRangeAsync(startDate, endDate, options, maxGetCount);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving accounts created between {startDate} and {endDate}");
+                return StatusCode(500, "An error occurred while retrieving accounts by created date range.");
+            }
+        }
+
+        [HttpGet("created/by-date")]
+        public async Task<IActionResult> GetByCreatedDateTimeAsync([FromQuery] DateTime dateTime, [FromQuery] ECompareType compareType,
+            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxGetCount)
+        {
+            try
+            {
+                var result = await _searchAccountServices.GetByCreatedDateTimeAsync(dateTime, compareType, options, maxGetCount);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving accounts created at {dateTime} with compareType {compareType}");
+                return StatusCode(500, "An error occurred while retrieving accounts by created date.");
+            }
+        }
+
+        [HttpGet("updated/by-month-year")]
+        public async Task<IActionResult> GetByLastUpdatedDateMonthAndYearAsync([FromQuery] int year, [FromQuery] int month,
+            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxGetCount)
+        {
+            try
+            {
+                var result = await _searchAccountServices.GetByLastUpdatedDateMonthAndYearAsync(year, month, options, maxGetCount);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving accounts last updated in {month}/{year}");
+                return StatusCode(500, "An error occurred while retrieving accounts by last updated month/year.");
+            }
+        }
+
+        [HttpGet("updated/by-year")]
+        public async Task<IActionResult> GetByLastUpdatedYearAsync([FromQuery] int year, [FromQuery] ECompareType compareType,
+            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxGetCount)
+        {
+            try
+            {
+                var result = await _searchAccountServices.GetByLastUpdatedYearAsync(year, compareType, options, maxGetCount);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving accounts last updated in year {year} with compareType {compareType}");
+                return StatusCode(500, "An error occurred while retrieving accounts by last updated year.");
+            }
+        }
+
+        [HttpGet("updated/by-date-range")]
+        public async Task<IActionResult> GetByLastUpdatedDateTimeRangeAsync([FromQuery] DateTime startDate, [FromQuery] DateTime endDate,
+            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxGetCount)
+        {
+            try
+            {
+                var result = await _searchAccountServices.GetByLastUpdatedDateTimeRangeAsync(startDate, endDate, options, maxGetCount);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving accounts last updated between {startDate} and {endDate}");
+                return StatusCode(500, "An error occurred while retrieving accounts by last updated date range.");
+            }
+        }
+
+        [HttpGet("updated/by-date")]
+        public async Task<IActionResult> GetByLastUpdatedDateTimeAsync([FromQuery] DateTime dateTime, [FromQuery] ECompareType compareType,
+            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxGetCount)
+        {
+            try
+            {
+                var result = await _searchAccountServices.GetByLastUpdatedDateTimeAsync(dateTime, compareType, options, maxGetCount);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving accounts last updated at {dateTime} with compareType {compareType}");
+                return StatusCode(500, "An error occurred while retrieving accounts by last updated date.");
+            }
+        }
+
+        // API test lấy thông tin tài khoản hiện tại
+        [HttpGet("current-account")]
+        public async Task<IActionResult> GetCurrentAccount([FromQuery] AccountNavigationOptions? options)
+        {
+            _logger.LogInformation("Bắt đầu lấy thông tin tài khoản hiện tại.");
+            string userName = GetUserNameByClaims();
+            if (string.IsNullOrEmpty(userName))
+            {
+                _logger.LogWarning("Không tìm thấy tên đăng nhập của tài khoản hiện tại.");
+                return NotFound("Current account not found.");
+            }
+
+            try
+            {
+                ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
+                serviceResult = await _searchAccountServices.GetByUserNameAsync(userName, options);
+                AccountModel currentAccount = serviceResult.Data!;
+                _logger.LogInformation($"Thông tin tài khoản hiện tại: {currentAccount.UserName}");
+                return Ok(serviceResult);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy thông tin tài khoản hiện tại.");
+                return BadRequest("Failed to get current account.");
+            }
+        }
+
+        // API test lấy danh sách quyền của người dùng hiện tại
+        [HttpGet("current-account-roles")]
+        public async Task<IActionResult> GetCurrentAccountRoles()
+        {
+            _logger.LogInformation("Bắt đầu lấy danh sách quyền của người dùng hiện tại.");
+            string userName = GetUserNameByClaims();
+            if (string.IsNullOrEmpty(userName))
+            {
+                _logger.LogWarning("Không tìm thấy tên đăng nhập của tài khoản hiện tại.");
+                return NotFound("Current account not found.");
+            }
+
+            try
+            {
+                ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
+                AccountNavigationOptions options = new() { IsGetRolesOfUsers = true };
+                serviceResult = await _searchAccountServices.GetByUserNameAsync(userName, options);
+                AccountModel? account = serviceResult.Data!;
+                IEnumerable<RolesOfUserModel> roles = account.RolesOfUsers;
+                _logger.LogInformation($"Số lượng quyền của người dùng hiện tại: {roles.Count()}");
+                return Ok(roles);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy danh sách quyền của người dùng hiện tại.");
+                return BadRequest("Failed to get current account roles.");
+            }
         }
 
         // TODO: API test lấy danh sách account và roles
@@ -68,7 +301,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
             try
             {
                 ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
-                serviceResult = await _loginAccountService.HandleLoginAsync(request.Email, request.Password, options);
+                serviceResult = await _loginAccountServices.HandleLoginAsync(request.Email, request.Password, options);
                 AccountModel account = serviceResult.Data!;
                 // Set claims principal for the current user
                 ClaimsPrincipal principal = BuildClaimsPrincipal(account);
@@ -99,7 +332,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
             try
             {
                 ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
-                serviceResult = await _signupService.AddAccountAsync(new AccountModel(request.Email, request.Password));
+                serviceResult = await _signupServices.AddAccountAsync(new AccountModel(request.Email, request.Password));
                 uint result = serviceResult.Data!.AccountId;
                 _logger.LogInformation($"Đăng ký thành công. {request.Email}");
                 // Có thể trả về CreatedAtAction nếu muốn, ở đây dùng Ok cho đơn giản
@@ -114,7 +347,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         // API test cập nhật trạng thái tài khoản
         [HttpPatch("update-status")]
-        public async Task<IActionResult> UpdateAccountStatus([FromBody] UpdateAccountStatusRequest request)
+        public async Task<IActionResult> UpdateAccountStatus([FromBody] AccountUpdateStatusRequest request)
         {
             _logger.LogInformation("Bắt đầu quá trình cập nhật trạng thái tài khoản.");
             if (request.AccountId <= 0)
@@ -125,7 +358,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
             try
             {
-                JsonLogEntry logEntry = await _updateAccountStatusService.UpdateAccountStatusAsync(request.AccountId, request.Status);
+                JsonLogEntry logEntry = await _updateAccountStatusServices.UpdateAccountStatusAsync(request.AccountId, request.Status);
                 _logger.LogInformation($"Cập nhật trạng thái thành công. AccountId: {request.AccountId}, New Status: {request.Status}");
                 return Ok(logEntry);
             }
@@ -138,7 +371,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         // API test cập nhật mật khẩu tài khoản
         [HttpPatch("update-password")]
-        public async Task<IActionResult> UpdatePassword([FromBody] UpdateAccountPasswordRequest request)
+        public async Task<IActionResult> UpdatePassword([FromBody] AccountUpdatePasswordRequest request)
         {
             _logger.LogInformation("Bắt đầu quá trình cập nhật mật khẩu tài khoản.");
             if (request.AccountId <= 0 || string.IsNullOrEmpty(request.NewPassword))
@@ -149,7 +382,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
             try
             {
-                JsonLogEntry logEntry = await _updateAccountStatusService.UpdateAccountPasswordAsync(request.AccountId, request.NewPassword);
+                JsonLogEntry logEntry = await _updateAccountStatusServices.UpdateAccountPasswordAsync(request.AccountId, request.NewPassword);
                 _logger.LogInformation($"Cập nhật mật khẩu thành công. AccountId: {request.AccountId}");
                 return Ok(logEntry);
             }
@@ -157,86 +390,6 @@ namespace ProjectShop.Server.WebAPI.Controllers
             {
                 _logger.LogError(ex, "Lỗi khi cập nhật mật khẩu tài khoản.");
                 return BadRequest("Update password failed.");
-            }
-        }
-
-        // API test lấy thông tin tài khoản hiện tại
-        [HttpGet("current-account")]
-        public async Task<IActionResult> GetCurrentAccount([FromQuery] AccountNavigationOptions? options)
-        {
-            _logger.LogInformation("Bắt đầu lấy thông tin tài khoản hiện tại.");
-            string userName = GetUserNameByClaims();
-            if (string.IsNullOrEmpty(userName))
-            {
-                _logger.LogWarning("Không tìm thấy tên đăng nhập của tài khoản hiện tại.");
-                return NotFound("Current account not found.");
-            }
-
-            try
-            {
-                ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
-                serviceResult = await _searchAccountService.GetByUserNameAsync(userName, options);
-                AccountModel currentAccount = serviceResult.Data!;
-                _logger.LogInformation($"Thông tin tài khoản hiện tại: {currentAccount.UserName}");
-                return Ok(serviceResult);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Lỗi khi lấy thông tin tài khoản hiện tại.");
-                return BadRequest("Failed to get current account.");
-            }
-        }
-
-        // API test lấy danh sách quyền của người dùng hiện tại
-        [HttpGet("current-account-roles")]
-        public async Task<IActionResult> GetCurrentAccountRoles()
-        {
-            _logger.LogInformation("Bắt đầu lấy danh sách quyền của người dùng hiện tại.");
-            string userName = GetUserNameByClaims();
-            if (string.IsNullOrEmpty(userName))
-            {
-                _logger.LogWarning("Không tìm thấy tên đăng nhập của tài khoản hiện tại.");
-                return NotFound("Current account not found.");
-            }
-
-            try
-            {
-                ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
-                AccountNavigationOptions options = new() { IsGetRolesOfUsers = true };
-                serviceResult = await _searchAccountService.GetByUserNameAsync(userName, options);
-                AccountModel? account = serviceResult.Data!;
-                IEnumerable<RolesOfUserModel> roles = account.RolesOfUsers;
-                _logger.LogInformation($"Số lượng quyền của người dùng hiện tại: {roles.Count()}");
-                return Ok(roles);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Lỗi khi lấy danh sách quyền của người dùng hiện tại.");
-                return BadRequest("Failed to get current account roles.");
-            }
-        }
-
-        // API test lấy thông tin tài khoản theo id
-        [HttpGet("account-by-id/{accountId}")]
-        public async Task<IActionResult> GetAccountById([FromQuery] uint accountId, [FromQuery] AccountNavigationOptions? options)
-        {
-            _logger.LogInformation($"Bắt đầu lấy thông tin tài khoản với AccountId: {accountId}");
-            if (accountId <= 0)
-            {
-                _logger.LogWarning("AccountId không hợp lệ.");
-                return BadRequest("Invalid AccountId.");
-            }
-
-            try
-            {
-                ServiceResult<AccountModel> serviceResult = await _searchAccountService.GetByAccountIdAsync(accountId, options);
-                _logger.LogInformation($"Thông tin tài khoản hiện tại: {serviceResult.Data!.UserName}");
-                return Ok(serviceResult);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Lỗi khi lấy thông tin tài khoản theo id.");
-                return BadRequest("Failed to get account by id.");
             }
         }
 
@@ -254,52 +407,6 @@ namespace ProjectShop.Server.WebAPI.Controllers
         {
             _logger.LogInformation("HEAD request received.");
             return Ok();
-        }
-
-
-        // BUG: JUST FOR TEST / NOT USE ON PRODUCTION
-
-        // API test lấy thông tin tài khoản theo tên đăng nhập
-        [HttpGet("account-by-username/{username}")]
-        public async Task<IActionResult> GetAccountByUsername(string username, [FromQuery] AccountNavigationOptions? options)
-        {
-            _logger.LogInformation($"Bắt đầu lấy thông tin tài khoản với tên đăng nhập: {username}");
-            if (string.IsNullOrEmpty(username))
-            {
-                _logger.LogWarning("Tên đăng nhập không hợp lệ.");
-                return BadRequest("Invalid username.");
-            }
-
-            try
-            {
-                ServiceResult<AccountModel> serviceResult = await _searchAccountService.GetByUserNameAsync(username, options);
-                _logger.LogInformation($"Thông tin tài khoản: {serviceResult.Data!.UserName}");
-                return Ok(serviceResult);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Lỗi khi lấy thông tin tài khoản theo tên đăng nhập.");
-                return BadRequest("Failed to get account by username.");
-            }
-        }
-
-        // API test lấy danh sách tài khoản theo trạng thái
-        [HttpGet("accounts-by-status/{status}")]
-        public async Task<IActionResult> GetAccountsByStatus(bool status, [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxCount)
-        {
-            _logger.LogInformation($"Bắt đầu lấy danh sách tài khoản với trạng thái: {status}");
-
-            try
-            {
-                ServiceResults<AccountModel> serviceResults = await _searchAccountService.GetByStatusAsync(status, options, maxCount);
-                _logger.LogInformation($"Số lượng tài khoản với trạng thái {status}: {serviceResults.Data!.Count()}");
-                return Ok(serviceResults);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Lỗi khi lấy danh sách tài khoản theo trạng thái.");
-                return BadRequest("Failed to get accounts by status.");
-            }
         }
 
         private static ClaimsPrincipal BuildClaimsPrincipal(AccountModel account)

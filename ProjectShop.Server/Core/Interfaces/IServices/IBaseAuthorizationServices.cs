@@ -1,6 +1,6 @@
 ﻿namespace ProjectShop.Server.Core.Interfaces.IServices
 {
-    public interface IBaseAuthorizationService
+    public interface IBaseAuthorizationServices
     {
     }
 }

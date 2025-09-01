@@ -2,7 +2,7 @@
 
 namespace ProjectShop.Server.Core.Interfaces.IServices.Role
 {
-    public interface ISearchRoleService<TEntity, TOption> where TEntity : class where TOption : class
+    public interface ISearchRoleServices<TEntity, TOption> where TEntity : class where TOption : class
     {
         Task<ServiceResults<TEntity>> GetAllAsync(TOption? options = null, int? maxGetCount = null);
         Task<ServiceResult<TEntity>> GetByRoleNameAsync(string roleName, TOption? options = null);

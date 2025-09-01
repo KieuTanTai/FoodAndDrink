@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Application.Services.Product
 {
-    public class BaseReturnProductService : IBaseGetNavigationPropertyService<ProductModel, ProductNavigationOptions>
+    public class BaseReturnProductService : IBaseGetNavigationPropertyServices<ProductModel, ProductNavigationOptions>
     {
         private readonly IDAO<SupplierModel> _baseSupplierDAO;
         private readonly IDetailCartDAO<DetailCartModel> _detailCartDAO;

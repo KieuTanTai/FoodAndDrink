@@ -8,11 +8,11 @@ using ProjectShop.Server.Core.ValueObjects;
 
 namespace ProjectShop.Server.Application.Services.Account
 {
-    public class SignupService : ISignupService<AccountModel>
+    public class SignupService : ISignupServices<AccountModel>
     {
         private readonly IDAO<AccountModel> _baseDAO;
         private readonly IAccountDAO<AccountModel> _accountDAO;
-        private readonly IBaseHelperService<AccountModel> _helper;
+        private readonly IBaseHelperServices<AccountModel> _helper;
         private readonly IHashPassword _hashPassword;
         private readonly ILogService _logger;
         private readonly IServiceResultFactory<SignupService> _serviceResultFactory;
@@ -20,7 +20,7 @@ namespace ProjectShop.Server.Application.Services.Account
         public SignupService(
             IDAO<AccountModel> baseDAO,
             IAccountDAO<AccountModel> accountDAO,
-            IBaseHelperService<AccountModel> helper,
+            IBaseHelperServices<AccountModel> helper,
             IHashPassword hashPassword, ILogService logger, IServiceResultFactory<SignupService> serviceResultFactory)
         {
             _logger = logger;

@@ -8,20 +8,20 @@ using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Application.Services.Account
 {
-    public class SearchAccountService : ISearchAccountService<AccountModel, AccountNavigationOptions>
+    public class SearchAccountService : ISearchAccountServices<AccountModel, AccountNavigationOptions>
     {
         private readonly IDAO<AccountModel> _baseDAO;
         private readonly IAccountDAO<AccountModel> _accountDAO;
-        private readonly IBaseHelperService<AccountModel> _helper;
-        private readonly IServiceGetSingle<AccountModel, AccountNavigationOptions, SearchAccountService> _getSingleService;
-        private readonly IServiceGetMultiple<AccountModel, AccountNavigationOptions, SearchAccountService> _getMultipleService;
-        private readonly IBaseGetByTimeService<AccountModel, AccountNavigationOptions> _byTimeService;
+        private readonly IBaseHelperServices<AccountModel> _helper;
+        private readonly IGetSingleServices<AccountModel, AccountNavigationOptions, SearchAccountService> _getSingleService;
+        private readonly IGetMultipleServices<AccountModel, AccountNavigationOptions, SearchAccountService> _getMultipleService;
+        private readonly IBaseGetByTimeServices<AccountModel, AccountNavigationOptions> _byTimeService;
 
         public SearchAccountService(IDAO<AccountModel> baseDAO, IAccountDAO<AccountModel> accountDAO,
-            IBaseHelperService<AccountModel> helper,
-            IBaseGetByTimeService<AccountModel, AccountNavigationOptions> byTimeService,
-            IServiceGetSingle<AccountModel, AccountNavigationOptions, SearchAccountService> getSingleService,
-            IServiceGetMultiple<AccountModel, AccountNavigationOptions, SearchAccountService> getMultipleService)
+            IBaseHelperServices<AccountModel> helper,
+            IBaseGetByTimeServices<AccountModel, AccountNavigationOptions> byTimeService,
+            IGetSingleServices<AccountModel, AccountNavigationOptions, SearchAccountService> getSingleService,
+            IGetMultipleServices<AccountModel, AccountNavigationOptions, SearchAccountService> getMultipleService)
         {
             _helper = helper;
             _baseDAO = baseDAO;

@@ -2,7 +2,7 @@
 
 namespace ProjectShop.Server.Core.Interfaces.IServices.IAccount
 {
-    public interface IUpdateAccountService
+    public interface IUpdateAccountServices
     {
         Task<JsonLogEntry> UpdateAccountStatusAsync(uint accountId, bool status);
         Task<JsonLogEntry> UpdateAccountStatusByUserNameAsync(string userName, bool status);

@@ -7,7 +7,7 @@ using ProjectShop.Server.Core.ValueObjects;
 
 namespace ProjectShop.Server.Application.Services.Account
 {
-    public class ForgotPasswordService : IForgotPasswordService
+    public class ForgotPasswordService : IForgotPasswordServices
     {
         private readonly IDAO<AccountModel> _baseDAO;
         private readonly IAccountDAO<AccountModel> _accountDAO;

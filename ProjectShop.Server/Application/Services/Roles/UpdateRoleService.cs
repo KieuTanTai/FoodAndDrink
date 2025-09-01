@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.ValueObjects;
 
 namespace ProjectShop.Server.Application.Services.Roles
 {
-    public class UpdateRoleService : IUpdateRoleService
+    public class UpdateRoleService : IUpdateRoleServices
     {
         private readonly IDAO<RoleModel> _baseDAO;
         private readonly ILogService _logger;
@@ -51,28 +51,31 @@ namespace ProjectShop.Server.Application.Services.Roles
 
         private async Task<IEnumerable<JsonLogEntry>> UpdateRoleNamesAsync(IEnumerable<string> inputs, IEnumerable<string> newNames, Func<IEnumerable<string>, int?, Task<IEnumerable<RoleModel>>> daoFunc)
         {
-            List<JsonLogEntry> logEntries = new List<JsonLogEntry>();
+            List<JsonLogEntry> logEntries = [];
             try
             {
-                var roles = await daoFunc(inputs, null);
+                var inputList = inputs.ToList();
+                var newNameList = newNames.ToList();
+                var roles = await daoFunc(inputList, null);
                 if (roles == null || !roles.Any())
                 {
-                    logEntries.Add(_logger.JsonLogWarning<RoleModel, UpdateRoleService>($"No roles found for inputs: {string.Join(", ", inputs)}."));
+                    logEntries.Add(_logger.JsonLogWarning<RoleModel, UpdateRoleService>($"No roles found for inputs: {string.Join(", ", inputList)}."));
                     return logEntries;
                 }
 
                 int index = 0;
-                int totalNames = newNames.Count();
+                int totalNames = newNameList.Count();
                 foreach (RoleModel role in roles)
                 {
                     if (index < totalNames)
-                        role.RoleName = newNames.ElementAt(index++);
+                        role.RoleName = newNameList.ElementAt(index++);
                     else
                     {
                         logEntries.Add(_logger.JsonLogWarning<RoleModel, UpdateRoleService>($"Not enough new names provided for all roles. Stopped at index {index}."));
                         break;
                     }
                 }
+
                 int affectedRows = await _baseDAO.UpdateAsync(roles);
                 if (affectedRows == 0)
                 {
@@ -114,10 +117,11 @@ namespace ProjectShop.Server.Application.Services.Roles
             List<JsonLogEntry> logEntries = new List<JsonLogEntry>();
             try
             {
-                var roles = await daoFunc(inputs, null);
+                var inputsList = inputs.ToList();
+                var roles = await daoFunc(inputsList, null);
                 if (roles == null || !roles.Any())
                 {
-                    logEntries.Add(_logger.JsonLogWarning<RoleModel, UpdateRoleService>($"No roles found for inputs: {string.Join(", ", inputs)}."));
+                    logEntries.Add(_logger.JsonLogWarning<RoleModel, UpdateRoleService>($"No roles found for inputs: {string.Join(", ", inputsList)}."));
                     return logEntries;
                 }
 

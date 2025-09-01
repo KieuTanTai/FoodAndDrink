@@ -8,14 +8,14 @@ using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Application.Services.Roles
 {
-    public class BaseReturnRoleService : IBaseGetNavigationPropertyService<RoleModel, RoleNavigationOptions>
+    public class BaseReturnRoleService : IBaseGetNavigationPropertyServices<RoleModel, RoleNavigationOptions>
     {
         private readonly ILogService _logger;
         private readonly IServiceResultFactory<BaseReturnRoleService> _serviceResultFactory;
-        private readonly ISearchAccountRoleService<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey> _searchAccountRoleService;
+        private readonly ISearchAccountRoleServices<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey> _searchAccountRoleService;
         public BaseReturnRoleService(
             ILogService logger,
-            ISearchAccountRoleService<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey> searchAccountRoleService,
+            ISearchAccountRoleServices<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey> searchAccountRoleService,
             IServiceResultFactory<BaseReturnRoleService> serviceResultFactory)
         {
             _logger = logger;

@@ -34,7 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application\Services\Account\AccountRoles\" />
     <Folder Include="Application\Services\Account\Customer\" />
     <Folder Include="Application\Services\Account\Employee\" />
     <Folder Include="Application\Services\Location\Inventory\" />

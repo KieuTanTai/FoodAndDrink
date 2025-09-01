@@ -9,20 +9,20 @@ using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Application.Services.Product
 {
-    public class SearchProductService : ISearchProductService<ProductModel, ProductNavigationOptions>
+    public class SearchProductService : ISearchProductServices<ProductModel, ProductNavigationOptions>
     {
         private readonly IDAO<ProductModel> _baseDAO;
         private readonly IProductDAO<ProductModel> _productDAO;
-        private readonly IBaseHelperService<ProductModel> _helper;
-        private readonly IServiceGetSingle<ProductModel, ProductNavigationOptions, SearchProductService> _getSingleService;
-        private readonly IServiceGetMultiple<ProductModel, ProductNavigationOptions, SearchProductService> _getMultipleService;
-        private readonly IBaseGetByTimeService<ProductModel, ProductNavigationOptions> _byTimeService;
+        private readonly IBaseHelperServices<ProductModel> _helper;
+        private readonly IGetSingleServices<ProductModel, ProductNavigationOptions, SearchProductService> _getSingleService;
+        private readonly IGetMultipleServices<ProductModel, ProductNavigationOptions, SearchProductService> _getMultipleService;
+        private readonly IBaseGetByTimeServices<ProductModel, ProductNavigationOptions> _byTimeService;
 
         public SearchProductService(IDAO<ProductModel> baseDAO, IProductDAO<ProductModel> productDAO,
-            IBaseHelperService<ProductModel> helper,
-            IBaseGetByTimeService<ProductModel, ProductNavigationOptions> byTimeService,
-            IServiceGetSingle<ProductModel, ProductNavigationOptions, SearchProductService> getSingleService,
-            IServiceGetMultiple<ProductModel, ProductNavigationOptions, SearchProductService> getMultipleService)
+            IBaseHelperServices<ProductModel> helper,
+            IBaseGetByTimeServices<ProductModel, ProductNavigationOptions> byTimeService,
+            IGetSingleServices<ProductModel, ProductNavigationOptions, SearchProductService> getSingleService,
+            IGetMultipleServices<ProductModel, ProductNavigationOptions, SearchProductService> getMultipleService)
         {
             _helper = helper;
             _baseDAO = baseDAO;

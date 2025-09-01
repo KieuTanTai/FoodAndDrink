@@ -2,7 +2,7 @@
 
 namespace ProjectShop.Server.Core.Interfaces.IServices.IProduct
 {
-    public interface IUpdateProductService
+    public interface IUpdateProductServices
     {
         Task<JsonLogEntry> UpdateProductStatusAsync(string productBarcode, bool status);
         Task<JsonLogEntry> UpdateProductNameAsync(string productBarcode, string productName);

@@ -9,7 +9,7 @@ using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class RoleOfUserDAO : BaseDAO<RolesOfUserModel>, IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey>
+    public class RoleOfUserDAO : BaseNoneUpdateDAO<RolesOfUserModel>, IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey>
     {
         public RoleOfUserDAO(
             IDbConnectionFactory connectionFactory,
@@ -23,14 +23,6 @@ namespace ProjectShop.Server.Infrastructure.Data
         {
             return $@"INSERT INTO {TableName} (account_id, role_id, added_date) 
                       VALUES (@AccountId, @RoleId, @AddedDate); SELECT LAST_INSERT_ID();";
-        }
-
-        protected override string GetUpdateQuery()
-        {
-            string colIdName = Converter.SnakeCaseToPascalCase(ColumnIdName);
-            return $@"UPDATE {TableName} 
-                      SET role_id = @RoleId
-                      WHERE {ColumnIdName} = @{colIdName}";
         }
 
         private string GetByKeysQuery()

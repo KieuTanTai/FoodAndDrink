@@ -8,20 +8,20 @@ using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Application.Services.Roles
 {
-    public class SearchRoleService : ISearchRoleService<RoleModel, RoleNavigationOptions>
+    public class SearchRoleService : ISearchRoleServices<RoleModel, RoleNavigationOptions>
     {
         private readonly IDAO<RoleModel> _baseDAO;
         private readonly IRoleDAO<RoleModel> _roleDAO;
-        private readonly IBaseHelperService<RoleModel> _helper;
-        private readonly IBaseGetByTimeService<RoleModel, RoleNavigationOptions> _byTimeService;
-        private readonly IServiceGetSingle<RoleModel, RoleNavigationOptions, SearchRoleService> _getSingleService;
-        private readonly IServiceGetMultiple<RoleModel, RoleNavigationOptions, SearchRoleService> _getMultipleService;
+        private readonly IBaseHelperServices<RoleModel> _helper;
+        private readonly IBaseGetByTimeServices<RoleModel, RoleNavigationOptions> _byTimeService;
+        private readonly IGetSingleServices<RoleModel, RoleNavigationOptions, SearchRoleService> _getSingleService;
+        private readonly IGetMultipleServices<RoleModel, RoleNavigationOptions, SearchRoleService> _getMultipleService;
 
         public SearchRoleService(IDAO<RoleModel> baseDAO, IRoleDAO<RoleModel> roleDAO, 
-            IBaseHelperService<RoleModel> helper,
-            IBaseGetByTimeService<RoleModel, RoleNavigationOptions> byTimeService,
-            IServiceGetMultiple<RoleModel, RoleNavigationOptions, SearchRoleService> getMultipleService,
-            IServiceGetSingle<RoleModel, RoleNavigationOptions, SearchRoleService> getSingleService)
+            IBaseHelperServices<RoleModel> helper,
+            IBaseGetByTimeServices<RoleModel, RoleNavigationOptions> byTimeService,
+            IGetMultipleServices<RoleModel, RoleNavigationOptions, SearchRoleService> getMultipleService,
+            IGetSingleServices<RoleModel, RoleNavigationOptions, SearchRoleService> getSingleService)
         {
             _helper = helper;
             _roleDAO = roleDAO;

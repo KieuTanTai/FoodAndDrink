@@ -1,6 +1,6 @@
 ﻿namespace ProjectShop.Server.Core.ValueObjects
 {
-    public class UpdateAccountPasswordRequest
+    public class AccountUpdatePasswordRequest
     {
         public uint AccountId { get; set; }
         public string UserName { get; set; } = string.Empty;

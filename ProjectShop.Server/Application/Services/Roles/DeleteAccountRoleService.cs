@@ -7,12 +7,12 @@ using ProjectShop.Server.Core.ValueObjects;
 
 namespace ProjectShop.Server.Application.Services.Roles
 {
-    public class DeleteAccountRoleService : IDeleteAccountRoleService<RolesOfUserKey>
+    public class DeleteAccountRoleService : IDeleteAccountRoleServices<RolesOfUserKey>
     {
         private readonly IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> _roleOfUserDAO;
-        private readonly IBaseHelperService<RolesOfUserModel> _helper;
+        private readonly IBaseHelperServices<RolesOfUserModel> _helper;
         private readonly ILogService _logger;
-        public DeleteAccountRoleService(IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> roleOfUserDAO, IBaseHelperService<RolesOfUserModel> helper, ILogService logger)
+        public DeleteAccountRoleService(IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> roleOfUserDAO, IBaseHelperServices<RolesOfUserModel> helper, ILogService logger)
         {
             _helper = helper;
             _logger = logger;
@@ -69,7 +69,6 @@ namespace ProjectShop.Server.Application.Services.Roles
             => await DeleteByIdsGenericAsync(roleIds, _roleOfUserDAO.GetByRoleIdsAsync, _roleOfUserDAO.DeleteByRoleIdsAsync);
 
         //DRY:
-
         private async Task<JsonLogEntry> DeleteByIdGenericAsync(uint input, Func<uint, int?, Task<IEnumerable<RolesOfUserModel>>> searchFunc, Func<uint, Task<int>> deleteFunc)
         {
             try

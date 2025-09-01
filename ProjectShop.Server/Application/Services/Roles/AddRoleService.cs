@@ -9,15 +9,15 @@ using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services.Roles
 {
-    public class AddRoleService : IAddRoleService<RoleModel>
+    public class AddRoleService : IAddRoleServices<RoleModel>
     {
         private readonly IDAO<RoleModel> _baseDAO;
         private readonly IRoleDAO<RoleModel> _roleDAO;
-        private readonly IBaseHelperService<RoleModel> _helper;
+        private readonly IBaseHelperServices<RoleModel> _helper;
         private readonly ILogService _logger;
         private readonly IServiceResultFactory<AddRoleService> _serviceResultFactory;
 
-        public AddRoleService(IDAO<RoleModel> baseDAO, IRoleDAO<RoleModel> roleDAO, IBaseHelperService<RoleModel> helper, ILogService logger, IServiceResultFactory<AddRoleService> serviceResultFactory)
+        public AddRoleService(IDAO<RoleModel> baseDAO, IRoleDAO<RoleModel> roleDAO, IBaseHelperServices<RoleModel> helper, ILogService logger, IServiceResultFactory<AddRoleService> serviceResultFactory)
         {
             _baseDAO = baseDAO;
             _roleDAO = roleDAO;

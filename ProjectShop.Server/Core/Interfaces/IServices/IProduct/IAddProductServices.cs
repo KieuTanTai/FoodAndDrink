@@ -2,7 +2,7 @@
 
 namespace ProjectShop.Server.Core.Interfaces.IServices.IProduct
 {
-    public interface IAddProductService<TEntity> where TEntity : class
+    public interface IAddProductServices<TEntity> where TEntity : class
     {
         Task<ServiceResult<TEntity>> AddProductAsync(TEntity entity);
         Task<ServiceResults<TEntity>> AddProductsAsync(IEnumerable<TEntity> entities);

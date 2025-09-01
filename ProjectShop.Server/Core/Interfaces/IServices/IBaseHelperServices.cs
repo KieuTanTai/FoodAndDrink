@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Core.Interfaces.IServices
 {
-    public interface IBaseHelperService<TEntity> where TEntity : class
+    public interface IBaseHelperServices<TEntity> where TEntity : class
     {
         Task<bool> IsExistObject(string input, Func<string, Task<TEntity?>> daoFunc);
         Task<bool> IsExistObject(uint input, Func<uint, Task<TEntity?>> daoFunc);

@@ -8,17 +8,17 @@ using ProjectShop.Server.Core.ValueObjects;
 
 namespace ProjectShop.Server.Application.Services.Product
 {
-    public class AddProductService : IAddProductService<ProductModel>
+    public class AddProductService : IAddProductServices<ProductModel>
     {
         private readonly IDAO<ProductModel> _baseDAO;
         private readonly IProductDAO<ProductModel> _productDAO;
-        private readonly IBaseHelperService<ProductModel> _helper;
+        private readonly IBaseHelperServices<ProductModel> _helper;
         private readonly ILogService _logger;
         private readonly IServiceResultFactory<AddProductService> _serviceResultFactory;
 
-        public AddProductService(IDAO<ProductModel> baseDAO, IProductDAO<ProductModel> productDAO, 
-            IBaseHelperService<ProductModel> helper, 
-            ILogService logger, 
+        public AddProductService(IDAO<ProductModel> baseDAO, IProductDAO<ProductModel> productDAO,
+            IBaseHelperServices<ProductModel> helper,
+            ILogService logger,
             IServiceResultFactory<AddProductService> serviceResultFactory)
         {
             _baseDAO = baseDAO;

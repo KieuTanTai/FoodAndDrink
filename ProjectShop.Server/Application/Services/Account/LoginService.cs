@@ -13,16 +13,16 @@ using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services.Account
 {
-    public class LoginService : ILoginService<AccountModel, AccountNavigationOptions>
+    public class LoginService : ILoginServices<AccountModel, AccountNavigationOptions>
     {
         private readonly IAccountDAO<AccountModel> _accountDAO;
         private readonly IHashPassword _hashPassword;
-        private readonly IBaseGetNavigationPropertyService<AccountModel, AccountNavigationOptions> _navigationService;
+        private readonly IBaseGetNavigationPropertyServices<AccountModel, AccountNavigationOptions> _navigationService;
         private readonly IServiceResultFactory<LoginService> _serviceResultFactory;
         private readonly ILogService _logger;
 
         public LoginService(IAccountDAO<AccountModel> accountDAO, IHashPassword hashPassword,
-            IBaseGetNavigationPropertyService<AccountModel, AccountNavigationOptions> navigationService,
+            IBaseGetNavigationPropertyServices<AccountModel, AccountNavigationOptions> navigationService,
             IServiceResultFactory<LoginService> serviceResultFactory, ILogService logger)
         {
             _logger = logger;

@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Core.Interfaces.IServices
 {
-    public interface IServiceGetSingle<TEntity, TOptions, TServiceCall>
+    public interface IGetSingleServices<TEntity, TOptions, TServiceCall>
         where TEntity : class, new()
         where TOptions : class
         where TServiceCall : class

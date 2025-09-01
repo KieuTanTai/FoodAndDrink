@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Application.Services.Roles
 {
-    public class BaseReturnAccountRoleService : IBaseGetNavigationPropertyService<RolesOfUserModel, RolesOfUserNavigationOptions>
+    public class BaseReturnAccountRoleService : IBaseGetNavigationPropertyServices<RolesOfUserModel, RolesOfUserNavigationOptions>
     {
         private readonly IDAO<RoleModel> _baseRoleDAO;
         private readonly IDAO<AccountModel> _baseAccountDAO;

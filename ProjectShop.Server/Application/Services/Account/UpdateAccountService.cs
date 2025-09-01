@@ -7,7 +7,7 @@ using ProjectShop.Server.Core.ValueObjects;
 
 namespace ProjectShop.Server.Application.Services.Account
 {
-    public class UpdateAccountService : IUpdateAccountService
+    public class UpdateAccountService : IUpdateAccountServices
     {
         private readonly IDAO<AccountModel> _baseDAO;
         private readonly IAccountDAO<AccountModel> _accountDAO;

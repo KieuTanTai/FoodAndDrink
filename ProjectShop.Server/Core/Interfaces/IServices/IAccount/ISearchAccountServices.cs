@@ -2,7 +2,7 @@
 
 namespace ProjectShop.Server.Core.Interfaces.IServices.IAccount
 {
-    public interface ISearchAccountService<TEntity, TOptions> where TEntity : class where TOptions : class
+    public interface ISearchAccountServices<TEntity, TOptions> where TEntity : class where TOptions : class
     {
         Task<ServiceResults<TEntity>> GetAllAsync(TOptions? options = null, int? maxGetCount = null);
         Task<ServiceResult<TEntity>> GetByUserNameAsync(string userName, TOptions? options = null);

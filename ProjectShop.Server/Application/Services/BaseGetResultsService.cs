@@ -6,16 +6,16 @@ using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Application.Services
 {
-    public class BaseGetResultsService<TEntity, TOptions, TServiceCall> : IServiceGetMultiple<TEntity, TOptions, TServiceCall>
+    public class BaseGetResultsService<TEntity, TOptions, TServiceCall> : IGetMultipleServices<TEntity, TOptions, TServiceCall>
         where TEntity : class, new()
         where TOptions : class
         where TServiceCall : class
     {
         private readonly ILogService _logger;
         private readonly IServiceResultFactory<TServiceCall> _serviceResultFactory;
-        private readonly IBaseGetNavigationPropertyService<TEntity, TOptions> _navigationService;
+        private readonly IBaseGetNavigationPropertyServices<TEntity, TOptions> _navigationService;
 
-        public BaseGetResultsService(ILogService logger, IServiceResultFactory<TServiceCall> serviceResultFactory, IBaseGetNavigationPropertyService<TEntity, TOptions> navigationService)
+        public BaseGetResultsService(ILogService logger, IServiceResultFactory<TServiceCall> serviceResultFactory, IBaseGetNavigationPropertyServices<TEntity, TOptions> navigationService)
         {
             _logger = logger;
             _serviceResultFactory = serviceResultFactory;

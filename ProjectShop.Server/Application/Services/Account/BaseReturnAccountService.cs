@@ -9,19 +9,19 @@ using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Application.Services.Account
 {
-    public class BaseReturnAccountService : IBaseGetNavigationPropertyService<AccountModel, AccountNavigationOptions>
+    public class BaseReturnAccountService : IBaseGetNavigationPropertyServices<AccountModel, AccountNavigationOptions>
     {
         private readonly IPersonDAO<CustomerModel> _customerDAO;
         private readonly IEmployeeDAO<EmployeeModel> _specificEmpDAO;
         private readonly ILogService _logger;
-        private readonly ISearchAccountRoleService<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey> _roleOfUserService;
+        private readonly ISearchAccountRoleServices<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey> _roleOfUserService;
         private readonly IServiceResultFactory<BaseReturnAccountService> _serviceResultFactory;
 
         public BaseReturnAccountService(
             IPersonDAO<CustomerModel> customerDAO,
             IEmployeeDAO<EmployeeModel> specificEmpDAO,
             ILogService logger,
-            ISearchAccountRoleService<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey> roleOfUserDAO,
+            ISearchAccountRoleServices<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey> roleOfUserDAO,
             IServiceResultFactory<BaseReturnAccountService> serviceResultFactory)
         {
             _logger = logger;

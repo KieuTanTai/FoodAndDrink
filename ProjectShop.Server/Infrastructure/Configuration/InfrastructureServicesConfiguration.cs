@@ -56,7 +56,7 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddTransient<IDAO<ProductImageModel>, ProductImageDAO>();
             services.AddTransient<INoneUpdateDAO<ProductLotModel>, ProductLotDAO>();
             services.AddTransient<IDAO<RoleModel>, RoleDAO>();
-            services.AddScoped<IDAO<RolesOfUserModel>, RoleOfUserDAO>();
+            services.AddScoped<INoneUpdateDAO<RolesOfUserModel>, RoleOfUserDAO>();
             services.AddTransient<IDAO<SaleEventModel>, SaleEventDAO>();
             services.AddTransient<IDAO<SaleEventImageModel>, SaleEventImageDAO>();
             services.AddTransient<IDAO<SupplierModel>, SupplierDAO>();

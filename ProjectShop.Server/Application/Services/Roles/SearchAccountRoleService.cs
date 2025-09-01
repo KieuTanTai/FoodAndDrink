@@ -9,21 +9,21 @@ using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Application.Services.Roles
 {
-    public class SearchAccountRoleService : ISearchAccountRoleService<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey>
+    public class SearchAccountRoleService : ISearchAccountRoleServices<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey>
     {
-        private readonly IDAO<RolesOfUserModel> _baseDAO;
-        private readonly IBaseHelperService<RolesOfUserModel> _helper;
+        private readonly INoneUpdateDAO<RolesOfUserModel> _baseDAO;
+        private readonly IBaseHelperServices<RolesOfUserModel> _helper;
         private readonly IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> _roleOfUserDAO;
-        private readonly IBaseGetByTimeService<RolesOfUserModel, RolesOfUserNavigationOptions> _byTimeService;
-        private readonly IServiceGetSingle<RolesOfUserModel, RolesOfUserNavigationOptions, SearchAccountRoleService> _getSingleService;
-        private readonly IServiceGetMultiple<RolesOfUserModel, RolesOfUserNavigationOptions, SearchAccountRoleService> _getMultipleService;
+        private readonly IBaseGetByTimeServices<RolesOfUserModel, RolesOfUserNavigationOptions> _byTimeService;
+        private readonly IGetSingleServices<RolesOfUserModel, RolesOfUserNavigationOptions, SearchAccountRoleService> _getSingleService;
+        private readonly IGetMultipleServices<RolesOfUserModel, RolesOfUserNavigationOptions, SearchAccountRoleService> _getMultipleService;
 
-        public SearchAccountRoleService(IDAO<RolesOfUserModel> baseDAO,
+        public SearchAccountRoleService(INoneUpdateDAO<RolesOfUserModel> baseDAO,
             IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> roleOfUserDAO,
-            IBaseHelperService<RolesOfUserModel> helper,
-            IBaseGetByTimeService<RolesOfUserModel, RolesOfUserNavigationOptions> byTimeService,
-            IServiceGetMultiple<RolesOfUserModel, RolesOfUserNavigationOptions, SearchAccountRoleService> getMultipleService,
-            IServiceGetSingle<RolesOfUserModel, RolesOfUserNavigationOptions, SearchAccountRoleService> getSingleService)
+            IBaseHelperServices<RolesOfUserModel> helper,
+            IBaseGetByTimeServices<RolesOfUserModel, RolesOfUserNavigationOptions> byTimeService,
+            IGetMultipleServices<RolesOfUserModel, RolesOfUserNavigationOptions, SearchAccountRoleService> getMultipleService,
+            IGetSingleServices<RolesOfUserModel, RolesOfUserNavigationOptions, SearchAccountRoleService> getSingleService)
         {
             _helper = helper;
             _baseDAO = baseDAO;
