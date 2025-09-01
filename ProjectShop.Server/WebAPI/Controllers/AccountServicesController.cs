@@ -36,7 +36,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         // API test lấy danh sách account
         [HttpGet(Name = "accounts")]
-        public async Task<IActionResult> GetAccounts([FromQuery] int? maxCount, [FromQuery] bool? status, [FromQuery] AccountNavigationOptions? options)
+        public async Task<IActionResult> GetAccounts([FromQuery] bool? status, [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxCount)
         {
             _logger.LogInformation("Bắt đầu lấy danh sách account.");
             //IEnumerable<AccountModel> accounts;
@@ -64,11 +64,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("by-status")]
-        public async Task<IActionResult> GetByStatusAsync([FromQuery] bool status, [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetByStatusAsync([FromQuery] bool status, [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchAccountServices.GetByStatusAsync(status, options, maxGetCount);
+                var result = await _searchAccountServices.GetByStatusAsync(status, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -110,11 +110,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         [HttpGet("created/by-month-year")]
         public async Task<IActionResult> GetByCreatedDateMonthAndYearAsync([FromQuery] int year, [FromQuery] int month,
-            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxGetCount)
+            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchAccountServices.GetByCreatedDateMonthAndYearAsync(year, month, options, maxGetCount);
+                var result = await _searchAccountServices.GetByCreatedDateMonthAndYearAsync(year, month, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -126,11 +126,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         [HttpGet("created/by-year")]
         public async Task<IActionResult> GetByCreatedYearAsync([FromQuery] int year, [FromQuery] ECompareType compareType,
-            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxGetCount)
+            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchAccountServices.GetByCreatedYearAsync(year, compareType, options, maxGetCount);
+                var result = await _searchAccountServices.GetByCreatedYearAsync(year, compareType, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -142,11 +142,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         [HttpGet("created/by-date-range")]
         public async Task<IActionResult> GetByCreatedDateTimeRangeAsync([FromQuery] DateTime startDate, [FromQuery] DateTime endDate,
-            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxGetCount)
+            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchAccountServices.GetByCreatedDateTimeRangeAsync(startDate, endDate, options, maxGetCount);
+                var result = await _searchAccountServices.GetByCreatedDateTimeRangeAsync(startDate, endDate, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -158,11 +158,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         [HttpGet("created/by-date")]
         public async Task<IActionResult> GetByCreatedDateTimeAsync([FromQuery] DateTime dateTime, [FromQuery] ECompareType compareType,
-            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxGetCount)
+            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchAccountServices.GetByCreatedDateTimeAsync(dateTime, compareType, options, maxGetCount);
+                var result = await _searchAccountServices.GetByCreatedDateTimeAsync(dateTime, compareType, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -174,11 +174,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         [HttpGet("updated/by-month-year")]
         public async Task<IActionResult> GetByLastUpdatedDateMonthAndYearAsync([FromQuery] int year, [FromQuery] int month,
-            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxGetCount)
+            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchAccountServices.GetByLastUpdatedDateMonthAndYearAsync(year, month, options, maxGetCount);
+                var result = await _searchAccountServices.GetByLastUpdatedDateMonthAndYearAsync(year, month, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -190,11 +190,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         [HttpGet("updated/by-year")]
         public async Task<IActionResult> GetByLastUpdatedYearAsync([FromQuery] int year, [FromQuery] ECompareType compareType,
-            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxGetCount)
+            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchAccountServices.GetByLastUpdatedYearAsync(year, compareType, options, maxGetCount);
+                var result = await _searchAccountServices.GetByLastUpdatedYearAsync(year, compareType, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -206,11 +206,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         [HttpGet("updated/by-date-range")]
         public async Task<IActionResult> GetByLastUpdatedDateTimeRangeAsync([FromQuery] DateTime startDate, [FromQuery] DateTime endDate,
-            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxGetCount)
+            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchAccountServices.GetByLastUpdatedDateTimeRangeAsync(startDate, endDate, options, maxGetCount);
+                var result = await _searchAccountServices.GetByLastUpdatedDateTimeRangeAsync(startDate, endDate, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -222,11 +222,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         [HttpGet("updated/by-date")]
         public async Task<IActionResult> GetByLastUpdatedDateTimeAsync([FromQuery] DateTime dateTime, [FromQuery] ECompareType compareType,
-            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxGetCount)
+            [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchAccountServices.GetByLastUpdatedDateTimeAsync(dateTime, compareType, options, maxGetCount);
+                var result = await _searchAccountServices.GetByLastUpdatedDateTimeAsync(dateTime, compareType, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)

@@ -28,11 +28,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync([FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetAllAsync([FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetAllAsync(options, maxGetCount);
+                var result = await _searchProductServices.GetAllAsync(options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -43,11 +43,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("all-by-unit")]
-        public async Task<IActionResult> GetAllByEnumAsync([FromQuery] EProductUnit unit, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetAllByEnumAsync([FromQuery] EProductUnit unit, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetAllByEnumAsync(unit, options, maxGetCount);
+                var result = await _searchProductServices.GetAllByEnumAsync(unit, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -58,11 +58,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("by-category-id/{categoryId}")]
-        public async Task<IActionResult> GetByCategoryIdAsync([FromRoute] uint categoryId, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetByCategoryIdAsync([FromRoute] uint categoryId, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetByCategoryIdAsync(categoryId, options, maxGetCount);
+                var result = await _searchProductServices.GetByCategoryIdAsync(categoryId, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -73,11 +73,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpPost("by-category-ids")]
-        public async Task<IActionResult> GetByCategoryIdsAsync([FromBody] IEnumerable<uint> categoryIds, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetByCategoryIdsAsync([FromBody] IEnumerable<uint> categoryIds, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetByCategoryIdsAsync(categoryIds, options, maxGetCount);
+                var result = await _searchProductServices.GetByCategoryIdsAsync(categoryIds, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -103,11 +103,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("by-input-price")]
-        public async Task<IActionResult> GetByInputPriceAsync([FromQuery] decimal price, [FromQuery] ECompareType compareType, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetByInputPriceAsync([FromQuery] decimal price, [FromQuery] ECompareType compareType, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetByInputPriceAsync(price, compareType, options, maxGetCount);
+                var result = await _searchProductServices.GetByInputPriceAsync(price, compareType, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -118,11 +118,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("by-range-price")]
-        public async Task<IActionResult> GetByRangePriceAsync([FromQuery] decimal minPrice, [FromQuery] decimal maxPrice, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetByRangePriceAsync([FromQuery] decimal minPrice, [FromQuery] decimal maxPrice, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetByRangePriceAsync(minPrice, maxPrice, options, maxGetCount);
+                var result = await _searchProductServices.GetByRangePriceAsync(minPrice, maxPrice, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -133,11 +133,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<IActionResult> GetByLikeStringAsync([FromQuery] string input, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetByLikeStringAsync([FromQuery] string input, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetByLikeStringAsync(input, options, maxGetCount);
+                var result = await _searchProductServices.GetByLikeStringAsync(input, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -148,11 +148,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("by-net-weight")]
-        public async Task<IActionResult> GetByNetWeightAsync([FromQuery] decimal netWeight, [FromQuery] ECompareType compareType, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetByNetWeightAsync([FromQuery] decimal netWeight, [FromQuery] ECompareType compareType, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetByNetWeightAsync(netWeight, compareType, options, maxGetCount);
+                var result = await _searchProductServices.GetByNetWeightAsync(netWeight, compareType, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -178,11 +178,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("by-rating-age")]
-        public async Task<IActionResult> GetByRatingAgeAsync([FromQuery] string ratingAge, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetByRatingAgeAsync([FromQuery] string ratingAge, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetByRatingAgeAsync(ratingAge, options, maxGetCount);
+                var result = await _searchProductServices.GetByRatingAgeAsync(ratingAge, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -193,11 +193,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("by-status")]
-        public async Task<IActionResult> GetByStatusAsync([FromQuery] bool status, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetByStatusAsync([FromQuery] bool status, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetByStatusAsync(status, options, maxGetCount);
+                var result = await _searchProductServices.GetByStatusAsync(status, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -208,11 +208,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("by-supplier-id/{supplierId}")]
-        public async Task<IActionResult> GetBySupplierIdAsync([FromRoute] uint supplierId, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetBySupplierIdAsync([FromRoute] uint supplierId, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetBySupplierIdAsync(supplierId, options, maxGetCount);
+                var result = await _searchProductServices.GetBySupplierIdAsync(supplierId, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -223,11 +223,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpPost("by-supplier-ids")]
-        public async Task<IActionResult> GetBySupplierIdsAsync([FromBody] IEnumerable<uint> supplierIds, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetBySupplierIdsAsync([FromBody] IEnumerable<uint> supplierIds, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetBySupplierIdsAsync(supplierIds, options, maxGetCount);
+                var result = await _searchProductServices.GetBySupplierIdsAsync(supplierIds, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -238,11 +238,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("by-last-updated-date")]
-        public async Task<IActionResult> GetByLastUpdatedDateAsync([FromQuery] DateTime lastUpdatedDate, [FromQuery] ECompareType compareType, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetByLastUpdatedDateAsync([FromQuery] DateTime lastUpdatedDate, [FromQuery] ECompareType compareType, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetByLastUpdatedDateAsync(lastUpdatedDate, compareType, options, maxGetCount);
+                var result = await _searchProductServices.GetByLastUpdatedDateAsync(lastUpdatedDate, compareType, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -253,11 +253,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("by-last-updated-date-range")]
-        public async Task<IActionResult> GetByLastUpdatedDateAsync([FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetByLastUpdatedDateAsync([FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetByLastUpdatedDateAsync(startDate, endDate, options, maxGetCount);
+                var result = await _searchProductServices.GetByLastUpdatedDateAsync(startDate, endDate, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -268,11 +268,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("by-last-updated-month-year")]
-        public async Task<IActionResult> GetByLastUpdatedDateAsync([FromQuery] int year, [FromQuery] int month, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetByLastUpdatedDateAsync([FromQuery] int year, [FromQuery] int month, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetByLastUpdatedDateAsync(year, month, options, maxGetCount);
+                var result = await _searchProductServices.GetByLastUpdatedDateAsync(year, month, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -283,11 +283,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("by-last-updated-year")]
-        public async Task<IActionResult> GetByLastUpdatedDateAsync([FromQuery] int year, [FromQuery] ECompareType compareType, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetByLastUpdatedDateAsync([FromQuery] int year, [FromQuery] ECompareType compareType, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetByLastUpdatedDateAsync(year, compareType, options, maxGetCount);
+                var result = await _searchProductServices.GetByLastUpdatedDateAsync(year, compareType, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -298,11 +298,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("by-created-date")]
-        public async Task<IActionResult> GetByDateTimeAsync([FromQuery] DateTime dateTime, [FromQuery] ECompareType compareType, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetByDateTimeAsync([FromQuery] DateTime dateTime, [FromQuery] ECompareType compareType, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetByDateTimeAsync(dateTime, compareType, options, maxGetCount);
+                var result = await _searchProductServices.GetByDateTimeAsync(dateTime, compareType, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -313,11 +313,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("by-created-date-range")]
-        public async Task<IActionResult> GetByDateTimeRangeAsync([FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetByDateTimeRangeAsync([FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetByDateTimeRangeAsync(startDate, endDate, options, maxGetCount);
+                var result = await _searchProductServices.GetByDateTimeRangeAsync(startDate, endDate, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -328,11 +328,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("by-created-month-year")]
-        public async Task<IActionResult> GetByMonthAndYearAsync([FromQuery] int year, [FromQuery] int month, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetByMonthAndYearAsync([FromQuery] int year, [FromQuery] int month, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetByMonthAndYearAsync(year, month, options, maxGetCount);
+                var result = await _searchProductServices.GetByMonthAndYearAsync(year, month, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -343,11 +343,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("by-created-year")]
-        public async Task<IActionResult> GetByYearAsync([FromQuery] int year, [FromQuery] ECompareType compareType, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxGetCount)
+        public async Task<IActionResult> GetByYearAsync([FromQuery] int year, [FromQuery] ECompareType compareType, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetByYearAsync(year, compareType, options, maxGetCount);
+                var result = await _searchProductServices.GetByYearAsync(year, compareType, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
