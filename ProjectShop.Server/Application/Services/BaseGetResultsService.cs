@@ -77,6 +77,7 @@ namespace ProjectShop.Server.Application.Services
 
                 if (options != null)
                     results = await _navigationService.GetNavigationPropertyByOptionsAsync(accounts, options, methodCall);
+
                 results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<TEntity, SearchAccountService>($"Retrieved entities by param = {param} with maxGetCount={maxGetCount}, options={options}.", methodCall: methodCall));
                 return results;
             }
@@ -100,7 +101,6 @@ namespace ProjectShop.Server.Application.Services
 
                 results.LogEntries = results.LogEntries!.Append(
                     _logger.JsonLogInfo<TEntity, SearchAccountService>($"Retrieved all entities with maxGetCount={maxGetCount}, options={options}.", methodCall: methodCall));
-
                 return results;
             }
             catch (Exception ex)

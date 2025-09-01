@@ -110,6 +110,9 @@ namespace ProjectShop.Server.Infrastructure.Data
         public async Task<ProductModel?> GetByProductNameAsync(string productName)
             => await GetSingleDataAsync(productName, "product_name");
 
+        public async Task<IEnumerable<ProductModel>> GetByProductNamesAsync(IEnumerable<string> productNames, int? maxGetCount)
+            => await GetByInputsAsync(productNames, "product_name", maxGetCount);
+
         public async Task<IEnumerable<ProductModel>> GetByRangePriceAsync(decimal minPrice, decimal maxPrice, int? maxGetCount)
             => await GetByRangeDecimalAsync(minPrice, maxPrice, "product_base_price", maxGetCount);
 

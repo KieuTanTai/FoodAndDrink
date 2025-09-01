@@ -3,6 +3,7 @@
     public interface IProductDAO<TEntity> : IGetByStatusAsync<TEntity>, IGetByEnumAsync<TEntity>, IGetRelativeAsync<TEntity>, IGetDataByDateTimeAsync<TEntity>, IGetByRangePriceAsync<TEntity> where TEntity : class
     {
         Task<TEntity?> GetByProductNameAsync(string productName);
+        Task<IEnumerable<TEntity>> GetByProductNamesAsync(IEnumerable<string> productNames, int? maxGetCount = null);
         Task<IEnumerable<TEntity>> GetByCategoryIdAsync(uint categoryId, int? maxGetCount = null);
         Task<IEnumerable<TEntity>> GetByCategoryIdsAsync(IEnumerable<uint> categoryIds, int? maxGetCount = null);
         Task<IEnumerable<TEntity>> GetBySupplierIdAsync(uint supplierId, int? maxGetCount = null);
