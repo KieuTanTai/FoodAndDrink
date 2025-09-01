@@ -6,12 +6,11 @@ namespace ProjectShop.Server.Core.Interfaces.IServices.IProduct
     public interface ISearchProductServices<TEntity, TOptions> where TEntity : class where TOptions : class
     {
         Task<ServiceResults<TEntity>> GetAllAsync(TOptions? options = null, int? maxGetCount = null);
+
         Task<ServiceResults<TEntity>> GetAllByEnumAsync(EProductUnit unit, TOptions? options = null, int? maxGetCount = null);
 
-        Task<ServiceResults<TEntity>> GetByCategoryIdAsync(uint categoryId, TOptions? options = null, int? maxGetCount = null);
-        Task<ServiceResults<TEntity>> GetByCategoryIdsAsync(IEnumerable<uint> categoryIds, TOptions? options = null, int? maxGetCount = null);
-
         Task<ServiceResults<TEntity>> GetByDateTimeAsync(DateTime dateTime, ECompareType compareType, TOptions? options = null, int? maxGetCount = null);
+
         Task<ServiceResults<TEntity>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate, TOptions? options = null, int? maxGetCount = null);
 
         Task<ServiceResult<TEntity>> GetByEnumAsync(EProductUnit unit, TOptions? options = null);
@@ -33,6 +32,7 @@ namespace ProjectShop.Server.Core.Interfaces.IServices.IProduct
         Task<ServiceResults<TEntity>> GetByStatusAsync(bool status, TOptions? options = null, int? maxGetCount = null);
 
         Task<ServiceResults<TEntity>> GetBySupplierIdAsync(uint supplierId, TOptions? options = null, int? maxGetCount = null);
+
         Task<ServiceResults<TEntity>> GetBySupplierIdsAsync(IEnumerable<uint> supplierIds, TOptions? options = null, int? maxGetCount = null);
 
         Task<ServiceResults<TEntity>> GetByYearAsync(int year, ECompareType compareType, TOptions? options = null, int? maxGetCount = null);

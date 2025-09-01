@@ -64,12 +64,6 @@ namespace ProjectShop.Server.Infrastructure.Data
             return await GetByInputAsync(unit.ToString(), "product_unit", maxGetCount);
         }
 
-        public async Task<IEnumerable<ProductModel>> GetByCategoryIdAsync(uint categoryId, int? maxGetCount)
-            => await GetByInputAsync(categoryId.ToString(), "category_id", maxGetCount);
-
-        public async Task<IEnumerable<ProductModel>> GetByCategoryIdsAsync(IEnumerable<uint> categoryIds, int? maxGetCount)
-            => await GetByInputsAsync(categoryIds.Select(categoryId => categoryId.ToString()), "category_id", maxGetCount);
-
         public async Task<IEnumerable<ProductModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount) where TEnum : Enum
         {
             if (compareType is not ECompareType type)

@@ -4,8 +4,6 @@
     {
         Task<TEntity?> GetByProductNameAsync(string productName);
         Task<IEnumerable<TEntity>> GetByProductNamesAsync(IEnumerable<string> productNames, int? maxGetCount = null);
-        Task<IEnumerable<TEntity>> GetByCategoryIdAsync(uint categoryId, int? maxGetCount = null);
-        Task<IEnumerable<TEntity>> GetByCategoryIdsAsync(IEnumerable<uint> categoryIds, int? maxGetCount = null);
         Task<IEnumerable<TEntity>> GetBySupplierIdAsync(uint supplierId, int? maxGetCount = null);
         Task<IEnumerable<TEntity>> GetBySupplierIdsAsync(IEnumerable<uint> supplierIds, int? maxGetCount = null);
         Task<IEnumerable<TEntity>> GetByRatingAgeAsync(string ratingAge, int? maxGetCount = null);

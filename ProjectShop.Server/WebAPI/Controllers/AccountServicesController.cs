@@ -94,11 +94,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("{accountId}")]
-        public async Task<IActionResult> GetByAccountIdAsync([FromRoute] uint accountId, [FromQuery] AccountNavigationOptions? options)
+        public async Task<IActionResult> GetByAccountIdAsync([FromRoute] int accountId, [FromQuery] AccountNavigationOptions? options)
         {
             try
             {
-                var result = await _searchAccountServices.GetByAccountIdAsync(accountId, options);
+                var result = await _searchAccountServices.GetByAccountIdAsync((uint)accountId, options);
                 return Ok(result);
             }
             catch (Exception ex)

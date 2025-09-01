@@ -38,12 +38,6 @@ namespace ProjectShop.Server.Application.Services.Product
         public async Task<ServiceResults<ProductModel>> GetAllByEnumAsync(EProductUnit unit, ProductNavigationOptions? options = null, int? maxGetCount = null)
             => await _getMultipleService.GetManyAsync(unit, _productDAO.GetAllByEnumAsync, options, _helper.GetValidMaxRecord(maxGetCount));
 
-        public async Task<ServiceResults<ProductModel>> GetByCategoryIdAsync(uint categoryId, ProductNavigationOptions? options = null, int? maxGetCount = null)
-            => await _getMultipleService.GetManyAsync(categoryId, _productDAO.GetByCategoryIdAsync, options, _helper.GetValidMaxRecord(maxGetCount));
-
-        public async Task<ServiceResults<ProductModel>> GetByCategoryIdsAsync(IEnumerable<uint> categoryIds, ProductNavigationOptions? options = null, int? maxGetCount = null)
-            => await _getMultipleService.GetManyAsync(categoryIds, _productDAO.GetByCategoryIdsAsync, options, _helper.GetValidMaxRecord(maxGetCount));
-
         public async Task<ServiceResult<ProductModel>> GetByEnumAsync(EProductUnit unit, ProductNavigationOptions? options = null)
             => await _getSingleService.GetAsync(unit, _productDAO.GetByEnumAsync, options);
 

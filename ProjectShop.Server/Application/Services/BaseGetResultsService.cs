@@ -1,4 +1,6 @@
 ﻿using ProjectShop.Server.Application.Services.Account;
+using ProjectShop.Server.Application.Services.Product;
+using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ValueObjects;
@@ -35,7 +37,7 @@ namespace ProjectShop.Server.Application.Services
                 if (options != null)
                     results = await _navigationService.GetNavigationPropertyByOptionsAsync(entities, options, methodCall);
 
-                results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<TEntity, SearchAccountService>($"Retrieved entities by range: {minValue} - {maxValue} with maxGetCount={maxGetCount}, options={options}.", methodCall: methodCall));
+                results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<TEntity, TServiceCall>($"Retrieved entities by range: {minValue} - {maxValue} with maxGetCount = {maxGetCount}, options = {options}.", methodCall: methodCall));
                 return results;
             }
             catch (Exception ex)
@@ -57,7 +59,7 @@ namespace ProjectShop.Server.Application.Services
                 if (options != null)
                     results = await _navigationService.GetNavigationPropertyByOptionsAsync(entities, options, methodCall);
 
-                results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<TEntity, SearchAccountService>($"Retrieved entities by value = {value} with maxGetCount={maxGetCount}, options={options}.", methodCall: methodCall));
+                results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<TEntity, TServiceCall>($"Retrieved entities by value = {value} with maxGetCount = {maxGetCount}, options = {options}.", methodCall: methodCall));
                 return results;
             }
             catch (Exception ex)
@@ -78,7 +80,7 @@ namespace ProjectShop.Server.Application.Services
                 if (options != null)
                     results = await _navigationService.GetNavigationPropertyByOptionsAsync(accounts, options, methodCall);
 
-                results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<TEntity, SearchAccountService>($"Retrieved entities by param = {param} with maxGetCount={maxGetCount}, options={options}.", methodCall: methodCall));
+                results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<TEntity, TServiceCall>($"Retrieved entities by param = {param} with maxGetCount = {maxGetCount}, options = {options}.", methodCall: methodCall));
                 return results;
             }
             catch (Exception ex)
@@ -100,7 +102,7 @@ namespace ProjectShop.Server.Application.Services
                     results = await _navigationService.GetNavigationPropertyByOptionsAsync(entities, options, methodCall);
 
                 results.LogEntries = results.LogEntries!.Append(
-                    _logger.JsonLogInfo<TEntity, SearchAccountService>($"Retrieved all entities with maxGetCount={maxGetCount}, options={options}.", methodCall: methodCall));
+                    _logger.JsonLogInfo<TEntity, TServiceCall>($"Retrieved all entities with maxGetCount = {maxGetCount}, options = {options}.", methodCall: methodCall));
                 return results;
             }
             catch (Exception ex)

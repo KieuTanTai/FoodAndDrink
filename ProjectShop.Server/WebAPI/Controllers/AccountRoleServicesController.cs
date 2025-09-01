@@ -264,11 +264,11 @@ public class AccountRoleServicesController : ControllerBase
 
     // Xóa t?t c? role c?a 1 account
     [HttpDelete("by-account-id/{accountId}")]
-    public async Task<IActionResult> DeleteByAccountIdAsync([FromRoute] uint accountId)
+    public async Task<IActionResult> DeleteByAccountIdAsync([FromRoute] int accountId)
     {
         try
         {
-            var result = await _deleteAccountRoleServices.DeleteByAccountIdAsync(accountId);
+            var result = await _deleteAccountRoleServices.DeleteByAccountIdAsync((uint)accountId);
             return Ok(result);
         }
         catch (Exception ex)
@@ -296,11 +296,11 @@ public class AccountRoleServicesController : ControllerBase
 
     // Xóa t?t c? account c?a 1 role
     [HttpDelete("by-role-id/{roleId}")]
-    public async Task<IActionResult> DeleteByRoleIdAsync([FromRoute] uint roleId)
+    public async Task<IActionResult> DeleteByRoleIdAsync([FromRoute] int roleId)
     {
         try
         {
-            var result = await _deleteAccountRoleServices.DeleteByRoleIdAsync(roleId);
+            var result = await _deleteAccountRoleServices.DeleteByRoleIdAsync((uint)roleId);
             return Ok(result);
         }
         catch (Exception ex)

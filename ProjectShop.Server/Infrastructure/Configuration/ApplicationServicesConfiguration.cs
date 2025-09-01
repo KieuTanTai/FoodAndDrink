@@ -5,6 +5,7 @@ using ProjectShop.Server.Application.Services.Roles;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
+using ProjectShop.Server.Core.Interfaces.IServices.IProduct;
 using ProjectShop.Server.Core.Interfaces.IServices.Role;
 using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 using TLGames.Application.Services;
@@ -37,6 +38,11 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddTransient<IDeleteAccountRoleServices<RolesOfUserKey>, DeleteAccountRoleService>();
             services.AddTransient<ISearchAccountRoleServices<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey>, SearchAccountRoleService>();
             services.AddTransient<ISearchRoleServices<RoleModel, RoleNavigationOptions>, SearchRoleService>();
+
+            // NOTE: PRODUCT SERVICES
+            services.AddTransient<IAddProductServices<ProductModel>, AddProductService>();
+            services.AddTransient<IUpdateProductServices, UpdateProductService>();
+            services.AddTransient<ISearchProductServices<ProductModel, ProductNavigationOptions>, SearchProductService>();
 
             // NOTE: IGetNavigationPropertyService
             services.AddTransient<IBaseGetNavigationPropertyServices<AccountModel, AccountNavigationOptions>, BaseReturnAccountService>();

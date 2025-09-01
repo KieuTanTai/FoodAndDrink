@@ -43,12 +43,12 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         // 1. Get by RoleId
-        [HttpGet("{roleId:uint}")]
-        public async Task<IActionResult> GetRoleByIdAsync([FromRoute] uint roleId, [FromQuery] RoleNavigationOptions? options)
+        [HttpGet("{roleId:int}")]
+        public async Task<IActionResult> GetRoleByIdAsync([FromRoute] int roleId, [FromQuery] RoleNavigationOptions? options)
         {
             try
             {
-                var result = await _searchRoleServices.GetByRoleIdAsync(roleId, options);
+                var result = await _searchRoleServices.GetByRoleIdAsync((uint)roleId, options);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -218,13 +218,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         // Cập nhật status 1 role
         [HttpPut("{roleId}/status")]
-        public async Task<IActionResult> UpdateRoleStatusAsync(
-            [FromRoute] uint roleId,
-            [FromQuery] bool status)
+        public async Task<IActionResult> UpdateRoleStatusAsync([FromRoute] int roleId, [FromQuery] bool status)
         {
             try
             {
-                var result = await _updateRoleService.UpdateRoleStatusAsync(roleId, status);
+                var result = await _updateRoleService.UpdateRoleStatusAsync((uint)roleId, status);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -253,13 +251,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         // Cập nhật tên 1 role
         [HttpPut("{roleId}/name")]
-        public async Task<IActionResult> UpdateRoleNameAsync(
-            [FromRoute] uint roleId,
-            [FromQuery] string newRoleName)
+        public async Task<IActionResult> UpdateRoleNameAsync([FromRoute] int roleId, [FromQuery] string newRoleName)
         {
             try
             {
-                var result = await _updateRoleService.UpdateRoleNameAsync(roleId, newRoleName);
+                var result = await _updateRoleService.UpdateRoleNameAsync((uint)roleId, newRoleName);
                 return Ok(result);
             }
             catch (Exception ex)

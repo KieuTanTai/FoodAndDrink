@@ -57,36 +57,6 @@ namespace ProjectShop.Server.WebAPI.Controllers
             }
         }
 
-        [HttpGet("by-category-id/{categoryId}")]
-        public async Task<IActionResult> GetByCategoryIdAsync([FromRoute] uint categoryId, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
-        {
-            try
-            {
-                var result = await _searchProductServices.GetByCategoryIdAsync(categoryId, options, maxCount);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error getting products by categoryId {categoryId}.");
-                return StatusCode(500, "An error occurred while getting products by category id.");
-            }
-        }
-
-        [HttpPost("by-category-ids")]
-        public async Task<IActionResult> GetByCategoryIdsAsync([FromBody] IEnumerable<uint> categoryIds, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
-        {
-            try
-            {
-                var result = await _searchProductServices.GetByCategoryIdsAsync(categoryIds, options, maxCount);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting products by category ids.");
-                return StatusCode(500, "An error occurred while getting products by category ids.");
-            }
-        }
-
         [HttpGet("by-unit")]
         public async Task<IActionResult> GetByEnumAsync([FromQuery] EProductUnit unit, [FromQuery] ProductNavigationOptions? options)
         {
@@ -208,11 +178,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("by-supplier-id/{supplierId}")]
-        public async Task<IActionResult> GetBySupplierIdAsync([FromRoute] uint supplierId, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
+        public async Task<IActionResult> GetBySupplierIdAsync([FromRoute] int supplierId, [FromQuery] ProductNavigationOptions? options, [FromQuery] int? maxCount)
         {
             try
             {
-                var result = await _searchProductServices.GetBySupplierIdAsync(supplierId, options, maxCount);
+                var result = await _searchProductServices.GetBySupplierIdAsync((uint)supplierId, options, maxCount);
                 return Ok(result);
             }
             catch (Exception ex)
