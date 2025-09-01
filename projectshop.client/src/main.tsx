@@ -1,7 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './assets/css/index.css';
-import App from './App';
 import Header from './components/header';
 import Footer from './components/footer';
 import SubHeader from './components/sub-header';
@@ -22,7 +21,6 @@ createRoot(document.getElementById('header')!).render(
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     {/*<SaleEventBlock/>*/}
-    <App />
     <ProductContainer
       id="featured-products"
       title="Featured Products"
@@ -51,7 +49,7 @@ createRoot(document.getElementById('root')!).render(
       ]}
     />
     <LoginForm />
-    <ForgotPasswordForm/>
+    <ForgotPasswordForm onBackToLogin={() => { /* handle back to login */ }} />
     <SignupForm />
     <Cart />
     <UserPage></UserPage>

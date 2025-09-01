@@ -1,4 +1,4 @@
-import { RolesOfUserModel } from "./rolesOfUserModel";
+import type { RolesOfUserModel } from "./rolesOfUserModel";
 
 export interface RoleModel {
     roleId: number;

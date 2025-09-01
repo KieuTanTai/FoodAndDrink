@@ -1,6 +1,6 @@
-import { RolesOfUserModel } from './rolesOfUserModel';
-import { CustomerModel } from "./customerModel";
-import { EmployeeModel } from "./employeeModel";
+import type{ RolesOfUserModel } from './rolesOfUserModel';
+import type{ CustomerModel } from "./customerModel";
+import type{ EmployeeModel } from "./employeeModel";
 
 export interface AccountModel {
     accountId: number;

@@ -1,4 +1,4 @@
-import { LocationModel } from './locationModel';
+import type{ LocationModel } from './locationModel';
 export interface InventoryModel {
     inventoryId: number;
     locationId: number;

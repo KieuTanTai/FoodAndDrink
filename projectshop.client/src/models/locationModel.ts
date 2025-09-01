@@ -1,10 +1,10 @@
-import { LocationTypeModel } from './locationTypeModel';
-import { LocationDistrictModel } from "./locationDistrictModel";
-import { LocationWardModel } from "./locationWardModel";
-import { LocationCityModel } from './locationCityModel';
-import { InventoryModel } from './inventoryModel';
-import { InventoryMovementModel } from './inventoryMovementModel';
-import { DisposeProductModel } from './disposeProductModel';
+import type { LocationTypeModel } from './locationTypeModel';
+import type { LocationDistrictModel } from "./locationDistrictModel";
+import type { LocationWardModel } from "./locationWardModel";
+import type { LocationCityModel } from './locationCityModel';
+import type { InventoryModel } from './inventoryModel';
+import type { InventoryMovementModel } from './inventoryMovementModel';
+import type { DisposeProductModel } from './disposeProductModel';
 
 export interface LocationModel {
     locationId: number;

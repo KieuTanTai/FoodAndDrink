@@ -1,6 +1,6 @@
-import { InventoryMovementModel } from './inventoryMovementModel';
-import { ProductLotModel } from './productLotModel';
-import { ProductModel } from "./productModel";
+import type{ InventoryMovementModel } from './inventoryMovementModel';
+import type{ ProductLotModel } from './productLotModel';
+import type{ ProductModel } from "./productModel";
 
 export interface DetailInventoryMovementModel {
     detailInventoryMovementId: number;

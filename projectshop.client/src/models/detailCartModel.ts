@@ -1,5 +1,5 @@
-import { ProductModel } from './productModel';
-import { CartModel } from "./cartModel";
+import type{ ProductModel } from './productModel';
+import type{ CartModel } from "./cartModel";
 
 export interface DetailCartModel {
     detailCartId: number;

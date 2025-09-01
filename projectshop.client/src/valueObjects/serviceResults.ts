@@ -1,4 +1,4 @@
-import { JsonLogEntry } from "./jsonLogEntry";
+import type { JsonLogEntry } from "./jsonLogEntry";
 
 export interface ServiceResults<TEntity> {
     logEntries: JsonLogEntry[] | null;

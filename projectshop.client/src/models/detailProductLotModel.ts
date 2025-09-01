@@ -1,5 +1,5 @@
-import { ProductLotModel } from "./productLotModel";
-import { ProductModel } from "./productModel";
+import type{ ProductLotModel } from "./productLotModel";
+import type{ ProductModel } from "./productModel";
 
 export interface DetailProductLotKey {
     productLotId: number;

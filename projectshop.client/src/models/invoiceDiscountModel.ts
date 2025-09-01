@@ -1,5 +1,5 @@
-import { InvoiceModel } from "./invoiceModel";
-import { SaleEventModel } from "./saleEventModel";
+import type{ InvoiceModel } from "./invoiceModel";
+import type{ SaleEventModel } from "./saleEventModel";
 
 export interface InvoiceDiscountKey {
     invoiceId: number;

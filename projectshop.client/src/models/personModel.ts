@@ -1,7 +1,7 @@
-import { AccountModel } from "./accountModel";
-import { LocationCityModel } from "./locationCityModel";
-import { LocationDistrictModel } from "./locationDistrictModel";
-import { LocationWardModel } from "./locationWardModel";
+import type { AccountModel } from "./accountModel";
+import type { LocationCityModel } from "./locationCityModel";
+import type { LocationDistrictModel } from "./locationDistrictModel";
+import type { LocationWardModel } from "./locationWardModel";
 
 export interface PersonModel {
     accountId: number;

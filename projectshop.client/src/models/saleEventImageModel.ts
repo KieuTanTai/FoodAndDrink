@@ -1,4 +1,4 @@
-import { SaleEventModel } from "./saleEventModel";
+import type { SaleEventModel } from "./saleEventModel";
 
 export interface SaleEventImageModel {
     saleEventImageId: number;

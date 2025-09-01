@@ -1,5 +1,5 @@
-import { AccountModel } from "./accountModel";
-import { RoleModel } from "./roleModel";
+import type { AccountModel } from "./accountModel";
+import type { RoleModel } from "./roleModel";
 
 export interface RolesOfUserKey {
     accountId: number;

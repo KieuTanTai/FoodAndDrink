@@ -1,6 +1,6 @@
-import { InvoiceModel } from './invoiceModel';
-import { CartModel } from "./cartModel";
-import { PersonModel } from "./personModel";
+import type{ InvoiceModel } from './invoiceModel';
+import type{ CartModel } from "./cartModel";
+import type{ PersonModel } from "./personModel";
 
 export interface CustomerModel extends PersonModel {
     customerId: number;

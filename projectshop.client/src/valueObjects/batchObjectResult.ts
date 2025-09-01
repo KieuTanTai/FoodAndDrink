@@ -1,4 +1,4 @@
-import { BatchItemResult } from "./batchItemResult";
+import type { BatchItemResult } from "./batchItemResult";
 
 export interface BatchObjectResult<TEntity> {
     validEntities: TEntity[];

@@ -1,4 +1,4 @@
-import { DisposeProductModel } from "./disposeProductModel";
+import type{ DisposeProductModel } from "./disposeProductModel";
 
 export interface DisposeReasonModel {
     disposeReasonId: number;

@@ -1,9 +1,9 @@
-import { EInvoicePaymentType } from './../Enums/eInvoicePaymentType';
-import { CustomerModel } from './customerModel';
-import { DetailInvoiceModel } from './detailInvoiceModel';
-import { EmployeeModel } from './employeeModel';
-import { InvoiceDiscountModel } from './invoiceDiscountModel';
-import { UserPaymentMethodModel } from './userPaymentMethodModel';
+import type{ EInvoicePaymentType } from './../enums/eInvoicePaymentType';
+import type{ CustomerModel } from './customerModel';
+import type{ DetailInvoiceModel } from './detailInvoiceModel';
+import type{ EmployeeModel } from './employeeModel';
+import type{ InvoiceDiscountModel } from './invoiceDiscountModel';
+import type{ UserPaymentMethodModel } from './userPaymentMethodModel';
 export interface InvoiceModel {
     invoiceId: number;
     customerId: number;

@@ -1,5 +1,5 @@
-import { InvoiceModel } from "./invoiceModel";
-import { ProductModel } from "./productModel";
+import type{ InvoiceModel } from "./invoiceModel";
+import type{ ProductModel } from "./productModel";
 
 export interface DetailInvoiceModel {
     detailInvoiceId: number;

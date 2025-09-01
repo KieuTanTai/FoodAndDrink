@@ -1,7 +1,7 @@
-import { LocationWardModel } from './locationWardModel';
-import { LocationDistrictModel } from './locationDistrictModel';
-import { LocationCityModel } from './locationCityModel';
-import { CustomerModel } from './customerModel';
+import type{ LocationWardModel } from './locationWardModel';
+import type{ LocationDistrictModel } from './locationDistrictModel';
+import type{ LocationCityModel } from './locationCityModel';
+import type{ CustomerModel } from './customerModel';
 export interface CustomerAddressModel {
     customerAddressId: number;
     customerCityId: number;

@@ -1,7 +1,7 @@
-import { DisposeReasonModel } from "./disposeReasonModel";
-import { EmployeeModel } from "./employeeModel";
-import { LocationModel } from "./locationModel";
-import { ProductModel } from "./productModel";
+import type{ DisposeReasonModel } from "./disposeReasonModel";
+import type{ EmployeeModel } from "./employeeModel";
+import type{ LocationModel } from "./locationModel";
+import type{ ProductModel } from "./productModel";
 
 export interface DisposeProductModel {
     disposeProductId: number;

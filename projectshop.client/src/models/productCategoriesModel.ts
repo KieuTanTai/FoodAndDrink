@@ -1,5 +1,5 @@
-import { CategoryModel } from "./categoryModel";
-import { ProductModel } from "./productModel";
+import type { CategoryModel } from "./categoryModel";
+import type { ProductModel } from "./productModel";
 
 export interface ProductCategoriesKey {
     categoryId: number;

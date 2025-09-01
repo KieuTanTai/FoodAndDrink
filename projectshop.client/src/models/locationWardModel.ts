@@ -1,7 +1,7 @@
-import { CustomerModel } from "./customerModel";
-import { EmployeeModel } from "./employeeModel";
-import { LocationModel } from "./locationModel";
-import { SupplierModel } from "./supplierModel";
+import type { CustomerModel } from "./customerModel";
+import type { EmployeeModel } from "./employeeModel";
+import type { LocationModel } from "./locationModel";
+import type { SupplierModel } from "./supplierModel";
 
 export interface LocationWardModel {
     locationWardId: number;

@@ -1,14 +1,14 @@
-import { EProductUnit } from './../Enums/eProductUnit';
-import { DetailCartModel } from './detailCartModel';
-import { DetailInventoryModel } from './detailInventoryModel';
-import { DetailInventoryMovementModel } from './detailInventoryMovementModel';
-import { DetailInvoiceModel } from './detailInvoiceModel';
-import { DetailProductLotModel } from './detailProductLotModel';
-import { DetailSaleEventModel } from './detailSaleEventModel';
-import { DisposeProductModel } from './disposeProductModel';
-import { ProductCategoriesModel } from './productCategoriesModel';
-import { ProductImageModel } from './productImageModel';
-import { SupplierModel } from './supplierModel';
+import type { EProductUnit } from './../enums/eProductUnit';
+import type { DetailCartModel } from './detailCartModel';
+import type { DetailInventoryModel } from './detailInventoryModel';
+import type { DetailInventoryMovementModel } from './detailInventoryMovementModel';
+import type { DetailInvoiceModel } from './detailInvoiceModel';
+import type { DetailProductLotModel } from './detailProductLotModel';
+import type { DetailSaleEventModel } from './detailSaleEventModel';
+import type { DisposeProductModel } from './disposeProductModel';
+import type { ProductCategoriesModel } from './productCategoriesModel';
+import type { ProductImageModel } from './productImageModel';
+import type { SupplierModel } from './supplierModel';
 export interface ProductModel {
     productBarcode: string;
     supplierId: number;

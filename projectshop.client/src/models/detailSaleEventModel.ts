@@ -1,6 +1,6 @@
-import { SaleEventModel } from './saleEventModel';
-import { EDiscountType } from './../Enums/eDiscountType';
-import { ProductModel } from './productModel';
+import type{ SaleEventModel } from './saleEventModel';
+import type{ EDiscountType } from './../enums/eDiscountType';
+import type{ ProductModel } from './productModel';
 export interface DetailSaleEventModel {
     detailSaleEventId: number;
     saleEventId: number;

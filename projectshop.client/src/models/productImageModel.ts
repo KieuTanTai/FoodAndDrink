@@ -1,4 +1,4 @@
-import { ProductModel } from "./productModel";
+import type { ProductModel } from "./productModel";
 
 export interface ProductImageModel {
     productImageId: number;

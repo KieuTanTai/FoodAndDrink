@@ -1,5 +1,5 @@
-import { InventoryModel } from "./inventoryModel";
-import { ProductModel } from "./productModel";
+import type{ InventoryModel } from "./inventoryModel";
+import type{ ProductModel } from "./productModel";
 
 export interface DetailInventoryModel {
     detailInventoryId: number;

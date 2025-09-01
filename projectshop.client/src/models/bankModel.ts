@@ -1,4 +1,4 @@
-import { UserPaymentMethodModel } from './userPaymentMethodModel';
+import type{ UserPaymentMethodModel } from './userPaymentMethodModel';
 export interface BankModel {
     bankId: number;
     bankName: string;

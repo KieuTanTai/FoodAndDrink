@@ -1,6 +1,6 @@
-import { BankModel } from "./bankModel";
-import { CustomerModel } from "./customerModel";
-import { InvoiceModel } from "./invoiceModel";
+import type { BankModel } from "./bankModel";
+import type { CustomerModel } from "./customerModel";
+import type { InvoiceModel } from "./invoiceModel";
 
 export interface UserPaymentMethodModel {
     userPaymentMethodId: number;

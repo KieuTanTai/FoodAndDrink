@@ -1,5 +1,5 @@
-import { EInventoryMovementReason } from './../Enums/eInventoryMovementReason';
-import { LocationModel } from './locationModel';
+import type{ EInventoryMovementReason } from './../enums/eInventoryMovementReason';
+import type{ LocationModel } from './locationModel';
 export interface InventoryMovementModel {
     inventoryMovementId: number;
     sourceLocationId: number;

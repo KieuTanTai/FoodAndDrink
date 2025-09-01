@@ -1,8 +1,8 @@
-import { LocationCityModel } from "./locationCityModel";
-import { LocationDistrictModel } from "./locationDistrictModel";
-import { LocationModel } from "./locationModel";
-import { LocationWardModel } from "./locationWardModel";
-import { PersonModel } from "./personModel";
+import type{ LocationCityModel } from "./locationCityModel";
+import type{ LocationDistrictModel } from "./locationDistrictModel";
+import type{ LocationModel } from "./locationModel";
+import type{ LocationWardModel } from "./locationWardModel";
+import type{ PersonModel } from "./personModel";
 
 export interface EmployeeModel extends PersonModel {
     employeeId: number;

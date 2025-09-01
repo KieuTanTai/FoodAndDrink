@@ -1,4 +1,4 @@
-export interface UpdateAccountPasswordRequest {
+export interface AccountUpdatePasswordRequest {
     accountId: number;
     userName: string;
     newPassword: string;

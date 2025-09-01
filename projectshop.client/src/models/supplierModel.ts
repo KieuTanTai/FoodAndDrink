@@ -1,5 +1,5 @@
-import { LocationModel } from "./locationModel";
-import { ProductModel } from "./productModel";
+import type { LocationModel } from "./locationModel";
+import type { ProductModel } from "./productModel";
 
 export interface SupplierModel {
     supplierId: number;
