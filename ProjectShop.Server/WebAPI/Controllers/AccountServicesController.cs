@@ -34,18 +34,18 @@ namespace ProjectShop.Server.WebAPI.Controllers
             _searchAccountServices = searchAccountServices;
         }
 
-        // API test lấy danh sách account
+        // API to get account list
         [HttpGet(Name = "accounts")]
         public async Task<IActionResult> GetAccounts([FromQuery] bool? status, [FromQuery] AccountNavigationOptions? options, [FromQuery] int? maxCount)
         {
-            _logger.LogInformation("Bắt đầu lấy danh sách account.");
+            _logger.LogInformation("Starting to retrieve account list.");
             //IEnumerable<AccountModel> accounts;
             ServiceResults<AccountModel> serviceResults = new ServiceResults<AccountModel>();
             try
             {
                 if (maxCount.HasValue && maxCount.Value <= 0)
                 {
-                    _logger.LogWarning("maxCount phải lớn hơn 0.");
+                    _logger.LogWarning("maxCount must be greater than 0.");
                     return BadRequest("maxCount must be greater than 0.");
                 }
 
@@ -53,11 +53,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
                     serviceResults = await _searchAccountServices.GetByStatusAsync(status.Value, options, maxCount);
                 else
                     serviceResults = await _searchAccountServices.GetAllAsync(options, maxCount);
-                return Ok(serviceResults); // trả json ra postman/browser
+                return Ok(serviceResults); // return json to postman/browser
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "\nLỗi khi lấy danh sách tài khoản.");
+                _logger.LogError(ex, "\nError when retrieving account list.");
                 return Ok(new List<AccountModel>());
             }
 
@@ -236,15 +236,15 @@ namespace ProjectShop.Server.WebAPI.Controllers
             }
         }
 
-        // API test lấy thông tin tài khoản hiện tại
+        // API to get current account information
         [HttpGet("current-account")]
         public async Task<IActionResult> GetCurrentAccount([FromQuery] AccountNavigationOptions? options)
         {
-            _logger.LogInformation("Bắt đầu lấy thông tin tài khoản hiện tại.");
+            _logger.LogInformation("Starting to retrieve current account information.");
             string userName = GetUserNameByClaims();
             if (string.IsNullOrEmpty(userName))
             {
-                _logger.LogWarning("Không tìm thấy tên đăng nhập của tài khoản hiện tại.");
+                _logger.LogWarning("Current account username not found.");
                 return NotFound("Current account not found.");
             }
 
@@ -253,25 +253,25 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
                 serviceResult = await _searchAccountServices.GetByUserNameAsync(userName, options);
                 AccountModel currentAccount = serviceResult.Data!;
-                _logger.LogInformation($"Thông tin tài khoản hiện tại: {currentAccount.UserName}");
+                _logger.LogInformation($"Current account information: {currentAccount.UserName}");
                 return Ok(serviceResult);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi lấy thông tin tài khoản hiện tại.");
+                _logger.LogError(ex, "Error when retrieving current account information.");
                 return BadRequest("Failed to get current account.");
             }
         }
 
-        // API test lấy danh sách quyền của người dùng hiện tại
+        // API to get current user's roles list
         [HttpGet("current-account-roles")]
         public async Task<IActionResult> GetCurrentAccountRoles()
         {
-            _logger.LogInformation("Bắt đầu lấy danh sách quyền của người dùng hiện tại.");
+            _logger.LogInformation("Starting to retrieve current user's roles list.");
             string userName = GetUserNameByClaims();
             if (string.IsNullOrEmpty(userName))
             {
-                _logger.LogWarning("Không tìm thấy tên đăng nhập của tài khoản hiện tại.");
+                _logger.LogWarning("Current account username not found.");
                 return NotFound("Current account not found.");
             }
 
@@ -282,22 +282,21 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 serviceResult = await _searchAccountServices.GetByUserNameAsync(userName, options);
                 AccountModel? account = serviceResult.Data!;
                 IEnumerable<RolesOfUserModel> roles = account.RolesOfUsers;
-                _logger.LogInformation($"Số lượng quyền của người dùng hiện tại: {roles.Count()}");
+                _logger.LogInformation($"Number of current user's roles: {roles.Count()}");
                 return Ok(roles);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi lấy danh sách quyền của người dùng hiện tại.");
+                _logger.LogError(ex, "Error when retrieving current user's roles list.");
                 return BadRequest("Failed to get current account roles.");
             }
         }
 
-        // TODO: API test lấy danh sách account và roles
-        // API test đăng nhập
+        // API for login
         [HttpPost(Name = "login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request, [FromQuery] AccountNavigationOptions? options)
         {
-            _logger.LogInformation("Bắt đầu quá trình đăng nhập.");
+            _logger.LogInformation("Starting login process.");
             try
             {
                 ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
@@ -306,26 +305,26 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 // Set claims principal for the current user
                 ClaimsPrincipal principal = BuildClaimsPrincipal(account);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-                _logger.LogInformation($"Đăng nhập thành công. {account.UserName}");
+                _logger.LogInformation($"Login successful. {account.UserName}");
                 return Ok(serviceResult);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi đăng nhập.");
+                _logger.LogError(ex, "Error during login.");
                 return BadRequest("Login failed.");
             }
         }
 
-        // API test đăng ký
+        // API for signup
         [HttpPost("signup")]
         public async Task<IActionResult> Signup([FromBody] RegisterRequest request)
         {
-            _logger.LogInformation("Bắt đầu quá trình đăng ký.");
+            _logger.LogInformation("Starting signup process.");
 
-            // Validate đầu vào
+            // Validate input
             if (request == null || string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
             {
-                _logger.LogWarning("Dữ liệu đăng ký không hợp lệ.");
+                _logger.LogWarning("Invalid signup data.");
                 return BadRequest("Invalid signup data.");
             }
 
@@ -334,66 +333,142 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
                 serviceResult = await _signupServices.AddAccountAsync(new AccountModel(request.Email, request.Password));
                 uint result = serviceResult.Data!.AccountId;
-                _logger.LogInformation($"Đăng ký thành công. {request.Email}");
-                // Có thể trả về CreatedAtAction nếu muốn, ở đây dùng Ok cho đơn giản
+                _logger.LogInformation($"Signup successful. {request.Email}");
+                // Could return CreatedAtAction if desired, using Ok for simplicity
                 return Ok(serviceResult);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi đăng ký.");
+                _logger.LogError(ex, "Error during signup.");
                 return StatusCode(500, "Internal server error during signup.");
             }
         }
 
-        // API test cập nhật trạng thái tài khoản
+        // TODO: API to update account status and related customer or employee status
         [HttpPatch("update-status")]
         public async Task<IActionResult> UpdateAccountStatus([FromBody] AccountUpdateStatusRequest request)
         {
-            _logger.LogInformation("Bắt đầu quá trình cập nhật trạng thái tài khoản.");
+            _logger.LogInformation("Starting account status update process.");
             if (request.AccountId <= 0)
             {
-                _logger.LogWarning("AccountId không hợp lệ.");
+                _logger.LogWarning("Invalid AccountId.");
                 return BadRequest("Invalid AccountId.");
             }
 
             try
             {
                 JsonLogEntry logEntry = await _updateAccountStatusServices.UpdateAccountStatusAsync(request.AccountId, request.Status);
-                _logger.LogInformation($"Cập nhật trạng thái thành công. AccountId: {request.AccountId}, New Status: {request.Status}");
+                _logger.LogInformation($"Status update successful. AccountId: {request.AccountId}, New Status: {request.Status}");
                 return Ok(logEntry);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi cập nhật trạng thái tài khoản.");
+                _logger.LogError(ex, "Error when updating account status.");
                 return BadRequest("Update status failed.");
             }
         }
 
-        // API test cập nhật mật khẩu tài khoản
+        // API to update account password
         [HttpPatch("update-password")]
         public async Task<IActionResult> UpdatePassword([FromBody] AccountUpdatePasswordRequest request)
         {
-            _logger.LogInformation("Bắt đầu quá trình cập nhật mật khẩu tài khoản.");
+            _logger.LogInformation("Starting account password update process.");
             if (request.AccountId <= 0 || string.IsNullOrEmpty(request.NewPassword))
             {
-                _logger.LogWarning("AccountId hoặc NewPassword không hợp lệ.");
+                _logger.LogWarning("Invalid AccountId or NewPassword.");
                 return BadRequest("Invalid AccountId or NewPassword.");
             }
 
             try
             {
                 JsonLogEntry logEntry = await _updateAccountStatusServices.UpdateAccountPasswordAsync(request.AccountId, request.NewPassword);
-                _logger.LogInformation($"Cập nhật mật khẩu thành công. AccountId: {request.AccountId}");
+                _logger.LogInformation($"Password update successful. AccountId: {request.AccountId}");
                 return Ok(logEntry);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi cập nhật mật khẩu tài khoản.");
+                _logger.LogError(ex, "Error when updating account password.");
                 return BadRequest("Update password failed.");
             }
         }
 
-        // API test OPTIONS trên Postman
+        [HttpDelete("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            _logger.LogInformation("Starting logout process.");
+            try
+            {
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                _logger.LogInformation("Logout successful.");
+                return Ok("Logout successful.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during logout.");
+                return StatusCode(500, "Internal server error during logout.");
+            }
+        }
+
+        [HttpDelete("logout-all")]
+        public async Task<IActionResult> LogoutAll()
+        {
+            _logger.LogInformation("Starting logout from all sessions process.");
+            try
+            {
+                // Delete all cookies (if any)
+                foreach (var cookie in Request.Cookies.Keys)
+                    Response.Cookies.Delete(cookie);
+
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                _logger.LogInformation("Logout from all sessions successful.");
+                return Ok("Logout from all sessions successful.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during logout from all sessions.");
+                return StatusCode(500, "Internal server error during logout from all sessions.");
+            }
+        }
+
+        // TODO: API to disable account and related customer or employee
+        [HttpDelete("disable-account/{accountId}")]
+        public async Task<IActionResult> DisableAccount([FromRoute] int accountId, [FromBody] AccountUpdateRelativeRequest request)
+        {
+            _logger.LogInformation("Starting account disabling process.");
+            if (accountId <= 0)
+            {
+                _logger.LogWarning("Invalid AccountId.");
+                return BadRequest("Invalid AccountId.");
+            }
+
+            try
+            {
+                JsonLogEntry logEntry = await _updateAccountStatusServices.UpdateAccountStatusAsync((uint)accountId, false);
+                _logger.LogInformation($"Account disabling successful. AccountId: {accountId}");
+                if (request.IsUpdateCustomer)
+                {
+                    _logger.LogInformation($"Updating related customer status for AccountId: {accountId}");
+                }
+
+                else if (request.IsUpdateEmployee)
+                {
+                    // Call service to update related employee status
+                    _logger.LogInformation($"Updating related employee status for AccountId: {accountId}");
+                    // await _updateEmployeeStatusServices.UpdateEmployeeStatusByAccountIdAsync((uint)accountId, false);
+                }
+
+                else if (request.IsUpdateCustomer && request.IsUpdateEmployee)
+                    _logger.LogError("Both IsUpdateCustomer and IsUpdateEmployee cannot be true at the same time.");
+                return Ok(logEntry);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error when disabling account.");
+                return BadRequest("Disable account failed.");
+            }
+        }
+
+        // API for testing OPTIONS on Postman
         [HttpOptions]
         public IActionResult Options()
         {
@@ -401,7 +476,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
             return Ok();
         }
 
-        // API test HEAD trên Postman
+        // API for testing HEAD on Postman
         [HttpHead]
         public IActionResult Head()
         {
@@ -420,7 +495,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
                     new Claim(ClaimTypes.NameIdentifier, account.AccountId.ToString()),
                 };
             foreach (var role in account.RolesOfUsers)
-                claims.Add(new Claim(ClaimTypes.Role, role.RoleId.ToString())); // Dùng tên role
+                claims.Add(new Claim(ClaimTypes.Role, role.RoleId.ToString())); // Use role name
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);

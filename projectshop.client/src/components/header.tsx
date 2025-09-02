@@ -18,7 +18,7 @@ function Header() {
      };
 
      return (
-          <header className="bg-white py-2 border-b border-gray-200 shadow-md">
+          <div id="header-container" className="bg-white py-2 border-b border-gray-200 relative drop-shadow-md">
                <section className="container mx-auto px-4 lg:px-0 max-w-[75rem]">
                     <section className="flex flex-wrap justify-between items-center -mx-2 md:-mx-3">
                          {/* Mobile Header - hidden on md+ */}
@@ -65,7 +65,7 @@ function Header() {
                               </div>
 
                               {/* Right Side Icons */}
-                              <div className="hidden lg:flex w-5/12 items-center text-sm px-2">
+                              <div className="hidden lg:flex w-5/12 items-center text-sm px-2 h-full">
                                    {/* Hotline */}
                                    <div className="flex items-center px-3">
                                         <FontAwesomeIcon icon={faPhoneVolume} size="xl" className="main-color" />
@@ -76,7 +76,7 @@ function Header() {
                                    </div>
 
                                    {/* Order Tracking */}
-                                   <div className="flex items-center px-3">
+                                   <div className="flex items-center px-3 h-full">
                                         <FontAwesomeIcon icon={faTruckFast} size="xl" className="main-color" />
                                         <div className="flex flex-col pl-2">
                                              <span>Tra cứu</span>
@@ -85,7 +85,7 @@ function Header() {
                                    </div>
 
                                    {/* Cart */}
-                                   <div className="relative flex items-center space-x-2 cursor-pointer" onClick={handleAddToCart}>
+                                   <div className="relative flex items-center space-x-2 cursor-pointer h-full" onClick={handleAddToCart}>
                                         <FontAwesomeIcon icon={faCartShopping} size="xl" className="main-color" />
                                         <div className="absolute -top-2 left-0 transform translate-x-1 -translate-y-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center transition-all duration-300">
                                              {cartCount}
@@ -94,7 +94,7 @@ function Header() {
                                    </div>
 
                                    {/* Account */}
-                                   <div className="relative group pb-1">
+                                   <div className="relative group pb-1 account-hover-area rounded-md ml-4 h-full">
                                         {/* Icon và text */}
                                         <div className="flex items-center pl-3 cursor-pointer">
                                              <FontAwesomeIcon icon={faCircleUser} size="xl" className="main-color" />
@@ -102,7 +102,7 @@ function Header() {
                                         </div>
 
                                         {/* Menu con */}
-                                        <div className="absolute top-full right-0 mt-0 w-48 bg-white border border-gray-200 rounded-md shadow-lg hidden group-hover:block z-50">
+                                        <div className="absolute top-full right-0 mt-4 w-48 bg-white border border-gray-200 rounded-md shadow-lg hidden group-hover:block z-50">
                                              <div className="flex flex-col p-2">
                                                   <button className="py-2 px-4 flex items-center justify-center mb-2 text-left rounded-md font-medium">Đăng nhập</button>
                                                   <button className="py-2 px-4 flex items-center justify-center mb-2 text-left rounded-md font-medium">Đăng kí</button>
@@ -114,7 +114,7 @@ function Header() {
                          </div>    
                     </section>
                </section>
-          </header>
+          </div>
      );
 };
 

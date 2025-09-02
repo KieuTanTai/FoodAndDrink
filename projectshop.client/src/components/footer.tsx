@@ -4,7 +4,7 @@ import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
 
 const Footer = () => {
      return (
-          <footer className="bg-gray-200 py-8 border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.1),_0_-2px_4px_-2px_rgb(0,0,0,0.1)] ">
+          <footer id="footer-container" className="bg-gray-200 py-8 border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.1),_0_-2px_4px_-2px_rgb(0,0,0,0.1)] ">
                <section className="container mx-auto max-w-[75rem]">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
                          {/* Column 1: Logo & Contact Info */}

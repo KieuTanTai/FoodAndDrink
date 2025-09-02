@@ -7,7 +7,8 @@ namespace ProjectShop.Server.Core.Entities
 
         // Navigation properties
         public CartModel Cart { get; set; } = null!;
-        public ICollection<InvoiceModel> Invoices { get; set; } = new List<InvoiceModel>();
+        public ICollection<InvoiceModel> Invoices { get; set; } = [];
+        public ICollection<CustomerAddressModel> CustomerAddresses { get; set; } = [];
         // End of navigation properties
 
         // Constructor sử dụng base(...) để gọi constructor của lớp cha PersonModel

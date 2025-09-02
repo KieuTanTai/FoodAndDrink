@@ -3,12 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle, faLock } from '@fortawesome/free-solid-svg-icons';
 import { faFacebook as faFacebookBrand, faGoogle as faGoogleBrand } from '@fortawesome/free-brands-svg-icons';
 
-//interface AccountLogin {
-//    accountId: number;
-//    email: string;
-//    password: string;
-//    rememberMe: boolean;
-//}
 
 const LoginForm: React.FC = () => {
      // State to manage form inputs

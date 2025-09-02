@@ -1,58 +1,55 @@
-﻿import { useEffect, useState } from 'react';
-// import './assets/css/App.css';
-
-interface Forecast {
-    date: string;
-    temperatureC: number;
-    temperatureF: number;
-    summary: string;
-}
+﻿import Header from './components/header';
+import SubHeader from './components/sub-header';
+import Footer from './components/footer';
+import ProductContainer from './components/product-container';
+import SignupForm from './pages/signup-page';
 
 function App() {
-    const [forecasts, setForecasts] = useState<Forecast[]>();
-
-    useEffect(() => {
-        populateWeatherData();
-    }, []);
-    const contents = forecasts === undefined
-        ? <p><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationreact">https://aka.ms/jspsintegrationreact</a> for more details.</em></p>
-        : <table className="table-striped table" aria-labelledby="tableLabel">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Temp. (C)</th>
-                    <th>Temp. (F)</th>
-                    <th>Summary</th>
-                </tr>
-            </thead>
-            <tbody>
-                {forecasts.map(forecast =>
-                    <tr key={forecast.date}>
-                        <td>{forecast.date}</td>
-                        <td>{forecast.temperatureC}</td>
-                        <td>{forecast.temperatureF}</td>
-                        <td>{forecast.summary}</td>
-                    </tr>
-                )}
-            </tbody>
-        </table>;
     return (
-        <div className='container mx-auto flex max-w-[75rem] flex-col items-center justify-center p-4 lg:px-0'>
-            <h1 id="tableLabel">Weather forecast</h1>
-            <img src="./src/assets/react.svg"></img>
-            <div className="text-s font-bold text-red-200 underline">REACT</div>
-            <p>This component demonstrates fetching data from the server.</p>
-            {contents}
-        </div>
-    );
+        <>
+            <header id="header" className="sticky top-0 z-50">
+                <Header />
+                <SubHeader />
+            </header>
 
-    async function populateWeatherData() {
-        const response = await fetch('api/weatherforecast');
-        if (response.ok) {
-            const data = await response.json();
-            setForecasts(data);
-        }
-    }
+            <main id="main-content">
+                {/*<SaleEventBlock/>*/}
+                <ProductContainer
+                    id="featured-products"
+                    title="Featured Products"
+                    link="/products"
+                    products={[
+                        {
+                            id: 1,
+                            imageSrc: "./src/assets/images/1747247649_iphone-14-pro-max-den-cu.jpg.webp",
+                            altText: "Product 1",
+                            title: "Product 1",
+                            price: "$100",
+                            oldPrice: "$120",
+                            salePercentage: "17%",
+                            status: "available"
+                        },
+                        {
+                            id: 2,
+                            imageSrc: "./src/assets/images/1747247649_iphone-14-pro-max-den-cu.jpg.webp",
+                            altText: "Product 2",
+                            title: "Product 2",
+                            price: "$80",
+                            oldPrice: "$100",
+                            salePercentage: "20%",
+                            status: "out_of_stock"
+                        }
+                    ]}
+                />
+                {/* <LoginForm /> */}
+                {/* <ForgotPasswordForm onBackToLogin={() => { }} /> */}
+                <SignupForm />
+                {/* <Cart /> */}
+                {/* <UserPage /> */}
+            </main>
+            <Footer />
+        </>
+    );     
 }
 
 export default App;

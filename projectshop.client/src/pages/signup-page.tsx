@@ -42,7 +42,7 @@ const SignupForm: React.FC = () => {
 
                     <form className="space-y-4" onSubmit={handleSubmit} id='signup-form'>
                          {/* Tên */}
-                         <div>
+                         {/* <div>
                               <label htmlFor="signup-name" className="sr-only">Họ và tên</label>
                               <div className="relative">
                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -61,7 +61,7 @@ const SignupForm: React.FC = () => {
                                    />
                               </div>
                               <div className="mt-1 h-4 text-xs text-red-500" id="signup-name-error-msg"></div>
-                         </div>
+                         </div> */}
 
                          {/* Username */}
                          <div>
