@@ -8,8 +8,8 @@ namespace ProjectShop.Server.Core.Entities
         // Corresponds to 'dispose_product_id' (INT UNSIGNED AUTO_INCREMENT)
         public uint DisposeProductId { get; set; }
 
-        // Corresponds to 'product_barcode' (INT UNSIGNED)
-        public uint ProductBarcode { get; set; }
+        // Corresponds to 'product_barcode' (string)
+        public string ProductBarcode { get; set; } = string.Empty;
 
         // Corresponds to 'location_id' (INT UNSIGNED)
         public uint LocationId { get; set; }
@@ -33,7 +33,7 @@ namespace ProjectShop.Server.Core.Entities
         public DisposeReasonModel DisposeReason { get; set; } = null!;
         // End of navigation properties
 
-        public DisposeProductModel(uint disposeProductId, uint productBarcode, uint locationId, uint disposeByEmployeeId,
+        public DisposeProductModel(uint disposeProductId, string productBarcode, uint locationId, uint disposeByEmployeeId,
                             uint disposeReasonId, int disposeQuantity, DateTime disposedDate)
         {
             DisposeProductId = disposeProductId;

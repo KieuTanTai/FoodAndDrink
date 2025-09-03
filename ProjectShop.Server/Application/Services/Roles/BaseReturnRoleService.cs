@@ -1,4 +1,5 @@
 ﻿using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IServices.Role;
 using ProjectShop.Server.Core.Interfaces.IValidate;
@@ -12,15 +13,18 @@ namespace ProjectShop.Server.Application.Services.Roles
     {
         private readonly ILogService _logger;
         private readonly IServiceResultFactory<BaseReturnRoleService> _serviceResultFactory;
-        private readonly ISearchAccountRoleServices<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey> _searchAccountRoleService;
+        private readonly IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> _baseRoleOfUserDAO;
+        private readonly IBaseHelperReturnTEntityService<BaseReturnRoleService> _baseHelperReturnTEntityService;
         public BaseReturnRoleService(
             ILogService logger,
-            ISearchAccountRoleServices<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey> searchAccountRoleService,
-            IServiceResultFactory<BaseReturnRoleService> serviceResultFactory)
+            IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey> baseRoleOfUserDAO,
+            IServiceResultFactory<BaseReturnRoleService> serviceResultFactory,
+            IBaseHelperReturnTEntityService<BaseReturnRoleService> baseHelperReturnTEntityService)
         {
             _logger = logger;
+            _baseRoleOfUserDAO = baseRoleOfUserDAO;
             _serviceResultFactory = serviceResultFactory;
-            _searchAccountRoleService = searchAccountRoleService;
+            _baseHelperReturnTEntityService = baseHelperReturnTEntityService;
         }
 
         public async Task<ServiceResult<RoleModel>> GetNavigationPropertyByOptionsAsync(RoleModel role, RoleNavigationOptions? options, [CallerMemberName] string? methodCall = null)
@@ -46,73 +50,22 @@ namespace ProjectShop.Server.Application.Services.Roles
 
         // Lấy 1 roleId
         private async Task<ServiceResults<RolesOfUserModel>> TryLoadRolesOfUsersAsync(uint roleId)
-        {
-            try
-            {
-                return await _searchAccountRoleService.GetByRoleIdAsync(roleId)
-                    ?? _serviceResultFactory.CreateServiceResults<RolesOfUserModel>($"No RolesOfUser found for provided RoleId.", [], false);
-            }
-            catch (Exception ex)
-            {
-                return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("Error occurred while fetching RolesOfUser.", [], false, ex);
-            }
-        }
+            => await _baseHelperReturnTEntityService.TryLoadICollectionEntitiesAsync<uint, RolesOfUserModel>(roleId,
+                (id) => _baseRoleOfUserDAO.GetByRoleIdAsync(id), nameof(TryLoadRolesOfUsersAsync));
 
         // Lấy nhiều roleId (khuyến nghị DAO trả về IEnumerable<RolesOfUserModel> cho nhiều roleId)
         private async Task<IDictionary<uint, ServiceResults<RolesOfUserModel>>> TryLoadRolesOfUsersAsync(IEnumerable<uint> roleIds)
-        {
-            uint firstId = roleIds.FirstOrDefault();
-            try
-            {
-                var rolesList = await _searchAccountRoleService.GetByRoleIdsAsync(roleIds) ?? _serviceResultFactory.CreateServiceResults<RolesOfUserModel>($"No account roles found for provided roleIds.", new List<RolesOfUserModel>(), false);
-                bool isExists = rolesList.Data!.Any();
-                if (!isExists)
-                {
-                    return new Dictionary<uint, ServiceResults<RolesOfUserModel>>
-                    {
-                        [firstId] = _serviceResultFactory.CreateServiceResults<RolesOfUserModel>($"No RolesOfUser found for provided RoleIds.", [], false)
-                    };
-                }
-                // Group theo RoleId
-                return rolesList.Data!
-                    .GroupBy(role => role.RoleId)
-                    .ToDictionary(group => group.Key, group => _serviceResultFactory.CreateServiceResults<RolesOfUserModel>($"RolesOfUser found for RoleId {group.Key}.", group, true));
-            }
-            catch
-            {
-                return new Dictionary<uint, ServiceResults<RolesOfUserModel>>
-                {
-                    [firstId] = _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("Error occurred while fetching RolesOfUser.", [], false)
-                };
-            }
-        }
+            => await _baseHelperReturnTEntityService.TryLoadICollectionEntitiesAsync<uint, RolesOfUserModel>(roleIds,
+                (ids) => _baseRoleOfUserDAO.GetByRoleIdsAsync(ids), entity => entity.RoleId, nameof(TryLoadRolesOfUsersAsync));
 
         // Helper cho 1 role
         private async Task LoadRolesOfUsersAsync(RoleModel role, List<JsonLogEntry> logEntries)
-        {
-            var results = await TryLoadRolesOfUsersAsync(role.RoleId);
-            logEntries.AddRange(results.LogEntries!);
-            role.RolesOfUsers = (ICollection<RolesOfUserModel>) results.Data!;
-            logEntries.Add(_logger.JsonLogInfo<RoleModel, BaseReturnRoleService>("Loaded account's roles for a single role."));
-        }
+            => await _baseHelperReturnTEntityService.LoadICollectionEntitiesAsync<uint, RolesOfUserModel>((result) => role.RolesOfUsers = [..result], 
+                () => role.RoleId, TryLoadRolesOfUsersAsync, logEntries, nameof(LoadRolesOfUsersAsync));
 
         // Helper cho nhiều role
         private async Task LoadRolesOfUsersAsync(IEnumerable<RoleModel> roles, List<JsonLogEntry> logEntries)
-        {
-            var roleList = roles.ToList();
-            var roleIds = roleList.Select(r => r.RoleId).ToList();
-            var rolesDict = await TryLoadRolesOfUsersAsync(roleIds);
-            foreach (var role in roleList)
-            {
-                if (!rolesDict.TryGetValue(role.RoleId, out var serviceResults) || serviceResults == null || serviceResults.Data == null)
-                {
-                    role.RolesOfUsers = [];
-                    continue;
-                }
-                logEntries.AddRange(serviceResults.LogEntries!);
-                role.RolesOfUsers = (ICollection<RolesOfUserModel>) serviceResults.Data;
-            }
-            logEntries.Add(_logger.JsonLogInfo<RoleModel, BaseReturnRoleService>("Loaded account's roles for multiple roles."));
-        }
+            => await _baseHelperReturnTEntityService.LoadICollectionEntitiesAsync<uint, RoleModel, RolesOfUserModel>(roles, (role, result) => role.RolesOfUsers = [..result],
+                (role) => role.RoleId, TryLoadRolesOfUsersAsync, logEntries, nameof(LoadRolesOfUsersAsync));
     }
 }
