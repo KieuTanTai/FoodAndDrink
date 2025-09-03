@@ -43,7 +43,7 @@ namespace ProjectShop.Server.Core.Entities
         public LocationWardModel LocationWard { get; set; } = null!;
         public LocationTypeModel LocationType { get; set; } = null!;
         public LocationCityModel LocationCity { get; set; } = null!;
-        public ICollection<InventoryModel> Inventories { get; set; } = new List<InventoryModel>();
+        public InventoryModel Inventory { get; set; } = null!;
         public ICollection<InventoryMovementModel> SourceInventoryMovements { get; set; } = new List<InventoryMovementModel>();
         public ICollection<InventoryMovementModel> DestinationInventoryMovements { get; set; } = new List<InventoryMovementModel>();
         public ICollection<DisposeProductModel> DisposeProducts { get; set; } = new List<DisposeProductModel>();

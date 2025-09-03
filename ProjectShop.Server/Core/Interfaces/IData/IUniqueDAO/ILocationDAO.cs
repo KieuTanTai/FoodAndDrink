@@ -1,6 +1,6 @@
 ﻿namespace ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO
 {
-    public interface ILocationDAO<TEntity> : IGetByStatusAsync<TEntity>, IGetRelativeAsync<TEntity> where TEntity : class
+    public interface ILocationDAO<TEntity> : IBaseLocationDAO<TEntity> where TEntity : class
     {
         Task<TEntity?> GetByLocationNameAsync(string name);
         Task<IEnumerable<TEntity>> GetByLocationNamesAsync(IEnumerable<string> names, int? maxGetCount = null);

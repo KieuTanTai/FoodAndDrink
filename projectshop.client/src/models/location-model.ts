@@ -22,7 +22,7 @@ export interface LocationModel {
     locationWard: LocationWardModel | null;
     locationType: LocationTypeModel | null;
     locationCity: LocationCityModel | null;
-    inventories: InventoryModel[] | [];
+    inventory: InventoryModel | null;
     sourceInventoryMovements: InventoryMovementModel[] | [];
     destinationInventoryMovements: InventoryMovementModel[];
     disposeProducts: DisposeProductModel[] | [];

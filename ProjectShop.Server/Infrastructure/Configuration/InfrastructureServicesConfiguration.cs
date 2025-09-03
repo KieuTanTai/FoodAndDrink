@@ -85,14 +85,10 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddTransient<IInvoiceDAO<InvoiceModel>, InvoiceDAO>();
             services.AddTransient<IInvoiceDiscountDAO<InvoiceDiscountModel, InvoiceDiscountKey>, InvoiceDiscountDAO>();
             services.AddTransient<ILocationDAO<LocationModel>, LocationDAO>();
-            services.AddTransient<IGetRelativeAsync<LocationCityModel>, LocationCityDAO>();
-            services.AddTransient<IGetByStatusAsync<LocationCityModel>, LocationCityDAO>();
-            services.AddTransient<IGetRelativeAsync<LocationDistrictModel>, LocationDistrictDAO>();
-            services.AddTransient<IGetByStatusAsync<LocationDistrictModel>, LocationDistrictDAO>();
-            services.AddTransient<IGetRelativeAsync<LocationTypeModel>, LocationTypeDAO>();
-            services.AddTransient<IGetByStatusAsync<LocationTypeModel>, LocationTypeDAO>();
-            services.AddTransient<IGetRelativeAsync<LocationWardModel>, LocationWardDAO>();
-            services.AddTransient<IGetByStatusAsync<LocationWardModel>, LocationWardDAO>();
+            services.AddTransient<IBaseLocationDAO<LocationCityModel>, LocationCityDAO>();
+            services.AddTransient<IBaseLocationDAO<LocationDistrictModel>, LocationDistrictDAO>();
+            services.AddTransient<IBaseLocationDAO<LocationTypeModel>, LocationTypeDAO>();
+            services.AddTransient<IBaseLocationDAO<LocationWardModel>, LocationWardDAO>();
             services.AddTransient<IProductCategoriesDAO<ProductCategoriesModel, ProductCategoriesKey>, ProductCateogriesDAO>();
             services.AddTransient<IPersonDAO<EmployeeModel>, EmployeeDAO>();
             services.AddTransient<IPersonDAO<CustomerModel>, CustomerDAO>();

@@ -32,14 +32,14 @@ namespace ProjectShop.Server.Infrastructure.Data
             return await GetSingleDataAsync(reason.ToString(), "inventory_movement_reason");
         }
 
-        public async Task<InventoryMovementModel?> GetByDestinationLocationId(uint locationId)
-            => await GetSingleDataAsync(locationId.ToString(), "destination_location_id");
+        public async Task<IEnumerable<InventoryMovementModel>> GetByDestinationLocationIdAsync(uint locationId, int? maxGetCount)
+            => await GetByInputAsync(locationId.ToString(), "destination_location_id", maxGetCount);
 
         public async Task<InventoryMovementModel?> GetByInventoryIdAsync(uint inventoryId)
             => await GetSingleDataAsync(inventoryId.ToString(), "inventory_id");
 
-        public async Task<InventoryMovementModel?> GetBySourceLocationId(uint locationId)
-            => await GetSingleDataAsync(locationId.ToString(), "source_location_id");
+        public async Task<IEnumerable<InventoryMovementModel>> GetBySourceLocationIdAsync(uint locationId, int? maxGetCount)
+            => await GetByInputAsync(locationId.ToString(), "source_location_id", maxGetCount);
 
         public async Task<IEnumerable<InventoryMovementModel>> GetAllByEnumAsync<TEnum>(TEnum tEnum, int? maxGetCount) where TEnum : Enum
         {

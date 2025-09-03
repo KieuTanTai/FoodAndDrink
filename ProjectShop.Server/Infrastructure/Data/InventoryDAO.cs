@@ -32,7 +32,7 @@ namespace ProjectShop.Server.Infrastructure.Data
                       WHERE {ColumnIdName} = @{colIdName}";
         }
 
-        public async Task<IEnumerable<InventoryModel>> GetAllByLocationIdsAsync(IEnumerable<uint> locationIds, int? maxGetCount) 
+        public async Task<IEnumerable<InventoryModel>> GetByLocationIdsAsync(IEnumerable<uint> locationIds, int? maxGetCount) 
             => await GetByInputsAsync(locationIds.Select(locationId => locationId.ToString()), "location_id", maxGetCount);
 
         public async Task<IEnumerable<InventoryModel>> GetByDateTimeAsync<TEnum>(DateTime dateTime, TEnum compareType, int? maxGetCount) where TEnum : Enum

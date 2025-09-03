@@ -1,11 +1,12 @@
 ﻿using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence;
 
 namespace ProjectShop.Server.Infrastructure.Data
 {
-    public class LocationDistrictDAO : BaseDAO<LocationDistrictModel>, IGetRelativeAsync<LocationDistrictModel>, IGetByStatusAsync<LocationDistrictModel>
+    public class LocationDistrictDAO : BaseDAO<LocationDistrictModel>, IBaseLocationDAO<LocationDistrictModel>
     {
         public LocationDistrictDAO(
             IDbConnectionFactory connectionFactory,

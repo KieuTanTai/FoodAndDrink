@@ -2,8 +2,8 @@
 {
     public interface IInventoryMovementDAO<TEntity> : IGetByEnumAsync<TEntity>, IGetDataByDateTimeAsync<TEntity> where TEntity : class
     {
-        Task<TEntity?> GetBySourceLocationId(uint locationId);
-        Task<TEntity?> GetByDestinationLocationId(uint locationId);
+        Task<IEnumerable<TEntity>> GetBySourceLocationIdAsync(uint locationId, int? maxGetCount = null);
+        Task<IEnumerable<TEntity>> GetByDestinationLocationIdAsync(uint locationId, int? maxGetCount = null);
         Task<IEnumerable<TEntity>> GetBySourceLocationIdsAsync(IEnumerable<uint> locationIds, int? maxGetCount = null);
         Task<IEnumerable<TEntity>> GetByDestinationLocationIdsAsync(IEnumerable<uint> locationIds, int? maxGetCount = null);
         Task<TEntity?> GetByInventoryIdAsync(uint inventoryId);

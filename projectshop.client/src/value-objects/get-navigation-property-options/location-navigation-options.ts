@@ -3,7 +3,7 @@ export interface LocationNavigationOptions {
     isGetLocationWard: boolean;
     isGetLocationType: boolean;
     isGetLocationCity: boolean;
-    isGetInventories: boolean;
+    isGetInventory: boolean;
     isGetSourceInventoryMovements: boolean;
     isGetDestinationInventoryMovements: boolean;
     isGetDisposeProducts: boolean;
