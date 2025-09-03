@@ -5,7 +5,7 @@ import type{ ProductModel } from "./product-model";
 
 export interface DisposeProductModel {
     disposeProductId: number;
-    productBarcode: number;
+    productBarcode: string;
     locationId: number;
     disposeByEmployeeId: number;
     disposeReasonId: number;
