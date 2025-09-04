@@ -1,5 +1,5 @@
 import React from 'react';
-import ProductForm from './product-form';
+import ProductForm from './ProductForm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBolt } from '@fortawesome/free-solid-svg-icons';
 

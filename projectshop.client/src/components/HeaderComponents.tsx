@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faCartShopping, faMagnifyingGlass, faPhoneVolume, faTruckFast } from '@fortawesome/free-solid-svg-icons';
-import { faCircleUser } from '@fortawesome/free-regular-svg-icons';
+import HeaderAccount from "../utils/HeaderAccount";
 
 function Header() {
      const [query, setQuery] = useState('');
@@ -93,23 +93,7 @@ function Header() {
                                         <span>Giỏ hàng</span>
                                    </div>
 
-                                   {/* Account */}
-                                   <div className="relative group pb-1 account-hover-area rounded-md ml-4 h-full">
-                                        {/* Icon và text */}
-                                        <div className="flex items-center pl-3 cursor-pointer">
-                                             <FontAwesomeIcon icon={faCircleUser} size="xl" className="main-color" />
-                                             <span className="pl-2">Tài khoản</span>
-                                        </div>
-
-                                        {/* Menu con */}
-                                        <div className="absolute top-full right-0 mt-4 w-48 bg-white border border-gray-200 rounded-md shadow-lg hidden group-hover:block z-50">
-                                             <div className="flex flex-col p-2">
-                                                  <button className="py-2 px-4 flex items-center justify-center mb-2 text-left rounded-md font-medium">Đăng nhập</button>
-                                                  <button className="py-2 px-4 flex items-center justify-center mb-2 text-left rounded-md font-medium">Đăng kí</button>
-                                                  <button className="py-2 px-4 items-center justify-center text-left rounded-md hidden font-medium">Đăng xuất</button>
-                                             </div>
-                                        </div>
-                                   </div>
+                                   <HeaderAccount />
                               </div>
                          </div>    
                     </section>

@@ -1,5 +1,5 @@
-﻿@import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+@import "tailwindcss";
 
 :root {
   font-family: 'Open Sans', system-ui, Helvetica, Arial, sans-serif;
@@ -11,7 +11,8 @@
   --main-color: #a2cff3;
   --main-hover: #45a5ff;
   background-color: #eeeeee;
-
+  
+  box-sizing: border-box;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
