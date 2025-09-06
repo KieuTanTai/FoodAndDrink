@@ -1,5 +1,6 @@
 ﻿import React, { useState } from "react";
 import ForgotPasswordForm from "../components/ForgotPasswordForm";
+import LoginPage from "./LoginPage";
 
 const ForgotPasswordPage: React.FC = () => {
     const [showLogin, setShowLogin] = useState(false);
@@ -9,7 +10,7 @@ const ForgotPasswordPage: React.FC = () => {
     };
 
     // Nếu muốn hiển thị login page thì render LoginPage ở đây, ví dụ:
-    // if (showLogin) return <LoginPage />;
+    if (showLogin) return <LoginPage />;
 
     return (
         <ForgotPasswordForm onBackToLogin={handleBackToLogin} />

@@ -6,9 +6,18 @@
 
         static AppConfigConnection()
         {
-            string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\");
-            configurationRoot = new ConfigurationBuilder().SetBasePath(basePath)
-                                    .AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true).Build();
+            try
+            {
+                string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"../../../");
+                Console.WriteLine($"[DEBUG] basePath: {basePath}");
+                configurationRoot = new ConfigurationBuilder().SetBasePath(basePath)
+                                        .AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true).Build();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("AppConfigConnection static constructor error: " + ex);
+                throw;
+            }
         }
         public static string GetConnectionString(string name = "DefaultConnection")
         {

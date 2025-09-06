@@ -11,11 +11,11 @@ async function mockSendVerifyCode(email: string): Promise<boolean> {
     await new Promise((r) => setTimeout(r, 600));
     return /\S+@\S+\.\S+/.test(email);
 }
-async function mockVerifyCode(email: string, code: string): Promise<boolean> {
+async function mockVerifyCode(_email: string, code: string): Promise<boolean> {
     await new Promise((r) => setTimeout(r, 600));
     return code === "123456";
 }
-async function mockResetPassword(email: string, newPassword: string): Promise<boolean> {
+async function mockResetPassword(_email: string, newPassword: string): Promise<boolean> {
     await new Promise((r) => setTimeout(r, 600));
     return newPassword.length >= 6;
 }

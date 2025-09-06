@@ -1,7 +1,7 @@
-import type { AccountModel } from "../models/accountModel";
-import type { LocationCityModel } from "../models/locationCityModel";
-import type { LocationDistrictModel } from "../models/locationDistrictModel";
-import type { LocationWardModel } from "../models/locationWardModel";
+import type { AccountModel } from "../models/account-model";
+import type { LocationCityModel } from "../models/location-city-model";
+import type { LocationDistrictModel } from "../models/location-district-model";
+import type { LocationWardModel } from "../models/location-ward-model";
 
 export interface Customer {
      birthday: string;

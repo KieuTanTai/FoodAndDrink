@@ -12,7 +12,7 @@ using System.Security.Claims;
 namespace ProjectShop.Server.WebAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class AccountServicesController : ControllerBase
     {
         private readonly ILogger<AccountServicesController> _logger;

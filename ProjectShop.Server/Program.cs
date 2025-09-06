@@ -14,6 +14,7 @@ try
     builder.Services.AddInfrastructureServices();
     builder.Services.AddApplicationServices();
     //builder.Services.AddControllerServices();
+    builder.WebHost.UseUrls("https://localhost:5294");
     SnakeCaseMapperInitializer.RegisterAllEntities();
 }
 catch (Exception ex)

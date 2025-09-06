@@ -1,4 +1,4 @@
-import type { LocationModel } from "../models/locationModel";
+import type { LocationModel } from "../models/location-model";
 
 export interface Employee {
      birthday: string;
