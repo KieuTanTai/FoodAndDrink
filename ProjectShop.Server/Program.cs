@@ -9,6 +9,18 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Thêm cấu hình CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhostFrontend", policy =>
+    {
+        policy.WithOrigins("https://localhost:58435")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // Nếu bạn dùng cookie/session
+    });
+});
+
 try
 {
     builder.Services.AddInfrastructureServices();
@@ -23,6 +35,14 @@ catch (Exception ex)
     Environment.Exit(1);
 }
 
+builder.Services.AddAuthentication("Cookies")
+    .AddCookie("Cookies", options =>
+    {
+        options.LoginPath = "/login";
+        options.LogoutPath = "/logout";
+        // Tuỳ chỉnh thêm nếu muốn
+    });
+
 var app = builder.Build();
 SqlTypeHandlerRegistration.Register();
 GetProviderService.SetServiceProvider(app.Services);
@@ -35,7 +55,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("AllowLocalhostFrontend");
 
 app.MapControllers();
 

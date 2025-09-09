@@ -1,6 +1,6 @@
 import Modal from "react-modal";
 import SignupForm from "../components/SignupForm"; 
-import type { SignupModalProps } from "../models/props/signup-props/signup-modal-props";
+import type SignupModalProps from "./props/signup-modal-props/signup-modal-props";
 
 function LoginModal({ isOpen, onRequestClose }: SignupModalProps) {
      return (

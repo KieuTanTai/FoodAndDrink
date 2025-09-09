@@ -137,3 +137,15 @@ button:focus-visible {
     background-color: var(--main-color);
   }
 }
+
+input:-webkit-autofill,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0px 1000px #fff inset !important;
+  /* ép nền trắng */
+  -webkit-text-fill-color: #222 !important;
+  /* ép chữ màu đen */
+  caret-color: #222 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}

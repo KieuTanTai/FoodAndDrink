@@ -293,7 +293,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         // API for login
-        [HttpPost(Name = "login")]
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request, [FromQuery] AccountNavigationOptions? options)
         {
             _logger.LogInformation("Starting login process.");
@@ -309,7 +309,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 return Ok(serviceResult);
             }
             catch (Exception ex)
-            {
+            {   
                 _logger.LogError(ex, "Error during login.");
                 return BadRequest("Login failed.");
             }

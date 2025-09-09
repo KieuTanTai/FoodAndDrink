@@ -1,4 +1,4 @@
-export interface SignupData {
+export interface UISignupData {
      email: string;
      password: string;
      confirmPassword: string;

@@ -1,6 +1,6 @@
 import Modal from "react-modal";
 import LoginForm from "../components/LoginForm";
-import type { LoginModalProps } from "../models/props/login-props/login-modal-props";
+import type { LoginModalProps } from "./props/login-modal-props/login-modal-props";
 
 function LoginModal({ isOpen, onRequestClose }: LoginModalProps) {
   return (

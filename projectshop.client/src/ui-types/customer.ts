@@ -3,7 +3,7 @@ import type { LocationCityModel } from "../models/location-city-model";
 import type { LocationDistrictModel } from "../models/location-district-model";
 import type { LocationWardModel } from "../models/location-ward-model";
 
-export interface Customer {
+export interface UICustomer {
      birthday: string;
      phone: string;
      email: string;

@@ -1,6 +1,6 @@
 import type { LocationModel } from "../models/location-model";
 
-export interface Employee {
+export interface UIEmployee {
      birthday: string;
      phone: string;
      email: string;

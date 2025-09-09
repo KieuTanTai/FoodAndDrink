@@ -1,4 +1,4 @@
-export interface Account {
+export interface UIAccount {
      id: number;
      email: string;
 }

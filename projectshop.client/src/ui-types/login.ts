@@ -1,5 +1,5 @@
-export interface LoginData {
-     username: string;
+export interface UILoginData {
+     email: string;
      password: string;
      rememberMe: boolean;
 }
