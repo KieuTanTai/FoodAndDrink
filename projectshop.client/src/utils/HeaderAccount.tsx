@@ -1,20 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
-import LoginModal from "../modal/LoginModal"; 
+import LoginModal from "../modal/LoginModal";
 import SignupModal from "../modal/SignupModal";
 import type { AccountModel } from "../models/account-model";
+import { getCurrentAccount } from "../api/authApi";
 
 function HeaderAccount() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [currentAccount, setCurrentAccount] = useState<AccountModel | null>(null);
   const [signupOpen, setSignupOpen] = useState(false);
 
+  useEffect(() => {
+    async function fetchAccount() {
+      try {
+        const result = await getCurrentAccount({ isGetCustomer: true });
+        if (result.data && result.data.accountId !== 0)
+          setCurrentAccount(result.data);
+        else
+          setCurrentAccount(null);
+      } catch (error) {
+        console.error("Error fetching current account:", error);
+        setCurrentAccount(null);
+      }
+    }
+    fetchAccount();
+  }, []);
 
   return (
     <div className="relative group pb-1 account-hover-area rounded-md h-full">
       {/* Icon và text */}
-      <div className="flex items-center pl-3 cursor-pointer" id ="account-menu-button">
+      <div className="flex items-center pl-3 cursor-pointer" id="account-menu-button">
         <FontAwesomeIcon icon={faCircleUser} size="xl" className="main-color" />
         <div className="pl-2 text-nowrap max-w-26 text-ellipsis overflow-hidden">{currentAccount ? currentAccount.customer?.name : "Tài khoản"}</div>
       </div>
@@ -35,7 +51,7 @@ function HeaderAccount() {
             </button>
           </div>
 
-          <button className="py-2 px-4 items-center justify-center text-left rounded-md hidden font-medium bg-red-300! text-black!" 
+          <button className="py-2 px-4 items-center justify-center text-left rounded-md hidden font-medium bg-red-300! text-black!"
             style={{ display: currentAccount ? "block" : "none" }}>
             Đăng xuất
           </button>

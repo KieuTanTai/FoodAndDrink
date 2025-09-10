@@ -5,18 +5,27 @@ import UseForm from '../hooks/use-auth';
 import { login } from '../api/authApi';
 import type { UILoginData } from '../ui-types/login';
 import type { LoginModalProps } from '../modal/props/login-modal-props/login-modal-props';
+import type { ServiceResult } from '../value-objects/service-result';
+import type { AccountModel } from '../models/account-model';
 
 function LoginForm({onLoginSuccess} : LoginModalProps)  {
-     const {formData, handleChange, handleSubmit, isSubmitting, userNameErrorMessage, passwordErrorMessage} = UseForm(
+     const {formData, handleChange, handleSubmit, isSubmitting, userNameErrorMessage, passwordErrorMessage, handleCopy} = UseForm(
           { email: "", password: "", rememberMe: false},
           async (data: UILoginData) => {
-               const result = await login(data, {isGetCustomer:true});
-               if (result.data && result.data.accountId !== 0) {
-                    onLoginSuccess(result.data);
-               } else {
-                    alert("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
+               try {
+                    const result = await login(data, {isGetCustomer:true});
+                    if (result.data && result.data.accountId !== 0)
+                         onLoginSuccess(result.data);
+                    else
+                         alert("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
+                    return result;
+               } catch (error) {
+                    if (error instanceof Error)
+                         alert(`Đăng nhập thất bại: ${error.message}`);
+                    else
+                         alert('Đăng nhập thất bại: Đã xảy ra lỗi không xác định.');
+                    return {} as ServiceResult<AccountModel>;
                }
-               return result;
           });
      
      return (
@@ -67,6 +76,7 @@ function LoginForm({onLoginSuccess} : LoginModalProps)  {
                                    value={formData.password}
                                    disabled={isSubmitting}
                                    onChange={(e) => handleChange(e, false, true)}
+                                   onCopy={handleCopy}
                                    className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none"
                               />
                          </div>

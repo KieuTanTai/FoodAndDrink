@@ -29,6 +29,19 @@ export async function signup(form: UISignupData) : Promise<ServiceResult<Account
      }
 }
 
+export async function getCurrentAccount(navigation: AccountNavigationOptions) : Promise<ServiceResult<AccountModel>> {
+     try {
+          const response = await axios.get('https://localhost:5294/api/accountservices/me', {params: {
+               isGetEmployee: navigation.isGetEmployee,
+               isGetCustomer: navigation.isGetCustomer,
+               isGetRolesOfUsers: navigation.isGetRolesOfUsers,
+          }, withCredentials: true});
+          return response.data as ServiceResult<AccountModel>;
+     } catch (error) {
+          throw new Error('Authentication failed', error as { cause?: Error } | undefined);
+     }
+}
+
 export async function forgotPassword(form: UIForgotPasswordData) : Promise<ServiceResult<string>> {
      try {
           const response = await axios.post('/api/accountservices/forgot-password', form);

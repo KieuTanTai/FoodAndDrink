@@ -61,7 +61,11 @@ function UseForm<T extends object, TBackEndEntity extends AccountModel>(initialD
         }
     }
 
-    return {formData, setFormData, handleChange, isSubmitting, handleSubmit, userNameErrorMessage, passwordErrorMessage}
+    const handleCopy = (event: FormEvent) => {
+        event.preventDefault();
+    }
+
+    return {formData, setFormData, handleChange, isSubmitting, handleSubmit, userNameErrorMessage, passwordErrorMessage, handleCopy}
 }
 
 export default UseForm;
