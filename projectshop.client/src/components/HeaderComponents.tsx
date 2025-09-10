@@ -93,7 +93,7 @@ function Header() {
                                         <span>Giỏ hàng</span>
                                    </div>
 
-                                   <HeaderAccount />
+                                   <HeaderAccount  />
                               </div>
                          </div>    
                     </section>

@@ -4,6 +4,7 @@ import ProductContainer from "../components/ProductContainer";
 import SubHeader from "../components/SubHeader";
 
 function EndUserLayout() {
+
     return (
         <>
             <header id="header" className="sticky top-0 z-50">

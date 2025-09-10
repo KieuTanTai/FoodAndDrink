@@ -4,15 +4,17 @@ import { faGoogle as faGoogleBrand, faFacebook as faFacebookBrand } from '@forta
 import UseForm from '../hooks/use-auth';
 import { login } from '../api/authApi';
 import type { UILoginData } from '../ui-types/login';
+import type { LoginModalProps } from '../modal/props/login-modal-props/login-modal-props';
 
-function LoginForm() {
+function LoginForm({onLoginSuccess} : LoginModalProps)  {
      const {formData, handleChange, handleSubmit, isSubmitting, userNameErrorMessage, passwordErrorMessage} = UseForm(
-          { email: "", password: "", rememberMe: false },
+          { email: "", password: "", rememberMe: false},
           async (data: UILoginData) => {
-               const result = await login(data);
-               if (result.data?.accountId !== 0 || result.data) {
+               const result = await login(data, {isGetCustomer:true});
+               if (result.data && result.data.accountId !== 0) {
+                    onLoginSuccess(result.data);
                } else {
-                    // Handle login error
+                    alert("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
                }
                return result;
           });

@@ -294,22 +294,30 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         // API for login
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request, [FromQuery] AccountNavigationOptions? options)
+        public async Task<IActionResult> Login([FromBody] FELoginRequest request, [FromQuery] AccountNavigationOptions? options)
         {
             _logger.LogInformation("Starting login process.");
+            ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
+
             try
             {
-                ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
-                serviceResult = await _loginAccountServices.HandleLoginAsync(request.Email, request.Password, options);
+                // validate cookie here if needed
+                if (Request.Cookies.ContainsKey(".AspNetCore.Cookies"))
+                {
+                    serviceResult = await _searchAccountServices.GetByUserNameAsync(GetUserNameByClaims());
+                }
+                else
+                {
+                    serviceResult = await _loginAccountServices.HandleLoginAsync(request.Email, request.Password, options);
+                }
                 AccountModel account = serviceResult.Data!;
                 // Set claims principal for the current user
-                ClaimsPrincipal principal = BuildClaimsPrincipal(account);
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                await SetUserClaims(account, request);
                 _logger.LogInformation($"Login successful. {account.UserName}");
                 return Ok(serviceResult);
             }
             catch (Exception ex)
-            {   
+            {
                 _logger.LogError(ex, "Error during login.");
                 return BadRequest("Login failed.");
             }
@@ -490,16 +498,29 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 throw new ArgumentNullException(nameof(account), "Account cannot be null.");
 
             var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, account.UserName),
-                    new Claim(ClaimTypes.NameIdentifier, account.AccountId.ToString()),
-                };
+            {
+                new Claim(ClaimTypes.Name, account.UserName ?? string.Empty),
+                new Claim(ClaimTypes.NameIdentifier, account.AccountId.ToString()),
+            };
             foreach (var role in account.RolesOfUsers)
-                claims.Add(new Claim(ClaimTypes.Role, role.RoleId.ToString())); // Use role name
+                claims.Add(new Claim(ClaimTypes.Role, role.RoleId.ToString()));
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-            return principal;
+            return new ClaimsPrincipal(identity);
+        }
+
+        private async Task SetUserClaims(AccountModel account, FELoginRequest request)
+        {
+            ClaimsPrincipal principal = BuildClaimsPrincipal(account);
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                principal,
+                new AuthenticationProperties
+                {
+                    IsPersistent = request.RememberMe,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7),
+                    AllowRefresh = true
+                });
         }
 
         private string GetUserNameByClaims()

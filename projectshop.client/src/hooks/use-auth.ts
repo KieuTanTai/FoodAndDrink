@@ -1,7 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import type FormPropsHandler from "../models/props/form-props";
 import type { ServiceResult } from "../value-objects/service-result";
-import { isValidEmail, isValidPassword } from "../validates/is-valid-input";
+import { isValidEmail, isValidPassword } from "../helpers/is-valid-input";
 import type { AccountModel } from "../models/account-model";
 
 function UseForm<T extends object, TBackEndEntity extends AccountModel>(initialData: T, onSubmit: (data: T) => Promise<ServiceResult<TBackEndEntity>>)
@@ -17,10 +17,21 @@ function UseForm<T extends object, TBackEndEntity extends AccountModel>(initialD
         let finalValue: string | boolean = value;
         if (isCheckUserName && !isValidEmail(value))
             setUserNameErrorMessage("Email không hợp lệ.");
-        else if (isCheckPassword && !isValidPassword(value)) 
+        else
+            setUserNameErrorMessage("");
+
+        if (isCheckPassword && !isValidPassword(value)) 
             setPasswordErrorMessage("Mật khẩu không hợp lệ.");
-        else if (isCheckbox || type == "checkbox")
+        else
+            setPasswordErrorMessage("");
+
+        if (isCheckbox || type == "checkbox")
             finalValue = checked;
+        if (value.length === 0)
+        {
+            setUserNameErrorMessage("");
+            setPasswordErrorMessage("");
+        }
 
         setFormData((prevData) => ({...prevData, [name]: finalValue}));
         if (userNameErrorMessage.length > 0 || passwordErrorMessage.length > 0)

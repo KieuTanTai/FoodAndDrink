@@ -3,6 +3,8 @@ import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import EndUserLayout from './pages/EndUserLayout';
 
 function App() {
+    //auth  
+
     Modal.setAppElement('#root');
     return (
         <BrowserRouter>
