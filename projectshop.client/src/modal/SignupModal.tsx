@@ -2,7 +2,7 @@ import Modal from "react-modal";
 import SignupForm from "../components/SignupForm"; 
 import type SignupModalProps from "./props/signup-modal-props/signup-modal-props";
 
-function LoginModal({ isOpen, onRequestClose }: SignupModalProps) {
+function SignupModal({ isOpen, onRequestClose, onSignupSuccess }: SignupModalProps) {
      return (
           <Modal
                isOpen={isOpen}
@@ -19,9 +19,9 @@ function LoginModal({ isOpen, onRequestClose }: SignupModalProps) {
                >
                     X
                </button>
-               <SignupForm />
+               <SignupForm onSignupSuccess={onSignupSuccess} />
           </Modal>
      );
 }
 
-export default LoginModal;
+export default SignupModal;

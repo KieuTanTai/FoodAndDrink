@@ -20,7 +20,7 @@ function LoginModal({ isOpen, onRequestClose, onLoginSuccess }: LoginModalProps)
       >
         X
       </button>
-      <LoginForm onLoginSuccess={onLoginSuccess} isOpen={isOpen} onRequestClose={onRequestClose} />
+      <LoginForm onLoginSuccess={onLoginSuccess}/>
     </Modal>
   );
 }

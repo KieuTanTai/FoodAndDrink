@@ -1,34 +1,33 @@
-import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { faFacebook as faFacebookBrand, faGoogle as faGoogleBrand } from '@fortawesome/free-brands-svg-icons';
+import type SignupFormProps from '../models/props/account/signup-form-props';
+import UseForm from '../hooks/use-auth';
+import { signup } from '../api/authApi';
+import type { UISignupData } from '../ui-types/signup';
 
-const SignupForm: React.FC = () => {
-     const [email, setEmail] = useState('');
-     const [password, setPassword] = useState('');
-     const [confirmPassword, setConfirmPassword] = useState('');
-     const [message, setMessage] = useState('');
-     const [isError, setIsError] = useState(false);
-
-     const handleSubmit = (e: React.FormEvent) => {
-          e.preventDefault();
-          setMessage('');
-          setIsError(false);
-
-          console.log('Email:', email);
-          console.log('Mật khẩu:', password);
-          console.log('Nhập lại mật khẩu:', confirmPassword);
-
-          if (password !== confirmPassword) {
-               setMessage('Mật khẩu và xác nhận mật khẩu không khớp!');
-               setIsError(true);
-               return;
-          }
-
-          setMessage('Đăng ký thành công!');
-          setIsError(false);
-          // Logic xử lý đăng ký tài khoản ở đây
-     };
+function SignupForm({ onSignupSuccess }: SignupFormProps) {
+     const { formData, isSubmitting, userNameErrorMessage, passwordErrorMessage, handleChange, handleSubmit, handleCopy }
+          = UseForm(
+               { email: "", password: "", confirmPassword: "" },
+               async (data : UISignupData) => {
+                    try {
+                         const result = await signup(data);
+                         if (result.data && result.data.userName !== "") {
+                              onSignupSuccess();
+                              alert("Đăng ký thành công! Vui lòng đăng nhập.");
+                         }
+                         else
+                              alert("Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.");
+                         return result;
+                    } catch (error) {
+                         if (error instanceof Error)
+                              throw new Error(error.message);
+                         else 
+                              throw new Error('An unknown error occurred during submission.');
+                    }
+               }
+     )
 
      return (
           <div className="w-full max-w-lg space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-lg">
@@ -47,17 +46,20 @@ const SignupForm: React.FC = () => {
                               </div>
                               <input
                                    id="signup-email"
-                                   name="signup_email"
+                                   name="email"
                                    type="email"
                                    autoComplete="email"
                                    required
                                    placeholder="Email"
-                                   value={email}
-                                   onChange={(e) => setEmail(e.target.value)}
+                                   value={formData.email}
+                                   disabled={isSubmitting}
+                                   onChange={(e) => handleChange(e, true)}
                                    className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none"
                               />
                          </div>
-                         <div className="mt-1 h-4 text-xs text-red-500" id="signup-email-error-msg"></div>
+                         <div className="mt-1 h-4 text-xs text-red-500" id="signup-email-error-msg">
+                              {userNameErrorMessage}
+                         </div>
                     </div>
 
                     {/* Mật khẩu */}
@@ -69,17 +71,21 @@ const SignupForm: React.FC = () => {
                               </div>
                               <input
                                    id="signup-password"
-                                   name="signup_password"
+                                   name="password"
                                    type="password"
                                    autoComplete="new-password"
                                    required
                                    placeholder="Mật khẩu"
-                                   value={password}
-                                   onChange={(e) => setPassword(e.target.value)}
+                                   disabled={isSubmitting}
+                                   value={formData.password}
+                                   onCopy={handleCopy}
+                                   onChange={(e) => handleChange(e, false, true)}
                                    className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none"
                               />
                          </div>
-                         <div className="mt-1 h-4 text-xs text-red-500" id="signup-pass-error-msg"></div>
+                         <div className="mt-1 h-4 text-xs text-red-500" id="signup-pass-error-msg">
+                              {passwordErrorMessage}
+                         </div>
                     </div>
 
                     {/* Nhập lại mật khẩu */}
@@ -91,34 +97,38 @@ const SignupForm: React.FC = () => {
                               </div>
                               <input
                                    id="signup-confirm-password"
-                                   name="confirm_password"
+                                   name="confirmPassword"
                                    type="password"
                                    autoComplete="new-password"
                                    required
                                    placeholder="Nhập lại mật khẩu"
-                                   value={confirmPassword}
-                                   onChange={(e) => setConfirmPassword(e.target.value)}
+                                   disabled={isSubmitting}
+                                   value={formData.confirmPassword}
+                                   onCopy={handleCopy}
+                                   onChange={(e) => handleChange(e, false, true)}
                                    className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none"
                               />
                          </div>
-                         <div className="mt-1 h-4 text-xs text-red-500" id="signup-confirm-pass-error-msg"></div>
+                         <div className="mt-1 h-4 text-xs text-red-500" id="signup-confirm-pass-error-msg">
+                         </div>
                     </div>
 
-                    {message && (
+                    {/* {message && (
                          <div
                               className={`p-3 text-center text-sm rounded-lg ${isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}
                               role="alert"
                          >
                               {message}
                          </div>
-                    )}
+                    )} */}
 
                     {/* Register button */}
                     <div>
                          <button
                               type="submit"
-                              className="flex w-full justify-center rounded-lg border border-transparent px-4 py-2 text-sm font-medium shadow-sm"
-                         >
+                              onSubmit={handleSubmit}
+                              className="flex w-full justify-center rounded-lg border border-transparent px-4 py-2 
+                                   text-sm font-medium shadow-sm">
                               Đăng ký
                          </button>
                     </div>

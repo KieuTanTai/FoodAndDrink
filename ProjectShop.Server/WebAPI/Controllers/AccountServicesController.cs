@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
+using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ValueObjects;
 using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 using System.Security.Claims;
@@ -16,6 +17,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
     public class AccountServicesController : ControllerBase
     {
         private readonly ILogger<AccountServicesController> _logger;
+        private readonly ILogService _logService;
         private readonly ILoginServices<AccountModel, AccountNavigationOptions> _loginAccountServices;
         private readonly ISignupServices<AccountModel> _signupServices;
         private readonly IUpdateAccountServices _updateAccountStatusServices;
@@ -25,9 +27,11 @@ namespace ProjectShop.Server.WebAPI.Controllers
             ILoginServices<AccountModel, AccountNavigationOptions> loginAccountServices,
             ISignupServices<AccountModel> signupServices,
             IUpdateAccountServices updateAccountStatusServices,
+            ILogService logService,
             ISearchAccountServices<AccountModel, AccountNavigationOptions> searchAccountServices)
         {
             _logger = logger;
+            _logService = logService;
             _loginAccountServices = loginAccountServices;
             _signupServices = signupServices;
             _updateAccountStatusServices = updateAccountStatusServices;
@@ -237,7 +241,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         // API to get current account information
-        [HttpGet("current-account")]
+        [HttpGet("me")]
         public async Task<IActionResult> GetCurrentAccount([FromQuery] AccountNavigationOptions? options)
         {
             _logger.LogInformation("Starting to retrieve current account information.");
@@ -296,29 +300,26 @@ namespace ProjectShop.Server.WebAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] FELoginRequest request, [FromQuery] AccountNavigationOptions? options)
         {
-            _logger.LogInformation("Starting login process.");
+            _logService.LogInfo<AccountModel, AccountServicesController>("Starting login process.");
             ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
 
             try
             {
                 // validate cookie here if needed
                 if (Request.Cookies.ContainsKey(".AspNetCore.Cookies"))
-                {
                     serviceResult = await _searchAccountServices.GetByUserNameAsync(GetUserNameByClaims());
-                }
                 else
-                {
                     serviceResult = await _loginAccountServices.HandleLoginAsync(request.Email, request.Password, options);
-                }
+                    
                 AccountModel account = serviceResult.Data!;
                 // Set claims principal for the current user
                 await SetUserClaims(account, request);
-                _logger.LogInformation($"Login successful. {account.UserName}");
+                _logService.LogInfo<AccountModel, AccountServicesController>($"Login successful. {account.UserName}");
                 return Ok(serviceResult);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during login.");
+                _logService.LogError<AccountModel, AccountServicesController>("Error during login.", ex);
                 return BadRequest("Login failed.");
             }
         }
@@ -332,7 +333,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
             // Validate input
             if (request == null || string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
             {
-                _logger.LogWarning("Invalid signup data.");
+                _logService.LogWarning<AccountModel, AccountServicesController>("Invalid signup data.");
                 return BadRequest("Invalid signup data.");
             }
 
@@ -340,7 +341,6 @@ namespace ProjectShop.Server.WebAPI.Controllers
             {
                 ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
                 serviceResult = await _signupServices.AddAccountAsync(new AccountModel(request.Email, request.Password));
-                uint result = serviceResult.Data!.AccountId;
                 _logger.LogInformation($"Signup successful. {request.Email}");
                 // Could return CreatedAtAction if desired, using Ok for simplicity
                 return Ok(serviceResult);

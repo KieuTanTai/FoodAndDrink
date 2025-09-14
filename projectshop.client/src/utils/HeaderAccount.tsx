@@ -14,9 +14,13 @@ function HeaderAccount() {
   useEffect(() => {
     async function fetchAccount() {
       try {
+        if (currentAccount) return; // Nếu đã có tài khoản, không cần gọi API nữa
         const result = await getCurrentAccount({ isGetCustomer: true });
-        if (result.data && result.data.accountId !== 0)
+        if (result.data && result.data.userName !== "")
+        {
           setCurrentAccount(result.data);
+          console.log("Current account:", result.data.customer?.name);
+        }
         else
           setCurrentAccount(null);
       } catch (error) {
@@ -25,14 +29,35 @@ function HeaderAccount() {
       }
     }
     fetchAccount();
-  }, []);
+  }, [currentAccount]);
+
+  const handleSignup = () => {
+    try {
+      setSignupOpen(false);
+      setLoginOpen(true);
+      alert("Đăng ký thành công! Vui lòng đăng nhập.");
+    } catch (error) {
+      if (error instanceof Error)
+        alert(error.message);
+    }
+  }
+
+  const showAccountName = () => {
+    if (currentAccount) {
+      if (currentAccount.customer && currentAccount.customer.name !== "")
+        return currentAccount.customer.name;
+      else
+        return "unknown name";
+    }
+    return "Tài khoản";
+  };
 
   return (
     <div className="relative group pb-1 account-hover-area rounded-md h-full">
       {/* Icon và text */}
       <div className="flex items-center pl-3 cursor-pointer" id="account-menu-button">
         <FontAwesomeIcon icon={faCircleUser} size="xl" className="main-color" />
-        <div className="pl-2 text-nowrap max-w-26 text-ellipsis overflow-hidden">{currentAccount ? currentAccount.customer?.name : "Tài khoản"}</div>
+        <div className="pl-2 text-nowrap max-w-26 text-ellipsis overflow-hidden">{showAccountName()}</div>
       </div>
 
       {/* Menu con */}
@@ -65,7 +90,10 @@ function HeaderAccount() {
         onLoginSuccess={(account) => { setCurrentAccount(account); alert(`Đăng nhập thành công! ${account.customer?.name}`); setLoginOpen(false); }}
       />
       {/* Signup Modal */}
-      <SignupModal isOpen={signupOpen} onRequestClose={() => setSignupOpen(false)} />
+      <SignupModal isOpen={signupOpen}
+        onRequestClose={() => setSignupOpen(false)}
+        onSignupSuccess={() => handleSignup()}
+      />
     </div>
   );
 }

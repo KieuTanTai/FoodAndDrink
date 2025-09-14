@@ -14,7 +14,9 @@ export async function login(form: UILoginData, navigation: AccountNavigationOpti
                isGetCustomer: navigation.isGetCustomer,
                isGetRolesOfUsers: navigation.isGetRolesOfUsers,
           }, withCredentials: true});
-          return response.data as ServiceResult<AccountModel>;
+          const result = response.data as ServiceResult<AccountModel>;
+          console.log(result);
+          return result;
      } catch (error) {
           throw new Error('Login failed', error as { cause?: Error } | undefined);
      }
@@ -22,8 +24,11 @@ export async function login(form: UILoginData, navigation: AccountNavigationOpti
 
 export async function signup(form: UISignupData) : Promise<ServiceResult<AccountModel>> {
      try {
-          const response = await axios.post('/api/accountservices/signup', form);
-          return response.data as ServiceResult<AccountModel>;
+          const sendData = { Email: form.email, Password: form.password };
+          const response = await axios.post('https://localhost:5294/api/accountservices/signup', sendData);
+          const result = response.data as ServiceResult<AccountModel>;
+          console.log(result);
+          return result;
      } catch (error) {
           throw new Error('Signup failed', error as { cause?: Error } | undefined);
      }
