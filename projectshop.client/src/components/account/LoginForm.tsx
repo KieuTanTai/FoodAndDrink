@@ -1,33 +1,36 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle, faLock } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle as faGoogleBrand, faFacebook as faFacebookBrand } from '@fortawesome/free-brands-svg-icons';
-import UseForm from '../hooks/use-auth';
-import { login } from '../api/authApi';
-import type { UILoginData } from '../ui-types/login';
-import type { ServiceResult } from '../value-objects/service-result';
-import type { AccountModel } from '../models/account-model';
-import type LoginFormProps from '../models/props/account/login-form-props';
+import UseForm from '../../hooks/use-auth';
+import { login } from '../../api/authApi';
+import type { UILoginData } from '../../ui-types/login';
+import type { ServiceResult } from '../../value-objects/service-result';
+import type { AccountModel } from '../../models/account-model';
+import type LoginFormProps from '../../models/props/account/login-form-props';
+import { useMessageModalProvider } from '../../hooks/use-message-modal-context';
 
-function LoginForm({onLoginSuccess} : LoginFormProps)  {
-     const {formData, handleChange, handleSubmit, isSubmitting, userNameErrorMessage, passwordErrorMessage, handleCopy} = UseForm(
-          { email: "", password: "", rememberMe: false},
+function LoginForm({ onLoginSuccess }: LoginFormProps) {
+     const { showMessage } = useMessageModalProvider();
+     const { formData, handleChange, handleSubmit, isSubmitting, userNameErrorMessage, passwordErrorMessage, handleCopy } = UseForm(
+          { email: "", password: "", rememberMe: false },
           async (data: UILoginData) => {
                try {
-                    const result = await login(data, {isGetCustomer:true});
+                    const result = await login(data, { isGetCustomer: true });
+
                     if (result.data && result.data.userName !== "")
                          onLoginSuccess(result.data);
                     else
-                         alert("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
+                         showMessage("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.", "error");
                     return result;
                } catch (error) {
                     if (error instanceof Error)
-                         alert(`Đăng nhập thất bại: ${error.message}`);
+                         showMessage(`Đăng nhập thất bại: ${error.message}`, "error");
                     else
-                         alert('Đăng nhập thất bại: Đã xảy ra lỗi không xác định.');
+                         showMessage('Đăng nhập thất bại: Đã xảy ra lỗi không xác định.', "error");
                     return {} as ServiceResult<AccountModel>;
                }
           });
-     
+
      return (
           <div className="w-full max-w-lg space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-lg" id="login-form-container">
                <div className="text-center">

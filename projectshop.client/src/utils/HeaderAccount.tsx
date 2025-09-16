@@ -1,23 +1,23 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
-import LoginModal from "../modal/LoginModal";
-import SignupModal from "../modal/SignupModal";
+import LoginModal from "../modal/account/LoginModal";
+import SignupModal from "../modal/account/SignupModal";
 import type { AccountModel } from "../models/account-model";
-import { getCurrentAccount } from "../api/authApi";
-
+import { getCurrentAccount, logout } from "../api/authApi";
+import { useMessageModalProvider } from "../hooks/use-message-modal-context";
 function HeaderAccount() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [currentAccount, setCurrentAccount] = useState<AccountModel | null>(null);
   const [signupOpen, setSignupOpen] = useState(false);
+  const { showMessage } = useMessageModalProvider();
 
   useEffect(() => {
     async function fetchAccount() {
       try {
         if (currentAccount) return; // Nếu đã có tài khoản, không cần gọi API nữa
         const result = await getCurrentAccount({ isGetCustomer: true });
-        if (result.data && result.data.userName !== "")
-        {
+        if (result.data && result.data.userName !== "") {
           setCurrentAccount(result.data);
           console.log("Current account:", result.data.customer?.name);
         }
@@ -35,10 +35,24 @@ function HeaderAccount() {
     try {
       setSignupOpen(false);
       setLoginOpen(true);
-      alert("Đăng ký thành công! Vui lòng đăng nhập.");
+      showMessage("Đăng ký thành công! Vui lòng đăng nhập.", "success");
     } catch (error) {
       if (error instanceof Error)
-        alert(error.message);
+        showMessage(error.message, "error");
+    }
+  }
+
+  const handleLogout = async () => {
+    if (currentAccount) {
+      try {
+        // window.location.reload();
+        const result = await logout();
+        setCurrentAccount(null);
+        showMessage(result, "info");
+      } catch (error) {
+        if (error instanceof Error)
+          showMessage(error.message, "error");
+      }
     }
   }
 
@@ -77,6 +91,7 @@ function HeaderAccount() {
           </div>
 
           <button className="py-2 px-4 items-center justify-center text-left rounded-md hidden font-medium bg-red-300! text-black!"
+            onClick={handleLogout}
             style={{ display: currentAccount ? "block" : "none" }}>
             Đăng xuất
           </button>
@@ -87,7 +102,11 @@ function HeaderAccount() {
       <LoginModal
         isOpen={loginOpen}
         onRequestClose={() => setLoginOpen(false)}
-        onLoginSuccess={(account) => { setCurrentAccount(account); alert(`Đăng nhập thành công! ${account.customer?.name}`); setLoginOpen(false); }}
+        onLoginSuccess={(account) => {
+          setCurrentAccount(account);
+          showMessage(`Đăng nhập thành công! ${account.customer?.name}`, "success");
+          setLoginOpen(false);
+        }}
       />
       {/* Signup Modal */}
       <SignupModal isOpen={signupOpen}

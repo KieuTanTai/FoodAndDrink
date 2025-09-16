@@ -1,33 +1,35 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { faFacebook as faFacebookBrand, faGoogle as faGoogleBrand } from '@fortawesome/free-brands-svg-icons';
-import type SignupFormProps from '../models/props/account/signup-form-props';
-import UseForm from '../hooks/use-auth';
-import { signup } from '../api/authApi';
-import type { UISignupData } from '../ui-types/signup';
+import type SignupFormProps from '../../models/props/account/signup-form-props';
+import UseForm from '../../hooks/use-auth';
+import { signup } from '../../api/authApi';
+import type { UISignupData } from '../../ui-types/signup';
+import { useMessageModalProvider } from '../../hooks/use-message-modal-context';
 
 function SignupForm({ onSignupSuccess }: SignupFormProps) {
+     const { showMessage } = useMessageModalProvider();
      const { formData, isSubmitting, userNameErrorMessage, passwordErrorMessage, handleChange, handleSubmit, handleCopy }
           = UseForm(
                { email: "", password: "", confirmPassword: "" },
-               async (data : UISignupData) => {
+               async (data: UISignupData) => {
                     try {
                          const result = await signup(data);
                          if (result.data && result.data.userName !== "") {
                               onSignupSuccess();
-                              alert("Đăng ký thành công! Vui lòng đăng nhập.");
+                              showMessage("Đăng ký thành công! Vui lòng đăng nhập.", "success");
                          }
                          else
-                              alert("Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.");
+                              showMessage("Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.", "error");
                          return result;
                     } catch (error) {
                          if (error instanceof Error)
                               throw new Error(error.message);
-                         else 
+                         else
                               throw new Error('An unknown error occurred during submission.');
                     }
                }
-     )
+          )
 
      return (
           <div className="w-full max-w-lg space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-lg">

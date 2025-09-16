@@ -254,7 +254,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
             try
             {
-                ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
+                ServiceResult<AccountModel> serviceResult = new();
                 serviceResult = await _searchAccountServices.GetByUserNameAsync(userName, options);
                 AccountModel currentAccount = serviceResult.Data!;
                 _logger.LogInformation($"Current account information: {currentAccount.UserName}");
@@ -310,7 +310,14 @@ namespace ProjectShop.Server.WebAPI.Controllers
                     serviceResult = await _searchAccountServices.GetByUserNameAsync(GetUserNameByClaims());
                 else
                     serviceResult = await _loginAccountServices.HandleLoginAsync(request.Email, request.Password, options);
-                    
+
+                if (serviceResult.Data == null || string.IsNullOrEmpty(serviceResult.Data.UserName)
+                    || serviceResult.Data.AccountId <= 0)
+                {
+                    _logService.LogWarning<AccountModel, AccountServicesController>($"Login failed. {request.Email}");
+                    return BadRequest("Login failed. Invalid username or password.");
+                }
+
                 AccountModel account = serviceResult.Data!;
                 // Set claims principal for the current user
                 await SetUserClaims(account, request);
@@ -321,6 +328,45 @@ namespace ProjectShop.Server.WebAPI.Controllers
             {
                 _logService.LogError<AccountModel, AccountServicesController>("Error during login.", ex);
                 return BadRequest("Login failed.");
+            }
+        }
+
+        // API for multi signup (migrate data from other platforms)
+        [HttpPost("multi-signup")]
+        public async Task<IActionResult> MultiSignup([FromBody] FEMigrateAccountRequest request)
+        {
+            _logger.LogInformation("Starting multi-signup process.");
+            //DEBUG: MOCK TEST ONLY, REMOVE IN PRODUCTION
+            if (request.AdminKey != "admin")
+            {
+                _logger.LogWarning("Invalid admin key for multi-signup.");
+                return Unauthorized("Invalid admin key.");
+            }
+
+            //END DEBUG
+            if (request == null || request.Accounts == null || !request.Accounts.Any())
+            {
+                _logService.LogWarning<AccountModel, AccountServicesController>("Invalid multi-signup data.");
+                return BadRequest("Invalid multi-signup data.");
+            }
+
+            try
+            {
+                ServiceResults<AccountModel> serviceResults = new ServiceResults<AccountModel>();
+                serviceResults = await _signupServices.AddAccountsAsync(request.Accounts);
+                if (serviceResults.Data == null || !serviceResults.Data.Any())
+                {
+                    _logService.LogWarning<AccountModel, AccountServicesController>("Multi-signup failed.");
+                    return BadRequest("Multi-signup failed.");
+                }
+
+                _logger.LogInformation($"Multi-signup successful. Number of accounts created: {serviceResults.Data.Count()}");
+                return Ok(serviceResults);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during multi-signup.");
+                return StatusCode(500, "Internal server error during multi-signup.");
             }
         }
 
@@ -341,6 +387,14 @@ namespace ProjectShop.Server.WebAPI.Controllers
             {
                 ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
                 serviceResult = await _signupServices.AddAccountAsync(new AccountModel(request.Email, request.Password));
+
+                if (serviceResult.Data == null || string.IsNullOrEmpty(serviceResult.Data.UserName)
+                    || serviceResult.Data.AccountId <= 0)
+                {
+                    _logService.LogWarning<AccountModel, AccountServicesController>($"Signup failed. {request.Email}");
+                    return BadRequest("Signup failed.");
+                }
+
                 _logger.LogInformation($"Signup successful. {request.Email}");
                 // Could return CreatedAtAction if desired, using Ok for simplicity
                 return Ok(serviceResult);
@@ -413,6 +467,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during logout.");
+                _logService.LogError<AccountModel, AccountServicesController>("error when fetch!", ex);
                 return StatusCode(500, "Internal server error during logout.");
             }
         }
