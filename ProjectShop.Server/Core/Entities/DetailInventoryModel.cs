@@ -4,23 +4,55 @@ namespace ProjectShop.Server.Core.Entities
 {
     public class DetailInventoryModel : IGetIdEntity<uint>
     {
+        // Backing fields
+        private uint _detailInventoryId;
+        private uint _inventoryId;
+        private string _productBarcode = string.Empty;
+        private uint _detailInventoryQuantity;
+        private DateTime _detailInventoryAddedDate;
+        private DateTime _detailInventoryLastUpdatedDate;
+
         // Corresponds to 'inventory_detail_id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint DetailInventoryId { get; set; }
+        public uint DetailInventoryId
+        {
+            get => _detailInventoryId;
+            set => _detailInventoryId = value;
+        }
 
         // Corresponds to 'inventory_id' (INT UNSIGNED)
-        public uint InventoryId { get; set; }
+        public uint InventoryId
+        {
+            get => _inventoryId;
+            set => _inventoryId = value;
+        }
 
         // Corresponds to 'product_barcode' (VARCHAR(20))
-        public string ProductBarcode { get; set; } = string.Empty;
+        public string ProductBarcode
+        {
+            get => _productBarcode;
+            set => _productBarcode = value ?? string.Empty;
+        }
 
         // Corresponds to 'inventory_detail_quantity' (INT UNSIGNED)
-        public uint DetailInventoryQuantity { get; set; }
+        public uint DetailInventoryQuantity
+        {
+            get => _detailInventoryQuantity;
+            set => _detailInventoryQuantity = value;
+        }
 
         // Corresponds to 'inventory_detail_added_date' (DATETIME)
-        public DateTime DetailInventoryAddedDate { get; set; }
+        public DateTime DetailInventoryAddedDate
+        {
+            get => _detailInventoryAddedDate;
+            set => _detailInventoryAddedDate = value;
+        }
 
         // Corresponds to 'inventory_detail_last_updated_date' (DATETIME)
-        public DateTime DetailInventoryLastUpdatedDate { get; set; }
+        public DateTime DetailInventoryLastUpdatedDate
+        {
+            get => _detailInventoryLastUpdatedDate;
+            set => _detailInventoryLastUpdatedDate = value;
+        }
 
         // Navigation properties
         public ProductModel Product { get; set; } = null!;

@@ -2,5 +2,12 @@ namespace ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 public class LocationTypeNavigationOptions
 {
-    public bool IsGetLocations { get; set; }
+    // Backing fields
+    private bool _isGetLocations;
+
+    public bool IsGetLocations
+    {
+        get => _isGetLocations;
+        set => _isGetLocations = value;
+    }
 }

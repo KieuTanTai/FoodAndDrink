@@ -2,13 +2,34 @@
 {
     public class ServiceResult<TEntity> where TEntity : class
     {
-        public IEnumerable<JsonLogEntry>? LogEntries { get; set; }
-        public TEntity? Data { get; set; }
+        // Backing fields
+        private IEnumerable<JsonLogEntry>? _logEntries;
+        private TEntity? _data;
+        private bool _isSuccess;
+
+        public IEnumerable<JsonLogEntry>? LogEntries
+        {
+            get => _logEntries;
+            set => _logEntries = value;
+        }
+
+        public TEntity? Data
+        {
+            get => _data;
+            set => _data = value;
+        }
+
+        public bool IsSuccess
+        {
+            get => _isSuccess;
+            set => _isSuccess = value;
+        }
 
         public ServiceResult()
         {
-            LogEntries = new List<JsonLogEntry>();
+            LogEntries = [];
             Data = null;
+            IsSuccess = false;
         }
     }
 }

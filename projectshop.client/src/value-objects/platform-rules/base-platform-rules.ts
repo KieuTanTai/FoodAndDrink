@@ -1,4 +1,4 @@
-export interface BaseRule {
+export interface BasePlatformRule {
     type: string;
     enabled: boolean;
   }

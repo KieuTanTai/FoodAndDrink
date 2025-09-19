@@ -2,7 +2,20 @@
 {
     public class RoleUpdateNamesRequest
     {
-        public IEnumerable<uint> RoleIds { get; set; } = [];
-        public IEnumerable<string> NewRoleNames { get; set; } = [];
+        // Backing fields
+        private IEnumerable<uint> _roleIds = [];
+        private IEnumerable<string> _newRoleNames = [];
+
+        public IEnumerable<uint> RoleIds
+        {
+            get => _roleIds;
+            set => _roleIds = value ?? [];
+        }
+
+        public IEnumerable<string> NewRoleNames
+        {
+            get => _newRoleNames;
+            set => _newRoleNames = value ?? [];
+        }
     }
 }

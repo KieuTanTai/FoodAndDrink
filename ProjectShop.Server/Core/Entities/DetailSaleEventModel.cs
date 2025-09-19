@@ -6,29 +6,71 @@ namespace ProjectShop.Server.Core.Entities
 {
     public class DetailSaleEventModel : IGetIdEntity<uint>
     {
+        // Backing fields
+        private uint _detailSaleEventId;
+        private uint _saleEventId;
+        private string _productBarcode = string.Empty;
+        private EDiscountType _discountType;
+        private decimal _discountPercent;
+        private decimal _discountAmount;
+        private decimal _maxDiscountPrice;
+        private decimal _minPriceToUse;
+
         // Corresponds to 'detail_sale_event_id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint DetailSaleEventId { get; set; }
+        public uint DetailSaleEventId
+        {
+            get => _detailSaleEventId;
+            set => _detailSaleEventId = value;
+        }
 
         // Corresponds to 'sale_event_id' (INT UNSIGNED)
-        public uint SaleEventId { get; set; }
+        public uint SaleEventId
+        {
+            get => _saleEventId;
+            set => _saleEventId = value;
+        }
 
         // Corresponds to 'product_barcode' (VARCHAR(20))
-        public string ProductBarcode { get; set; } = string.Empty;
+        public string ProductBarcode
+        {
+            get => _productBarcode;
+            set => _productBarcode = value ?? string.Empty;
+        }
 
         // Corresponds to 'discount_type' (ENUM)
-        public EDiscountType DiscountType { get; set; }
+        public EDiscountType DiscountType
+        {
+            get => _discountType;
+            set => _discountType = value;
+        }
 
         // Corresponds to 'discount_percent' (DECIMAL(5,2))
-        public decimal DiscountPercent { get; set; }
+        public decimal DiscountPercent
+        {
+            get => _discountPercent;
+            set => _discountPercent = value;
+        }
 
         // Corresponds to 'discount_amount' (DECIMAL(10,2))
-        public decimal DiscountAmount { get; set; }
+        public decimal DiscountAmount
+        {
+            get => _discountAmount;
+            set => _discountAmount = value;
+        }
 
         // Corresponds to 'max_discount_price' (DECIMAL(10,2))
-        public decimal MaxDiscountPrice { get; set; }
+        public decimal MaxDiscountPrice
+        {
+            get => _maxDiscountPrice;
+            set => _maxDiscountPrice = value;
+        }
 
         // Corresponds to 'min_price_to_use' (DECIMAL(10,2))
-        public decimal MinPriceToUse { get; set; }
+        public decimal MinPriceToUse
+        {
+            get => _minPriceToUse;
+            set => _minPriceToUse = value;
+        }
 
         // Navigation properties
         public SaleEventModel SaleEvent { get; set; } = null!;

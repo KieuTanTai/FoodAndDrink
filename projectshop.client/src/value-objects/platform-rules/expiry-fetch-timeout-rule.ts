@@ -1,6 +1,6 @@
-import type { BaseRule } from "./base-rules";
+import type { BasePlatformRule } from "./base-platform-rules";
 
-export interface FetchTimeoutRule extends BaseRule {
-    type: 'fetch-timeout';
-    maxFetchTimeout: number;
-  }
+export interface FetchTimeoutRule extends BasePlatformRule {
+  type: 'fetch-timeout';
+  maxFetchTimeout: number;
+}

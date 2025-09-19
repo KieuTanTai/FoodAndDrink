@@ -65,15 +65,15 @@ export function MessageModal({ message, type, timeout = 3000, marginTop = 0, onC
     <div
       style={{
         position: 'fixed',
-        top: `${marginTop + 16}px`,
+        top: `${marginTop}px`,
         right: '32px',
         zIndex: 9999,
-        minWidth: 320,
-        maxWidth: 380,
+        minWidth: 250,
+        maxWidth: 2500,
         background: '#fff',
         boxShadow: '0 4px 24px rgba(0,0,0,0.15)',
         borderRadius: 10,
-        padding: '32px 24px',
+        padding: '24px 24px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -93,8 +93,8 @@ export function MessageModal({ message, type, timeout = 3000, marginTop = 0, onC
         aria-label="Đóng"
         style={{
           position: 'absolute',
-          top: 14,
-          right: 18,
+          top: -14,
+          right: -20,
           background: 'none',
           border: 'none',
           fontSize: 26,

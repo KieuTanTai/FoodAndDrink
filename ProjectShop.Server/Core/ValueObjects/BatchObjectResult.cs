@@ -2,7 +2,20 @@
 {
     public class BatchObjectResult<TEntity> where TEntity : class
     {
-        public IEnumerable<TEntity> ValidEntities { get; set; } = new List<TEntity>();
-        public IEnumerable<BatchItemResult<TEntity>> BatchResults { get; set; } = new List<BatchItemResult<TEntity>>();
+        // Backing fields
+        private IEnumerable<TEntity> _validEntities = [];
+        private IEnumerable<BatchItemResult<TEntity>> _batchResults = [];
+
+        public IEnumerable<TEntity> ValidEntities
+        {
+            get => _validEntities;
+            set => _validEntities = value;
+        }
+
+        public IEnumerable<BatchItemResult<TEntity>> BatchResults
+        {
+            get => _batchResults;
+            set => _batchResults = value;
+        }
     }
 }

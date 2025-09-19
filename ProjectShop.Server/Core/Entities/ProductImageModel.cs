@@ -5,23 +5,55 @@ namespace ProjectShop.Server.Core.Entities
 {
     public class ProductImageModel : IGetIdEntity<uint>
     {
+        // Backing fields
+        private uint _productImageId;
+        private string _productBarcode = string.Empty;
+        private string _productImageUrl = string.Empty;
+        private int _productImagePriority;
+        private DateTime _productImageCreatedDate = DateTime.UtcNow;
+        private DateTime _productImageLastUpdatedDate = DateTime.UtcNow;
+
         // Corresponds to 'product_image_id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint ProductImageId { get; set; }
+        public uint ProductImageId
+        {
+            get => _productImageId;
+            set => _productImageId = value;
+        }
 
         // Corresponds to 'product_barcode' (VARCHAR(20))
-        public string ProductBarcode { get; set; } = string.Empty;
+        public string ProductBarcode
+        {
+            get => _productBarcode;
+            set => _productBarcode = value ?? string.Empty;
+        }
 
         // Corresponds to 'image_url' (VARCHAR(255))
-        public string ProductImageUrl { get; set; } = string.Empty;
+        public string ProductImageUrl
+        {
+            get => _productImageUrl;
+            set => _productImageUrl = value ?? string.Empty;
+        }
 
         // Corresponds to 'product_image_priority' (INT)
-        public int ProductImagePriority { get; set; }
+        public int ProductImagePriority
+        {
+            get => _productImagePriority;
+            set => _productImagePriority = value;
+        }
 
         // Corresponds to 'product_image_create_date' (DATETIME)
-        public DateTime ProductImageCreatedDate { get; set; } = DateTime.UtcNow;
+        public DateTime ProductImageCreatedDate
+        {
+            get => _productImageCreatedDate;
+            set => _productImageCreatedDate = value;
+        }
 
         // Corresponds to `ProductImageLastUpdatedDate` (DATETIME)
-        public DateTime ProductImageLastUpdatedDate { get; set; } = DateTime.UtcNow;
+        public DateTime ProductImageLastUpdatedDate
+        {
+            get => _productImageLastUpdatedDate;
+            set => _productImageLastUpdatedDate = value;
+        }
 
         // Navigation properties
         public ProductModel Product { get; set; } = null!;

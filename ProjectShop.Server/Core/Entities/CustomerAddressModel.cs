@@ -4,14 +4,63 @@ namespace ProjectShop.Server.Core.Entities
 {
     public class CustomerAddressModel : IGetIdEntity<uint>
     {
-        public uint CustomerAddressId { get; set; }
-        public uint CustomerCityId { get; set; }
-        public uint CustomerDistrictId { get; set; }
-        public uint CustomerWardId { get; set; }
-        public uint CustomerId { get; set; }
-        public string CustomerStreet { get; set; } = string.Empty;
-        public string CustomerAddressNumber { get; set; } = string.Empty;
-        public bool CustomerAddressStatus { get; set; } = true;
+        // Backing fields
+        private uint _customerAddressId;
+        private uint _customerCityId;
+        private uint _customerDistrictId;
+        private uint _customerWardId;
+        private uint _customerId;
+        private string _customerStreet = string.Empty;
+        private string _customerAddressNumber = string.Empty;
+        private bool _customerAddressStatus = true;
+
+        public uint CustomerAddressId
+        {
+            get => _customerAddressId;
+            set => _customerAddressId = value;
+        }
+
+        public uint CustomerCityId
+        {
+            get => _customerCityId;
+            set => _customerCityId = value;
+        }
+
+        public uint CustomerDistrictId
+        {
+            get => _customerDistrictId;
+            set => _customerDistrictId = value;
+        }
+
+        public uint CustomerWardId
+        {
+            get => _customerWardId;
+            set => _customerWardId = value;
+        }
+
+        public uint CustomerId
+        {
+            get => _customerId;
+            set => _customerId = value;
+        }
+
+        public string CustomerStreet
+        {
+            get => _customerStreet;
+            set => _customerStreet = value ?? string.Empty;
+        }
+
+        public string CustomerAddressNumber
+        {
+            get => _customerAddressNumber;
+            set => _customerAddressNumber = value ?? string.Empty;
+        }
+
+        public bool CustomerAddressStatus
+        {
+            get => _customerAddressStatus;
+            set => _customerAddressStatus = value;
+        }
 
         // Navigation properties
         public LocationCityModel? City { get; set; }

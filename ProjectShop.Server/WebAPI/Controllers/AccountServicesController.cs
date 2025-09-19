@@ -388,11 +388,13 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 ServiceResult<AccountModel> serviceResult = new ServiceResult<AccountModel>();
                 serviceResult = await _signupServices.AddAccountAsync(new AccountModel(request.Email, request.Password));
 
-                if (serviceResult.Data == null || string.IsNullOrEmpty(serviceResult.Data.UserName)
-                    || serviceResult.Data.AccountId <= 0)
+                if (serviceResult.Data == null || string.IsNullOrEmpty(serviceResult.Data.UserName) || !serviceResult.IsSuccess)
                 {
-                    _logService.LogWarning<AccountModel, AccountServicesController>($"Signup failed. {request.Email}");
-                    return BadRequest("Signup failed.");
+                    _logService.LogWarning<AccountModel, AccountServicesController>($@"Signup failed. {serviceResult.Data}, 
+                        {serviceResult.Data?.UserName}, {serviceResult.Data?.Password}");
+                    if (serviceResult.Data != null)
+                        serviceResult.Data.Password = "";
+                    return BadRequest(serviceResult);
                 }
 
                 _logger.LogInformation($"Signup successful. {request.Email}");

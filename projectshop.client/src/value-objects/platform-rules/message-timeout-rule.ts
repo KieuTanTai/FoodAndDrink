@@ -1,6 +1,6 @@
-import type { BaseRule } from "./base-rules";
+import type { BasePlatformRule } from "./base-platform-rules";
 
-export default interface MessageTimeoutRule extends BaseRule {
+export default interface MessageTimeoutRule extends BasePlatformRule {
     type: "message-timeout";
     maxMessageTimeout: number;
 }

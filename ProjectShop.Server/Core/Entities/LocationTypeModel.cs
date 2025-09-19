@@ -5,14 +5,31 @@ namespace ProjectShop.Server.Core.Entities
 {
     public class LocationTypeModel : IGetIdEntity<uint>
     {
+        // Backing fields
+        private uint _locationTypeId;
+        private string _locationTypeName = string.Empty;
+        private bool _locationTypeStatus;
+
         // Corresponds to 'location_type_id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint LocationTypeId { get; set; }
+        public uint LocationTypeId
+        {
+            get => _locationTypeId;
+            set => _locationTypeId = value;
+        }
 
         // Corresponds to 'location_type_name' (VARCHAR(20))
-        public string LocationTypeName { get; set; } = string.Empty;
+        public string LocationTypeName
+        {
+            get => _locationTypeName;
+            set => _locationTypeName = value ?? string.Empty;
+        }
 
         // Corresponds to 'location_type_status' (TINYINT(1))
-        public bool LocationTypeStatus { get; set; }
+        public bool LocationTypeStatus
+        {
+            get => _locationTypeStatus;
+            set => _locationTypeStatus = value;
+        }
 
         // Navigation properties
         public ICollection<LocationModel> Locations { get; set; } = new List<LocationModel>();

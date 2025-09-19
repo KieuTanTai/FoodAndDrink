@@ -5,26 +5,63 @@ namespace ProjectShop.Server.Core.Entities
 {
     public class DisposeProductModel : IGetIdEntity<uint>
     {
+        // Backing fields
+        private uint _disposeProductId;
+        private string _productBarcode = string.Empty;
+        private uint _locationId;
+        private uint _disposeByEmployeeId;
+        private uint _disposeReasonId;
+        private int _disposeQuantity;
+        private DateTime _disposedDate = DateTime.UtcNow;
+
         // Corresponds to 'dispose_product_id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint DisposeProductId { get; set; }
+        public uint DisposeProductId
+        {
+            get => _disposeProductId;
+            set => _disposeProductId = value;
+        }
 
         // Corresponds to 'product_barcode' (string)
-        public string ProductBarcode { get; set; } = string.Empty;
+        public string ProductBarcode
+        {
+            get => _productBarcode;
+            set => _productBarcode = value ?? string.Empty;
+        }
 
         // Corresponds to 'location_id' (INT UNSIGNED)
-        public uint LocationId { get; set; }
+        public uint LocationId
+        {
+            get => _locationId;
+            set => _locationId = value;
+        }
 
         // Corresponds to 'dispose_by_employee_id' (INT UNSIGNED)
-        public uint DisposeByEmployeeId { get; set; }
+        public uint DisposeByEmployeeId
+        {
+            get => _disposeByEmployeeId;
+            set => _disposeByEmployeeId = value;
+        }
 
         // Corresponds to 'dispose_reason_id' (INT UNSIGNED)
-        public uint DisposeReasonId { get; set; }
+        public uint DisposeReasonId
+        {
+            get => _disposeReasonId;
+            set => _disposeReasonId = value;
+        }
 
         // Corresponds to 'dispose_quantity' (INT UNSIGNED)
-        public int DisposeQuantity { get; set; }
+        public int DisposeQuantity
+        {
+            get => _disposeQuantity;
+            set => _disposeQuantity = value;
+        }
 
         // Corresponds to 'dispose_date' (DATETIME)
-        public DateTime DisposedDate { get; set; } = DateTime.UtcNow;
+        public DateTime DisposedDate
+        {
+            get => _disposedDate;
+            set => _disposedDate = value;
+        }
 
         // Navigation properties
         public ProductModel Product { get; set; } = null!;

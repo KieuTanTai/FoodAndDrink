@@ -1,7 +1,6 @@
-import type { BaseRule } from "./base-rules";
+import type { BasePlatformRule } from "./base-platform-rules";
 
-export interface CookieExpiryRule extends BaseRule {
+export interface CookieExpiryRule extends BasePlatformRule {
     type: 'cookie-expiry'; // xác định đúng loại
     maxAgeDays: number;
 }
-  

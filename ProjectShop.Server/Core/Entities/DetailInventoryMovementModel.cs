@@ -4,20 +4,47 @@ namespace ProjectShop.Server.Core.Entities
 {
     public class DetailInventoryMovementModel : IGetIdEntity<uint>
     {
+        // Backing fields
+        private uint _detailInventoryMovementId;
+        private uint _inventoryMovementId;
+        private string _productBarcode = string.Empty;
+        private uint _productLotId;
+        private uint _detailInventoryMovementQuantity;
+
         // Corresponds to 'detail_inventory_movement_id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint DetailInventoryMovementId { get; set; }
+        public uint DetailInventoryMovementId
+        {
+            get => _detailInventoryMovementId;
+            set => _detailInventoryMovementId = value;
+        }
 
         // Corresponds to 'inventory_movement_id' (INT UNSIGNED)
-        public uint InventoryMovementId { get; set; }
+        public uint InventoryMovementId
+        {
+            get => _inventoryMovementId;
+            set => _inventoryMovementId = value;
+        }
 
         // Corresponds to 'product_barcode' (VARCHAR(20))
-        public string ProductBarcode { get; set; } = string.Empty;
+        public string ProductBarcode
+        {
+            get => _productBarcode;
+            set => _productBarcode = value ?? string.Empty;
+        }
 
         // Corresponds to 'product_lot_id' (INT UNSIGNED)
-        public uint ProductLotId { get; set; }
+        public uint ProductLotId
+        {
+            get => _productLotId;
+            set => _productLotId = value;
+        }
 
         // Corresponds to 'detail_inventory_movement_quantity' (INT UNSIGNED)
-        public uint DetailInventoryMovementQuantity { get; set; }
+        public uint DetailInventoryMovementQuantity
+        {
+            get => _detailInventoryMovementQuantity;
+            set => _detailInventoryMovementQuantity = value;
+        }
 
         // Navigation properties
         public ProductModel Product { get; set; } = null!;

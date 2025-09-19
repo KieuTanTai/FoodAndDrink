@@ -2,5 +2,12 @@ namespace ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 public class CategoryNavigationOptions
 {
-    public bool IsGetProductCategories { get; set; }
+    // Backing fields
+    private bool _isGetProductCategories;
+
+    public bool IsGetProductCategories
+    {
+        get => _isGetProductCategories;
+        set => _isGetProductCategories = value;
+    }
 }

@@ -26,6 +26,8 @@ namespace ProjectShop.Server.Infrastructure.Configuration
                 throw new InvalidOperationException("Connection string is incorrect or empty. Please check configuration.");
             services.AddSingleton<IDbConnectionFactory>(provider => new MySqlConnectionFactory(connectionString));
 
+            
+
             // Registering DAOs
             services.AddScoped<IDAO<AccountModel>, AccountDAO>();
             services.AddTransient<IDAO<BankModel>, BankDAO>();

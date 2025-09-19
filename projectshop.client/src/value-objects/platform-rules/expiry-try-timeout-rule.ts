@@ -1,6 +1,6 @@
-import type { BaseRule } from "./base-rules";
+import type { BasePlatformRule } from "./base-platform-rules";
 
-export interface TryTimeoutRule extends BaseRule {
-    type: 'try-timeout';
-    maxTryTimes: number;
-  }
+export interface TryTimeoutRule extends BasePlatformRule {
+  type: 'try-timeout';
+  maxTryTimes: number;
+}

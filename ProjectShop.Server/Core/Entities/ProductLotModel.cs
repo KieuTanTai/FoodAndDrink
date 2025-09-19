@@ -5,14 +5,31 @@ namespace ProjectShop.Server.Core.Entities
 {
     public class ProductLotModel : IGetIdEntity<uint>
     {
+        // Backing fields
+        private uint _productLotId;
+        private uint _inventoryId;
+        private DateTime _productLotCreatedDate = DateTime.UtcNow;
+
         // Corresponds to 'product_lot_id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint ProductLotId { get; set; }
+        public uint ProductLotId
+        {
+            get => _productLotId;
+            set => _productLotId = value;
+        }
 
         // Corresponds to 'inventory_id' (INT UNSIGNED)
-        public uint InventoryId { get; set; }
+        public uint InventoryId
+        {
+            get => _inventoryId;
+            set => _inventoryId = value;
+        }
 
         // Corresponds to 'product_lot_create_date' (DATETIME)
-        public DateTime ProductLotCreatedDate { get; set; } = DateTime.UtcNow;
+        public DateTime ProductLotCreatedDate
+        {
+            get => _productLotCreatedDate;
+            set => _productLotCreatedDate = value;
+        }
 
         // Navigation properties
         public ICollection<InventoryModel> Inventories { get; set; } = new List<InventoryModel>();

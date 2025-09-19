@@ -3,7 +3,14 @@ namespace ProjectShop.Server.Core.Entities
 {
     public class CustomerModel : PersonModel
     {
-        public uint CustomerId { get; set; }
+        // Backing fields
+        private uint _customerId;
+
+        public uint CustomerId
+        {
+            get => _customerId;
+            set => _customerId = value;
+        }
 
         // Navigation properties
         public CartModel Cart { get; set; } = null!;

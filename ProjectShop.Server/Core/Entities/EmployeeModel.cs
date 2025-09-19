@@ -3,13 +3,56 @@ namespace ProjectShop.Server.Core.Entities
 {
     public class EmployeeModel : PersonModel
     {
-        public uint EmployeeId { get; set; }
-        public string EmployeeHouseNumber { get; set; } = string.Empty;
-        public string EmployeeStreet { get; set; } = string.Empty;
-        public uint? EmployeeWardId { get; set; }
-        public uint? EmployeeDistrictId { get; set; }
-        public uint? EmployeeCityId { get; set; }
-        public uint LocationId { get; set; }
+        // Backing fields
+        private uint _employeeId;
+        private string _employeeHouseNumber = string.Empty;
+        private string _employeeStreet = string.Empty;
+        private uint? _employeeWardId;
+        private uint? _employeeDistrictId;
+        private uint? _employeeCityId;
+        private uint _locationId;
+
+        public uint EmployeeId
+        {
+            get => _employeeId;
+            set => _employeeId = value;
+        }
+
+        public string EmployeeHouseNumber
+        {
+            get => _employeeHouseNumber;
+            set => _employeeHouseNumber = value ?? string.Empty;
+        }
+
+        public string EmployeeStreet
+        {
+            get => _employeeStreet;
+            set => _employeeStreet = value ?? string.Empty;
+        }
+
+        public uint? EmployeeWardId
+        {
+            get => _employeeWardId;
+            set => _employeeWardId = value;
+        }
+
+        public uint? EmployeeDistrictId
+        {
+            get => _employeeDistrictId;
+            set => _employeeDistrictId = value;
+        }
+
+        public uint? EmployeeCityId
+        {
+            get => _employeeCityId;
+            set => _employeeCityId = value;
+        }
+
+        public uint LocationId
+        {
+            get => _locationId;
+            set => _locationId = value;
+        }
 
         // Navigation properties
         public LocationWardModel? EmployeeWard { get; set; }

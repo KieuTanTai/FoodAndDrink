@@ -6,6 +6,8 @@ import UseForm from '../../hooks/use-auth';
 import { signup } from '../../api/authApi';
 import type { UISignupData } from '../../ui-types/signup';
 import { useMessageModalProvider } from '../../hooks/use-message-modal-context';
+import type { AccountModel } from '../../models/account-model';
+import type { ServiceResult } from '../../value-objects/service-result';
 
 function SignupForm({ onSignupSuccess }: SignupFormProps) {
      const { showMessage } = useMessageModalProvider();
@@ -15,13 +17,16 @@ function SignupForm({ onSignupSuccess }: SignupFormProps) {
                async (data: UISignupData) => {
                     try {
                          const result = await signup(data);
-                         if (result.data && result.data.userName !== "") {
+                         if (!(result instanceof Array) && result.data && result.data.userName !== "") {
                               onSignupSuccess();
                               showMessage("Đăng ký thành công! Vui lòng đăng nhập.", "success");
+                              return result;
                          }
-                         else
-                              showMessage("Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.", "error");
-                         return result;
+                         else if (result instanceof Array)
+                              showMessage(result[0].message ?? "lỗi khi đăng kí, kiểm tra lại thông tin ", "error");
+                         else 
+                              showMessage("lỗi khi đăng kí, vui lòng thử lại!", "error");
+                         return {} as ServiceResult<AccountModel>;
                     } catch (error) {
                          if (error instanceof Error)
                               throw new Error(error.message);

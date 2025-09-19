@@ -8,9 +8,22 @@ namespace ProjectShop.Server.Core.ValueObjects
 {
     public class FEMigrateAccountRequest
     {
-        public ICollection<AccountModel> Accounts { get; set; } = new List<AccountModel>();
+        // Backing fields
+        private ICollection<AccountModel> _accounts = [];
+        private string _adminKey = string.Empty;
+
+        public ICollection<AccountModel> Accounts
+        {
+            get => _accounts;
+            set => _accounts = value ?? [];
+        }
+
         // key for admin to authorize migration
-        public string AdminKey { get; set; } = string.Empty;
+        public string AdminKey
+        {
+            get => _adminKey;
+            set => _adminKey = value ?? string.Empty;
+        }
 
         public FEMigrateAccountRequest()
         {

@@ -18,14 +18,31 @@ namespace ProjectShop.Server.Core.Entities
 
     public class ProductCategoriesModel : IGetIdEntity<ProductCategoriesKey>
     {
+        // Backing fields
+        private uint _id;
+        private uint _categoryId;
+        private string _productBarcode = string.Empty;
+
         // Corresponds to 'id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint Id { get; set; }
+        public uint Id
+        {
+            get => _id;
+            set => _id = value;
+        }
 
         // Corresponds to 'category_id' (INT UNSIGNED)
-        public uint CategoryId { get; set; }
+        public uint CategoryId
+        {
+            get => _categoryId;
+            set => _categoryId = value;
+        }
 
         // Corresponds to 'product_barcode' (VARCHAR(20))
-        public string ProductBarcode { get; set; } = string.Empty;
+        public string ProductBarcode
+        {
+            get => _productBarcode;
+            set => _productBarcode = value ?? string.Empty;
+        }
 
         // Navigation properties
         public CategoryModel Category { get; set; } = null!;

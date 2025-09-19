@@ -1,4 +1,3 @@
-import axios from 'axios';
 // import Cookies from 'js-cookie';
 import type { UILoginData } from '../ui-types/login';
 import type { UISignupData } from '../ui-types/signup';
@@ -6,10 +5,9 @@ import type { AccountModel } from '../models/account-model';
 import type { UIForgotPasswordData } from '../ui-types/forgot-password';
 import type { ServiceResult } from '../value-objects/service-result';
 import type { AccountNavigationOptions } from '../value-objects/get-navigation-property-options/account-navigation-options';
-// import { isExpiryCookieRule, readCustomRuleExpiryCookie } from '../helpers/read-rules-json';
-// import type { BaseRule } from '../value-objects/platform-rules/base-rules';
 import { InvalidValueError } from '../value-objects/custom-error/invalidValueError';
-
+import type { JsonLogEntry } from '../value-objects/json-log-entry';
+import axios, { isAxiosError, type AxiosResponse } from 'axios';
 
 export async function login(form: UILoginData, navigation: AccountNavigationOptions) : Promise<ServiceResult<AccountModel>> {
      try {
@@ -29,17 +27,32 @@ export async function login(form: UILoginData, navigation: AccountNavigationOpti
      }
 }
 
-export async function signup(form: UISignupData) : Promise<ServiceResult<AccountModel>> {
+export async function signup(form: UISignupData): Promise<ServiceResult<AccountModel> | JsonLogEntry[]> {
      try {
           const sendData = { Email: form.email, Password: form.password };
-          const response = await axios.post('https://localhost:5294/api/accountservices/signup', sendData);
-          const result = response.data as ServiceResult<AccountModel>;
-          console.log(result);
-          return result;
-     } catch (error) {
-          throw new Error('Signup failed', error as { cause?: Error } | undefined);
+          const response: AxiosResponse< ServiceResult<AccountModel>> = await axios.post(
+               'https://localhost:5294/api/accountservices/signup',
+               sendData
+          );
+          console.log('[signup] Kết quả trả về:', response.data);
+          return response.data;
+     } catch (error: unknown) {
+          if (isAxiosError(error)) {
+               console.error('[signup] Lỗi từ Axios:', error.message, error.code);
+               const responseData = error.response?.data;
+               console.error('[signup] Dữ liệu lỗi từ server:', responseData);
+               const logEntries: JsonLogEntry[] = responseData?.logEntries ?? [];
+               if (logEntries.length > 0) {
+                    console.table(logEntries);
+                    return logEntries;
+               }
+               return responseData;
+          } else {
+               console.error('[signup] Lỗi không phải AxiosError:', error);
+               throw error;
+          }
      }
-}
+ }
 
 export async function getCurrentAccount(navigation: AccountNavigationOptions) : Promise<ServiceResult<AccountModel>> {
      try {

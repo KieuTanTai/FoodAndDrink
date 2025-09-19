@@ -16,7 +16,7 @@
     },
     "custom-rules": {
         "expiry-cookie": {
-            "type": "cookie-expiry",
+            "type": "cookieExpiry",
             "maxAgeDays": 7,
             "enabled": true
         },

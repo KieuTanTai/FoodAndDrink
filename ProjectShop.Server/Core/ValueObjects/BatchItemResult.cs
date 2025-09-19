@@ -2,8 +2,27 @@
 {
     public class BatchItemResult<TEntity> where TEntity : class
     {
-        public TEntity Input { get; set; } = default!;
-        public bool IsSuccess { get; set; }
-        public string? ErrorMessage { get; set; }
+        // Backing fields
+        private TEntity _input = default!;
+        private bool _isSuccess;
+        private string? _errorMessage;
+
+        public TEntity Input
+        {
+            get => _input;
+            set => _input = value;
+        }
+
+        public bool IsSuccess
+        {
+            get => _isSuccess;
+            set => _isSuccess = value;
+        }
+
+        public string? ErrorMessage
+        {
+            get => _errorMessage;
+            set => _errorMessage = value;
+        }
     }
 }

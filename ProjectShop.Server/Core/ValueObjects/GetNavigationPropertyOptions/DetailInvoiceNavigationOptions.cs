@@ -2,6 +2,19 @@ namespace ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 public class DetailInvoiceNavigationOptions
 {
-    public bool IsGetInvoice { get; set; }
-    public bool IsGetProduct { get; set; }
+    // Backing fields
+    private bool _isGetInvoice;
+    private bool _isGetProduct;
+
+    public bool IsGetInvoice
+    {
+        get => _isGetInvoice;
+        set => _isGetInvoice = value;
+    }
+
+    public bool IsGetProduct
+    {
+        get => _isGetProduct;
+        set => _isGetProduct = value;
+    }
 }

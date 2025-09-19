@@ -2,15 +2,14 @@
 {
     public class AppConfigConnection
     {
-        private static readonly IConfigurationRoot configurationRoot;
+        private static readonly IConfigurationRoot _configurationRoot;
 
         static AppConfigConnection()
         {
             try
             {
-                string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"../../../");
-                Console.WriteLine($"[DEBUG] basePath: {basePath}");
-                configurationRoot = new ConfigurationBuilder().SetBasePath(basePath)
+                string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../");
+                _configurationRoot = new ConfigurationBuilder().SetBasePath(basePath)
                                         .AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true).Build();
             }
             catch (Exception ex)
@@ -21,9 +20,8 @@
         }
         public static string GetConnectionString(string name = "DefaultConnection")
         {
-            var connectionString = configurationRoot.GetConnectionString(name);
-            if (connectionString == null)
-                connectionString = "";
+            var connectionString = _configurationRoot.GetConnectionString(name);
+            connectionString ??= "";
             return connectionString;
         }
     }

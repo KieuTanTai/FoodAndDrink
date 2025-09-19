@@ -17,17 +17,39 @@ namespace ProjectShop.Server.Core.Entities
 
     public class RolesOfUserModel : IGetIdEntity<uint>
     {
+        // Backing fields
+        private uint _id;
+        private uint _accountId;
+        private uint _roleId;
+        private DateTime _addedDate;
+
         // Corresponds to 'id' (INT UNSIGNED AUTO_INCREMENT)
-        public uint Id { get; set; }
+        public uint Id
+        {
+            get => _id;
+            set => _id = value;
+        }
 
         // Corresponds to 'account_id' (INT UNSIGNED)
-        public uint AccountId { get; set; }
+        public uint AccountId
+        {
+            get => _accountId;
+            set => _accountId = value;
+        }
 
         // Corresponds to 'role_id' (INT UNSIGNED)
-        public uint RoleId { get; set; }
+        public uint RoleId
+        {
+            get => _roleId;
+            set => _roleId = value;
+        }
 
         // Corresponds to 'added_date' (DATETIME)
-        public DateTime AddedDate { get; set; }
+        public DateTime AddedDate
+        {
+            get => _addedDate;
+            set => _addedDate = value;
+        }
 
         // Navigation properties
         public AccountModel Account { get; set; } = null!;

@@ -28,7 +28,7 @@ namespace ProjectShop.Server.Application.Services
                 if (affectedRows == null)
                     logEntries.Add(_logger.JsonLogWarning<TEntity, TEntityCall>(message, methodCall: methodCall));
                 else
-                    logEntries.Add(_logger.JsonLogWarning<TEntity, TEntityCall>(message, null, affectedRows: affectedRows, methodCall: methodCall   ));
+                    logEntries.Add(_logger.JsonLogWarning<TEntity, TEntityCall>(message, null, affectedRows: affectedRows, methodCall: methodCall));
             }
             else
             {
@@ -40,7 +40,8 @@ namespace ProjectShop.Server.Application.Services
             return new ServiceResult<TEntity>
             {
                 Data = entity,
-                LogEntries = logEntries
+                LogEntries = logEntries,
+                IsSuccess = isSuccess 
             };
         }
 
@@ -71,25 +72,28 @@ namespace ProjectShop.Server.Application.Services
             return new ServiceResults<TEntity>
             {
                 Data = entities?.ToList(),
-                LogEntries = logEntries
+                LogEntries = logEntries,
+                IsSuccess = isSuccess
             };
         }
 
-        public ServiceResult<TEntity> CreateServiceResult<TEntity>(TEntity data, IEnumerable<JsonLogEntry> logEntries) where TEntity : class
+        public ServiceResult<TEntity> CreateServiceResult<TEntity>(TEntity data, IEnumerable<JsonLogEntry> logEntries, bool isSuccess) where TEntity : class
         {
             return new ServiceResult<TEntity>
             {
                 Data = data,
-                LogEntries = logEntries
+                LogEntries = logEntries,
+                IsSuccess = isSuccess
             };
         }
 
-        public ServiceResults<TEntity> CreateServiceResults<TEntity>(IEnumerable<TEntity> data, IEnumerable<JsonLogEntry> logEntries) where TEntity : class
+        public ServiceResults<TEntity> CreateServiceResults<TEntity>(IEnumerable<TEntity> data, IEnumerable<JsonLogEntry> logEntries, bool isSuccess) where TEntity : class
         {
             return new ServiceResults<TEntity>
             {
                 Data = data?.ToList(),
-                LogEntries = logEntries
+                LogEntries = logEntries,
+                IsSuccess = isSuccess
             };
         }
     }
