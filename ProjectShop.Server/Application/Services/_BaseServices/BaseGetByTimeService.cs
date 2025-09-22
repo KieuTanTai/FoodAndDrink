@@ -3,7 +3,7 @@ using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ValueObjects;
 using System.Runtime.CompilerServices;
 
-namespace ProjectShop.Server.Application.Services
+namespace ProjectShop.Server.Application.Services._BaseServices
 {
     public class BaseGetByTimeService<TEntity, TOptions> : IBaseGetByTimeServices<TEntity, TOptions>
         where TEntity : class
@@ -49,7 +49,7 @@ namespace ProjectShop.Server.Application.Services
             }
         }
 
-        public async Task<ServiceResults<TEntity>> GetByDateTimeRangeGenericAsync(Func<int?, Task<IEnumerable<TEntity>>> daoFunc, TOptions? options, string errorMsg, 
+        public async Task<ServiceResults<TEntity>> GetByDateTimeRangeGenericAsync(Func<int?, Task<IEnumerable<TEntity>>> daoFunc, TOptions? options, string errorMsg,
             int? maxGetCount = null, [CallerMemberName] string? methodCall = null)
         {
             ServiceResults<TEntity> results = new([], [], true);
@@ -76,7 +76,7 @@ namespace ProjectShop.Server.Application.Services
             }
         }
 
-        public async Task<ServiceResults<TEntity>> GetByMonthAndYearGenericAsync(Func<int, int, int?, Task<IEnumerable<TEntity>>> daoFunc, int year, int month, TOptions? options, string errorMsg, 
+        public async Task<ServiceResults<TEntity>> GetByMonthAndYearGenericAsync(Func<int, int, int?, Task<IEnumerable<TEntity>>> daoFunc, int year, int month, TOptions? options, string errorMsg,
             int? maxGetCount = null, [CallerMemberName] string? methodCall = null)
         {
             ServiceResults<TEntity> results = new([], [], true);

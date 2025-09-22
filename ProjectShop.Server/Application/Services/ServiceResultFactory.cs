@@ -41,7 +41,7 @@ namespace ProjectShop.Server.Application.Services
             {
                 Data = entity,
                 LogEntries = logEntries,
-                IsSuccess = isSuccess 
+                IsSuccess = isSuccess
             };
         }
 

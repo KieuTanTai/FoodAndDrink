@@ -66,7 +66,7 @@ namespace ProjectShop.Server.Application.Services.Product
                     return _serviceResultFactory.CreateServiceResults<ProductModel>([], logEntries, false);
                 }
                 // Insert
-                    int affectedRows = await _baseDAO.InsertAsync(serviceResults.Data);
+                int affectedRows = await _baseDAO.InsertAsync(serviceResults.Data);
                 if (affectedRows == 0)
                 {
                     logEntries.Add(_logger.JsonLogWarning<ProductModel, AddProductService>("Failed to insert the products.", affectedRows: affectedRows));

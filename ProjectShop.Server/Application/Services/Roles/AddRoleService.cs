@@ -5,7 +5,6 @@ using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IServices.Role;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ValueObjects;
-using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services.Roles
 {
@@ -34,7 +33,7 @@ namespace ProjectShop.Server.Application.Services.Roles
                     return _serviceResultFactory.CreateServiceResult("Role with the same ID already exists.", role, false);
                 // Add the new role
                 int affectedRows = await _baseDAO.InsertAsync(role);
-                if (affectedRows > 0) 
+                if (affectedRows > 0)
                     return _serviceResultFactory.CreateServiceResult("Role added successfully.", role, true, affectedRows: affectedRows);
                 return _serviceResultFactory.CreateServiceResult("Failed to add role.", role, false);
             }

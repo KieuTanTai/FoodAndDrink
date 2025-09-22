@@ -8,7 +8,7 @@ using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
 using ProjectShop.Server.Core.Interfaces.IServices.IProduct;
 using ProjectShop.Server.Core.Interfaces.IServices.Role;
 using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
-using TLGames.Application.Services;
+using ProjectShop.Server.Application.Services._BaseServices;
 
 namespace ProjectShop.Server.Infrastructure.Configuration
 {
@@ -17,7 +17,7 @@ namespace ProjectShop.Server.Infrastructure.Configuration
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             // NOTE: BASE SERVICES (OPEN GENERIC)
-            services.AddTransient(typeof(IBaseAuthorizationServices), typeof(BaseAuthorizationService));
+            services.AddTransient<IBaseAuthorizationServices, BaseAuthorizationService>();
             services.AddTransient(typeof(IBaseHelperServices<>), typeof(BaseHelperService<>));
             services.AddTransient(typeof(IBaseGetByTimeServices<,>), typeof(BaseGetByTimeService<,>));
             services.AddTransient(typeof(IServiceResultFactory<>), typeof(ServiceResultFactory<>));

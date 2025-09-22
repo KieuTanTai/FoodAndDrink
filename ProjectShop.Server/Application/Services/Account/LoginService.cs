@@ -9,7 +9,6 @@ using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ValueObjects;
 using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 using System.Security.Claims;
-using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services.Account
 {

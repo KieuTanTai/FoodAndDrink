@@ -47,15 +47,15 @@ namespace ProjectShop.Server.Application.Services.Roles
                 _roleOfUserDAO.GetByMonthAndYearAsync, year, month, options, $"No roles found added in {month}/{year}.", _helper.GetValidMaxRecord(maxGetCount));
 
         public async Task<ServiceResults<RolesOfUserModel>> GetByAddedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, RolesOfUserNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
-            => await _byTimeService.GetByDateTimeGenericAsync((compareType, maxGetCount) => _roleOfUserDAO.GetByDateTimeAsync(dateTime, compareType, maxGetCount), 
+            => await _byTimeService.GetByDateTimeGenericAsync((compareType, maxGetCount) => _roleOfUserDAO.GetByDateTimeAsync(dateTime, compareType, maxGetCount),
                 compareType, options, $"No roles found added at {dateTime} with comparison type {compareType}.", _helper.GetValidMaxRecord(maxGetCount));
 
         public async Task<ServiceResults<RolesOfUserModel>> GetByAddedDateTimeRangeAsync(DateTime startDate, DateTime endDate, RolesOfUserNavigationOptions? options, int? maxGetCount)
-            => await _byTimeService.GetByDateTimeRangeGenericAsync((maxGetCount) => _roleOfUserDAO.GetByDateTimeRangeAsync(startDate, endDate, maxGetCount), 
+            => await _byTimeService.GetByDateTimeRangeGenericAsync((maxGetCount) => _roleOfUserDAO.GetByDateTimeRangeAsync(startDate, endDate, maxGetCount),
                 options, $"No account roles found created between {startDate} and {endDate}.", _helper.GetValidMaxRecord(maxGetCount));
 
         public async Task<ServiceResults<RolesOfUserModel>> GetByAddedYearAsync<TCompareType>(int year, TCompareType compareType, RolesOfUserNavigationOptions? options, int? maxGetCount) where TCompareType : Enum
-            => await _byTimeService.GetByDateTimeGenericAsync((compareType, maxGetCount) => _roleOfUserDAO.GetByYearAsync(year, compareType, maxGetCount), 
+            => await _byTimeService.GetByDateTimeGenericAsync((compareType, maxGetCount) => _roleOfUserDAO.GetByYearAsync(year, compareType, maxGetCount),
                 compareType, options, $"No roles found added in year {year} with comparison type {compareType}.", _helper.GetValidMaxRecord(maxGetCount));
 
         public async Task<ServiceResult<RolesOfUserModel>> GetByKeysAsync(RolesOfUserKey keys, RolesOfUserNavigationOptions? options)

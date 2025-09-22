@@ -5,7 +5,6 @@ using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IServices.Role;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ValueObjects;
-using TLGames.Application.Services;
 
 namespace ProjectShop.Server.Application.Services.Roles
 {
@@ -39,7 +38,7 @@ namespace ProjectShop.Server.Application.Services.Roles
                     return _serviceResultFactory.CreateServiceResult($"Failed to add account role with AccountId {keys.AccountId} and RoleId {keys.RoleId}.",
                         new RolesOfUserModel(keys.AccountId, keys.RoleId), false);
                 return _serviceResultFactory.CreateServiceResult($"Successfully added account role with AccountId {keys.AccountId} and RoleId {keys.RoleId}.",
-                    new RolesOfUserModel(keys.AccountId, keys.RoleId), true, affectedRows : affectedRows);
+                    new RolesOfUserModel(keys.AccountId, keys.RoleId), true, affectedRows: affectedRows);
             }
             catch (Exception ex)
             {

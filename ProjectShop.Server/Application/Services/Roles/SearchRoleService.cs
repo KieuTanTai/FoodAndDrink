@@ -17,7 +17,7 @@ namespace ProjectShop.Server.Application.Services.Roles
         private readonly IGetSingleServices<RoleModel, RoleNavigationOptions, SearchRoleService> _getSingleService;
         private readonly IGetMultipleServices<RoleModel, RoleNavigationOptions, SearchRoleService> _getMultipleService;
 
-        public SearchRoleService(IDAO<RoleModel> baseDAO, IRoleDAO<RoleModel> roleDAO, 
+        public SearchRoleService(IDAO<RoleModel> baseDAO, IRoleDAO<RoleModel> roleDAO,
             IBaseHelperServices<RoleModel> helper,
             IBaseGetByTimeServices<RoleModel, RoleNavigationOptions> byTimeService,
             IGetMultipleServices<RoleModel, RoleNavigationOptions, SearchRoleService> getMultipleService,

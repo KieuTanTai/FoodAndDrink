@@ -3,7 +3,7 @@ using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ValueObjects;
 using System.Runtime.CompilerServices;
 
-namespace TLGames.Application.Services
+namespace ProjectShop.Server.Application.Services._BaseServices
 {
     public class BaseHelperService<TEntity> : IBaseHelperServices<TEntity>
         where TEntity : class

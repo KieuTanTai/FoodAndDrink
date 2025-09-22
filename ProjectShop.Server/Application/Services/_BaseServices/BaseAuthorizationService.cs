@@ -1,6 +1,6 @@
 ﻿using ProjectShop.Server.Core.Interfaces.IServices;
 
-namespace ProjectShop.Server.Application.Services
+namespace ProjectShop.Server.Application.Services._BaseServices
 {
     public class BaseAuthorizationService : IBaseAuthorizationServices
     {

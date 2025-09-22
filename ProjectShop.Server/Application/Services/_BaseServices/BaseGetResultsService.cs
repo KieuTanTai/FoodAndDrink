@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ValueObjects;
 using System.Runtime.CompilerServices;
 
-namespace ProjectShop.Server.Application.Services
+namespace ProjectShop.Server.Application.Services._BaseServices
 {
     public class BaseGetResultsService<TEntity, TOptions, TServiceCall> : IGetMultipleServices<TEntity, TOptions, TServiceCall>
         where TEntity : class, new()
