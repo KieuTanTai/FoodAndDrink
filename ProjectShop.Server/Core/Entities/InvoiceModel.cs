@@ -76,8 +76,8 @@ namespace ProjectShop.Server.Core.Entities
         public CustomerModel Customer { get; set; } = null!;
         public EmployeeModel Employee { get; set; } = null!;
         public UserPaymentMethodModel UserPaymentMethod { get; set; } = null!;
-        public ICollection<DetailInvoiceModel> DetailInvoices { get; set; } = new List<DetailInvoiceModel>();
-        public ICollection<InvoiceDiscountModel> InvoiceDiscounts { get; set; } = new List<InvoiceDiscountModel>();
+        public ICollection<DetailInvoiceModel> DetailInvoices { get; set; } = [];
+        public ICollection<InvoiceDiscountModel> InvoiceDiscounts { get; set; } = [];
         // End of navigation properties
 
         public InvoiceModel(uint invoiceId, uint customerId, uint employeeId, uint paymentMethodId, decimal invoiceTotalPrice,

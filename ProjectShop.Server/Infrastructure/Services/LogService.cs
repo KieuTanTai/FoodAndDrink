@@ -68,7 +68,7 @@ namespace ProjectShop.Server.Infrastructure.Services
             Console.ResetColor();
         }
 
-        private JsonLogEntry CreateLogEntry<TEntity, TCurrentEntityCall>(string message, string? name, Exception? ex = null, int? affectedRows = null, [CallerMemberName] string? methodCall = null)
+        private static JsonLogEntry CreateLogEntry<TEntity, TCurrentEntityCall>(string message, string? name, Exception? ex = null, int? affectedRows = null, [CallerMemberName] string? methodCall = null)
         {
             bool isHaveAffectedRows = affectedRows.HasValue;
             if (isHaveAffectedRows && affectedRows < 0)

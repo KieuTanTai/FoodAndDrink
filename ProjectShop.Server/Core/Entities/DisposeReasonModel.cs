@@ -24,7 +24,7 @@ namespace ProjectShop.Server.Core.Entities
         }
 
         // Navigation properties
-        public ICollection<DisposeProductModel> DisposeProducts { get; set; } = new List<DisposeProductModel>();
+        public ICollection<DisposeProductModel> DisposeProducts { get; set; } = [];
         // End of navigation properties
 
         public DisposeReasonModel(uint disposeReasonId, string disposeReasonName)

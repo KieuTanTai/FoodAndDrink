@@ -15,7 +15,7 @@ namespace ProjectShop.Server.Application.Services
 
         public ServiceResult<TEntity> CreateServiceResult<TEntity>(string message, TEntity entity, bool isSuccess, Exception? ex, int? affectedRows, [CallerMemberName] string? methodCall = null) where TEntity : class
         {
-            List<JsonLogEntry> logEntries = new List<JsonLogEntry>();
+            List<JsonLogEntry> logEntries = [];
             if (isSuccess)
             {
                 if (affectedRows == null)
@@ -47,7 +47,7 @@ namespace ProjectShop.Server.Application.Services
 
         public ServiceResults<TEntity> CreateServiceResults<TEntity>(string message, IEnumerable<TEntity> entities, bool isSuccess, Exception? ex, int? affectedRows, [CallerMemberName] string? methodCall = null) where TEntity : class
         {
-            List<JsonLogEntry> logEntries = new List<JsonLogEntry>();
+            List<JsonLogEntry> logEntries = [];
             if (isSuccess)
             {
                 if (affectedRows == null)

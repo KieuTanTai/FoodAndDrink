@@ -189,7 +189,8 @@ namespace TLGames.Application.Services
                 if (existingEntities == null || !existingEntities.Any())
                     return new Dictionary<uint, ServiceResults<TEntity>>
                     {
-                        { 0, _serviceResultFactory.CreateServiceResults<TEntity>(entityList, [.. entityList.Select(_ => _logger.JsonLogInfo<TEntity, BaseHelperService<TEntity>>("Success", methodCall: methodCall))]) }
+                        { 0, _serviceResultFactory.CreateServiceResults<TEntity>(entityList, [.. entityList.Select(_
+                            => _logger.JsonLogInfo<TEntity, BaseHelperService<TEntity>>("Success", methodCall: methodCall))], true) }
                     };
                 existingEntities = [.. existingEntities];
 
@@ -201,7 +202,7 @@ namespace TLGames.Application.Services
                 var logEntries = CreateLogsByFilterEntities<TEntity, BaseHelperService<TEntity>>(entityList, existingFieldSet, fieldSelector).ToList();
                 return new Dictionary<uint, ServiceResults<TEntity>>
                 {
-                    { 0, _serviceResultFactory.CreateServiceResults<TEntity>(data, logEntries) }
+                    { 0, _serviceResultFactory.CreateServiceResults<TEntity>(data, logEntries, true) }
                 };
             }
             catch (Exception ex)
@@ -211,7 +212,7 @@ namespace TLGames.Application.Services
 
                 return new Dictionary<uint, ServiceResults<TEntity>>
                 {
-                    { 0, _serviceResultFactory.CreateServiceResults<TEntity>([], logEntries) }
+                    { 0, _serviceResultFactory.CreateServiceResults<TEntity>([], logEntries, false) }
                 };
             }
         }
@@ -230,7 +231,8 @@ namespace TLGames.Application.Services
                 if (existingEntities == null || !existingEntities.Any())
                     return new Dictionary<uint, ServiceResults<TEntity>>
                         {
-                            { 0, _serviceResultFactory.CreateServiceResults<TEntity>(entityList, [.. entityList.Select(_ => _logger.JsonLogInfo<TEntity, BaseHelperService<TEntity>>("Success", methodCall: methodCall))]) }
+                            { 0, _serviceResultFactory.CreateServiceResults<TEntity>(entityList, [.. entityList.Select(_
+                                => _logger.JsonLogInfo<TEntity, BaseHelperService<TEntity>>("Success", methodCall: methodCall))], true) }
                         };
                 existingEntities = [.. existingEntities];
 
@@ -242,7 +244,7 @@ namespace TLGames.Application.Services
                 var logEntries = CreateLogsByFilterEntities<TEntity, BaseHelperService<TEntity>, TKey>(entityList, existingFieldSet, fieldSelector).ToList();
                 return new Dictionary<uint, ServiceResults<TEntity>>
                 {
-                    { 0, _serviceResultFactory.CreateServiceResults<TEntity>(data, logEntries) }
+                    { 0, _serviceResultFactory.CreateServiceResults<TEntity>(data, logEntries, true) }
                 };
             }
             catch (Exception ex)
@@ -252,7 +254,7 @@ namespace TLGames.Application.Services
 
                 return new Dictionary<uint, ServiceResults<TEntity>>
                 {
-                    { 0, _serviceResultFactory.CreateServiceResults<TEntity>([], logEntries) }
+                    { 0, _serviceResultFactory.CreateServiceResults<TEntity>([], logEntries, false) }
                 };
             }
         }

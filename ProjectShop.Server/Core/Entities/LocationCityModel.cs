@@ -32,11 +32,11 @@ namespace ProjectShop.Server.Core.Entities
         }
 
         // Navigation properties
-        public ICollection<LocationModel> Locations { get; set; } = new List<LocationModel>();
-        public ICollection<SupplierModel> CompanySuppliers { get; set; } = new List<SupplierModel>();
-        public ICollection<SupplierModel> StoreSuppliers { get; set; } = new List<SupplierModel>();
-        public ICollection<CustomerModel> Customers { get; set; } = new List<CustomerModel>();
-        public ICollection<EmployeeModel> Employees { get; set; } = new List<EmployeeModel>();
+        public ICollection<LocationModel> Locations { get; set; } = [];
+        public ICollection<SupplierModel> CompanySuppliers { get; set; } = [];
+        public ICollection<SupplierModel> StoreSuppliers { get; set; } = [];
+        public ICollection<CustomerModel> Customers { get; set; } = [];
+        public ICollection<EmployeeModel> Employees { get; set; } = [];
         // End of navigation properties
 
         public LocationCityModel(uint locationCityId, string locationCityName, bool locationCityStatus)

@@ -23,14 +23,16 @@ namespace ProjectShop.Server.Application.Services
         public async Task<ServiceResults<TEntity>> GetByDateTimeGenericAsync<TCompareType>(Func<TCompareType, int?, Task<IEnumerable<TEntity>>> daoFunc, TCompareType compareType,
             TOptions? options, string errorMsg, int? maxGetCount = null, [CallerMemberName] string? methodCall = null) where TCompareType : Enum
         {
-            ServiceResults<TEntity> results = new();
+            ServiceResults<TEntity> results = new([], [], true);
             try
             {
                 IEnumerable<TEntity> entities = await daoFunc(compareType, maxGetCount);
                 if (entities == null || !entities.Any())
                 {
-                    JsonLogEntry log = _logger.JsonLogInfo<TEntity, BaseGetByTimeService<TEntity, TOptions>>($"No entities found with {typeof(TCompareType).Name}: {compareType}.", methodCall: methodCall);
+                    entities ??= [];
+                    JsonLogEntry log = _logger.JsonLogWarning<TEntity, BaseGetByTimeService<TEntity, TOptions>>($"No entities found with {typeof(TCompareType).Name}: {compareType}.", methodCall: methodCall);
                     results.LogEntries = results.LogEntries!.Append(log);
+                    results.IsSuccess = false;
                     return results;
                 }
 
@@ -50,14 +52,15 @@ namespace ProjectShop.Server.Application.Services
         public async Task<ServiceResults<TEntity>> GetByDateTimeRangeGenericAsync(Func<int?, Task<IEnumerable<TEntity>>> daoFunc, TOptions? options, string errorMsg, 
             int? maxGetCount = null, [CallerMemberName] string? methodCall = null)
         {
-            ServiceResults<TEntity> results = new();
+            ServiceResults<TEntity> results = new([], [], true);
             try
             {
                 IEnumerable<TEntity> entities = await daoFunc(maxGetCount);
                 if (entities == null || !entities.Any())
                 {
-                    JsonLogEntry log = _logger.JsonLogInfo<TEntity, BaseGetByTimeService<TEntity, TOptions>>("No entities found within the specified date range.", methodCall: methodCall);
+                    JsonLogEntry log = _logger.JsonLogWarning<TEntity, BaseGetByTimeService<TEntity, TOptions>>("No entities found within the specified date range.", methodCall: methodCall);
                     results.LogEntries = results.LogEntries!.Append(log);
+                    results.IsSuccess = false;
                     return results;
                 }
 
@@ -76,14 +79,15 @@ namespace ProjectShop.Server.Application.Services
         public async Task<ServiceResults<TEntity>> GetByMonthAndYearGenericAsync(Func<int, int, int?, Task<IEnumerable<TEntity>>> daoFunc, int year, int month, TOptions? options, string errorMsg, 
             int? maxGetCount = null, [CallerMemberName] string? methodCall = null)
         {
-            ServiceResults<TEntity> results = new();
+            ServiceResults<TEntity> results = new([], [], true);
             try
             {
                 IEnumerable<TEntity> entities = await daoFunc(month, year, maxGetCount);
                 if (entities == null || !entities.Any())
                 {
-                    JsonLogEntry log = _logger.JsonLogInfo<TEntity, BaseGetByTimeService<TEntity, TOptions>>($"No entities found for {month}/{year}.", methodCall: methodCall);
+                    JsonLogEntry log = _logger.JsonLogWarning<TEntity, BaseGetByTimeService<TEntity, TOptions>>($"No entities found for {month}/{year}.", methodCall: methodCall);
                     results.LogEntries = results.LogEntries!.Append(log);
+                    results.IsSuccess = false;
                     return results;
                 }
 

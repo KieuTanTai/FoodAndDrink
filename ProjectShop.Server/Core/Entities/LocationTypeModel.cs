@@ -32,7 +32,7 @@ namespace ProjectShop.Server.Core.Entities
         }
 
         // Navigation properties
-        public ICollection<LocationModel> Locations { get; set; } = new List<LocationModel>();
+        public ICollection<LocationModel> Locations { get; set; } = [];
         // End of navigation properties
 
         public LocationTypeModel(uint locationTypeId, string locationTypeName, bool locationTypeStatus)

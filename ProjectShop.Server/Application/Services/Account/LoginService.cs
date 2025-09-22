@@ -34,27 +34,28 @@ namespace ProjectShop.Server.Application.Services.Account
 
         public async Task<ServiceResult<AccountModel>> HandleLoginAsync(string userName, string password, AccountNavigationOptions? options)
         {
-            ServiceResult<AccountModel> result = new ServiceResult<AccountModel>();
+            ServiceResult<AccountModel> result = new(true);
             try
             {
                 AccountModel? account = await _accountDAO.GetByUserNameAsync(userName);
                 if (account == null)
-                    return _serviceResultFactory.CreateServiceResult<AccountModel>($"Account with username '{userName}' not found.", new AccountModel(), false);
+                    return _serviceResultFactory.CreateServiceResult($"Account with username '{userName}' not found.", new AccountModel(), false);
                 // validate account status and password
                 if (!account.AccountStatus)
-                    return _serviceResultFactory.CreateServiceResult<AccountModel>($"Account is inactive.", new AccountModel(), false);
+                    return _serviceResultFactory.CreateServiceResult($"Account is inactive.", new AccountModel(), false);
                 string accountPassword = account.Password;
                 if (!await _hashPassword.ComparePasswords(accountPassword, password))
-                    return _serviceResultFactory.CreateServiceResult<AccountModel>($"Invalid password.", new AccountModel(), false);
+                    return _serviceResultFactory.CreateServiceResult($"Invalid password.", new AccountModel(), false);
 
                 if (options != null)
                     result = await _navigationService.GetNavigationPropertyByOptionsAsync(account, options);
+
                 result.LogEntries = result.LogEntries!.Append(_logger.JsonLogInfo<AccountModel, LoginService>($"Login successful for user: {userName}"));
                 return result;
             }
             catch (Exception ex)
             {
-                return _serviceResultFactory.CreateServiceResult<AccountModel>("An error occurred during login.", new AccountModel(), false, ex);
+                return _serviceResultFactory.CreateServiceResult("An error occurred during login.", new AccountModel(), false, ex);
             }
         }
     }

@@ -31,5 +31,19 @@
             Data = [];
             IsSuccess = false;
         }
+
+        public ServiceResults(IEnumerable<JsonLogEntry>? logEntries, IEnumerable<TEntity>? data, bool isSuccess)
+        {
+            LogEntries = logEntries;
+            Data = data;
+            IsSuccess = isSuccess;
+        }
+
+        public ServiceResults(bool isSuccess)
+        {
+            LogEntries = [];
+            Data = [];
+            IsSuccess = isSuccess;
+        }
     }
 }

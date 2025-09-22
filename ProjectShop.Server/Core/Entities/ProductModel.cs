@@ -98,17 +98,17 @@ namespace ProjectShop.Server.Core.Entities
 
         // Navigation properties
         public SupplierModel Supplier { get; set; } = null!;
-        public ICollection<DetailCartModel> DetailCarts { get; set; } = new List<DetailCartModel>();
-        public ICollection<DetailProductLotModel> DetailProductLot { get; set; } = new List<DetailProductLotModel>();
-        public ICollection<ProductCategoriesModel> ProductCategories { get; set; } = new List<ProductCategoriesModel>();
-        public ICollection<ProductImageModel> ProductImages { get; set; } = new List<ProductImageModel>();
-        public ICollection<DetailSaleEventModel> DetailSaleEvents { get; set; } = new List<DetailSaleEventModel>();
-        public ICollection<DetailInvoiceModel> DetailInvoices { get; set; } = new List<DetailInvoiceModel>();
+        public ICollection<DetailCartModel> DetailCarts { get; set; } = [];
+        public ICollection<DetailProductLotModel> DetailProductLot { get; set; } = [];
+        public ICollection<ProductCategoriesModel> ProductCategories { get; set; } = [];
+        public ICollection<ProductImageModel> ProductImages { get; set; } = [];
+        public ICollection<DetailSaleEventModel> DetailSaleEvents { get; set; } = [];
+        public ICollection<DetailInvoiceModel> DetailInvoices { get; set; } = [];
 
         // NEW
-        public ICollection<DetailInventoryMovementModel> DetailInventoryMovements { get; set; } = new List<DetailInventoryMovementModel>();
-        public ICollection<DetailInventoryModel> DetailInventories { get; set; } = new List<DetailInventoryModel>();
-        public ICollection<DisposeProductModel> DisposeProducts { get; set; } = new List<DisposeProductModel>();
+        public ICollection<DetailInventoryMovementModel> DetailInventoryMovements { get; set; } = [];
+        public ICollection<DetailInventoryModel> DetailInventories { get; set; } = [];
+        public ICollection<DisposeProductModel> DisposeProducts { get; set; } = [];
         // End of navigation properties
 
         public ProductModel(string productBarcode, uint supplierId, string productName, decimal productNetWeight, string productWeightRange, EProductUnit productUnit, decimal productBasePrice,

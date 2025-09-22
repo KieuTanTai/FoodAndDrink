@@ -58,7 +58,7 @@ namespace ProjectShop.Server.Core.Entities
         // Navigation properties
         public CustomerModel Customer { get; set; } = null!;
         public EmployeeModel Employee { get; set; } = null!;
-        public ICollection<RolesOfUserModel> RolesOfUsers { get; set; } = new List<RolesOfUserModel>();
+        public ICollection<RolesOfUserModel> RolesOfUsers { get; set; } = [];
         // End of navigation properties
 
         public AccountModel() { }

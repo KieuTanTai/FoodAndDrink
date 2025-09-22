@@ -25,12 +25,12 @@ namespace ProjectShop.Server.Application.Services
 
         public async Task<ServiceResult<TEntity>> GetAsync<TParam>(TParam param, Func<TParam, Task<TEntity?>> queryFunc, TOptions? options = null, [CallerMemberName] string? methodCall = null)
         {
-            ServiceResult<TEntity> result = new();
+            ServiceResult<TEntity> result = new(true);
             try
             {
                 TEntity? entity = await queryFunc(param);
                 if (entity == null)
-                    return _serviceResultFactory.CreateServiceResult<TEntity>($"No Entity found with param: {param}.", new TEntity(), false, methodCall: methodCall);
+                    return _serviceResultFactory.CreateServiceResult($"No Entity found with param: {param}.", new TEntity(), false, methodCall: methodCall);
 
                 if (options != null)
                     result = await _navigationService.GetNavigationPropertyByOptionsAsync(entity, options, methodCall);
@@ -39,7 +39,7 @@ namespace ProjectShop.Server.Application.Services
             }
             catch (Exception ex)
             {
-                return _serviceResultFactory.CreateServiceResult<TEntity>($"An error occurred while retrieving entity by param: {param}.", new TEntity(), false, ex, methodCall: methodCall);
+                return _serviceResultFactory.CreateServiceResult($"An error occurred while retrieving entity by param: {param}.", new TEntity(), false, ex, methodCall: methodCall);
             }
         }
     }

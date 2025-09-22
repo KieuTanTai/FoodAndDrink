@@ -27,17 +27,23 @@ namespace ProjectShop.Server.Application.Services
         public async Task<ServiceResults<TEntity>> GetByRangeAsync(decimal minValue, decimal maxValue, Func<decimal, decimal, int?, Task<IEnumerable<TEntity>>> queryFunc,
             TOptions? options = null, int? maxGetCount = null, [CallerMemberName] string? methodCall = null)
         {
-            ServiceResults<TEntity> results = new();
+            ServiceResults<TEntity> results = new([], [], true);
             try
             {
                 IEnumerable<TEntity> entities = await queryFunc(minValue, maxValue, maxGetCount);
                 if (entities == null || !entities.Any())
-                    return _serviceResultFactory.CreateServiceResults<TEntity>($"No entities found in range: {minValue} - {maxValue}.", [], false, methodCall: methodCall);
+                {
+                    entities ??= [];
+                    results.LogEntries = results.LogEntries!.Append(_logger.JsonLogWarning<TEntity, TServiceCall>($"No entities found in range: {minValue} - {maxValue}.", methodCall: methodCall));
+                    results.IsSuccess = false;
+                    return results;
+                }
 
                 if (options != null)
                     results = await _navigationService.GetNavigationPropertyByOptionsAsync(entities, options, methodCall);
 
-                results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<TEntity, TServiceCall>($"Retrieved entities by range: {minValue} - {maxValue} with maxGetCount = {maxGetCount}, options = {options}.", methodCall: methodCall));
+                results.LogEntries = results.LogEntries!.Append(_logger.JsonLogInfo<TEntity, TServiceCall>($@"Retrieved entities by range: {minValue} - {maxValue} 
+                    with maxGetCount = {maxGetCount}, options = {options}.", methodCall: methodCall));
                 return results;
             }
             catch (Exception ex)
@@ -49,12 +55,17 @@ namespace ProjectShop.Server.Application.Services
         public async Task<ServiceResults<TEntity>> GetByValueAsync(decimal value, Func<decimal, int?, Task<IEnumerable<TEntity>>> queryFunc,
             TOptions? options = null, int? maxGetCount = null, [CallerMemberName] string? methodCall = null)
         {
-            ServiceResults<TEntity> results = new();
+            ServiceResults<TEntity> results = new([], [], true);
             try
             {
                 IEnumerable<TEntity> entities = await queryFunc(value, maxGetCount);
                 if (entities == null || !entities.Any())
-                    return _serviceResultFactory.CreateServiceResults<TEntity>($"No entities found with value = {value}.", [], false, methodCall: methodCall);
+                {
+                    entities ??= [];
+                    results.LogEntries = results.LogEntries!.Append(_logger.JsonLogWarning<TEntity, TServiceCall>($"No entities found with value = {value}.", methodCall: methodCall));
+                    results.IsSuccess = false;
+                    return results;
+                }
 
                 if (options != null)
                     results = await _navigationService.GetNavigationPropertyByOptionsAsync(entities, options, methodCall);
@@ -70,12 +81,17 @@ namespace ProjectShop.Server.Application.Services
 
         public async Task<ServiceResults<TEntity>> GetManyAsync<TParam>(TParam param, Func<TParam, int?, Task<IEnumerable<TEntity>>> queryFunc, TOptions? options = null, int? maxGetCount = null, [CallerMemberName] string? methodCall = null)
         {
-            ServiceResults<TEntity> results = new();
+            ServiceResults<TEntity> results = new([], [], true);
             try
             {
                 IEnumerable<TEntity> accounts = await queryFunc(param, maxGetCount);
                 if (accounts == null || !accounts.Any())
-                    return _serviceResultFactory.CreateServiceResults<TEntity>($"No entities found with param = {param}.", [], false, methodCall: methodCall);
+                {
+                    accounts ??= [];
+                    results.LogEntries = results.LogEntries!.Append(_logger.JsonLogWarning<TEntity, TServiceCall>($"No entities found by param = {param}.", methodCall: methodCall));
+                    results.IsSuccess = false;
+                    return results;
+                }
 
                 if (options != null)
                     results = await _navigationService.GetNavigationPropertyByOptionsAsync(accounts, options, methodCall);
@@ -91,12 +107,17 @@ namespace ProjectShop.Server.Application.Services
 
         public async Task<ServiceResults<TEntity>> GetManyAsync(Func<int?, Task<IEnumerable<TEntity>>> queryFunc, TOptions? options = null, int? maxGetCount = null, [CallerMemberName] string? methodCall = null)
         {
-            ServiceResults<TEntity> results = new();
+            ServiceResults<TEntity> results = new([], [], true);
             try
             {
                 IEnumerable<TEntity> entities = await queryFunc(maxGetCount);
                 if (entities == null || !entities.Any())
-                    return _serviceResultFactory.CreateServiceResults<TEntity>("No entities found.", [], false, methodCall: methodCall);
+                {
+                    entities ??= [];
+                    results.LogEntries = results.LogEntries!.Append(_logger.JsonLogWarning<TEntity, TServiceCall>("No entities found.", methodCall: methodCall));
+                    results.IsSuccess = false;
+                    return results;
+                }
 
                 if (options != null)
                     results = await _navigationService.GetNavigationPropertyByOptionsAsync(entities, options, methodCall);

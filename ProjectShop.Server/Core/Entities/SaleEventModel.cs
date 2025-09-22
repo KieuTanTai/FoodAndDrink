@@ -64,8 +64,8 @@ namespace ProjectShop.Server.Core.Entities
         }
 
         // Navigation properties
-        public ICollection<DetailSaleEventModel> DetailSaleEvents { get; set; } = new List<DetailSaleEventModel>();
-        public ICollection<InvoiceDiscountModel> InvoiceDiscounts { get; set; } = new List<InvoiceDiscountModel>();
+        public ICollection<DetailSaleEventModel> DetailSaleEvents { get; set; } = [];
+        public ICollection<InvoiceDiscountModel> InvoiceDiscounts { get; set; } = [];
         // End of navigation properties
 
         public SaleEventModel(uint saleEventId, DateTime saleEventStartDate, DateTime saleEventEndDate, string saleEventName, bool saleEventStatus, string saleEventDescription, string saleEventDiscountCode)

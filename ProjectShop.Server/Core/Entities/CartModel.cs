@@ -33,7 +33,7 @@ namespace ProjectShop.Server.Core.Entities
 
         // Navigation properties
         public CustomerModel Customer { get; set; } = null!;
-        public ICollection<DetailCartModel> DetailCarts { get; set; } = new List<DetailCartModel>();
+        public ICollection<DetailCartModel> DetailCarts { get; set; } = [];
         // End of navigation properties
 
         public CartModel(uint cartId, uint customerId, decimal cartTotalPrice)

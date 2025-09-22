@@ -114,7 +114,7 @@ namespace ProjectShop.Server.Application.Services.Roles
 
         private async Task<IEnumerable<JsonLogEntry>> UpdateRoleStatusAsync(IEnumerable<string> inputs, bool status, Func<IEnumerable<string>, int?, Task<IEnumerable<RoleModel>>> daoFunc)
         {
-            List<JsonLogEntry> logEntries = new List<JsonLogEntry>();
+            List<JsonLogEntry> logEntries = [];
             try
             {
                 var inputsList = inputs.ToList();

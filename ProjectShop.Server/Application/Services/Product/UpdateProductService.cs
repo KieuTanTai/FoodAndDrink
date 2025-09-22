@@ -101,7 +101,7 @@ namespace ProjectShop.Server.Application.Services.Product
 
         private async Task<IEnumerable<JsonLogEntry>> UpdateProductFieldAsync<T>(IEnumerable<string> inputs, IEnumerable<T> newValues, Func<IEnumerable<string>, int?, Task<IEnumerable<ProductModel>>> daoFunc, Action<ProductModel, T> updateAction, string fieldName)
         {
-            List<JsonLogEntry> logEntries = new List<JsonLogEntry>();
+            List<JsonLogEntry> logEntries = [];
             try
             {
                 var products = await daoFunc(inputs, null);
@@ -140,7 +140,7 @@ namespace ProjectShop.Server.Application.Services.Product
 
         private async Task<IEnumerable<JsonLogEntry>> UpdateProductFieldAsync<T>(IEnumerable<string> inputs, T newValue, Func<IEnumerable<string>, int?, Task<IEnumerable<ProductModel>>> daoFunc, Action<ProductModel, T> updateAction, string fieldName)
         {
-            List<JsonLogEntry> logEntries = new List<JsonLogEntry>();
+            List<JsonLogEntry> logEntries = [];
             try
             {
                 var products = await daoFunc(inputs, null);

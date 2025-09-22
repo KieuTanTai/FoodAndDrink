@@ -48,7 +48,7 @@ namespace ProjectShop.Server.Core.Entities
         }
 
         // Navigation properties
-        public ICollection<RolesOfUserModel> RolesOfUsers { get; set; } = new List<RolesOfUserModel>();
+        public ICollection<RolesOfUserModel> RolesOfUsers { get; set; } = [];
         // End of navigation properties
 
         public RoleModel(uint roleId, string roleName, bool roleStatus, DateTime roleCreatedDate, DateTime roleLastUpdatedDate)

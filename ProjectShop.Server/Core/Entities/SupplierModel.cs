@@ -74,7 +74,7 @@ namespace ProjectShop.Server.Core.Entities
         // Navigation properties
         public LocationModel StoreLocation { get; set; } = null!;
         public LocationModel CompanyLocation { get; set; } = null!;
-        public ICollection<ProductModel> Products { get; set; } = new List<ProductModel>();
+        public ICollection<ProductModel> Products { get; set; } = [];
         // End of navigation properties
 
         public SupplierModel(uint supplierId,

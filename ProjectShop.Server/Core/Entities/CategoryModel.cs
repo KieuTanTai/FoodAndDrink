@@ -32,7 +32,7 @@ namespace ProjectShop.Server.Core.Entities
         }
 
         // Navigation properties
-        public ICollection<ProductCategoriesModel> ProductCategories { get; set; } = new List<ProductCategoriesModel>();
+        public ICollection<ProductCategoriesModel> ProductCategories { get; set; } = [];
         // End of navigation properties
 
         public CategoryModel(uint categoryId, string categoryName, bool categoryStatus)

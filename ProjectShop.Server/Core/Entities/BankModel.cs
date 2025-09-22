@@ -32,7 +32,7 @@ namespace ProjectShop.Server.Core.Entities
         }
 
         // Navigation properties
-        public ICollection<UserPaymentMethodModel> UserPaymentMethods { get; set; } = new List<UserPaymentMethodModel>();
+        public ICollection<UserPaymentMethodModel> UserPaymentMethods { get; set; } = [];
         // End of navigation properties
 
         public BankModel(uint bankId, string bankName, bool bankStatus)

@@ -31,40 +31,49 @@ namespace ProjectShop.Server.Application.Services.Roles
             try
             {
                 if (await _helper.IsExistObject(role.RoleId.ToString(), _baseDAO.GetSingleDataAsync))
-                    return _serviceResultFactory.CreateServiceResult<RoleModel>("Role with the same ID already exists.", role, false);
+                    return _serviceResultFactory.CreateServiceResult("Role with the same ID already exists.", role, false);
                 // Add the new role
                 int affectedRows = await _baseDAO.InsertAsync(role);
                 if (affectedRows > 0) 
-                    return _serviceResultFactory.CreateServiceResult<RoleModel>("Role added successfully.", role, true, affectedRows: affectedRows);
-                return _serviceResultFactory.CreateServiceResult<RoleModel>("Failed to add role.", role, false);
+                    return _serviceResultFactory.CreateServiceResult("Role added successfully.", role, true, affectedRows: affectedRows);
+                return _serviceResultFactory.CreateServiceResult("Failed to add role.", role, false);
             }
             catch (Exception ex)
             {
                 _logger.LogError<RoleModel, AddRoleService>("An error occurred while adding the role.", ex);
-                return _serviceResultFactory.CreateServiceResult<RoleModel>("An error occurred while adding the role.", role, false, ex);
+                return _serviceResultFactory.CreateServiceResult("An error occurred while adding the role.", role, false, ex);
             }
         }
 
         public async Task<ServiceResults<RoleModel>> AddRolesAsync(IEnumerable<RoleModel> roles)
         {
+            List<JsonLogEntry> logEntries = [];
             try
             {
                 var filteredRoles = await _helper.FilterValidEntities(roles, (entity) => entity.RoleName, _roleDAO.GetByRoleNamesAsync);
                 filteredRoles.TryGetValue(filteredRoles.Keys.FirstOrDefault(), out var serviceResults);
-                if (!serviceResults!.Data!.Any())
-                    return _serviceResultFactory.CreateServiceResults<RoleModel>("No valid roles found to add.", [], false);
+                if (serviceResults == null || serviceResults.Data == null || !serviceResults.Data.Any())
+                {
+                    logEntries = serviceResults?.LogEntries?.ToList() ?? [];
+                    logEntries.Add(_logger.JsonLogWarning<IEnumerable<RoleModel>, AddRoleService>("All roles already exist or no valid roles to add."));
+                    return _serviceResultFactory.CreateServiceResults<RoleModel>([], logEntries, false);
+                }
 
                 // insert
                 int affectedRows = await _baseDAO.InsertAsync(serviceResults.Data!);
                 if (affectedRows == 0)
-                    return _serviceResultFactory.CreateServiceResults<RoleModel>("Failed to add roles.", serviceResults.Data!, false);
-                return _serviceResultFactory.CreateServiceResults<RoleModel>("Roles added successfully.", serviceResults.Data!, true, affectedRows: affectedRows);
+                {
+                    logEntries.Add(_logger.JsonLogWarning<IEnumerable<RoleModel>, AddRoleService>("Failed to add the roles.", affectedRows: affectedRows));
+                    return _serviceResultFactory.CreateServiceResults(serviceResults.Data, logEntries, false);
+                }
+                logEntries.Add(_logger.JsonLogInfo<IEnumerable<RoleModel>, AddRoleService>("Roles added successfully.", affectedRows: affectedRows));
+                return _serviceResultFactory.CreateServiceResults(serviceResults.Data, logEntries, true);
 
             }
             catch (Exception ex)
             {
-                _logger.LogError<IEnumerable<RoleModel>, AddRoleService>("An error occurred while adding the roles.", ex);
-                return _serviceResultFactory.CreateServiceResults<RoleModel>("An error occurred while adding the roles.", [], false, ex);
+                logEntries.Add(_logger.JsonLogError<IEnumerable<RoleModel>, AddRoleService>("An error occurred while adding roles.", ex));
+                return _serviceResultFactory.CreateServiceResults<RoleModel>([], logEntries, false);
             }
         }
     }

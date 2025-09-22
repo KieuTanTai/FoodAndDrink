@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Application.Services.Location
 {
-    public class BaseReturnLocationService :IBaseGetNavigationPropertyServices<LocationModel, LocationNavigationOptions>
+    public class BaseReturnLocationService : IBaseGetNavigationPropertyServices<LocationModel, LocationNavigationOptions>
     {
         private readonly ILogService _logger;
         private readonly IDAO<LocationCityModel> _baseCityDAO;
@@ -44,96 +44,149 @@ namespace ProjectShop.Server.Application.Services.Location
         public async Task<ServiceResult<LocationModel>> GetNavigationPropertyByOptionsAsync(LocationModel entity, LocationNavigationOptions options,
             [CallerMemberName] string? methodCall = null)
         {
-            List<JsonLogEntry> logEntries = new();
+            List<JsonLogEntry> logEntries = [];
+            bool isSuccess = true;
+
             if (options.IsGetInventory)
+            {
                 await LoadInventoryAsync(entity, logEntries);
+                isSuccess = ValidateInventoryLoaded(entity, isSuccess);
+            }
 
             if (options.IsGetLocationCity)
+            {
                 await LoadLocationCityAsync(entity, logEntries);
+                isSuccess = ValidateLocationCityLoaded(entity, isSuccess);
+            }
 
             if (options.IsGetLocationDistrict)
+            {
                 await LoadLocationDistrictAsync(entity, logEntries);
+                isSuccess = ValidateLocationDistrictLoaded(entity, isSuccess);
+            }
 
             if (options.IsGetLocationWard)
+            {
                 await LoadLocationWardAsync(entity, logEntries);
+                isSuccess = ValidateLocationWardLoaded(entity, isSuccess);
+            }
 
             if (options.IsGetLocationType)
+            {
                 await LoadLocationTypeAsync(entity, logEntries);
+                isSuccess = ValidateLocationTypeLoaded(entity, isSuccess);
+            }
 
             if (options.IsGetSourceInventoryMovements)
+            {
                 await LoadSourceInventoryMovementsAsync(entity, logEntries);
+                isSuccess = ValidateSourceInventoryMovementsLoaded(entity, isSuccess);
+            }
 
             if (options.IsGetDestinationInventoryMovements)
+            {
                 await LoadDestinationInventoryMovementsAsync(entity, logEntries);
+                isSuccess = ValidateDestinationInventoryMovementsLoaded(entity, isSuccess);
+            }
 
             if (options.IsGetDisposeProducts)
+            {
                 await LoadDisposeProductsAsync(entity, logEntries);
+                isSuccess = ValidateDisposeProductsLoaded(entity, isSuccess);
+            }
 
-            logEntries.Add(_logger.JsonLogInfo<LocationModel, BaseReturnLocationService>("Completed loading navigation properties for location.", methodCall: methodCall));
-            return _serviceResultFactory.CreateServiceResult<LocationModel>(entity, logEntries);
+            AddFinalLogEntry(logEntries, isSuccess, methodCall, "location");
+            return _serviceResultFactory.CreateServiceResult(entity, logEntries, isSuccess);
         }
 
         public async Task<ServiceResults<LocationModel>> GetNavigationPropertyByOptionsAsync(IEnumerable<LocationModel> entities, LocationNavigationOptions options,
             [CallerMemberName] string? methodCall = null)
         {
-            List<JsonLogEntry> logEntries = new();
+            List<JsonLogEntry> logEntries = [];
+            var locationList = entities.ToList();
+            bool isSuccess = true;
+
             if (options.IsGetInventory)
-                await LoadInventoriesAsync(entities, logEntries);
+            {
+                await LoadInventoriesAsync(locationList, logEntries);
+                isSuccess = ValidateInventoriesLoaded(locationList, isSuccess);
+            }
 
             if (options.IsGetLocationCity)
-                await LoadLocationCitiesAsync(entities, logEntries);
+            {
+                await LoadLocationCitiesAsync(locationList, logEntries);
+                isSuccess = ValidateLocationCitiesLoaded(locationList, isSuccess);
+            }
 
             if (options.IsGetLocationDistrict)
-                await LoadLocationDistrictsAsync(entities, logEntries);
+            {
+                await LoadLocationDistrictsAsync(locationList, logEntries);
+                isSuccess = ValidateLocationDistrictsLoaded(locationList, isSuccess);
+            }
 
             if (options.IsGetLocationWard)
-                await LoadLocationWardsAsync(entities, logEntries);
+            {
+                await LoadLocationWardsAsync(locationList, logEntries);
+                isSuccess = ValidateLocationWardsLoaded(locationList, isSuccess);
+            }
 
             if (options.IsGetLocationType)
-                await LoadLocationTypesAsync(entities, logEntries);
+            {
+                await LoadLocationTypesAsync(locationList, logEntries);
+                isSuccess = ValidateLocationTypesLoaded(locationList, isSuccess);
+            }
 
             if (options.IsGetSourceInventoryMovements)
-                await LoadSourceInventoryMovementsAsync(entities, logEntries);
+            {
+                await LoadSourceInventoryMovementsAsync(locationList, logEntries);
+                isSuccess = ValidateSourceInventoryMovementsLoaded(locationList, isSuccess);
+            }
 
             if (options.IsGetDestinationInventoryMovements)
-                await LoadDestinationInventoryMovementsAsync(entities, logEntries);
+            {
+                await LoadDestinationInventoryMovementsAsync(locationList, logEntries);
+                isSuccess = ValidateDestinationInventoryMovementsLoaded(locationList, isSuccess);
+            }
 
             if (options.IsGetDisposeProducts)
-                await LoadDisposeProductsAsync(entities, logEntries);
+            {
+                await LoadDisposeProductsAsync(locationList, logEntries);
+                isSuccess = ValidateDisposeProductsLoaded(locationList, isSuccess);
+            }
 
-            logEntries.Add(_logger.JsonLogInfo<LocationModel, BaseReturnLocationService>("Completed loading navigation properties for locations.", methodCall: methodCall));
-            return _serviceResultFactory.CreateServiceResults<LocationModel>(entities, logEntries);
+            AddFinalLogEntry(logEntries, isSuccess, methodCall, "locations");
+            return _serviceResultFactory.CreateServiceResults(locationList, logEntries, isSuccess);
         }
 
         // NOTE: private method for navigation properties (single param)
         private async Task<ServiceResult<LocationCityModel>> TryLoadLocationCityAsync(uint locationCityId)
-            => await _baseHelperReturnTEntityService.TryLoadEntityAsync<uint, LocationCityModel>(locationCityId, (id) => _baseCityDAO.GetSingleDataAsync(id.ToString()),
+            => await _baseHelperReturnTEntityService.TryLoadEntityAsync(locationCityId, (id) => _baseCityDAO.GetSingleDataAsync(id.ToString()),
                 () => new LocationCityModel(), nameof(TryLoadLocationCityAsync));
 
         private async Task<ServiceResult<LocationDistrictModel>> TryLoadLocationDistrictAsync(uint locationDistrictId)
-            => await _baseHelperReturnTEntityService.TryLoadEntityAsync<uint, LocationDistrictModel>(locationDistrictId, (id) => _baseDistrictDAO.GetSingleDataAsync(id.ToString()),
+            => await _baseHelperReturnTEntityService.TryLoadEntityAsync(locationDistrictId, (id) => _baseDistrictDAO.GetSingleDataAsync(id.ToString()),
                 () => new LocationDistrictModel(), nameof(TryLoadLocationDistrictAsync));
 
         private async Task<ServiceResult<LocationWardModel>> TryLoadLocationWardAsync(uint locationWardId)
-            => await _baseHelperReturnTEntityService.TryLoadEntityAsync<uint, LocationWardModel>(locationWardId, (id) => _baseWardDAO.GetSingleDataAsync(id.ToString()),
+            => await _baseHelperReturnTEntityService.TryLoadEntityAsync(locationWardId, (id) => _baseWardDAO.GetSingleDataAsync(id.ToString()),
                 () => new LocationWardModel(), nameof(TryLoadLocationWardAsync));
         private async Task<ServiceResult<LocationTypeModel>> TryLoadLocationTypeAsync(uint locationTypeId)
-            => await _baseHelperReturnTEntityService.TryLoadEntityAsync<uint, LocationTypeModel>(locationTypeId, (id) => _baseTypeDAO.GetSingleDataAsync(id.ToString()),
+            => await _baseHelperReturnTEntityService.TryLoadEntityAsync(locationTypeId, (id) => _baseTypeDAO.GetSingleDataAsync(id.ToString()),
                 () => new LocationTypeModel(), nameof(TryLoadLocationTypeAsync));
 
         private async Task<ServiceResult<InventoryModel>> TryLoadInventoryAsync(uint locationId)
-            => await _baseHelperReturnTEntityService.TryLoadEntityAsync<uint, InventoryModel>(locationId, _inventoryDAO.GetByLocationIdAsync, () => new InventoryModel(), nameof(TryLoadInventoryAsync));
+            => await _baseHelperReturnTEntityService.TryLoadEntityAsync(locationId, _inventoryDAO.GetByLocationIdAsync, () => new InventoryModel(), nameof(TryLoadInventoryAsync));
 
         private async Task<ServiceResults<InventoryMovementModel>> TryLoadSourceInventoryMovementsAsync(uint locationId)
-            => await _baseHelperReturnTEntityService.TryLoadICollectionEntitiesAsync<uint, InventoryMovementModel>(locationId, (id) => _inventoryMovementDAO.GetBySourceLocationIdAsync(id),
+            => await _baseHelperReturnTEntityService.TryLoadICollectionEntitiesAsync(locationId, (id) => _inventoryMovementDAO.GetBySourceLocationIdAsync(id),
                 nameof(TryLoadSourceInventoryMovementsAsync));
 
         private async Task<ServiceResults<InventoryMovementModel>> TryLoadDestinationInventoryMovementsAsync(uint locationId)
-            => await _baseHelperReturnTEntityService.TryLoadICollectionEntitiesAsync<uint, InventoryMovementModel>(locationId, (id) => _inventoryMovementDAO.GetByDestinationLocationIdAsync(id),
+            => await _baseHelperReturnTEntityService.TryLoadICollectionEntitiesAsync(locationId, (id) => _inventoryMovementDAO.GetByDestinationLocationIdAsync(id),
                 nameof(TryLoadDestinationInventoryMovementsAsync));
 
         private async Task<ServiceResults<DisposeProductModel>> TryLoadDisposeProductsAsync(uint locationId)
-            => await _baseHelperReturnTEntityService.TryLoadICollectionEntitiesAsync<uint, DisposeProductModel>(locationId, (id) => _disposeProductDAO.GetByLocationIdAsync(id),
+            => await _baseHelperReturnTEntityService.TryLoadICollectionEntitiesAsync(locationId, (id) => _disposeProductDAO.GetByLocationIdAsync(id),
                 nameof(TryLoadDisposeProductsAsync));
 
         // NOTE: private method for navigation properties (IEnumerable param)
@@ -158,80 +211,139 @@ namespace ProjectShop.Server.Application.Services.Location
                 () => new InventoryModel(), (entity) => entity.LocationId, nameof(TryLoadInventoriesAsync));
 
         private async Task<IDictionary<uint, ServiceResults<InventoryMovementModel>>> TryLoadSourceInventoryMovementsAsync(IEnumerable<uint> locationIds)
-            => await _baseHelperReturnTEntityService.TryLoadICollectionEntitiesAsync<uint, InventoryMovementModel>(locationIds, (ids) => _inventoryMovementDAO.GetBySourceLocationIdsAsync(ids),
+            => await _baseHelperReturnTEntityService.TryLoadICollectionEntitiesAsync(locationIds, (ids) => _inventoryMovementDAO.GetBySourceLocationIdsAsync(ids),
                 (entity) => entity.SourceLocationId, nameof(TryLoadSourceInventoryMovementsAsync));
 
         private async Task<IDictionary<uint, ServiceResults<InventoryMovementModel>>> TryLoadDestinationInventoryMovementsAsync(IEnumerable<uint> locationIds)
-            => await _baseHelperReturnTEntityService.TryLoadICollectionEntitiesAsync<uint, InventoryMovementModel>(locationIds, (ids) => _inventoryMovementDAO.GetByDestinationLocationIdsAsync(ids),
+            => await _baseHelperReturnTEntityService.TryLoadICollectionEntitiesAsync(locationIds, (ids) => _inventoryMovementDAO.GetByDestinationLocationIdsAsync(ids),
                 (entity) => entity.DestinationLocationId, nameof(TryLoadDestinationInventoryMovementsAsync));
 
         private async Task<IDictionary<uint, ServiceResults<DisposeProductModel>>> TryLoadDisposeProductsAsync(IEnumerable<uint> locationIds)
-            => await _baseHelperReturnTEntityService.TryLoadICollectionEntitiesAsync<uint, DisposeProductModel>(locationIds, (ids) => _disposeProductDAO.GetByLocationIdsAsync(ids),
+            => await _baseHelperReturnTEntityService.TryLoadICollectionEntitiesAsync(locationIds, (ids) => _disposeProductDAO.GetByLocationIdsAsync(ids),
                 (entity) => entity.LocationId, nameof(TryLoadDisposeProductsAsync));
 
         // NOTE: Helper methods
         private async Task LoadLocationCityAsync(LocationModel location, List<JsonLogEntry> logEntries)
-            => await _baseHelperReturnTEntityService.LoadEntityAsync<uint, LocationCityModel>(city => location.LocationCity = city,
+            => await _baseHelperReturnTEntityService.LoadEntityAsync(city => location.LocationCity = city,
                 () => location.LocationCityId, TryLoadLocationCityAsync, logEntries, nameof(LoadLocationCityAsync));
 
         private async Task LoadLocationDistrictAsync(LocationModel location, List<JsonLogEntry> logEntries)
-            => await _baseHelperReturnTEntityService.LoadEntityAsync<uint, LocationDistrictModel>(district => location.LocationDistrict = district,
+            => await _baseHelperReturnTEntityService.LoadEntityAsync(district => location.LocationDistrict = district,
                 () => location.LocationDistrictId, TryLoadLocationDistrictAsync, logEntries, nameof(LoadLocationDistrictAsync));
 
         private async Task LoadLocationWardAsync(LocationModel location, List<JsonLogEntry> logEntries)
-            => await _baseHelperReturnTEntityService.LoadEntityAsync<uint, LocationWardModel>(ward => location.LocationWard = ward,
+            => await _baseHelperReturnTEntityService.LoadEntityAsync(ward => location.LocationWard = ward,
                 () => location.LocationWardId, TryLoadLocationWardAsync, logEntries, nameof(LoadLocationWardAsync));
 
         private async Task LoadLocationTypeAsync(LocationModel location, List<JsonLogEntry> logEntries)
-            => await _baseHelperReturnTEntityService.LoadEntityAsync<uint, LocationTypeModel>(type => location.LocationType = type,
+            => await _baseHelperReturnTEntityService.LoadEntityAsync(type => location.LocationType = type,
                 () => location.LocationTypeId, TryLoadLocationTypeAsync, logEntries, nameof(LoadLocationTypeAsync));
 
         private async Task LoadInventoryAsync(LocationModel location, List<JsonLogEntry> logEntries)
-            => await _baseHelperReturnTEntityService.LoadEntityAsync<uint, InventoryModel>(inventory => location.Inventory = inventory,
+            => await _baseHelperReturnTEntityService.LoadEntityAsync(inventory => location.Inventory = inventory,
                 () => location.LocationId, TryLoadInventoryAsync, logEntries, nameof(LoadInventoryAsync));
 
         private async Task LoadSourceInventoryMovementsAsync(LocationModel location, List<JsonLogEntry> logEntries)
-            => await _baseHelperReturnTEntityService.LoadICollectionEntitiesAsync<uint, InventoryMovementModel>(movements => location.SourceInventoryMovements = [.. movements],
+            => await _baseHelperReturnTEntityService.LoadICollectionEntitiesAsync(movements => location.SourceInventoryMovements = [.. movements],
                 () => location.LocationId, TryLoadSourceInventoryMovementsAsync, logEntries, nameof(LoadSourceInventoryMovementsAsync));
 
         private async Task LoadDestinationInventoryMovementsAsync(LocationModel location, List<JsonLogEntry> logEntries)
-            => await _baseHelperReturnTEntityService.LoadICollectionEntitiesAsync<uint, InventoryMovementModel>(movements => location.DestinationInventoryMovements = [.. movements],
+            => await _baseHelperReturnTEntityService.LoadICollectionEntitiesAsync(movements => location.DestinationInventoryMovements = [.. movements],
                 () => location.LocationId, TryLoadDestinationInventoryMovementsAsync, logEntries, nameof(LoadDestinationInventoryMovementsAsync));
 
         private async Task LoadDisposeProductsAsync(LocationModel location, List<JsonLogEntry> logEntries)
-            => await _baseHelperReturnTEntityService.LoadICollectionEntitiesAsync<uint, DisposeProductModel>(disposeProducts => location.DisposeProducts = [.. disposeProducts],
+            => await _baseHelperReturnTEntityService.LoadICollectionEntitiesAsync(disposeProducts => location.DisposeProducts = [.. disposeProducts],
                 () => location.LocationId, TryLoadDisposeProductsAsync, logEntries, nameof(LoadDisposeProductsAsync));
 
         private async Task LoadLocationCitiesAsync(IEnumerable<LocationModel> locations, List<JsonLogEntry> logEntries)
-            => await _baseHelperReturnTEntityService.LoadEntitiesAsync<uint, LocationModel, LocationCityModel>(locations, (location, city) => location.LocationCity = city,
+            => await _baseHelperReturnTEntityService.LoadEntitiesAsync(locations, (location, city) => location.LocationCity = city,
                 location => location.LocationCityId, TryLoadLocationCitiesAsync, logEntries, nameof(LoadLocationCitiesAsync));
 
         private async Task LoadLocationDistrictsAsync(IEnumerable<LocationModel> locations, List<JsonLogEntry> logEntries)
-            => await _baseHelperReturnTEntityService.LoadEntitiesAsync<uint, LocationModel, LocationDistrictModel>(locations, (location, district) => location.LocationDistrict = district,
+            => await _baseHelperReturnTEntityService.LoadEntitiesAsync(locations, (location, district) => location.LocationDistrict = district,
                 location => location.LocationDistrictId, TryLoadLocationDistrictsAsync, logEntries, nameof(LoadLocationDistrictsAsync));
 
         private async Task LoadLocationWardsAsync(IEnumerable<LocationModel> locations, List<JsonLogEntry> logEntries)
-            => await _baseHelperReturnTEntityService.LoadEntitiesAsync<uint, LocationModel, LocationWardModel>(locations, (location, ward) => location.LocationWard = ward,
+            => await _baseHelperReturnTEntityService.LoadEntitiesAsync(locations, (location, ward) => location.LocationWard = ward,
                 location => location.LocationWardId, TryLoadLocationWardsAsync, logEntries, nameof(LoadLocationWardsAsync));
 
         private async Task LoadLocationTypesAsync(IEnumerable<LocationModel> locations, List<JsonLogEntry> logEntries)
-            => await _baseHelperReturnTEntityService.LoadEntitiesAsync<uint, LocationModel, LocationTypeModel>(locations, (location, type) => location.LocationType = type,
+            => await _baseHelperReturnTEntityService.LoadEntitiesAsync(locations, (location, type) => location.LocationType = type,
                 location => location.LocationTypeId, TryLoadLocationTypesAsync, logEntries, nameof(LoadLocationTypesAsync));
 
         private async Task LoadInventoriesAsync(IEnumerable<LocationModel> locations, List<JsonLogEntry> logEntries)
-            => await _baseHelperReturnTEntityService.LoadEntitiesAsync<uint, LocationModel, InventoryModel>(locations, (location, inventory) => location.Inventory = inventory,
+            => await _baseHelperReturnTEntityService.LoadEntitiesAsync(locations, (location, inventory) => location.Inventory = inventory,
                 location => location.LocationId, TryLoadInventoriesAsync, logEntries, nameof(LoadInventoriesAsync));
 
         private async Task LoadSourceInventoryMovementsAsync(IEnumerable<LocationModel> locations, List<JsonLogEntry> logEntries)
-            => await _baseHelperReturnTEntityService.LoadICollectionEntitiesAsync<uint, LocationModel, InventoryMovementModel>(locations, (location, movements) => location.SourceInventoryMovements = [.. movements],
+            => await _baseHelperReturnTEntityService.LoadICollectionEntitiesAsync(locations, (location, movements) => location.SourceInventoryMovements = [.. movements],
                 location => location.LocationId, TryLoadSourceInventoryMovementsAsync, logEntries, nameof(LoadSourceInventoryMovementsAsync));
 
         private async Task LoadDestinationInventoryMovementsAsync(IEnumerable<LocationModel> locations, List<JsonLogEntry> logEntries)
-            => await _baseHelperReturnTEntityService.LoadICollectionEntitiesAsync<uint, LocationModel, InventoryMovementModel>(locations, (location, movements) => location.DestinationInventoryMovements = [.. movements],
+            => await _baseHelperReturnTEntityService.LoadICollectionEntitiesAsync(locations, (location, movements) => location.DestinationInventoryMovements = [.. movements],
                 location => location.LocationId, TryLoadDestinationInventoryMovementsAsync, logEntries, nameof(LoadDestinationInventoryMovementsAsync));
 
         private async Task LoadDisposeProductsAsync(IEnumerable<LocationModel> locations, List<JsonLogEntry> logEntries)
-            => await _baseHelperReturnTEntityService.LoadICollectionEntitiesAsync<uint, LocationModel, DisposeProductModel>(locations, (location, disposeProducts) => location.DisposeProducts = [.. disposeProducts],
+            => await _baseHelperReturnTEntityService.LoadICollectionEntitiesAsync(locations, (location, disposeProducts) => location.DisposeProducts = [.. disposeProducts],
                 location => location.LocationId, TryLoadDisposeProductsAsync, logEntries, nameof(LoadDisposeProductsAsync));
+
+        // Validation helper methods for single entity
+        private static bool ValidateInventoryLoaded(LocationModel location, bool currentSuccess)
+            => currentSuccess && location.Inventory != null && location.Inventory.InventoryId != 0;
+
+        private static bool ValidateLocationCityLoaded(LocationModel location, bool currentSuccess)
+            => currentSuccess && location.LocationCity != null && location.LocationCity.LocationCityId != 0;
+
+        private static bool ValidateLocationDistrictLoaded(LocationModel location, bool currentSuccess)
+            => currentSuccess && location.LocationDistrict != null && location.LocationDistrict.LocationDistrictId != 0;
+
+        private static bool ValidateLocationWardLoaded(LocationModel location, bool currentSuccess)
+            => currentSuccess && location.LocationWard != null && location.LocationWard.LocationWardId != 0;
+
+        private static bool ValidateLocationTypeLoaded(LocationModel location, bool currentSuccess)
+            => currentSuccess && location.LocationType != null && location.LocationType.LocationTypeId != 0;
+
+        private static bool ValidateSourceInventoryMovementsLoaded(LocationModel location, bool currentSuccess)
+            => currentSuccess && location.SourceInventoryMovements != null && location.SourceInventoryMovements.Count > 0;
+
+        private static bool ValidateDestinationInventoryMovementsLoaded(LocationModel location, bool currentSuccess)
+            => currentSuccess && location.DestinationInventoryMovements != null && location.DestinationInventoryMovements.Count > 0;
+
+        private static bool ValidateDisposeProductsLoaded(LocationModel location, bool currentSuccess)
+            => currentSuccess && location.DisposeProducts != null && location.DisposeProducts.Count > 0;
+
+        // Validation helper methods for multiple entities
+        private static bool ValidateInventoriesLoaded(IEnumerable<LocationModel> locations, bool currentSuccess)
+            => currentSuccess && !locations.Any(location => location.Inventory == null || location.Inventory.InventoryId == 0);
+
+        private static bool ValidateLocationCitiesLoaded(IEnumerable<LocationModel> locations, bool currentSuccess)
+            => currentSuccess && !locations.Any(location => location.LocationCity == null || location.LocationCity.LocationCityId == 0);
+
+        private static bool ValidateLocationDistrictsLoaded(IEnumerable<LocationModel> locations, bool currentSuccess)
+            => currentSuccess && !locations.Any(location => location.LocationDistrict == null || location.LocationDistrict.LocationDistrictId == 0);
+
+        private static bool ValidateLocationWardsLoaded(IEnumerable<LocationModel> locations, bool currentSuccess)
+            => currentSuccess && !locations.Any(location => location.LocationWard == null || location.LocationWard.LocationWardId == 0);
+
+        private static bool ValidateLocationTypesLoaded(IEnumerable<LocationModel> locations, bool currentSuccess)
+            => currentSuccess && !locations.Any(location => location.LocationType == null || location.LocationType.LocationTypeId == 0);
+
+        private static bool ValidateSourceInventoryMovementsLoaded(IEnumerable<LocationModel> locations, bool currentSuccess)
+            => currentSuccess && !locations.Any(location => location.SourceInventoryMovements == null || location.SourceInventoryMovements.Count == 0);
+
+        private static bool ValidateDestinationInventoryMovementsLoaded(IEnumerable<LocationModel> locations, bool currentSuccess)
+            => currentSuccess && !locations.Any(location => location.DestinationInventoryMovements == null || location.DestinationInventoryMovements.Count == 0);
+
+        private static bool ValidateDisposeProductsLoaded(IEnumerable<LocationModel> locations, bool currentSuccess)
+            => currentSuccess && !locations.Any(location => location.DisposeProducts == null || location.DisposeProducts.Count == 0);
+
+        // Final log entry helper
+        private void AddFinalLogEntry(List<JsonLogEntry> logEntries, bool isSuccess, string? methodCall, string entityName)
+        {
+            if (!isSuccess)
+                logEntries.Add(_logger.JsonLogWarning<LocationModel, BaseReturnLocationService>($"One or more navigation properties could not be loaded for {entityName}.", methodCall: methodCall));
+            else
+                logEntries.Add(_logger.JsonLogInfo<LocationModel, BaseReturnLocationService>($"Successfully retrieved {entityName} with navigation properties.", methodCall: methodCall));
+        }
     }
 }

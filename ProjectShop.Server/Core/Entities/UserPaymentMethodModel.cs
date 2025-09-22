@@ -106,7 +106,7 @@ namespace ProjectShop.Server.Core.Entities
         // Navigation properties
         public BankModel? Bank { get; set; }
         public CustomerModel Customer { get; set; } = null!;
-        public ICollection<InvoiceModel> Invoices { get; set; } = new List<InvoiceModel>();
+        public ICollection<InvoiceModel> Invoices { get; set; } = [];
         // End of navigation properties
 
         public UserPaymentMethodModel(uint userPaymentMethodId, string paymentMethodType, uint? bankId, uint customerId, DateTime paymentMethodAddedDate, DateTime paymentMethodLastUpdatedDate, int paymentMethodStatus,

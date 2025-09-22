@@ -31,41 +31,54 @@ namespace ProjectShop.Server.Application.Services.Roles
             try
             {
                 if (await _helper.IsExistObject(keys, _roleOfUserDAO.GetByKeysAsync))
-                    return _serviceResultFactory.CreateServiceResult<RolesOfUserModel>($"The account role with AccountId {keys.AccountId} and RoleId {keys.RoleId} already exists.", new RolesOfUserModel(keys.AccountId, keys.RoleId), false);
+                    return _serviceResultFactory.CreateServiceResult($"The account role with AccountId {keys.AccountId} and RoleId {keys.RoleId} already exists.",
+                            new RolesOfUserModel(keys.AccountId, keys.RoleId), false);
                 // Add the new account role
                 int affectedRows = await _baseDAO.InsertAsync(new RolesOfUserModel { AccountId = keys.AccountId, RoleId = keys.RoleId });
                 if (affectedRows == 0)
-                    return _serviceResultFactory.CreateServiceResult<RolesOfUserModel>($"Failed to add account role with AccountId {keys.AccountId} and RoleId {keys.RoleId}.", new RolesOfUserModel(keys.AccountId, keys.RoleId), false);
-                return _serviceResultFactory.CreateServiceResult<RolesOfUserModel>($"Successfully added account role with AccountId {keys.AccountId} and RoleId {keys.RoleId}.", new RolesOfUserModel(keys.AccountId, keys.RoleId), true, affectedRows : affectedRows);
+                    return _serviceResultFactory.CreateServiceResult($"Failed to add account role with AccountId {keys.AccountId} and RoleId {keys.RoleId}.",
+                        new RolesOfUserModel(keys.AccountId, keys.RoleId), false);
+                return _serviceResultFactory.CreateServiceResult($"Successfully added account role with AccountId {keys.AccountId} and RoleId {keys.RoleId}.",
+                    new RolesOfUserModel(keys.AccountId, keys.RoleId), true, affectedRows : affectedRows);
             }
             catch (Exception ex)
             {
                 _logger.LogError<RolesOfUserModel, AddAccountRoleService>($"An error occurred while adding account role with AccountId {keys.AccountId} and RoleId {keys.RoleId}.", ex);
-                return _serviceResultFactory.CreateServiceResult<RolesOfUserModel>($"An error occurred while adding account role with AccountId {keys.AccountId} and RoleId {keys.RoleId}.", new RolesOfUserModel(keys.AccountId, keys.RoleId), false);
+                return _serviceResultFactory.CreateServiceResult($"An error occurred while adding account role with AccountId {keys.AccountId} and RoleId {keys.RoleId}.",
+                    new RolesOfUserModel(keys.AccountId, keys.RoleId), false);
             }
         }
 
         // BUG: It may not work correctly if the entities are not unique by AccountId and RoleId.
         public async Task<ServiceResults<RolesOfUserModel>> AddAccountRolesAsync(IEnumerable<RolesOfUserModel> entities)
         {
+            List<JsonLogEntry> logEntries = [];
             try
             {
                 var filteredEntities = await _helper.FilterValidEntities(entities, (entity)
                     => new RolesOfUserKey(entity.AccountId, entity.RoleId), _roleOfUserDAO.GetByListKeysAsync);
                 filteredEntities.TryGetValue(filteredEntities.Keys.FirstOrDefault(), out var serviceResults);
-                if (!serviceResults!.Data!.Any())
-                    return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("No valid account roles to add.", [], false);
+                if (serviceResults == null || serviceResults.Data == null || !serviceResults.Data.Any())
+                {
+                    logEntries = serviceResults?.LogEntries?.ToList() ?? [];
+                    logEntries.Add(_logger.JsonLogWarning<RolesOfUserModel, AddAccountRoleService>("No valid account roles to add."));
+                    return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>([], logEntries, false);
+                }
 
                 // Insert
                 int affectedRows = await _baseDAO.InsertAsync(serviceResults.Data!);
                 if (affectedRows == 0)
-                    return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("Failed to add account roles.", serviceResults.Data!, false);
-                return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>($"Successfully added account roles.", serviceResults.Data!, true, affectedRows : affectedRows);
+                {
+                    logEntries.Add(_logger.JsonLogWarning<RolesOfUserModel, AddAccountRoleService>("Failed to add account roles.", affectedRows: affectedRows));
+                    return _serviceResultFactory.CreateServiceResults(serviceResults.Data, logEntries, false);
+                }
+                logEntries.Add(_logger.JsonLogInfo<RolesOfUserModel, AddAccountRoleService>($"Successfully added account roles.", affectedRows: affectedRows));
+                return _serviceResultFactory.CreateServiceResults(serviceResults.Data, logEntries, true);
             }
             catch (Exception ex)
             {
-                _logger.LogError<RolesOfUserModel, AddAccountRoleService>("An error occurred while adding account roles.", ex);
-                return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>("An error occurred while adding account roles.", [], false);
+                logEntries.Add(_logger.JsonLogError<RolesOfUserModel, AddAccountRoleService>("An error occurred while adding account roles.", ex));
+                return _serviceResultFactory.CreateServiceResults<RolesOfUserModel>([], logEntries, false);
             }
         }
     }
