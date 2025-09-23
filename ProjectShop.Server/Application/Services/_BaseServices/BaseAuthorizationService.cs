@@ -1,4 +1,4 @@
-﻿using ProjectShop.Server.Core.Interfaces.IServices;
+﻿using ProjectShop.Server.Core.Interfaces.IServices._IBase;
 
 namespace ProjectShop.Server.Application.Services._BaseServices
 {

@@ -2,7 +2,7 @@
 
 namespace ProjectShop.Server.Infrastructure.Services
 {
-    public class HashPaswordService : IHashPassword
+    public class HashPasswordService : IHashPassword
     {
         // Hash password dùng BCrypt (async), truyền workFactor = 4 cho tốc độ hash nhanh hơn
         public Task<string> HashPasswordAsync(string password)

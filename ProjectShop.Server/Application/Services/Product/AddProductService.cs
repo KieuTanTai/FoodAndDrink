@@ -2,6 +2,7 @@
 using ProjectShop.Server.Core.Interfaces.IData;
 using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
 using ProjectShop.Server.Core.Interfaces.IServices;
+using ProjectShop.Server.Core.Interfaces.IServices._IBase;
 using ProjectShop.Server.Core.Interfaces.IServices.IProduct;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ValueObjects;

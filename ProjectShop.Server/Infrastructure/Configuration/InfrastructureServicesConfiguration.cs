@@ -15,7 +15,7 @@ namespace ProjectShop.Server.Infrastructure.Configuration
         {
             services.AddSingleton<IStringChecker, StringChecker>();
             services.AddSingleton<IStringConverter, StringConverter>();
-            services.AddSingleton<IHashPassword, HashPaswordService>();
+            services.AddSingleton<IHashPassword, HashPasswordService>();
             services.AddSingleton<IClock, SystemClockService>();
             services.AddSingleton<ILogService, LogService>();
             services.AddSingleton<IClock>(provider => new FakeClockService { UtcNow = new DateTime(2030, 12, 31) });

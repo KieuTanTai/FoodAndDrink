@@ -1,7 +1,7 @@
 ﻿using ProjectShop.Server.Core.ValueObjects;
 using System.Runtime.CompilerServices;
 
-namespace ProjectShop.Server.Core.Interfaces.IServices
+namespace ProjectShop.Server.Core.Interfaces.IServices._IBase
 {
     public interface IBaseGetByTimeServices<TEntity, TOptions>
         where TEntity : class

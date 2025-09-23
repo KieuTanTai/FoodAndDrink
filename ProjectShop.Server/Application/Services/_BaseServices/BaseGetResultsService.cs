@@ -1,7 +1,5 @@
-﻿using ProjectShop.Server.Application.Services.Account;
-using ProjectShop.Server.Application.Services.Product;
-using ProjectShop.Server.Core.Entities;
-using ProjectShop.Server.Core.Interfaces.IServices;
+﻿using ProjectShop.Server.Core.Interfaces.IServices;
+using ProjectShop.Server.Core.Interfaces.IServices._IBase;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ValueObjects;
 using System.Runtime.CompilerServices;

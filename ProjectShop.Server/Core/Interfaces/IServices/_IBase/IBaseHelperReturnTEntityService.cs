@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace ProjectShop.Server.Core.Interfaces.IServices
+namespace ProjectShop.Server.Core.Interfaces.IServices._IBase
 {
     public interface IBaseHelperReturnTEntityService<TCurrentCall> where TCurrentCall : class
     {
