@@ -69,10 +69,10 @@ export async function getCurrentAccount(navigation: AccountNavigationOptions) : 
      }
 }
 
-export async function forgotPassword(form: UIForgotPasswordData) : Promise<ServiceResult<string>> {
+export async function forgotPassword(form: UIForgotPasswordData) : Promise<JsonLogEntry> {
      try {
           const response = await axios.post('https://localhost:5294/api/accountservices/forgot-password', form);
-          return response.data as ServiceResult<string>;
+          return response.data as JsonLogEntry;
      } catch (error) {
           throw new Error('Forgot password request failed', error as { cause?: Error } | undefined);
      }

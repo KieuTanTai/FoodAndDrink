@@ -7,26 +7,25 @@ import { signup } from '../../api/authApi';
 import type { UISignupData } from '../../ui-types/signup';
 import { useMessageModalProvider } from '../../hooks/use-message-modal-context';
 import type { AccountModel } from '../../models/account-model';
-import type { ServiceResult } from '../../value-objects/service-result';
 
-function SignupForm({ onSignupSuccess }: SignupFormProps) {
+function SignupForm({ onSuccess }: SignupFormProps) {
      const { showMessage } = useMessageModalProvider();
      const { formData, isSubmitting, userNameErrorMessage, passwordErrorMessage, handleChange, handleSubmit, handleCopy }
           = UseForm(
                { email: "", password: "", confirmPassword: "" },
-               async (data: UISignupData) => {
+               async (data: UISignupData) : Promise<AccountModel> => {
                     try {
                          const result = await signup(data);
                          if (!(result instanceof Array) && result.data && result.data.userName !== "") {
-                              onSignupSuccess();
+                              onSuccess();
                               showMessage("Đăng ký thành công! Vui lòng đăng nhập.", "success");
-                              return result;
+                              return result.data;
                          }
                          else if (result instanceof Array)
                               showMessage(result[0].message ?? "lỗi khi đăng kí, kiểm tra lại thông tin ", "error");
                          else 
                               showMessage("lỗi khi đăng kí, vui lòng thử lại!", "error");
-                         return {} as ServiceResult<AccountModel>;
+                         return {} as AccountModel;
                     } catch (error) {
                          if (error instanceof Error)
                               throw new Error(error.message);
@@ -112,7 +111,7 @@ function SignupForm({ onSignupSuccess }: SignupFormProps) {
                                    disabled={isSubmitting}
                                    value={formData.confirmPassword}
                                    onCopy={handleCopy}
-                                   onChange={(e) => handleChange(e, false, true)}
+                                   onChange={(e) => handleChange(e, false, false)}
                                    className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none"
                               />
                          </div>

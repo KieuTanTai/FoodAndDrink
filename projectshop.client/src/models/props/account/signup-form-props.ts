@@ -1,3 +1,3 @@
 export default interface SignupFormProps {
-    onSignupSuccess: () => void;
+    onSuccess: () => void;
 }

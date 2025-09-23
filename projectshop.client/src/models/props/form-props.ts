@@ -1,7 +1,6 @@
 import type { ChangeEvent, FormEvent } from "react";
-import type { ServiceResult } from "../../value-objects/service-result";
 
-export default interface FormPropsHandler<T, TBackEndEntity> {
+export default interface FormPropsHandler<T, TReturnEntity> {
     formData: T;
     isSubmitting: boolean;
     userNameErrorMessage?: string;
@@ -13,6 +12,6 @@ export default interface FormPropsHandler<T, TBackEndEntity> {
         isCheckPasswordValid?: boolean,
         isCheckbox?: boolean
     ) => boolean;
-    handleSubmit: (e: FormEvent<Element>) => ServiceResult<TBackEndEntity> | Promise<ServiceResult<TBackEndEntity>>;
+    handleSubmit: (e: FormEvent<Element>) => TReturnEntity | Promise<TReturnEntity>;
     handleCopy: (e: FormEvent<Element>) => void;
 }

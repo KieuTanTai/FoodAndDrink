@@ -19,6 +19,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+body.modal-open {
+  overflow: hidden;
+  padding-right: 15px; /* Giữ khoảng cách cho scrollbar */
+}
+
 .main-color {
   color: var(--main-color);
 }

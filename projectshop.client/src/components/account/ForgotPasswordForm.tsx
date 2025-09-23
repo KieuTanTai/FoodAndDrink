@@ -1,102 +1,61 @@
-import React, { useState, type FormEvent } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faArrowLeft, faKey, faLock } from "@fortawesome/free-solid-svg-icons";
+import UseForm from "../../hooks/use-auth";
+import { forgotPassword } from "../../api/authApi";
+import { useMessageModalProvider } from "../../hooks/use-message-modal-context";
+import type { UIForgotPasswordData } from "../../ui-types/forgot-password";
+import type { JsonLogEntry } from "../../value-objects/json-log-entry";
+import { useState } from "react";
 
-interface ForgotPasswordFormProps {
-    onBackToLogin: () => void;
-}
+function ForgotPasswordForm({ onForgotPasswordSuccess, onBackToLogin }: { onForgotPasswordSuccess: () => void, onBackToLogin: () => void }) {
+    const { showMessage } = useMessageModalProvider();
+    const [sent, setSent] = useState(false);
+    const [sendingCode, setSendingCode] = useState(false);
+    const [codeSent, setCodeSent] = useState(false);
+    const [verifying, setVerifying] = useState(false);
+    const [canResetPassword, setCanResetPassword] = useState(false);
+    const [verifyErrorMsg, setVerifyErrorMsg] = useState("");
+    const [resetErrorMsg, setResetErrorMsg] = useState("");
 
-// Giả lập API
-async function mockSendVerifyCode(email: string): Promise<boolean> {
-    await new Promise((r) => setTimeout(r, 600));
-    return /\S+@\S+\.\S+/.test(email);
-}
-async function mockVerifyCode(_email: string, code: string): Promise<boolean> {
-    await new Promise((r) => setTimeout(r, 600));
-    return code === "123456";
-}
-async function mockResetPassword(_email: string, newPassword: string): Promise<boolean> {
-    await new Promise((r) => setTimeout(r, 600));
-    return newPassword.length >= 6;
-}
+    const { formData, isSubmitting, userNameErrorMessage, passwordErrorMessage, handleChange, handleSubmit, handleCopy }
+        = UseForm(
+            { email: "", verifyCode: '', newPassword: "", confirmNewPassword: "" },
+            async (data: UIForgotPasswordData) : Promise<JsonLogEntry> => {
+                try {
+                    const result = await forgotPassword(data);
+                    if (!(result instanceof Array) && result.errorName === "" && result.errorMessage === "") {
+                        onForgotPasswordSuccess();
+                        showMessage("Đăng ký thành công! Vui lòng đăng nhập.", "success");
+                        return result;
+                    }
+                    else if (result instanceof Array)
+                        showMessage(result[0].message ?? "lỗi khi đăng kí, kiểm tra lại thông tin ", "error");
+                    else
+                        showMessage("lỗi khi đăng kí, vui lòng thử lại!", "error");
+                    return {} as JsonLogEntry;
+                } catch (error) {
+                    if (error instanceof Error)
+                        throw new Error(error.message);
+                    else
+                        throw new Error('An unknown error occurred during submission.');
+                }
+            }
+        )
 
-const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackToLogin }) => {
-    const [email, setEmail] = useState<string>("");
-    const [verifyCode, setVerifyCode] = useState<string>("");
-    const [codeSent, setCodeSent] = useState<boolean>(false);
-    const [sendingCode, setSendingCode] = useState<boolean>(false);
-    const [canResetPassword, setCanResetPassword] = useState<boolean>(false);
-    const [verifying, setVerifying] = useState<boolean>(false);
-
-    const [newPassword, setNewPassword] = useState<string>("");
-    const [confirmPassword, setConfirmPassword] = useState<string>("");
-
-    const [sent, setSent] = useState<boolean>(false);
-    const [errorMsg, setErrorMsg] = useState<string>("");
-    const [verifyErrorMsg, setVerifyErrorMsg] = useState<string>("");
-    const [resetErrorMsg, setResetErrorMsg] = useState<string>("");
-
-    const handleSendCode = async () => {
-        setErrorMsg("");
-        if (!email || !/\S+@\S+\.\S+/.test(email)) {
-            setErrorMsg("Vui lòng nhập email hợp lệ.");
-            return;
-        }
-        setSendingCode(true);
-        const result = await mockSendVerifyCode(email.trim());
-        setSendingCode(false);
-        if (result) {
-            setCodeSent(true);
-        } else {
-            setErrorMsg("Không thể gửi mã xác thực. Vui lòng thử lại.");
-        }
-    };
-
-    const handleVerifyCode = async () => {
-        setVerifyErrorMsg("");
-        setVerifying(true);
-        const result = await mockVerifyCode(email.trim(), verifyCode.trim());
-        setVerifying(false);
-        if (result) {
-            setCanResetPassword(true);
-        } else {
-            setVerifyErrorMsg("Mã xác thực không đúng.");
-        }
-    };
-
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setResetErrorMsg("");
-        if (!canResetPassword) return;
-        if (!newPassword || newPassword.length < 6) {
-            setResetErrorMsg("Mật khẩu mới phải có ít nhất 6 ký tự.");
-            return;
-        }
-        if (newPassword !== confirmPassword) {
-            setResetErrorMsg("Mật khẩu xác nhận không khớp.");
-            return;
-        }
-        const ok = await mockResetPassword(email.trim(), newPassword);
-        if (ok) {
-            setSent(true);
-        } else {
-            setResetErrorMsg("Đổi mật khẩu thất bại. Thử lại!");
-        }
-    };
 
     return (
-        <div className="mx-auto flex max-w-[75rem] flex-col items-center justify-center p-4 lg:px-0"
+        <div className="mx-auto flex max-w-[75rem] flex-col items-center justify-center lg:px-0"
             style={{ gridTemplateColumns: "1fr minmax(0, 400px) 1fr" }}>
             <div></div>
-            <div className="w-full max-w-lg space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-lg">
-                <button
+            <div className="w-full max-w-lg space-y-6 rounded-xl bg-white p-8 shadow-lg">
+                {/* <button
                     type="button"
                     onClick={onBackToLogin}
-                    className="main-color mb-4 flex items-center bg-transparent! text-sm"
+                    className="main-color mb-4 flex items-center bg-transparent! text-sm!"
                 >
                     <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
                     Quay lại đăng nhập
-                </button>
+                </button> */}
                 <div className="text-center">
                     <h2 className="text-2xl font-bold text-gray-900">Quên mật khẩu?</h2>
                     <p className="mt-2 text-sm text-gray-500">
@@ -125,14 +84,8 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackToLogin }
                                     autoComplete="email"
                                     required
                                     placeholder="Nhập email đã đăng ký"
-                                    value={email}
-                                    onChange={(e) => {
-                                        setEmail(e.target.value);
-                                        setSent(false);
-                                        setCodeSent(false);
-                                        setVerifyCode("");
-                                        setCanResetPassword(false);
-                                    }}
+                                    value={formData.email}
+                                    onChange= {(e) => handleChange(e, true)}
                                     className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none"
                                     disabled={sendingCode || codeSent}
                                 />
@@ -153,11 +106,8 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackToLogin }
                                         name="verify_code"
                                         type="text"
                                         placeholder="Mã xác thực"
-                                        value={verifyCode}
-                                        onChange={(e) => {
-                                            setVerifyCode(e.target.value);
-                                            setVerifyErrorMsg("");
-                                        }}
+                                        value={formData.verifyCode}
+                                        onChange={(e) => handleChange(e)}
                                         className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none"
                                         disabled={!codeSent || canResetPassword}
                                         required
@@ -166,8 +116,8 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackToLogin }
                             </div>
                             <button
                                 type="button"
-                                onClick={handleSendCode}
-                                disabled={!email || !/\S+@\S+\.\S+/.test(email) || sendingCode || codeSent}
+                                    onClick={() => { }}
+                                disabled={!formData.email || !/\S+@\S+\.\S+/.test(formData.email) || sendingCode || codeSent}
                                 className="rounded-lg text-sm font-medium shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 {sendingCode ? "Đang gửi..." : codeSent ? "Đã gửi" : "Gửi mã"}
@@ -178,8 +128,8 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackToLogin }
                             <div className="flex items-center gap-2">
                                 <button
                                     type="button"
-                                    onClick={handleVerifyCode}
-                                    disabled={!verifyCode || verifying}
+                                        onClick={() => { }}
+                                    disabled={!formData.verifyCode || verifying}
                                     className="bg-green-500 hover:bg-green-600"
                                     style={{ color: "white", minWidth: 120 }}
                                 >
@@ -191,11 +141,11 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackToLogin }
                             </div>
                         )}
                         {/* Error */}
-                        {errorMsg && (
+                        {/* {errorMsg && (
                             <div className="mt-1 h-4 text-xs text-red-500">
                                 {errorMsg}
                             </div>
-                        )}
+                        )} */}
                         {/* Đặt lại mật khẩu */}
                         <div className="space-y-2">
                             <div className="relative">
@@ -207,8 +157,8 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackToLogin }
                                     name="new_password"
                                     type="password"
                                     placeholder="Mật khẩu mới"
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    value={formData.newPassword}
+                                    onChange={(e) => handleChange(e, false, true)}
                                     disabled={!canResetPassword}
                                     className={`w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none
                                         ${!canResetPassword ? "bg-gray-100 text-gray-400 cursor-not-allowed" : ""}`}
@@ -224,8 +174,8 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackToLogin }
                                     name="confirm_password"
                                     type="password"
                                     placeholder="Xác nhận mật khẩu mới"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    value={formData.confirmNewPassword}
+                                    onChange={(e) => handleChange(e)}
                                     disabled={!canResetPassword}
                                     className={`w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none
                                         ${!canResetPassword ? "bg-gray-100 text-gray-400 cursor-not-allowed" : ""}`}
@@ -255,6 +205,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackToLogin }
                                     background: !canResetPassword ? "#e5e7eb" : "var(--main-color)",
                                     transition: "border-color 0.25s"
                                 }}
+                                onClick={handleSubmit}
                             >
                                 Đặt lại mật khẩu
                             </button>

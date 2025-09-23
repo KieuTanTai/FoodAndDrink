@@ -1,10 +1,8 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import type FormPropsHandler from "../models/props/form-props";
-import type { ServiceResult } from "../value-objects/service-result";
 import { isValidEmail, isValidPassword } from "../helpers/is-valid-input";
-import type { AccountModel } from "../models/account-model";
 
-function UseForm<T extends object, TBackEndEntity extends AccountModel>(initialData: T, onSubmit: (data: T) => Promise<ServiceResult<TBackEndEntity>>)
+function UseForm<T extends object, TBackEndEntity, TReturnEntity extends TBackEndEntity>(initialData: T, onSubmit: (data: T) => Promise<TReturnEntity>)
 : FormPropsHandler<T, TBackEndEntity> {
     const[formData, setFormData] = useState<T>(initialData);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -39,7 +37,7 @@ function UseForm<T extends object, TBackEndEntity extends AccountModel>(initialD
         return true;
     }
 
-    const handleSubmit = async (event: FormEvent): Promise<ServiceResult<TBackEndEntity>> => {
+    const handleSubmit = async (event: FormEvent): Promise<TReturnEntity> => {
         event.preventDefault();
         setIsSubmitting(true);
         setUserNameErrorMessage("");
@@ -55,7 +53,7 @@ function UseForm<T extends object, TBackEndEntity extends AccountModel>(initialD
             else
                 setPasswordErrorMessage('An unknown error occurred during submission.');
             // Return a failed ServiceResult<TBackEndEntity> object
-            return {} as ServiceResult<TBackEndEntity>;
+            return {} as TReturnEntity;
         } finally {
             setIsSubmitting(false);
         }

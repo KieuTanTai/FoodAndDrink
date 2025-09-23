@@ -1,13 +1,15 @@
 import Modal from "react-modal";
 import SignupForm from "../../components/account/SignupForm";
-import type SignupModalProps from "../props/signup-modal-props/signup-modal-props";
+import type { BaseAccountModalProps } from "../props/account-props/base-account-modal-props";
+import useFixedScrollbarCompensate from "../../hooks/use-scrollbar-compensate";
 
-function SignupModal({ isOpen, onRequestClose, onSignupSuccess }: SignupModalProps) {
+function SignupModal({ isOpen, onRequestClose, onSuccess }: BaseAccountModalProps) {
+     useFixedScrollbarCompensate(isOpen);
      return (
           <Modal
                isOpen={isOpen}
                onRequestClose={onRequestClose}
-               contentLabel="Login Form"
+               contentLabel="Signup Form"
                overlayClassName="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]"
                className="relative bg-white rounded-xl min-w-[350px] shadow-lg flex flex-col"
                bodyOpenClassName="overflow-hidden"
@@ -19,7 +21,7 @@ function SignupModal({ isOpen, onRequestClose, onSignupSuccess }: SignupModalPro
                >
                     X
                </button>
-               <SignupForm onSignupSuccess={onSignupSuccess} />
+               <SignupForm onSuccess={onSuccess} />
           </Modal>
      );
 }

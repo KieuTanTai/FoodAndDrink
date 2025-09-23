@@ -1,35 +1,44 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCircle, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faUserCircle, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle as faGoogleBrand, faFacebook as faFacebookBrand } from '@fortawesome/free-brands-svg-icons';
 import UseForm from '../../hooks/use-auth';
 import { login } from '../../api/authApi';
 import type { UILoginData } from '../../ui-types/login';
-import type { ServiceResult } from '../../value-objects/service-result';
 import type { AccountModel } from '../../models/account-model';
 import type LoginFormProps from '../../models/props/account/login-form-props';
 import { useMessageModalProvider } from '../../hooks/use-message-modal-context';
+import { useState } from 'react';
 
-function LoginForm({ onLoginSuccess }: LoginFormProps) {
+function LoginForm({ onSuccess }: LoginFormProps) {
+
+     const [showPassword, setShowPassword] = useState(false);
      const { showMessage } = useMessageModalProvider();
-     const { formData, handleChange, handleSubmit, isSubmitting, userNameErrorMessage, passwordErrorMessage, handleCopy } = UseForm(
+     const { formData, handleChange, handleSubmit, isSubmitting, userNameErrorMessage, passwordErrorMessage, handleCopy }
+          = UseForm(
           { email: "", password: "", rememberMe: false },
-          async (data: UILoginData) => {
+          async (data: UILoginData): Promise<AccountModel> => {
                try {
                     const result = await login(data, { isGetCustomer: true });
 
-                    if (result.data && result.data.userName !== "")
-                         onLoginSuccess(result.data);
-                    else
+                    if (result.data && result.data.userName !== "") {
+                         onSuccess(result.data);
+                         return result.data;
+                    } else {
                          showMessage("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.", "error");
-                    return result;
+                         return {} as AccountModel;
+                    }
                } catch (error) {
                     if (error instanceof Error)
                          showMessage(`Đăng nhập thất bại: ${error.message}`, "error");
                     else
                          showMessage('Đăng nhập thất bại: Đã xảy ra lỗi không xác định.', "error");
-                    return {} as ServiceResult<AccountModel>;
+                    return {} as AccountModel;
                }
           });
+
+     const toggleShowPassword = () => {
+          setShowPassword(!showPassword);
+     };
 
      return (
           <div className="w-full max-w-lg space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-lg" id="login-form-container">
@@ -72,7 +81,7 @@ function LoginForm({ onLoginSuccess }: LoginFormProps) {
                               <input
                                    id="login-password"
                                    name="password"
-                                   type="password"
+                                   type={showPassword ? "text" : "password"}
                                    autoComplete="current-password"
                                    required
                                    placeholder="Mật khẩu"
@@ -82,6 +91,19 @@ function LoginForm({ onLoginSuccess }: LoginFormProps) {
                                    onCopy={handleCopy}
                                    className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none"
                               />
+                              {/* Nút show/hide password */}
+                              <button
+                                   type="button"
+                                   onClick={toggleShowPassword}
+                                   tabIndex={-1}
+                                   aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                                   className="absolute inset-y-0 right-0 flex items-center px-3 focus:outline-none bg-transparent!"
+                              >
+                                   <FontAwesomeIcon
+                                        icon={showPassword ? faEyeSlash : faEye}
+                                        className="text-gray-400 hover:text-gray-500"
+                                   />
+                              </button>
                          </div>
                          <div className="mt-1 h-4 text-xs text-red-500" id="login-pass-error-msg">
                               {passwordErrorMessage}

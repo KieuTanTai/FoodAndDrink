@@ -6,11 +6,14 @@ import SignupModal from "../modal/account/SignupModal";
 import type { AccountModel } from "../models/account-model";
 import { getCurrentAccount, logout } from "../api/authApi";
 import { useMessageModalProvider } from "../hooks/use-message-modal-context";
+import ForgotPasswordModal from "../modal/account/ForgotPasswordModal";
 function HeaderAccount() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [currentAccount, setCurrentAccount] = useState<AccountModel | null>(null);
   const [signupOpen, setSignupOpen] = useState(false);
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const { showMessage } = useMessageModalProvider();
+  console.log()
 
   useEffect(() => {
     async function fetchAccount() {
@@ -61,7 +64,7 @@ function HeaderAccount() {
       if (currentAccount.customer && currentAccount.customer.name !== "")
         return currentAccount.customer.name;
       else
-        return "unknown name";
+        return currentAccount.userName;
     }
     return "Tài khoản";
   };
@@ -88,6 +91,11 @@ function HeaderAccount() {
               onClick={() => setSignupOpen(true)}>
               Đăng kí
             </button>
+
+            <button className="py-2 px-4 flex items-center justify-center text-left rounded-md font-medium"
+              onClick={() => setForgotPasswordOpen(true)}>
+              Quên mật khẩu
+            </button>
           </div>
 
           <button className="py-2 px-4 items-center justify-center text-left rounded-md hidden font-medium bg-red-300! text-black!"
@@ -102,7 +110,7 @@ function HeaderAccount() {
       <LoginModal
         isOpen={loginOpen}
         onRequestClose={() => setLoginOpen(false)}
-        onLoginSuccess={(account) => {
+        onSuccess={(account) => {
           setCurrentAccount(account);
           showMessage(`Đăng nhập thành công! ${account.customer?.name}`, "success");
           setLoginOpen(false);
@@ -111,8 +119,16 @@ function HeaderAccount() {
       {/* Signup Modal */}
       <SignupModal isOpen={signupOpen}
         onRequestClose={() => setSignupOpen(false)}
-        onSignupSuccess={() => handleSignup()}
+        onSuccess={() => handleSignup()}
       />
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal isOpen={forgotPasswordOpen}
+        onRequestClose={() => setForgotPasswordOpen(false)}
+        onSuccess={() => {
+          setForgotPasswordOpen(false);
+          setLoginOpen(true);
+          showMessage("Đặt lại mật khẩu thành công! Vui lòng đăng nhập.", "success");
+        }} />
     </div>
   );
 }
