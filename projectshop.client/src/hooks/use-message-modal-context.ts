@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { MessageModalContext } from "../context/MessageModalContext";
+import { MessageModalContext } from "../context/message/messageModalContext";
 
 export function useMessageModalProvider() {
     const context = useContext(MessageModalContext);

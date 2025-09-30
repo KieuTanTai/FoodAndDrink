@@ -83,12 +83,22 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("by-username")]
-        public async Task<IActionResult> GetByUserNameAsync([FromQuery] string userName, [FromQuery] AccountNavigationOptions? options)
+        public async Task<IActionResult> GetByUserNameAsync([FromQuery] string userName, [FromQuery] bool isCheckExisted, [FromQuery] AccountNavigationOptions? options)
         {
+            if (string.IsNullOrEmpty(userName))
+            {
+                _logger.LogWarning("Username parameter is null or empty.");
+                return BadRequest("Username parameter is required.");
+            }
             try
             {
                 var result = await _searchAccountServices.GetByUserNameAsync(userName, options);
-                return Ok(result);
+                if (result == null || result.Data == null)
+                {
+                    _logger.LogWarning($"Account with username {userName} not found.");
+                    return NotFound($"Account with username {userName} not found.");
+                }
+                return Ok(isCheckExisted ? result.IsSuccess : result);
             }
             catch (Exception ex)
             {

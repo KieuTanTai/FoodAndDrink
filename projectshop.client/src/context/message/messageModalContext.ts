@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import type { MessageType } from "../modal/props/popup-message/message-modal-props";
+import type { MessageType } from "../../modal/props/popup-message/message-modal-props";
 
 export type MessageModalContextType = {
     showMessage: (
@@ -10,7 +10,7 @@ export type MessageModalContextType = {
 };
 
 export const defaultMessageModalContext: MessageModalContextType = {
-    showMessage: () => { },
+    showMessage: () => { }
 };
 
 export const MessageModalContext = createContext<MessageModalContextType>(defaultMessageModalContext);

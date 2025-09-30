@@ -1,9 +1,9 @@
-import {  useCallback, useState, type ReactNode } from "react";
-import type { MessageType } from "../modal/props/popup-message/message-modal-props";
-import { isMessageTimeoutRule, readCustomRuleMessageTimeout } from "../helpers/read-rules-json";
-import { MessageModal } from "../modal/message/PopupMessage";
+import { useCallback, useState, type ReactNode } from "react";
+import type { MessageType } from "../../modal/props/popup-message/message-modal-props";
+import { isMessageTimeoutRule, readCustomRuleMessageTimeout } from "../../helpers/read-rules-json";
+import { MessageModal } from "../../modal/message/PopupMessage";
 
-import { MessageModalContext } from "./MessageModalContext";
+import { MessageModalContext } from "./messageModalContext";
 
 const getTimeoutValue = async () => {
     const result = await readCustomRuleMessageTimeout();

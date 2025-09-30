@@ -198,7 +198,7 @@ public class AccountRoleServicesController : ControllerBase
         }
     }
 
-    // Thêm 1 account role (gán 1 role cho 1 account)
+    // Thï¿½m 1 account role (gï¿½n 1 role cho 1 account)
     [HttpPost]
     public async Task<IActionResult> AddAccountRoleAsync([FromBody] RolesOfUserKey keys)
     {
@@ -214,7 +214,7 @@ public class AccountRoleServicesController : ControllerBase
         }
     }
 
-    // Thêm nhi?u account role (gán nhi?u role cho nhi?u account)
+    // Thï¿½m nhi?u account role (gï¿½n nhi?u role cho nhi?u account)
     [HttpPost("batch")]
     public async Task<IActionResult> AddAccountRolesAsync([FromBody] IEnumerable<RolesOfUserModel> entities)
     {
@@ -230,7 +230,7 @@ public class AccountRoleServicesController : ControllerBase
         }
     }
 
-    // Xóa 1 account role theo composite key
+    // Xï¿½a 1 account role theo composite key
     [HttpDelete]
     public async Task<IActionResult> DeleteAccountRoleAsync([FromBody] RolesOfUserKey keys)
     {
@@ -246,7 +246,7 @@ public class AccountRoleServicesController : ControllerBase
         }
     }
 
-    // Xóa nhi?u account role theo danh sách key
+    // Xï¿½a nhi?u account role theo danh sï¿½ch key
     [HttpDelete("batch")]
     public async Task<IActionResult> DeleteAccountRolesAsync([FromBody] IEnumerable<RolesOfUserKey> listKeys)
     {
@@ -262,7 +262,7 @@ public class AccountRoleServicesController : ControllerBase
         }
     }
 
-    // Xóa t?t c? role c?a 1 account
+    // Xï¿½a t?t c? role c?a 1 account
     [HttpDelete("by-account-id/{accountId}")]
     public async Task<IActionResult> DeleteByAccountIdAsync([FromRoute] int accountId)
     {
@@ -278,7 +278,7 @@ public class AccountRoleServicesController : ControllerBase
         }
     }
 
-    // Xóa t?t c? role c?a nhi?u account
+    // Xï¿½a t?t c? role c?a nhi?u account
     [HttpDelete("by-account-ids")]
     public async Task<IActionResult> DeleteByAccountIdsAsync([FromBody] IEnumerable<uint> accountIds)
     {
@@ -294,7 +294,7 @@ public class AccountRoleServicesController : ControllerBase
         }
     }
 
-    // Xóa t?t c? account c?a 1 role
+    // Xï¿½a t?t c? account c?a 1 role
     [HttpDelete("by-role-id/{roleId}")]
     public async Task<IActionResult> DeleteByRoleIdAsync([FromRoute] int roleId)
     {
@@ -310,7 +310,7 @@ public class AccountRoleServicesController : ControllerBase
         }
     }
 
-    // Xóa t?t c? account c?a nhi?u role
+    // Xï¿½a t?t c? account c?a nhi?u role
     [HttpDelete("by-role-ids")]
     public async Task<IActionResult> DeleteByRoleIdsAsync([FromBody] IEnumerable<uint> roleIds)
     {

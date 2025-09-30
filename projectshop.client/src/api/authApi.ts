@@ -69,6 +69,20 @@ export async function getCurrentAccount(navigation: AccountNavigationOptions) : 
      }
 }
 
+export async function checkExistedByEmail(email: string): Promise<boolean> {
+     try {
+          const response = await axios.get('https://localhost:5294/api/accountservices/by-username',
+               { params: { userName: email, isCheckExisted: true } });
+          if (response && response.status)
+               return true;
+          return false;
+     } catch (error) {
+          if (error instanceof Error)
+               console.error(error.message);
+          return false;
+     }
+}
+
 export async function forgotPassword(form: UIForgotPasswordData) : Promise<JsonLogEntry> {
      try {
           const response = await axios.post('https://localhost:5294/api/accountservices/forgot-password', form);
