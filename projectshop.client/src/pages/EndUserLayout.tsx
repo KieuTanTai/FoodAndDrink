@@ -2,8 +2,10 @@ import Footer from "../components/FooterComponents";
 import Header from "../components/HeaderComponents";
 import ProductContainer from "../components/ProductContainer";
 import SaleEventBlock from "../components/saleEvent/SaleEventBlock";
+import SaleEventMainSlider from "../components/saleEvent/SaleEventMainSlider";
+import SaleEventSideSlider from "../components/saleEvent/SaleEventSideSlider";
 import SubHeader from "../components/SubHeader";
-import { AbsoluteArrowNavigationProvider } from "../context/absoluteArrow/AbsoluteArrowNavigationProvider";
+import { AbsoluteArrowNavigationProvider } from "../contexts/absoluteArrow/AbsoluteArrowNavigationProvider";
 import type { SaleEventItemProps } from "../models/props/sale_events/sale-event-item-props";
 
 // mock test view
@@ -38,8 +40,8 @@ const sideEvents: SaleEventItemProps[] = [
         image: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=400",
         time: "24-09-2025 19:00",
     },
-// ... thêm event khác
-  ];
+    // ... thêm event khác
+];
 
 function EndUserLayout() {
 
@@ -51,10 +53,20 @@ function EndUserLayout() {
             </header>
 
             <main id="main-content">
-                // TODO: CREATE PROVIDER AND FIX BUG HERE
-                <AbsoluteArrowNavigationProvider value={{ isHaveSideEvent: true, mainSaleEvents: mainEvents, sideSaleEvents: sideEvents }}>
-                    <SaleEventBlock mainSaleEvents={mainEvents} sideSaleEvents={sideEvents} />
-                </AbsoluteArrowNavigationProvider>
+                <SaleEventBlock
+                    mainBlock={
+                        <AbsoluteArrowNavigationProvider value={{ saleEventItems: mainEvents }}>
+                            <SaleEventMainSlider events={mainEvents} /> 
+                        </AbsoluteArrowNavigationProvider>
+                    }
+                    sideBlock={
+                        <AbsoluteArrowNavigationProvider value={{ saleEventItems: sideEvents }}>
+                            <SaleEventSideSlider saleEventItems={sideEvents} /> 
+                        </AbsoluteArrowNavigationProvider>
+                    }
+                />
+                {/* Product Container */}
+                {/* Repeat ProductContainer as needed */}
                 <ProductContainer
                     id="temp1-products"
                     title="Featured Products"
@@ -82,7 +94,7 @@ function EndUserLayout() {
                         }
                     ]}
                 />
-                
+
                 <ProductContainer
                     id="temp2-products"
                     title="Featured Products"

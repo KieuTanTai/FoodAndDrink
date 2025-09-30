@@ -1,7 +1,7 @@
 import Modal from "react-modal";
-import SignupForm from "../../components/account/SignupForm";
-import type { BaseAccountModalProps } from "../props/account-props/base-account-modal-props";
-import useFixedScrollbarCompensate from "../../hooks/use-scrollbar-compensate";
+import SignupForm from "../../../components/account/SignupForm";
+import type { BaseAccountModalProps } from "../../props/account-props/base-account-modal-props";
+import useFixedScrollbarCompensate from "../../../hooks/use-scrollbar-compensate";
 
 function SignupModal({ isOpen, onRequestClose, onSuccess }: BaseAccountModalProps) {
      useFixedScrollbarCompensate(isOpen);

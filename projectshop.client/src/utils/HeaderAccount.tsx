@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
-import LoginModal from "../modal/account/LoginModal";
-import SignupModal from "../modal/account/SignupModal";
+import LoginModal from "../modal/components/account/LoginModal";
+import SignupModal from "../modal/components/account/SignupModal";
 import type { AccountModel } from "../models/account-model";
 import { getCurrentAccount, logout } from "../api/authApi";
 import { useMessageModalProvider } from "../hooks/use-message-modal-context";
-import ForgotPasswordModal from "../modal/account/ForgotPasswordModal";
+import ForgotPasswordModal from "../modal/components/account/ForgotPasswordModal";
 function HeaderAccount() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [currentAccount, setCurrentAccount] = useState<AccountModel | null>(null);
@@ -110,7 +110,7 @@ function HeaderAccount() {
       <LoginModal
         isOpen={loginOpen}
         onRequestClose={() => setLoginOpen(false)}
-        onSuccess={(account) => {
+        onSuccess={(account: AccountModel) => {
           setCurrentAccount(account);
           showMessage(`Đăng nhập thành công! ${account.customer?.name}`, "success");
           setLoginOpen(false);

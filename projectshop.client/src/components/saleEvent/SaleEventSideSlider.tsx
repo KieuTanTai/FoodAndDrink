@@ -1,13 +1,17 @@
 import type { SaleEventItemsProps } from "../../models/props/sale_events/sale-event-items-props";
-import AbsoluteArrowNavigationModal from "../../modal/arrowNavigation/AbsoluteArrowNavigationModal";
+import AbsoluteArrowNavigationModal from "../../modal/components/arrowNavigation/AbsoluteArrowNavigationModal";
 import { useContext } from "react";
-import { AbsoluteArrowNavigationContext } from "../../context/absoluteArrow/absoluteArrowNavigationContext";
+import { AbsoluteArrowNavigationContext } from "../../contexts/absoluteArrow/absoluteArrowNavigationContext";
+import DotNavigationModal from "../../modal/components/dots/DotNavigationModal";
 
-function SaleEventSideSlider({ events }: SaleEventItemsProps) {
+function SaleEventSideSlider({ saleEventItems }: SaleEventItemsProps) {
+  const context = useContext(AbsoluteArrowNavigationContext);
+  if (!context) {
+    return null;
+  }
+  const { current, setCurrent, handleSlideNext, handleSlidePrev } = context;
 
-  const [current, setCurrent] = useState(0);
-
-  const event = events[current];
+  const event = saleEventItems[current];
   console.log(`[Slider] Hiển thị sự kiện: ${event.title}, index: ${current}`);
 
   return (
@@ -25,9 +29,17 @@ function SaleEventSideSlider({ events }: SaleEventItemsProps) {
             <span className="text-yellow-300 text-xs mt-1">{event.time}</span>
           )}
           <AbsoluteArrowNavigationModal
-            onNext={() => handleNextNavigation(current)}
-            onPrev={() => handlePrevNavigation(current)}
+            onNext={() => handleSlideNext(current)}
+            onPrev={() => handleSlidePrev(current)}
           />
+          {/* Dot navigation */}
+          <div className="flex justify-center gap-2 mt-2 absolute right-0 bottom-2 w-full">
+            <DotNavigationModal
+              current={current}
+              length={saleEventItems.length}
+              setCurrent={setCurrent}
+            />
+          </div>
         </div>
       </div>
     </div>

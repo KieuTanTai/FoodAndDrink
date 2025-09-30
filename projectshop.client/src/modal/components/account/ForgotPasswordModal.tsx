@@ -1,7 +1,7 @@
 import Modal from "react-modal";
-import type { BaseAccountModalProps } from "../props/account-props/base-account-modal-props";
-import ForgotPasswordForm from "../../components/account/ForgotPasswordForm";
-import useFixedScrollbarCompensate from "../../hooks/use-scrollbar-compensate";
+import type { BaseAccountModalProps } from "../../props/account-props/base-account-modal-props";
+import ForgotPasswordForm from "../../../components/account/ForgotPasswordForm";
+import useFixedScrollbarCompensate from "../../../hooks/use-scrollbar-compensate";
 
 function ForgotPasswordModal({ isOpen, onRequestClose, onSuccess }: BaseAccountModalProps) {
     useFixedScrollbarCompensate(isOpen);

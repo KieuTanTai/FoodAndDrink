@@ -1,6 +1,6 @@
 ﻿import React, { useState } from "react";
-import ForgotPasswordForm from "../components/account/ForgotPasswordForm";
 import LoginPage from "./LoginPage";
+import ForgotPasswordForm from "../components/account/ForgotPasswordForm";
 
 const ForgotPasswordPage: React.FC = () => {
     const [showLogin, setShowLogin] = useState(false);

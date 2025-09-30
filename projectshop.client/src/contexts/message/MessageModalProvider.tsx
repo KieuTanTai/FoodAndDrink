@@ -1,7 +1,7 @@
 import { useCallback, useState, type ReactNode } from "react";
 import type { MessageType } from "../../modal/props/popup-message/message-modal-props";
 import { isMessageTimeoutRule, readCustomRuleMessageTimeout } from "../../helpers/read-rules-json";
-import { MessageModal } from "../../modal/message/PopupMessage";
+import { MessageModal } from "../../modal/components/message/PopupMessage";
 
 import { MessageModalContext } from "./messageModalContext";
 
