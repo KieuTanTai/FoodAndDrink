@@ -1,21 +1,23 @@
 // import Cookies from 'js-cookie';
-import type { UILoginData } from '../ui-types/login';
-import type { UISignupData } from '../ui-types/signup';
+import type { UILoginData } from '../ui-props/accounts/login';
+import type { UISignupData } from '../ui-props/accounts/signup';
 import type { AccountModel } from '../models/account-model';
-import type { UIForgotPasswordData } from '../ui-types/forgot-password';
+import type { UIForgotPasswordData } from '../ui-props/accounts/forgot-password';
 import type { ServiceResult } from '../value-objects/service-result';
 import type { AccountNavigationOptions } from '../value-objects/get-navigation-property-options/account-navigation-options';
 import { InvalidValueError } from '../value-objects/custom-error/invalidValueError';
 import type { JsonLogEntry } from '../value-objects/json-log-entry';
 import axios, { isAxiosError, type AxiosResponse } from 'axios';
 
-export async function login(form: UILoginData, navigation: AccountNavigationOptions) : Promise<ServiceResult<AccountModel>> {
+export async function login(form: UILoginData, navigation: AccountNavigationOptions): Promise<ServiceResult<AccountModel>> {
      try {
-          const response = await axios.post('https://localhost:5294/api/accountservices/login', form, {params: {
-               isGetEmployee: navigation.isGetEmployee,
-               isGetCustomer: navigation.isGetCustomer,
-               isGetRolesOfUsers: navigation.isGetRolesOfUsers,
-          }, withCredentials: form.rememberMe});
+          const response = await axios.post('https://localhost:5294/api/accountservices/login', form, {
+               params: {
+                    isGetEmployee: navigation.isGetEmployee,
+                    isGetCustomer: navigation.isGetCustomer,
+                    isGetRolesOfUsers: navigation.isGetRolesOfUsers,
+               }, withCredentials: form.rememberMe
+          });
           const result = response.data as ServiceResult<AccountModel>;
           console.log(result);
           // setCookie(result);
@@ -30,7 +32,7 @@ export async function login(form: UILoginData, navigation: AccountNavigationOpti
 export async function signup(form: UISignupData): Promise<ServiceResult<AccountModel> | JsonLogEntry[]> {
      try {
           const sendData = { Email: form.email, Password: form.password };
-          const response: AxiosResponse< ServiceResult<AccountModel>> = await axios.post(
+          const response: AxiosResponse<ServiceResult<AccountModel>> = await axios.post(
                'https://localhost:5294/api/accountservices/signup',
                sendData
           );
@@ -52,15 +54,17 @@ export async function signup(form: UISignupData): Promise<ServiceResult<AccountM
                throw error;
           }
      }
- }
+}
 
-export async function getCurrentAccount(navigation: AccountNavigationOptions) : Promise<ServiceResult<AccountModel>> {
+export async function getCurrentAccount(navigation: AccountNavigationOptions): Promise<ServiceResult<AccountModel>> {
      try {
-          const response = await axios.get('https://localhost:5294/api/accountservices/me', {params: {
-               isGetEmployee: navigation.isGetEmployee,
-               isGetCustomer: navigation.isGetCustomer,
-               isGetRolesOfUsers: navigation.isGetRolesOfUsers,
-          }, withCredentials: true});
+          const response = await axios.get('https://localhost:5294/api/accountservices/me', {
+               params: {
+                    isGetEmployee: navigation.isGetEmployee,
+                    isGetCustomer: navigation.isGetCustomer,
+                    isGetRolesOfUsers: navigation.isGetRolesOfUsers,
+               }, withCredentials: true
+          });
           return response.data as ServiceResult<AccountModel>;
      } catch (error) {
           if (error instanceof Error)
@@ -83,7 +87,7 @@ export async function checkExistedByEmail(email: string): Promise<boolean> {
      }
 }
 
-export async function forgotPassword(form: UIForgotPasswordData) : Promise<JsonLogEntry> {
+export async function forgotPassword(form: UIForgotPasswordData): Promise<JsonLogEntry> {
      try {
           const response = await axios.post('https://localhost:5294/api/accountservices/forgot-password', form);
           return response.data as JsonLogEntry;
@@ -94,7 +98,7 @@ export async function forgotPassword(form: UIForgotPasswordData) : Promise<JsonL
 
 export async function logout() {
      try {
-          const response = await axios.delete('https://localhost:5294/api/accountservices/logout', {withCredentials: true});
+          const response = await axios.delete('https://localhost:5294/api/accountservices/logout', { withCredentials: true });
           return response.data as string;
      } catch (error) {
           throw new Error('Error when fetch to logout api', error as { cause?: Error } | undefined);

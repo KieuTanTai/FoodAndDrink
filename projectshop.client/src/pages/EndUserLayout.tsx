@@ -1,12 +1,13 @@
 import Footer from "../components/FooterComponents";
 import Header from "../components/HeaderComponents";
-import ProductContainer from "../components/ProductContainer";
 import SaleEventBlock from "../components/saleEvent/SaleEventBlock";
 import SaleEventMainSlider from "../components/saleEvent/SaleEventMainSlider";
 import SaleEventSideSlider from "../components/saleEvent/SaleEventSideSlider";
 import SubHeader from "../components/SubHeader";
-import { AbsoluteArrowNavigationProvider } from "../contexts/absoluteArrow/AbsoluteArrowNavigationProvider";
+import { AbsoluteArrowNavigationProvider } from "../contexts/absoluteArrow/NavigationProvider";
+import OtherInfoBlock from "../modal/components/others/OtherInfoBlock";
 import type { SaleEventItemProps } from "../models/props/sale_events/sale-event-item-props";
+import DemoPage from "./demo/pages_demo";
 
 // mock test view
 const mainEvents: SaleEventItemProps[] = [
@@ -55,129 +56,26 @@ function EndUserLayout() {
             <main id="main-content">
                 <SaleEventBlock
                     mainBlock={
-                        <AbsoluteArrowNavigationProvider value={{ saleEventItems: mainEvents }}>
-                            <SaleEventMainSlider events={mainEvents} /> 
+                        <AbsoluteArrowNavigationProvider value={{ saleEventItems: mainEvents }} timeInterval={5000}>
+                            <SaleEventMainSlider saleEventItems={mainEvents} />
                         </AbsoluteArrowNavigationProvider>
                     }
-                    sideBlock={
-                        <AbsoluteArrowNavigationProvider value={{ saleEventItems: sideEvents }}>
-                            <SaleEventSideSlider saleEventItems={sideEvents} /> 
+                    sideBlocks={[
+                        <AbsoluteArrowNavigationProvider value={{ saleEventItems: sideEvents }} timeInterval={3000} key="side-slider">
+                            <SaleEventSideSlider saleEventItems={sideEvents} />
+                        </AbsoluteArrowNavigationProvider>,
+
+                        <AbsoluteArrowNavigationProvider value={{ saleEventItems: sideEvents }} timeInterval={3000} key="side-slider">
+                            <SaleEventSideSlider saleEventItems={sideEvents} />
                         </AbsoluteArrowNavigationProvider>
-                    }
+                    ]}
+                    
                 />
                 {/* Product Container */}
                 {/* Repeat ProductContainer as needed */}
-                <ProductContainer
-                    id="temp1-products"
-                    title="Featured Products"
-                    link="/products"
-                    products={[
-                        {
-                            id: 1,
-                            imageSrc: "./src/assets/images/1747247649_iphone-14-pro-max-den-cu.jpg.webp",
-                            altText: "Product 1",
-                            title: "Product 1",
-                            price: "$100",
-                            oldPrice: "$120",
-                            salePercentage: "17%",
-                            status: "available"
-                        },
-                        {
-                            id: 2,
-                            imageSrc: "./src/assets/images/1747247649_iphone-14-pro-max-den-cu.jpg.webp",
-                            altText: "Product 2",
-                            title: "Product 2",
-                            price: "$80",
-                            oldPrice: "$100",
-                            salePercentage: "20%",
-                            status: "out_of_stock"
-                        }
-                    ]}
-                />
-
-                <ProductContainer
-                    id="temp2-products"
-                    title="Featured Products"
-                    link="/products"
-                    products={[
-                        {
-                            id: 1,
-                            imageSrc: "./src/assets/images/1747247649_iphone-14-pro-max-den-cu.jpg.webp",
-                            altText: "Product 1",
-                            title: "Product 1",
-                            price: "$100",
-                            oldPrice: "$120",
-                            salePercentage: "17%",
-                            status: "available"
-                        },
-                        {
-                            id: 2,
-                            imageSrc: "./src/assets/images/1747247649_iphone-14-pro-max-den-cu.jpg.webp",
-                            altText: "Product 2",
-                            title: "Product 2",
-                            price: "$80",
-                            oldPrice: "$100",
-                            salePercentage: "20%",
-                            status: "out_of_stock"
-                        }
-                    ]}
-                />
-
-                <ProductContainer
-                    id="temp3-products"
-                    title="Featured Products"
-                    link="/products"
-                    products={[
-                        {
-                            id: 1,
-                            imageSrc: "./src/assets/images/1747247649_iphone-14-pro-max-den-cu.jpg.webp",
-                            altText: "Product 1",
-                            title: "Product 1",
-                            price: "$100",
-                            oldPrice: "$120",
-                            salePercentage: "17%",
-                            status: "available"
-                        },
-                        {
-                            id: 2,
-                            imageSrc: "./src/assets/images/1747247649_iphone-14-pro-max-den-cu.jpg.webp",
-                            altText: "Product 2",
-                            title: "Product 2",
-                            price: "$80",
-                            oldPrice: "$100",
-                            salePercentage: "20%",
-                            status: "out_of_stock"
-                        }
-                    ]}
-                />
-
-                <ProductContainer
-                    id="temp4-products"
-                    title="Featured Products"
-                    link="/products"
-                    products={[
-                        {
-                            id: 1,
-                            imageSrc: "./src/assets/images/1747247649_iphone-14-pro-max-den-cu.jpg.webp",
-                            altText: "Product 1",
-                            title: "Product 1",
-                            price: "$100",
-                            oldPrice: "$120",
-                            salePercentage: "17%",
-                            status: "available"
-                        },
-                        {
-                            id: 2,
-                            imageSrc: "./src/assets/images/1747247649_iphone-14-pro-max-den-cu.jpg.webp",
-                            altText: "Product 2",
-                            title: "Product 2",
-                            price: "$80",
-                            oldPrice: "$100",
-                            salePercentage: "20%",
-                            status: "out_of_stock"
-                        }
-                    ]}
-                />
+                {/* Other Info Block */}
+                <OtherInfoBlock />
+                <DemoPage />
                 {/* <LoginPage /> */}
                 {/* <ForgotPasswordPage onBackToLogin={() => { }} /> */}
                 {/* <Cart /> */}

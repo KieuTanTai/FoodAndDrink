@@ -3,11 +3,12 @@ import type { SaleEventItemProps } from "../../models/props/sale_events/sale-eve
 
 export type AbsoluteArrowNavigationContextType = {
     current: number;
-    saleEventItems?: SaleEventItemProps;
+    saleEventItems?: SaleEventItemProps[];
     setSaleEventItems: (items: SaleEventItemProps[]) => void;
     handleSlideNext: (idx: number) => void;
     handleSlidePrev: (idx: number) => void;
     setCurrent: (current: number) => void;
+    setTimeInterval: (time: number, isSlideNext?: boolean) => void;
 }
 
 export const defaultAbsoluteArrowNavigationContext: AbsoluteArrowNavigationContextType = {
@@ -15,7 +16,8 @@ export const defaultAbsoluteArrowNavigationContext: AbsoluteArrowNavigationConte
     handleSlideNext: () => { },
     handleSlidePrev: () => { },
     setSaleEventItems: () => { },
-    setCurrent: () => { }
+    setCurrent: () => { },
+    setTimeInterval: () => { }
 }
 
 export const AbsoluteArrowNavigationContext = createContext<AbsoluteArrowNavigationContextType>(defaultAbsoluteArrowNavigationContext);

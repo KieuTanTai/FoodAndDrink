@@ -3,7 +3,7 @@ import { faEnvelope, faArrowLeft, faKey, faLock } from "@fortawesome/free-solid-
 import UseForm from "../../hooks/use-auth";
 import { forgotPassword } from "../../api/authApi";
 import { useMessageModalProvider } from "../../hooks/use-message-modal-context";
-import type { UIForgotPasswordData } from "../../ui-types/forgot-password";
+import type { UIForgotPasswordData } from "../../ui-props/accounts/forgot-password";
 import type { JsonLogEntry } from "../../value-objects/json-log-entry";
 import { useState } from "react";
 
@@ -22,7 +22,7 @@ function ForgotPasswordForm({ onForgotPasswordSuccess, onBackToLogin }: { onForg
     const { formData, isSubmitting, userNameErrorMessage, passwordErrorMessage, handleChange, handleSubmit, handleCopy }
         = UseForm(
             { email: "", verifyCode: '', newPassword: "", confirmNewPassword: "" },
-            async (data: UIForgotPasswordData) : Promise<JsonLogEntry> => {
+            async (data: UIForgotPasswordData): Promise<JsonLogEntry> => {
                 try {
                     const result = await forgotPassword(data);
                     if (!(result instanceof Array) && result.errorName === "" && result.errorMessage === "") {

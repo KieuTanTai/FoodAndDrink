@@ -1,10 +1,8 @@
 import Modal from "react-modal";
 import type { BaseAccountModalProps } from "../../props/account-props/base-account-modal-props";
 import ForgotPasswordForm from "../../../components/account/ForgotPasswordForm";
-import useFixedScrollbarCompensate from "../../../hooks/use-scrollbar-compensate";
 
-function ForgotPasswordModal({ isOpen, onRequestClose, onSuccess }: BaseAccountModalProps) {
-    useFixedScrollbarCompensate(isOpen);
+function ForgotPasswordModal({ isOpen, onRequestClose, onSuccess, dictLinksClick }: BaseAccountModalProps) {
     return (
         <Modal
             isOpen={isOpen}
@@ -21,7 +19,9 @@ function ForgotPasswordModal({ isOpen, onRequestClose, onSuccess }: BaseAccountM
             >
                 X
             </button>
-            <ForgotPasswordForm onForgotPasswordSuccess={onSuccess} onBackToLogin={onSuccess} />
+            <ForgotPasswordForm
+                onForgotPasswordSuccess={onSuccess}
+                onBackToLogin={dictLinksClick ? dictLinksClick.login : () => { }} />
         </Modal>
     );
 }

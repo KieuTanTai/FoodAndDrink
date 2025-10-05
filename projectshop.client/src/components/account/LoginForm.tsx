@@ -3,38 +3,38 @@ import { faUserCircle, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid
 import { faGoogle as faGoogleBrand, faFacebook as faFacebookBrand } from '@fortawesome/free-brands-svg-icons';
 import UseForm from '../../hooks/use-auth';
 import { login } from '../../api/authApi';
-import type { UILoginData } from '../../ui-types/login';
+import type { UILoginData } from '../../ui-props/accounts/login';
 import type { AccountModel } from '../../models/account-model';
 import type LoginFormProps from '../../models/props/account/login-form-props';
 import { useMessageModalProvider } from '../../hooks/use-message-modal-context';
 import { useState } from 'react';
 
-function LoginForm({ onSuccess }: LoginFormProps) {
+function LoginForm({ onSuccess, onForgotPasswordLinkClick, onRegisterLinkClick }: LoginFormProps) {
 
      const [showPassword, setShowPassword] = useState(false);
      const { showMessage } = useMessageModalProvider();
      const { formData, handleChange, handleSubmit, isSubmitting, userNameErrorMessage, passwordErrorMessage, handleCopy }
           = UseForm(
-          { email: "", password: "", rememberMe: false },
-          async (data: UILoginData): Promise<AccountModel> => {
-               try {
-                    const result = await login(data, { isGetCustomer: true });
+               { email: "", password: "", rememberMe: false },
+               async (data: UILoginData): Promise<AccountModel> => {
+                    try {
+                         const result = await login(data, { isGetCustomer: true });
 
-                    if (result.data && result.data.userName !== "") {
-                         onSuccess(result.data);
-                         return result.data;
-                    } else {
-                         showMessage("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.", "error");
+                         if (result.data && result.data.userName !== "") {
+                              onSuccess(result.data);
+                              return result.data;
+                         } else {
+                              showMessage("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.", "error");
+                              return {} as AccountModel;
+                         }
+                    } catch (error) {
+                         if (error instanceof Error)
+                              showMessage(`Đăng nhập thất bại: ${error.message}`, "error");
+                         else
+                              showMessage('Đăng nhập thất bại: Đã xảy ra lỗi không xác định.', "error");
                          return {} as AccountModel;
                     }
-               } catch (error) {
-                    if (error instanceof Error)
-                         showMessage(`Đăng nhập thất bại: ${error.message}`, "error");
-                    else
-                         showMessage('Đăng nhập thất bại: Đã xảy ra lỗi không xác định.', "error");
-                    return {} as AccountModel;
-               }
-          });
+               });
 
      const toggleShowPassword = () => {
           setShowPassword(!showPassword);
@@ -125,7 +125,7 @@ function LoginForm({ onSuccess }: LoginFormProps) {
                               </label>
                          </div>
                          <div className="text-sm">
-                              <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+                              <a href="#" onClick={onForgotPasswordLinkClick} className="font-medium text-blue-600 hover:text-blue-500">
                                    Quên mật khẩu?
                               </a>
                          </div>
@@ -163,7 +163,7 @@ function LoginForm({ onSuccess }: LoginFormProps) {
                {/* Register link */}
                <div className="mt-6 text-center text-sm text-gray-500">
                     Bạn chưa có tài khoản?{' '}
-                    <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+                    <a href="#" onClick={onRegisterLinkClick} className="font-medium text-blue-600 hover:text-blue-500">
                          Đăng ký ngay
                     </a>
                </div>

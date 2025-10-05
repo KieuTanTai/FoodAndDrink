@@ -1,15 +1,5 @@
 import { useEffect } from "react";
 
-/**
- * Hook fix cứng padding-right cho body khi mở modal.
- * Dùng: gọi useFixedScrollbarCompensate(isOpen) ở component modal.
- * Chỉ cần thêm CSS sau vào global.css:
- * 
- * body.modal-open {
- *   padding-right: 15px !important;
- *   overflow: hidden;
- * }
- */
 export default function useFixedScrollbarCompensate(isOpen: boolean) {
   useEffect(() => {
     if (isOpen) {

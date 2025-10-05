@@ -4,16 +4,16 @@ import { faFacebook as faFacebookBrand, faGoogle as faGoogleBrand } from '@forta
 import type SignupFormProps from '../../models/props/account/signup-form-props';
 import UseForm from '../../hooks/use-auth';
 import { signup } from '../../api/authApi';
-import type { UISignupData } from '../../ui-types/signup';
+import type { UISignupData } from '../../ui-props/accounts/signup';
 import { useMessageModalProvider } from '../../hooks/use-message-modal-context';
 import type { AccountModel } from '../../models/account-model';
 
-function SignupForm({ onSuccess }: SignupFormProps) {
+function SignupForm({ onSuccess, onLoginLinkClick }: SignupFormProps) {
      const { showMessage } = useMessageModalProvider();
      const { formData, isSubmitting, userNameErrorMessage, passwordErrorMessage, handleChange, handleSubmit, handleCopy }
           = UseForm(
                { email: "", password: "", confirmPassword: "" },
-               async (data: UISignupData) : Promise<AccountModel> => {
+               async (data: UISignupData): Promise<AccountModel> => {
                     try {
                          const result = await signup(data);
                          if (!(result instanceof Array) && result.data && result.data.userName !== "") {
@@ -23,7 +23,7 @@ function SignupForm({ onSuccess }: SignupFormProps) {
                          }
                          else if (result instanceof Array)
                               showMessage(result[0].message ?? "lỗi khi đăng kí, kiểm tra lại thông tin ", "error");
-                         else 
+                         else
                               showMessage("lỗi khi đăng kí, vui lòng thử lại!", "error");
                          return {} as AccountModel;
                     } catch (error) {
@@ -165,7 +165,8 @@ function SignupForm({ onSuccess }: SignupFormProps) {
                {/* Login link */}
                <div className="mt-6 text-center text-sm text-gray-500">
                     Đã có tài khoản?{' '}
-                    <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+                    <a href="#" onClick={onLoginLinkClick}
+                         className="font-medium text-blue-600 hover:text-blue-500">
                          Đăng nhập ngay
                     </a>
                </div>

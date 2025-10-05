@@ -1,11 +1,9 @@
 import Modal from "react-modal";
 import LoginForm from "../../../components/account/LoginForm";
 import type { LoginModalProps } from "../../props/account-props/login-modal-props";
-import useScrollbarCompensate from "../../../hooks/use-scrollbar-compensate";
 // import the correct type for LoginForm props if available
 
-function LoginModal({ isOpen, onRequestClose, onSuccess }: LoginModalProps) {
-  useScrollbarCompensate(isOpen);
+function LoginModal({ isOpen, onRequestClose, onSuccess, dictLinksClick }: LoginModalProps) {
   return (
     <Modal
       isOpen={isOpen}
@@ -22,7 +20,10 @@ function LoginModal({ isOpen, onRequestClose, onSuccess }: LoginModalProps) {
       >
         X
       </button>
-      <LoginForm onSuccess={onSuccess} />
+      <LoginForm
+        onSuccess={onSuccess}
+        onRegisterLinkClick={dictLinksClick ? dictLinksClick.signup : () => { }}
+        onForgotPasswordLinkClick={dictLinksClick ? dictLinksClick.forgotPassword : () => { }} />
     </Modal>
   );
 }

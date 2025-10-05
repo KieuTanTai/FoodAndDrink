@@ -7,14 +7,21 @@ import type { AccountModel } from "../models/account-model";
 import { getCurrentAccount, logout } from "../api/authApi";
 import { useMessageModalProvider } from "../hooks/use-message-modal-context";
 import ForgotPasswordModal from "../modal/components/account/ForgotPasswordModal";
-function HeaderAccount() {
-  const [loginOpen, setLoginOpen] = useState(false);
-  const [currentAccount, setCurrentAccount] = useState<AccountModel | null>(null);
-  const [signupOpen, setSignupOpen] = useState(false);
-  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
-  const { showMessage } = useMessageModalProvider();
-  console.log()
+import useFixedScrollbarCompensate from "../hooks/use-scrollbar-compensate";
 
+
+function HeaderAccount() {
+  const [currentAccount, setCurrentAccount] = useState<AccountModel | null>(null);
+  const { showMessage } = useMessageModalProvider();
+  
+  // Handler mở đóng modal
+  const [openModal, setOpenModal] = useState<"" | "login" | "signup" | "forgot-password">("");
+  const openLogin = () => setOpenModal("login");
+  const openSignup = () => setOpenModal("signup");
+  const openForgotPassword = () => setOpenModal("forgot-password");
+  const closeModal = () => setOpenModal("");
+  useFixedScrollbarCompensate(openModal !== "");
+  
   useEffect(() => {
     async function fetchAccount() {
       try {
@@ -36,8 +43,7 @@ function HeaderAccount() {
 
   const handleSignup = () => {
     try {
-      setSignupOpen(false);
-      setLoginOpen(true);
+      openLogin();
       showMessage("Đăng ký thành công! Vui lòng đăng nhập.", "success");
     } catch (error) {
       if (error instanceof Error)
@@ -83,17 +89,17 @@ function HeaderAccount() {
           <div className="flex flex-col border-b border-gray-200 mb-2 pb-2" id="account-menu-options" style={currentAccount ? { display: "none" } : {}}>
             <button
               className="py-2 px-4 flex items-center justify-center mb-2 text-left rounded-md font-medium"
-              onClick={() => setLoginOpen(true)}>
+              onClick={openLogin}>
               Đăng nhập
             </button>
 
             <button className="py-2 px-4 flex items-center justify-center mb-2 text-left rounded-md font-medium"
-              onClick={() => setSignupOpen(true)}>
+              onClick={openSignup}>
               Đăng kí
             </button>
 
             <button className="py-2 px-4 flex items-center justify-center text-left rounded-md font-medium"
-              onClick={() => setForgotPasswordOpen(true)}>
+              onClick={openForgotPassword}>
               Quên mật khẩu
             </button>
           </div>
@@ -108,27 +114,35 @@ function HeaderAccount() {
 
       {/* Login Modal */}
       <LoginModal
-        isOpen={loginOpen}
-        onRequestClose={() => setLoginOpen(false)}
+        isOpen={openModal === "login"}
+        onRequestClose={closeModal}
         onSuccess={(account: AccountModel) => {
           setCurrentAccount(account);
           showMessage(`Đăng nhập thành công! ${account.customer?.name}`, "success");
-          setLoginOpen(false);
+          closeModal();
+        }}
+        dictLinksClick={{
+          signup: () => openSignup(),
+          forgotPassword: () => openForgotPassword()
         }}
       />
       {/* Signup Modal */}
-      <SignupModal isOpen={signupOpen}
-        onRequestClose={() => setSignupOpen(false)}
+      <SignupModal
+        isOpen={openModal === "signup"}
+        onRequestClose={closeModal}
         onSuccess={() => handleSignup()}
+        dictLinksClick={{ login: () => openLogin() }}
       />
       {/* Forgot Password Modal */}
-      <ForgotPasswordModal isOpen={forgotPasswordOpen}
-        onRequestClose={() => setForgotPasswordOpen(false)}
+      <ForgotPasswordModal
+        isOpen={openModal === "forgot-password"}
+        onRequestClose={closeModal}
         onSuccess={() => {
-          setForgotPasswordOpen(false);
-          setLoginOpen(true);
+          openLogin();
           showMessage("Đặt lại mật khẩu thành công! Vui lòng đăng nhập.", "success");
-        }} />
+        }}
+        dictLinksClick={{ login: () => openLogin() }}
+      />
     </div>
   );
 }
