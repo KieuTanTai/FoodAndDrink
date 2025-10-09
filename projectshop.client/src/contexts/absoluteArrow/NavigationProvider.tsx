@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { AbsoluteArrowNavigationContext } from "./navigationContext";
-import type { SaleEventItemsProps } from "../../models/props/sale_events/sale-event-items-props";
-import type { SaleEventItemProps } from "../../models/props/sale_events/sale-event-item-props";
+import type { SaleEventItemsProps } from "../../models/props/sale_events/SaleEventItemsProps";
+import type { SaleEventItemProps } from "../../models/props/sale_events/SaleEventItemProps";
 /**
  * Provider quản lý trạng thái slider (arrow/dot), interval và log chi tiết.
  * - Khi click arrow/dot sẽ reset lại interval.

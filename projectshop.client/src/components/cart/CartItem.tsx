@@ -1,5 +1,5 @@
 import { Trash2 } from 'lucide-react';
-import type { CartItemProps } from '../../models/props/cart-item-props';
+import type { CartItemProps } from '../../models/props/CartItemProps';
 
 function CartItem({ item, onQuantityChange, onRemove }: CartItemProps) {
   return (

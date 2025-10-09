@@ -1,6 +1,6 @@
 import Modal from "react-modal";
 import SignupForm from "../../../components/account/SignupForm";
-import type { BaseAccountModalProps } from "../../props/account-props/base-account-modal-props";
+import type { BaseAccountModalProps } from "../../props/account-props/BaseAccountModalProps";
 
 function SignupModal({ isOpen, onRequestClose, onSuccess, dictLinksClick }: BaseAccountModalProps) {
      return (

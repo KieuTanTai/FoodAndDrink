@@ -1,6 +1,6 @@
 import React from 'react';
 import CartItem from './CartItem';
-import type { CartItemProps } from '../../models/props/cart-item-props';
+import type { CartItemProps } from '../../models/props/CartItemProps';
 import { ShoppingBag } from 'lucide-react';
 
 interface CartItemsListProps {

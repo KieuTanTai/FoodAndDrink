@@ -1,12 +1,12 @@
 // import Cookies from 'js-cookie';
-import type { UILoginData } from '../ui-props/accounts/login';
-import type { UISignupData } from '../ui-props/accounts/signup';
-import type { AccountModel } from '../models/account-model';
-import type { UIForgotPasswordData } from '../ui-props/accounts/forgot-password';
-import type { ServiceResult } from '../value-objects/service-result';
-import type { AccountNavigationOptions } from '../value-objects/get-navigation-property-options/account-navigation-options';
+import type { UILoginData } from '../ui-props/accounts/Login';
+import type { UISignupData } from '../ui-props/accounts/Signup';
+import type { AccountModel } from '../models/AccountModel';
+import type { UIForgotPasswordData } from '../ui-props/accounts/ForgotPassword';
+import type { ServiceResult } from '../value-objects/ServiceResult';
+import type { AccountNavigationOptions } from '../value-objects/get-navigation-property-options/AccountNavigationOptions';
 import { InvalidValueError } from '../value-objects/custom-error/invalidValueError';
-import type { JsonLogEntry } from '../value-objects/json-log-entry';
+import type { JsonLogEntry } from '../value-objects/JsonLogEntry';
 import axios, { isAxiosError, type AxiosResponse } from 'axios';
 
 export async function login(form: UILoginData, navigation: AccountNavigationOptions): Promise<ServiceResult<AccountModel>> {

@@ -1,4 +1,4 @@
-import type { SaleEventItemsProps } from "../../models/props/sale_events/sale-event-items-props";
+import type { SaleEventItemsProps } from "../../models/props/sale_events/SaleEventItemsProps";
 import AbsoluteArrowNavigationModal from "../../modal/components/arrowNavigation/AbsoluteArrowNavigationModal";
 import { useContext } from "react";
 import { AbsoluteArrowNavigationContext } from "../../contexts/absoluteArrow/navigationContext";

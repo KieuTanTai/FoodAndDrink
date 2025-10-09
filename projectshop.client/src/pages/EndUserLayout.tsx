@@ -6,7 +6,7 @@ import SaleEventSideSlider from "../components/saleEvent/SaleEventSideSlider";
 import SubHeader from "../components/SubHeader";
 import { AbsoluteArrowNavigationProvider } from "../contexts/absoluteArrow/NavigationProvider";
 import OtherInfoBlock from "../modal/components/others/OtherInfoBlock";
-import type { SaleEventItemProps } from "../models/props/sale_events/sale-event-item-props";
+import type { SaleEventItemProps } from "../models/props/sale_events/SaleEventItemProps";
 import DemoPage from "./demo/pages_demo";
 
 // mock test view

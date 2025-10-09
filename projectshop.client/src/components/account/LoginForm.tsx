@@ -1,12 +1,12 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle as faGoogleBrand, faFacebook as faFacebookBrand } from '@fortawesome/free-brands-svg-icons';
-import UseForm from '../../hooks/use-auth';
-import { login } from '../../api/authApi';
-import type { UILoginData } from '../../ui-props/accounts/login';
-import type { AccountModel } from '../../models/account-model';
-import type LoginFormProps from '../../models/props/account/login-form-props';
-import { useMessageModalProvider } from '../../hooks/use-message-modal-context';
+import UseForm from '../../hooks/useAuth';
+import { login } from '../../api/auth-api';
+import type { UILoginData } from '../../ui-props/accounts/Login';
+import type { AccountModel } from '../../models/AccountModel';
+import type LoginFormProps from '../../models/props/account/LoginFormProps';
+import { useMessageModalProvider } from '../../hooks/useMessageModalContext';
 import { useState } from 'react';
 
 function LoginForm({ onSuccess, onForgotPasswordLinkClick, onRegisterLinkClick }: LoginFormProps) {

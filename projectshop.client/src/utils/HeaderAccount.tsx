@@ -3,17 +3,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
 import LoginModal from "../modal/components/account/LoginModal";
 import SignupModal from "../modal/components/account/SignupModal";
-import type { AccountModel } from "../models/account-model";
-import { getCurrentAccount, logout } from "../api/authApi";
-import { useMessageModalProvider } from "../hooks/use-message-modal-context";
+import type { AccountModel } from "../models/AccountModel";
+import { getCurrentAccount, logout } from "../api/auth-api";
+import { useMessageModalProvider } from "../hooks/useMessageModalContext";
 import ForgotPasswordModal from "../modal/components/account/ForgotPasswordModal";
-import useFixedScrollbarCompensate from "../hooks/use-scrollbar-compensate";
+import useFixedScrollbarCompensate from "../hooks/useScrollbarCompensate";
 
 
 function HeaderAccount() {
   const [currentAccount, setCurrentAccount] = useState<AccountModel | null>(null);
   const { showMessage } = useMessageModalProvider();
-  
+
   // Handler mở đóng modal
   const [openModal, setOpenModal] = useState<"" | "login" | "signup" | "forgot-password">("");
   const openLogin = () => setOpenModal("login");
@@ -21,7 +21,7 @@ function HeaderAccount() {
   const openForgotPassword = () => setOpenModal("forgot-password");
   const closeModal = () => setOpenModal("");
   useFixedScrollbarCompensate(openModal !== "");
-  
+
   useEffect(() => {
     async function fetchAccount() {
       try {

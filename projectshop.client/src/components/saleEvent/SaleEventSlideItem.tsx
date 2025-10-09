@@ -1,5 +1,5 @@
 import { motion, easeInOut } from "framer-motion";
-import type UISaleEventSlideItemProps from "../../ui-props/sale-events/sale-event-item-props";
+import type UISaleEventSlideItemProps from "../../ui-props/sale-events/SaleEventItemProps";
 
 /**
  * Slide effect: Slide luôn sang trái khi chuyển slide, không cần direction.

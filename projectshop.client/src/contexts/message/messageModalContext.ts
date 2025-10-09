@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import type { MessageType } from "../../modal/props/popup-message/message-modal-props";
+import type { MessageType } from "../../modal/props/popup-message/MessageModalProps";
 
 export type MessageModalContextType = {
     showMessage: (

@@ -1,5 +1,5 @@
 import { CircleIcon } from "lucide-react";
-import type DotNavigationModalProps from "../../props/dots/dot-navigation-modal-props";
+import type DotNavigationModalProps from "../../props/dots/DotNavigationModalProps";
 
 function DotNavigationModal({ length, current, setCurrent, className = "" }: DotNavigationModalProps) {
   return (

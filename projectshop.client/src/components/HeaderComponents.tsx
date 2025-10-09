@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faCartShopping, faMagnifyingGlass, faPhoneVolume, faTruckFast } from '@fortawesome/free-solid-svg-icons';
 import HeaderAccount from "../utils/HeaderAccount";
@@ -7,7 +7,7 @@ function Header() {
      const [query, setQuery] = useState('');
      const [cartCount, setCartCount] = useState(0); // State for cart count
 
-     const handleSearch = (e: React.FormEvent) => {
+     const handleSearch = (e: FormEvent) => {
           e.preventDefault();
           // Handle search logic here
           console.log('Searching for:', query);

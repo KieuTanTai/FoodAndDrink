@@ -1,5 +1,5 @@
 import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
-import type AbsoluteArrowProps from "../../props/absolute-arrows/absolute-arrows-modal-props";
+import type AbsoluteArrowProps from "../../props/absolute-arrows/AbsoluteArrowsModalProps";
 
 function AbsoluteArrowNavigationModal({ onNext, onPrev }: AbsoluteArrowProps) {
     return (

@@ -1,6 +1,6 @@
 export type MessageType = 'success' | 'error' | 'warning' | 'info';
 
-export interface MessageModalProps {
+export default interface MessageModalProps {
   message: string;
   type: MessageType;
   timeout?: number; // milliseconds

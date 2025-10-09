@@ -1,4 +1,4 @@
-import type { SaleEventBlockProps } from "../../ui-props/sale-events/sale-event-block-props";
+import type { SaleEventBlockProps } from "../../ui-props/sale-events/SaleEventBlockProps";
 
 
 function SaleEventBlock({ mainBlock, sideBlocks }: SaleEventBlockProps) {

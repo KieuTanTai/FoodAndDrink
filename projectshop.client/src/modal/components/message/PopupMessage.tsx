@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { MessageModalProps } from '../props/popup-message/message-modal-props';
+import type MessageModalProps from '../../props/popup-message/MessageModalProps';
 
 const typeConfigs = {
   success: {

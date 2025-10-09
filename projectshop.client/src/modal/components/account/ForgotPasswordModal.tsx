@@ -1,5 +1,5 @@
 import Modal from "react-modal";
-import type { BaseAccountModalProps } from "../../props/account-props/base-account-modal-props";
+import type { BaseAccountModalProps } from "../../props/account-props/BaseAccountModalProps";
 import ForgotPasswordForm from "../../../components/account/ForgotPasswordForm";
 
 function ForgotPasswordModal({ isOpen, onRequestClose, onSuccess, dictLinksClick }: BaseAccountModalProps) {

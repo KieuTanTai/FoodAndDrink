@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import type { SaleEventItemProps } from "../../models/props/sale_events/sale-event-item-props";
+import type { SaleEventItemProps } from "../../models/props/sale_events/SaleEventItemProps";
 
 export type AbsoluteArrowNavigationContextType = {
     current: number;

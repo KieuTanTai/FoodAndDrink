@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import type FormPropsHandler from "../models/props/form-props";
+import type FormPropsHandler from "../models/props/FormProps";
 import { isValidEmail, isValidPassword } from "../helpers/is-valid-input";
 
 function UseForm<T extends object, TBackEndEntity, TReturnEntity extends TBackEndEntity>(initialData: T, onSubmit: (data: T) => Promise<TReturnEntity>)

@@ -1,10 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faArrowLeft, faKey, faLock } from "@fortawesome/free-solid-svg-icons";
-import UseForm from "../../hooks/use-auth";
-import { forgotPassword } from "../../api/authApi";
-import { useMessageModalProvider } from "../../hooks/use-message-modal-context";
-import type { UIForgotPasswordData } from "../../ui-props/accounts/forgot-password";
-import type { JsonLogEntry } from "../../value-objects/json-log-entry";
+import UseForm from "../../hooks/useAuth";
+import { forgotPassword } from "../../api/auth-api";
+import { useMessageModalProvider } from "../../hooks/useMessageModalContext";
+import type { UIForgotPasswordData } from "../../ui-props/accounts/ForgotPassword";
+import type { JsonLogEntry } from "../../value-objects/JsonLogEntry";
 import { useState } from "react";
 
 // TODO: fix after build product funcs

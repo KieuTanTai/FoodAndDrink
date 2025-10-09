@@ -1,12 +1,12 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { faFacebook as faFacebookBrand, faGoogle as faGoogleBrand } from '@fortawesome/free-brands-svg-icons';
-import type SignupFormProps from '../../models/props/account/signup-form-props';
-import UseForm from '../../hooks/use-auth';
-import { signup } from '../../api/authApi';
-import type { UISignupData } from '../../ui-props/accounts/signup';
-import { useMessageModalProvider } from '../../hooks/use-message-modal-context';
-import type { AccountModel } from '../../models/account-model';
+import type SignupFormProps from '../../models/props/account/SignupFormProps';
+import UseForm from '../../hooks/useAuth';
+import { signup } from '../../api/auth-api';
+import type { UISignupData } from '../../ui-props/accounts/Signup';
+import { useMessageModalProvider } from '../../hooks/useMessageModalContext';
+import type { AccountModel } from '../../models/AccountModel';
 
 function SignupForm({ onSuccess, onLoginLinkClick }: SignupFormProps) {
      const { showMessage } = useMessageModalProvider();
