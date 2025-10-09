@@ -599,6 +599,27 @@ coverage/
 *.lcov
 .nyc_output
 
+# Test files (ignore all test files)
+**/*test*.js
+**/*test*.ts
+**/*test*.tsx
+**/*test*.cs
+**/*test*.java
+**/*test*.py
+**/*Test*.js
+**/*Test*.ts
+**/*Test*.tsx
+**/*Test*.cs
+**/*Test*.java
+**/*Test*.py
+**/test*/
+**/tests/
+**/__tests__/
+**/*.spec.*
+**/*.test.*
+**/jest.config.*
+**/setupTests.*
+
 ##################################
 # Backup files
 ##################################
