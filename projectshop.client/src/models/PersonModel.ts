@@ -1,9 +1,7 @@
-import type { AccountModel } from "./account-model";
-import type { LocationCityModel } from "./location-city-model";
-import type { LocationDistrictModel } from "./location-district-model";
-import type { LocationWardModel } from "./location-ward-model";
+import type { AccountModel } from "./AccountModel";
 
 export interface PersonModel {
+    personId: number;
     accountId: number;
     birthday: string;
     phone: string;
@@ -12,8 +10,7 @@ export interface PersonModel {
     avatarUrl: string;
     gender: boolean;
     status: boolean;
+    createdDate: string;
+    lastUpdatedDate: string;
     account: AccountModel | null;
-    ward: LocationWardModel | null;
-    district: LocationDistrictModel | null;
-    city: LocationCityModel | null;
 }

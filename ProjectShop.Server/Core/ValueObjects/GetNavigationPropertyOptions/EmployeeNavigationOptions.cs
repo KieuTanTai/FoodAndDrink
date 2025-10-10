@@ -7,7 +7,13 @@ public class EmployeeNavigationOptions
     private bool _isGetEmployeeDistrict;
     private bool _isGetEmployeeCity;
     private bool _isGetLocation;
+    private bool _isGetPerson;
 
+    public bool IsGetPerson
+    {
+        get => _isGetPerson;
+        set => _isGetPerson = value;
+    }
     public bool IsGetEmployeeWard
     {
         get => _isGetEmployeeWard;

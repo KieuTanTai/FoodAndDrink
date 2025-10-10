@@ -1,0 +1,37 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace ProjectShop.Server.Core.Entities;
+
+public partial class UserPaymentMethod
+{
+    public uint UserPaymentMethodId { get; set; }
+
+    public string PaymentMethodType { get; set; } = null!;
+
+    public uint? BankId { get; set; }
+
+    public uint CustomerId { get; set; }
+
+    public DateTime PaymentMethodAddedDate { get; set; }
+
+    public DateTime PaymentMethodLastUpdatedDate { get; set; }
+
+    public bool? PaymentMethodStatus { get; set; }
+
+    public string PaymentMethodDisplayName { get; set; } = null!;
+
+    public string PaymentMethodLastFourDigit { get; set; } = null!;
+
+    public int PaymentMethodExpiryYear { get; set; }
+
+    public int PaymentMethodExpiryMonth { get; set; }
+
+    public string PaymentMethodToken { get; set; } = null!;
+
+    public virtual Bank? Bank { get; set; }
+
+    public virtual Customer Customer { get; set; } = null!;
+
+    public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
+}

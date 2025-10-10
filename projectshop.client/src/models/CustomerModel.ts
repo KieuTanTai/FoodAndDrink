@@ -1,10 +1,14 @@
-import type{ InvoiceModel } from './invoice-model';
-import type{ CartModel } from "./cart-model";
-import type{ PersonModel } from "./person-model";
-import type { CustomerAddressModel } from './customer-address-model';
+import type { InvoiceModel } from './InvoiceModel';
+import type { CartModel } from "./CartModel";
+import type { PersonModel } from "./PersonModel";
+import type { CustomerAddressModel } from './CustomerAddressModel';
 
-export interface CustomerModel extends PersonModel {
+export interface CustomerModel {
     customerId: number;
+    personIdRef: number;
+    loyaltyPoints: number;
+    registrationDate: string;
+    person: PersonModel | null;
     cart: CartModel | null;
     invoices: InvoiceModel[] | [];
     customerAddresses: CustomerAddressModel[] | [];

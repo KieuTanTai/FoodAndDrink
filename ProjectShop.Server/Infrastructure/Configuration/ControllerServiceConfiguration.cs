@@ -4,7 +4,6 @@
     {
         public static IServiceCollection AddControllerServices(this IServiceCollection services)
         {
-            //services.AddTransient<ICurrentAccountLogin<AccountModel, RolesOfUserModel>, CurrentAccountLoginService>();
             return services;
         }
     }

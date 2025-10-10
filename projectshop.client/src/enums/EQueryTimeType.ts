@@ -1,8 +1,8 @@
 export const EQueryTimeType = {
-    MONTH_AND_YEAR: 0,
-    YEAR: 1,
-    DATE_TIME_RANGE: 2,
-    DATE_TIME: 3
+    MONTH_AND_YEAR: 'month_and_year',
+    YEAR: 'year',
+    DATE_TIME_RANGE: 'date_time_range',
+    DATE_TIME: 'date_time'
 } as const;
 
 export type EQueryTimeType = typeof EQueryTimeType[keyof typeof EQueryTimeType];

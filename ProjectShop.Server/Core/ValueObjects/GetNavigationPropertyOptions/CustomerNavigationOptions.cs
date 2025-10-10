@@ -7,6 +7,14 @@ public class CustomerNavigationOptions
     private bool _isGetInvoices;
     private bool _isGetCustomerAddresses;
 
+    private bool _isGetPerson;
+
+    public bool IsGetPerson
+    {
+        get => _isGetPerson;
+        set => _isGetPerson = value;
+    }
+
     public bool IsGetCart
     {
         get => _isGetCart;

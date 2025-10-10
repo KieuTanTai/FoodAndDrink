@@ -1,17 +1,21 @@
-import type{ LocationCityModel } from "./location-city-model";
-import type{ LocationDistrictModel } from "./location-district-model";
-import type{ LocationModel } from "./location-model";
-import type{ LocationWardModel } from "./location-ward-model";
-import type{ PersonModel } from "./person-model";
+import type { LocationCityModel } from "./LocationCityModel";
+import type { LocationDistrictModel } from "./LocationDistrictModel";
+import type { LocationModel } from "./LocationModel";
+import type { LocationWardModel } from "./LocationWardModel";
+import type { PersonModel } from "./PersonModel";
 
-export interface EmployeeModel extends PersonModel {
+export interface EmployeeModel {
     employeeId: number;
+    personIdRef: number;
     employeeHouseNumber: string;
     employeeStreet: string;
     employeeWardId: number | null;
     employeeDistrictId: number | null;
     employeeCityId: number | null;
     locationId: number;
+    hireDate: string;
+    salary: number;
+    person: PersonModel | null;
     employeeWard: LocationWardModel | null;
     employeeDistrict: LocationDistrictModel | null;
     employeeCity: LocationCityModel | null;

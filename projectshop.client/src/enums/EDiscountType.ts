@@ -1,6 +1,6 @@
 export const EDiscountType = {
-    PERCENT: 0,
-    AMOUNT: 1
-}
+    PERCENT: 'percent',
+    AMOUNT: 'amount'
+} as const;
 
 export type EDiscountType = typeof EDiscountType[keyof typeof EDiscountType];

@@ -1,6 +1,6 @@
 export const EInvoicePaymentType = {
-    COD: 0,
-    PREPAID: 1
+    COD: 'cod',
+    PREPAID: 'prepaid'
 } as const;
 
 export type EInvoicePaymentType = typeof EInvoicePaymentType[keyof typeof EInvoicePaymentType];
