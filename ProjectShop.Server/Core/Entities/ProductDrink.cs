@@ -5,7 +5,7 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class ProductDrink
 {
-    public string ProductBarcode { get; set; } = null!;
+    public string ProductBarcode { get; init; } = null!;
 
     /// <summary>
     /// Percentage

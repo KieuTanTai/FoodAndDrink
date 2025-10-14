@@ -5,9 +5,9 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class Person
 {
-    public uint PersonId { get; set; }
+    public uint PersonId { get; init; }
 
-    public uint AccountId { get; set; }
+    public uint AccountId { get; private set; }
 
     public DateOnly PersonBirthday { get; set; }
 
@@ -23,7 +23,7 @@ public partial class Person
 
     public bool? PersonStatus { get; set; }
 
-    public DateTime PersonCreatedDate { get; set; }
+    public DateTime PersonCreatedDate { get; init; }
 
     public DateTime PersonLastUpdatedDate { get; set; }
 

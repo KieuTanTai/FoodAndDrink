@@ -5,11 +5,11 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class DetailInvoice
 {
-    public uint DetailInvoiceId { get; set; }
+    public uint DetailInvoiceId { get; init; }
 
-    public uint InvoiceId { get; set; }
+    public uint InvoiceId { get; private set; }
 
-    public string ProductBarcode { get; set; } = null!;
+    public string ProductBarcode { get; private set; } = null!;
 
     public uint DetailInvoiceQuantity { get; set; }
 

@@ -7,14 +7,7 @@ namespace ProjectShop.Server.Core.ValueObjects.PlatformRules
 {
     public class ExpiryTryTimeoutRule : BasePlatformRules
     {
-        // Backing fields
-        private readonly int _maxTryTimes;
-
-        public int MaxTryTimes
-        {
-            get => _maxTryTimes;
-            init => _maxTryTimes = value;
-        }
+        public int MaxTryTimes { get; init; }
 
         public ExpiryTryTimeoutRule() : base("", false)
         {

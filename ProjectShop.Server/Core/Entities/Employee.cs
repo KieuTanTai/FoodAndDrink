@@ -5,27 +5,27 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class Employee
 {
-    public uint EmployeeId { get; set; }
+    public uint EmployeeId { get; init; }
 
-    public uint PersonId { get; set; }
+    public uint PersonId { get; private set; }
 
     public string? EmployeeHouseNumber { get; set; }
 
     public string EmployeeStreet { get; set; } = null!;
 
-    public uint? EmployeeWardId { get; set; }
+    public uint? EmployeeWardId { get; private set; }
 
-    public uint? EmployeeDistrictId { get; set; }
+    public uint? EmployeeDistrictId { get; private set; }
 
-    public uint? EmployeeCityId { get; set; }
+    public uint? EmployeeCityId { get; private set; }
 
-    public uint LocationId { get; set; }
+    public uint LocationId { get; private set; }
 
-    public DateTime EmployeeHireDate { get; set; }
+    public DateTime EmployeeHireDate { get; init; }
 
     public decimal EmployeeSalary { get; set; }
 
-    public virtual ICollection<DisposeProduct> DisposeProducts { get; set; } = new List<DisposeProduct>();
+    public virtual ICollection<DisposeProduct> DisposeProducts { get; init; } = [];
 
     public virtual LocationCity? EmployeeCity { get; set; }
 
@@ -33,7 +33,7 @@ public partial class Employee
 
     public virtual LocationWard? EmployeeWard { get; set; }
 
-    public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
+    public virtual ICollection<Invoice> Invoices { get; init; } = [];
 
     public virtual Location Location { get; set; } = null!;
 

@@ -2,20 +2,7 @@
 {
     public class ProductUpdateBoolBatchRequest
     {
-        // Backing fields
-        private IEnumerable<string> _barcodes = [];
-        private bool _value;
-
-        public IEnumerable<string> Barcodes
-        {
-            get => _barcodes;
-            set => _barcodes = value ?? [];
-        }
-
-        public bool Value
-        {
-            get => _value;
-            set => _value = value;
-        }
+        public IEnumerable<string> Barcodes { get; set; } = [];
+        public bool Value { get; set; }
     }
 }

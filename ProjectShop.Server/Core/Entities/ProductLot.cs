@@ -5,13 +5,13 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class ProductLot
 {
-    public uint ProductLotId { get; set; }
+    public uint ProductLotId { get; init; }
 
-    public uint InventoryId { get; set; }
+    public uint InventoryId { get; private set; }
 
-    public DateTime ProductLotCreatedDate { get; set; }
+    public DateTime ProductLotCreatedDate { get; init; }
 
-    public virtual ICollection<DetailInventoryMovement> DetailInventoryMovements { get; set; } = new List<DetailInventoryMovement>();
+    public virtual ICollection<DetailInventoryMovement> DetailInventoryMovements { get; init; } = [];
 
     public virtual Inventory Inventory { get; set; } = null!;
 }

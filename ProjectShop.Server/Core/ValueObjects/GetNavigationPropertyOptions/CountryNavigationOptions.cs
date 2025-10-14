@@ -1,6 +1,6 @@
 namespace ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
-public class SupplierNavigationOptions
+public class CountryNavigationOptions
 {
     public bool IsGetProducts { get; set; }
 }

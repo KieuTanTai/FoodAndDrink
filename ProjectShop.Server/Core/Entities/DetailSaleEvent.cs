@@ -5,11 +5,11 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class DetailSaleEvent
 {
-    public uint DetailSaleEventId { get; set; }
+    public uint DetailSaleEventId { get; init; }
 
-    public uint SaleEventId { get; set; }
+    public uint SaleEventId { get; private set; }
 
-    public string ProductBarcode { get; set; } = null!;
+    public string ProductBarcode { get; private set; } = null!;
 
     public string DiscountType { get; set; } = null!;
 

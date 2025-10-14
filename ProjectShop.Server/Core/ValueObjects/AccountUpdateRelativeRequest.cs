@@ -7,27 +7,8 @@ namespace ProjectShop.Server.Core.ValueObjects
 {
     public class AccountUpdateRelativeRequest
     {
-        // Backing fields
-        private uint _accountId;
-        private bool _isUpdateCustomer = false;
-        private bool _isUpdateEmployee = false;
-
-        public uint AccountId
-        {
-            get => _accountId;
-            set => _accountId = value;
-        }
-
-        public bool IsUpdateCustomer
-        {
-            get => _isUpdateCustomer;
-            set => _isUpdateCustomer = value;
-        }
-
-        public bool IsUpdateEmployee
-        {
-            get => _isUpdateEmployee;
-            set => _isUpdateEmployee = value;
-        }
+        public uint AccountId { get; set; }
+        public bool IsUpdateCustomer { get; set; }
+        public bool IsUpdateEmployee { get; set; }
     }
 }

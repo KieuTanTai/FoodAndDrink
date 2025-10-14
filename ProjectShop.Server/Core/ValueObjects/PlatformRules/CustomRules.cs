@@ -7,35 +7,10 @@ namespace ProjectShop.Server.Core.ValueObjects.PlatformRules
 {
     public class CustomRules
     {
-        // Backing fields
-        private readonly ExpiryCookieRule _expiryCookieRule = new();
-        private readonly ExpiryFetchTimeoutRule _expiryFetchTimeoutRule = new();
-        private readonly ExpiryTryTimeoutRule _expiryTryTimeoutRule = new();
-        private readonly MessageTimeoutRule _messageTimeoutRule = new();
-
-        public ExpiryCookieRule ExpiryCookieRule
-        {
-            get => _expiryCookieRule;
-            init => _expiryCookieRule = value ?? new();
-        }
-
-        public ExpiryFetchTimeoutRule ExpiryFetchTimeoutRule
-        {
-            get => _expiryFetchTimeoutRule;
-            init => _expiryFetchTimeoutRule = value ?? new();
-        }
-
-        public ExpiryTryTimeoutRule ExpiryTryTimeoutRule
-        {
-            get => _expiryTryTimeoutRule;
-            init => _expiryTryTimeoutRule = value ?? new();
-        }
-
-        public MessageTimeoutRule MessageTimeoutRule
-        {
-            get => _messageTimeoutRule;
-            init => _messageTimeoutRule = value ?? new();
-        }
+        public ExpiryCookieRule ExpiryCookieRule { get; init; } = new();
+        public ExpiryFetchTimeoutRule ExpiryFetchTimeoutRule { get; init; } = new();
+        public ExpiryTryTimeoutRule ExpiryTryTimeoutRule { get; init; } = new();
+        public MessageTimeoutRule MessageTimeoutRule { get; init; } = new();
 
         public CustomRules() { }
 

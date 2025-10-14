@@ -5,17 +5,17 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class Role
 {
-    public uint RoleId { get; set; }
+    public uint RoleId { get; init; }
 
     public string RoleName { get; set; } = null!;
 
     public bool? RoleStatus { get; set; }
 
-    public DateTime RoleCreatedDate { get; set; }
+    public DateTime RoleCreatedDate { get; init; }
 
     public DateTime RoleLastUpdatedDate { get; set; }
 
-    public virtual ICollection<AccountRole> AccountRoles { get; set; } = new List<AccountRole>();
+    public virtual ICollection<AccountRole> AccountRoles { get; init; } = [];
 
-    public virtual ICollection<RolePermission> RolePermissions { get; set; } = new List<RolePermission>();
+    public virtual ICollection<RolePermission> RolePermissions { get; init; } = [];
 }

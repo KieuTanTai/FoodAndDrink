@@ -5,7 +5,7 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class ProductSnack
 {
-    public string ProductBarcode { get; set; } = null!;
+    public string ProductBarcode { get; init; } = null!;
 
     public string Flavor { get; set; } = null!;
 

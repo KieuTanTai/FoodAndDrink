@@ -1,8 +1,7 @@
 namespace ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
-public class PersonNavigationOptions
+public class AccountRoleNavigationOptions
 {
     public bool IsGetAccount { get; set; }
-    public bool IsGetCustomer { get; set; }
-    public bool IsGetEmployee { get; set; }
+    public bool IsGetRole { get; set; }
 }

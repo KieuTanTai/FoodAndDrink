@@ -5,18 +5,18 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class AccountAdditionalPermission
 {
-    public uint AccountAdditionalPermissionId { get; set; }
+    public uint AccountAdditionalPermissionId { get; init; }
 
-    public uint AccountId { get; set; }
+    public uint AccountId { get; private set; }
 
-    public uint PermissionId { get; set; }
+    public uint PermissionId { get; private set; }
 
     /// <summary>
     /// 1=granted, 0=denied
     /// </summary>
     public bool? IsGranted { get; set; }
 
-    public DateTime AdditionalPermissionAssignedDate { get; set; }
+    public DateTime AdditionalPermissionAssignedDate { get; init; }
 
     public bool? AdditionalPermissionStatus { get; set; }
 

@@ -5,13 +5,13 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class RolePermission
 {
-    public uint RolePermissionId { get; set; }
+    public uint RolePermissionId { get; init; }
 
-    public uint RoleId { get; set; }
+    public uint RoleId { get; private set; }
 
-    public uint PermissionId { get; set; }
+    public uint PermissionId { get; private set; }
 
-    public DateTime RolePermissionCreatedDate { get; set; }
+    public DateTime RolePermissionCreatedDate { get; init; }
 
     public virtual Permission Permission { get; set; } = null!;
 

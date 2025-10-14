@@ -5,9 +5,9 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class DetailProductLot
 {
-    public uint ProductLotId { get; set; }
+    public uint ProductLotId { get; init; }
 
-    public string ProductBarcode { get; set; } = null!;
+    public string ProductBarcode { get; private set; } = null!;
 
     public DateTime ProductLotMfgDate { get; set; }
 

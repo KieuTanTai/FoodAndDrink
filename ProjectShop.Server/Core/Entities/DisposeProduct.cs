@@ -5,19 +5,19 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class DisposeProduct
 {
-    public uint DisposeProductId { get; set; }
+    public uint DisposeProductId { get; init; }
 
-    public uint LocationId { get; set; }
+    public uint LocationId { get; private set; }
 
-    public string ProductBarcode { get; set; } = null!;
+    public string ProductBarcode { get; private set; } = null!;
 
-    public uint DisposeByEmployeeId { get; set; }
+    public uint DisposeByEmployeeId { get; private set; }
 
-    public uint DisposeReasonId { get; set; }
+    public uint DisposeReasonId { get; private set; }
 
     public uint DisposeQuantity { get; set; }
 
-    public DateTime DisposedDate { get; set; }
+    public DateTime DisposedDate { get; init; }
 
     public virtual Employee DisposeByEmployee { get; set; } = null!;
 

@@ -5,11 +5,11 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class Category
 {
-    public uint CategoryId { get; set; }
+    public uint CategoryId { get; init; }
 
     public string CategoryName { get; set; } = null!;
 
     public bool? CategoryStatus { get; set; }
 
-    public virtual ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
+    public virtual ICollection<ProductCategory> ProductCategories { get; init; } = [];
 }

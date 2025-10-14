@@ -5,13 +5,13 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class AccountRole
 {
-    public uint AccountRoleId { get; set; }
+    public uint AccountRoleId { get; init; }
 
-    public uint AccountId { get; set; }
+    public uint AccountId { get; private set; }
 
-    public uint RoleId { get; set; }
+    public uint RoleId { get; private set; }
 
-    public DateTime AccountRoleAssignedDate { get; set; }
+    public DateTime AccountRoleAssignedDate { get; init; }
 
     public bool? AccountRoleStatus { get; set; }
 

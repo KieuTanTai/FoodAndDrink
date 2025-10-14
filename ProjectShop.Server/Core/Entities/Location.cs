@@ -5,19 +5,19 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class Location
 {
-    public uint LocationId { get; set; }
+    public uint LocationId { get; init; }
 
-    public uint LocationTypeId { get; set; }
+    public uint LocationTypeId { get; private set; }
 
     public string LocationHouseNumber { get; set; } = null!;
 
     public string LocationStreet { get; set; } = null!;
 
-    public uint LocationWardId { get; set; }
+    public uint LocationWardId { get; private set; }
 
-    public uint LocationDistrictId { get; set; }
+    public uint LocationDistrictId { get; private set; }
 
-    public uint LocationCityId { get; set; }
+    public uint LocationCityId { get; private set; }
 
     public string LocationPhone { get; set; } = null!;
 
@@ -27,15 +27,15 @@ public partial class Location
 
     public bool? LocationStatus { get; set; }
 
-    public virtual ICollection<DisposeProduct> DisposeProducts { get; set; } = new List<DisposeProduct>();
+    public virtual ICollection<DisposeProduct> DisposeProducts { get; init; } = [];
 
-    public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
+    public virtual ICollection<Employee> Employees { get; init; } = [];
 
-    public virtual ICollection<Inventory> Inventories { get; set; } = new List<Inventory>();
+    public virtual ICollection<Inventory> Inventories { get; init; } = [];
 
-    public virtual ICollection<InventoryMovement> InventoryMovementDestinationLocations { get; set; } = new List<InventoryMovement>();
+    public virtual ICollection<InventoryMovement> InventoryMovementDestinationLocations { get; init; } = [];
 
-    public virtual ICollection<InventoryMovement> InventoryMovementSourceLocations { get; set; } = new List<InventoryMovement>();
+    public virtual ICollection<InventoryMovement> InventoryMovementSourceLocations { get; init; } = [];
 
     public virtual LocationCity LocationCity { get; set; } = null!;
 
@@ -45,7 +45,7 @@ public partial class Location
 
     public virtual LocationWard LocationWard { get; set; } = null!;
 
-    public virtual ICollection<Supplier> SupplierCompanyLocations { get; set; } = new List<Supplier>();
+    public virtual ICollection<Supplier> SupplierCompanyLocations { get; init; } = [];
 
-    public virtual ICollection<Supplier> SupplierStoreLocations { get; set; } = new List<Supplier>();
+    public virtual ICollection<Supplier> SupplierStoreLocations { get; init; } = [];
 }

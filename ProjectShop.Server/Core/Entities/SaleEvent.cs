@@ -5,7 +5,7 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class SaleEvent
 {
-    public uint SaleEventId { get; set; }
+    public uint SaleEventId { get; init; }
 
     public DateTime SaleEventStartDate { get; set; }
 
@@ -19,9 +19,9 @@ public partial class SaleEvent
 
     public string SaleEventDiscountCode { get; set; } = null!;
 
-    public virtual ICollection<DetailSaleEvent> DetailSaleEvents { get; set; } = new List<DetailSaleEvent>();
+    public virtual ICollection<DetailSaleEvent> DetailSaleEvents { get; init; } = [];
 
-    public virtual ICollection<SaleEventImage> SaleEventImages { get; set; } = new List<SaleEventImage>();
+    public virtual ICollection<SaleEventImage> SaleEventImages { get; init; } = [];
 
-    public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
+    public virtual ICollection<Invoice> Invoices { get; init; } = [];
 }

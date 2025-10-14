@@ -5,15 +5,15 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class DetailInventory
 {
-    public uint DetailInventoryId { get; set; }
+    public uint DetailInventoryId { get; init; }
 
-    public uint InventoryId { get; set; }
+    public uint InventoryId { get; private set; }
 
-    public string ProductBarcode { get; set; } = null!;
+    public string ProductBarcode { get; private set; } = null!;
 
     public uint DetailInventoryQuantity { get; set; }
 
-    public DateTime DetailInventoryAddedDate { get; set; }
+    public DateTime DetailInventoryAddedDate { get; init; }
 
     public DateTime DetailInventoryLastUpdatedDate { get; set; }
 

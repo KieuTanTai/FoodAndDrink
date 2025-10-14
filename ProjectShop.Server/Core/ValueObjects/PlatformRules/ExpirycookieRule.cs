@@ -7,14 +7,7 @@ namespace ProjectShop.Server.Core.ValueObjects.PlatformRules
 {
     public class ExpiryCookieRule : BasePlatformRules
     {
-        // Backing fields
-        private readonly uint _maxAgeDays;
-
-        public uint MaxAgeDays
-        {
-            get => _maxAgeDays;
-            init => _maxAgeDays = value;
-        }
+        public uint MaxAgeDays { get; init; }
 
         public ExpiryCookieRule() : base("", false)
         {

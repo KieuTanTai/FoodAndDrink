@@ -5,17 +5,17 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class Inventory
 {
-    public uint InventoryId { get; set; }
+    public uint InventoryId { get; init; }
 
-    public uint LocationId { get; set; }
+    public uint LocationId { get; private set; }
 
     public bool? InventoryStatus { get; set; }
 
     public DateTime InventoryLastUpdatedDate { get; set; }
 
-    public virtual ICollection<DetailInventory> DetailInventories { get; set; } = new List<DetailInventory>();
+    public virtual ICollection<DetailInventory> DetailInventories { get; init; } = [];
 
     public virtual Location Location { get; set; } = null!;
 
-    public virtual ICollection<ProductLot> ProductLots { get; set; } = new List<ProductLot>();
+    public virtual ICollection<ProductLot> ProductLots { get; init; } = [];
 }

@@ -2,12 +2,7 @@ namespace ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 public class InventoryNavigationOptions
 {
-    // Backing fields
-    private bool _isGetLocation;
-
-    public bool IsGetLocation
-    {
-        get => _isGetLocation;
-        set => _isGetLocation = value;
-    }
+    public bool IsGetDetailInventories { get; set; }
+    public bool IsGetLocation { get; set; }
+    public bool IsGetProductLots { get; set; }
 }

@@ -7,21 +7,8 @@ namespace ProjectShop.Server.Core.ValueObjects.PlatformRules
 {
     public class BasePlatformRules
     {
-        // Backing fields
-        private readonly string _type = "";
-        private readonly bool _enabled = false;
-
-        public string Type
-        {
-            get => _type;
-            init => _type = value ?? string.Empty;
-        }
-
-        public bool Enabled
-        {
-            get => _enabled;
-            init => _enabled = value;
-        }
+        public string Type { get; init; } = string.Empty;
+        public bool Enabled { get; init; }
 
         public BasePlatformRules() { }
         public BasePlatformRules(string type, bool enabled)

@@ -5,11 +5,11 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class Product
 {
-    public string ProductBarcode { get; set; } = null!;
+    public string ProductBarcode { get; init; } = null!;
 
-    public uint SupplierId { get; set; }
+    public uint SupplierId { get; private set; }
 
-    public uint CountryId { get; set; }
+    public uint CountryId { get; private set; }
 
     public string ProductName { get; set; } = null!;
 
@@ -27,31 +27,31 @@ public partial class Product
 
     public bool? ProductStatus { get; set; }
 
-    public DateTime ProductAddedDate { get; set; }
+    public DateTime ProductAddedDate { get; init; }
 
     public DateTime ProductLastUpdatedDate { get; set; }
 
     public virtual Country Country { get; set; } = null!;
 
-    public virtual ICollection<DetailCart> DetailCarts { get; set; } = new List<DetailCart>();
+    public virtual ICollection<DetailCart> DetailCarts { get; init; } = [];
 
-    public virtual ICollection<DetailInventory> DetailInventories { get; set; } = new List<DetailInventory>();
+    public virtual ICollection<DetailInventory> DetailInventories { get; init; } = [];
 
-    public virtual ICollection<DetailInventoryMovement> DetailInventoryMovements { get; set; } = new List<DetailInventoryMovement>();
+    public virtual ICollection<DetailInventoryMovement> DetailInventoryMovements { get; init; } = [];
 
-    public virtual ICollection<DetailInvoice> DetailInvoices { get; set; } = new List<DetailInvoice>();
+    public virtual ICollection<DetailInvoice> DetailInvoices { get; init; } = [];
 
-    public virtual ICollection<DetailSaleEvent> DetailSaleEvents { get; set; } = new List<DetailSaleEvent>();
+    public virtual ICollection<DetailSaleEvent> DetailSaleEvents { get; init; } = [];
 
-    public virtual ICollection<DisposeProduct> DisposeProducts { get; set; } = new List<DisposeProduct>();
+    public virtual ICollection<DisposeProduct> DisposeProducts { get; init; } = [];
 
-    public virtual ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
+    public virtual ICollection<ProductCategory> ProductCategories { get; init; } = [];
 
     public virtual ProductDrink? ProductDrink { get; set; }
 
     public virtual ProductFruit? ProductFruit { get; set; }
 
-    public virtual ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
+    public virtual ICollection<ProductImage> ProductImages { get; init; } = [];
 
     public virtual ProductMeat? ProductMeat { get; set; }
 

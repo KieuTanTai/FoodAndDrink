@@ -5,13 +5,13 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class DetailInventoryMovement
 {
-    public uint DetailInventoryMovementId { get; set; }
+    public uint DetailInventoryMovementId { get; init; }
 
-    public uint InventoryMovementId { get; set; }
+    public uint InventoryMovementId { get; private set; }
 
-    public string ProductBarcode { get; set; } = null!;
+    public string ProductBarcode { get; private set; } = null!;
 
-    public uint? ProductLotId { get; set; }
+    public uint? ProductLotId { get; private set; }
 
     public uint DetailInventoryMovementQuantity { get; set; }
 

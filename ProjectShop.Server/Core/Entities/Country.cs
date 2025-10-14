@@ -5,7 +5,7 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class Country
 {
-    public uint CountryId { get; set; }
+    public uint CountryId { get; init; }
 
     public string CountryName { get; set; } = null!;
 
@@ -13,5 +13,5 @@ public partial class Country
 
     public bool? CountryStatus { get; set; }
 
-    public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+    public virtual ICollection<Product> Products { get; init; } = [];
 }

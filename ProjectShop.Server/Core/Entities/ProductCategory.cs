@@ -5,11 +5,11 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class ProductCategory
 {
-    public uint Id { get; set; }
+    public uint Id { get; init; }
 
-    public uint CategoryId { get; set; }
+    public uint CategoryId { get; private set; }
 
-    public string ProductBarcode { get; set; } = null!;
+    public string ProductBarcode { get; private set; } = null!;
 
     public virtual Category Category { get; set; } = null!;
 

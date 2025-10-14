@@ -5,15 +5,15 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class UserPaymentMethod
 {
-    public uint UserPaymentMethodId { get; set; }
+    public uint UserPaymentMethodId { get; init; }
 
     public string PaymentMethodType { get; set; } = null!;
 
-    public uint? BankId { get; set; }
+    public uint? BankId { get; private set; }
 
-    public uint CustomerId { get; set; }
+    public uint CustomerId { get; private set; }
 
-    public DateTime PaymentMethodAddedDate { get; set; }
+    public DateTime PaymentMethodAddedDate { get; init; }
 
     public DateTime PaymentMethodLastUpdatedDate { get; set; }
 
@@ -33,5 +33,5 @@ public partial class UserPaymentMethod
 
     public virtual Customer Customer { get; set; } = null!;
 
-    public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
+    public virtual ICollection<Invoice> Invoices { get; init; } = [];
 }

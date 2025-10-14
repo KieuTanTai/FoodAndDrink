@@ -5,15 +5,15 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class CustomerAddress
 {
-    public uint CustomerAddressId { get; set; }
+    public uint CustomerAddressId { get; init; }
 
-    public uint CustomerCityId { get; set; }
+    public uint CustomerCityId { get; private set; }
 
-    public uint CustomerDistrictId { get; set; }
+    public uint CustomerDistrictId { get; private set; }
 
-    public uint CustomerWardId { get; set; }
+    public uint CustomerWardId { get; private set; }
 
-    public uint CustomerId { get; set; }
+    public uint CustomerId { get; private set; }
 
     public string CustomerStreet { get; set; } = null!;
 

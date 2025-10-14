@@ -7,14 +7,7 @@ namespace ProjectShop.Server.Core.ValueObjects.PlatformRules
 {
     public class ExpiryFetchTimeoutRule : BasePlatformRules
     {
-        // Backing fields
-        private readonly uint _maxFetchTimeout;
-
-        public uint MaxFetchTimeout
-        {
-            get => _maxFetchTimeout;
-            init => _maxFetchTimeout = value;
-        }
+        public uint MaxFetchTimeout { get; init; }
 
         public ExpiryFetchTimeoutRule(string type, bool enabled, uint maxFetchTimeout) : base(type, enabled)
         {
