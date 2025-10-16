@@ -150,8 +150,12 @@ namespace ProjectShop.Server.Application.Services._BaseServices
         }
 
         //DRY helper:
-        public async Task LoadEntityAsync<TKey, TEntity>(Action<TEntity> assignResult, Func<TKey> selectorField, Func<TKey, Task<ServiceResult<TEntity>>> tryLoadFunc,
-            List<JsonLogEntry> logEntries, [CallerMemberName] string? methodCall = null) where TEntity : class
+        public async Task LoadEntityAsync<TKey, TEntity>(
+            Action<TEntity> assignResult,
+            Func<TKey> selectorField,
+            Func<TKey, Task<ServiceResult<TEntity>>> tryLoadFunc,
+            List<JsonLogEntry> logEntries,
+            [CallerMemberName] string? methodCall = null) where TEntity : class
         {
             var result = (await tryLoadFunc(selectorField())) ?? new ServiceResult<TEntity>(false);
             logEntries.AddRange(result.LogEntries ?? []);
@@ -162,8 +166,11 @@ namespace ProjectShop.Server.Application.Services._BaseServices
                     methodCall: methodCall));
         }
 
-        public async Task LoadICollectionEntitiesAsync<TKey, TEntity>(Action<IEnumerable<TEntity>> assignResult, Func<TKey> selectorField, Func<TKey, Task<ServiceResults<TEntity>>> tryLoadFunc,
-            List<JsonLogEntry> logEntries, [CallerMemberName] string? methodCall = null) where TEntity : class
+        public async Task LoadICollectionEntitiesAsync<TKey, TEntity>(Action<IEnumerable<TEntity>> assignResult,
+            Func<TKey> selectorField,
+            Func<TKey, Task<ServiceResults<TEntity>>> tryLoadFunc,
+            List<JsonLogEntry> logEntries,
+            [CallerMemberName] string? methodCall = null) where TEntity : class
         {
             var result = await tryLoadFunc(selectorField());
             logEntries.AddRange(result.LogEntries ?? []);

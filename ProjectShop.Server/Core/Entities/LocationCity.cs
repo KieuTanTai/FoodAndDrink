@@ -11,9 +11,9 @@ public partial class LocationCity
 
     public bool? LocationCityStatus { get; set; }
 
-    public virtual ICollection<CustomerAddress> CustomerAddresses { get; init; } = [];
+    public virtual ICollection<CustomerAddress> CustomerAddresses { get; set; } = [];
 
-    public virtual ICollection<Employee> Employees { get; init; } = [];
+    public virtual ICollection<Employee> Employees { get; set; } = [];
 
-    public virtual ICollection<Location> Locations { get; init; } = [];
+    public virtual ICollection<Location> Locations { get; set; } = [];
 }

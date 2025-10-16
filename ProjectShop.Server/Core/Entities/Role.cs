@@ -15,7 +15,7 @@ public partial class Role
 
     public DateTime RoleLastUpdatedDate { get; set; }
 
-    public virtual ICollection<AccountRole> AccountRoles { get; init; } = [];
+    public virtual ICollection<AccountRole> AccountRoles { get; set; } = [];
 
-    public virtual ICollection<RolePermission> RolePermissions { get; init; } = [];
+    public virtual ICollection<RolePermission> RolePermissions { get; set; } = [];
 }

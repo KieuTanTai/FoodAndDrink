@@ -19,7 +19,7 @@ public partial class InventoryMovement
 
     public virtual Location DestinationLocation { get; set; } = null!;
 
-    public virtual ICollection<DetailInventoryMovement> DetailInventoryMovements { get; init; } = [];
+    public virtual ICollection<DetailInventoryMovement> DetailInventoryMovements { get; set; } = [];
 
     public virtual Location SourceLocation { get; set; } = null!;
 }

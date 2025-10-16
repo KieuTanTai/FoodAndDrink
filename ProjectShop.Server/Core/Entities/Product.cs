@@ -33,25 +33,25 @@ public partial class Product
 
     public virtual Country Country { get; set; } = null!;
 
-    public virtual ICollection<DetailCart> DetailCarts { get; init; } = [];
+    public virtual ICollection<DetailCart> DetailCarts { get; set; } = [];
 
-    public virtual ICollection<DetailInventory> DetailInventories { get; init; } = [];
+    public virtual ICollection<DetailInventory> DetailInventories { get; set; } = [];
 
-    public virtual ICollection<DetailInventoryMovement> DetailInventoryMovements { get; init; } = [];
+    public virtual ICollection<DetailInventoryMovement> DetailInventoryMovements { get; set; } = [];
 
-    public virtual ICollection<DetailInvoice> DetailInvoices { get; init; } = [];
+    public virtual ICollection<DetailInvoice> DetailInvoices { get; set; } = [];
 
-    public virtual ICollection<DetailSaleEvent> DetailSaleEvents { get; init; } = [];
+    public virtual ICollection<DetailSaleEvent> DetailSaleEvents { get; set; } = [];
 
-    public virtual ICollection<DisposeProduct> DisposeProducts { get; init; } = [];
+    public virtual ICollection<DisposeProduct> DisposeProducts { get; set; } = [];
 
-    public virtual ICollection<ProductCategory> ProductCategories { get; init; } = [];
+    public virtual ICollection<ProductCategory> ProductCategories { get; set; } = [];
 
     public virtual ProductDrink? ProductDrink { get; set; }
 
     public virtual ProductFruit? ProductFruit { get; set; }
 
-    public virtual ICollection<ProductImage> ProductImages { get; init; } = [];
+    public virtual ICollection<ProductImage> ProductImages { get; set; } = [];
 
     public virtual ProductMeat? ProductMeat { get; set; }
 

@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Interfaces.IContext;
 
 namespace ProjectShop.Server.Core.Entities.Context;
 
-public partial class FoodAndDrinkShopDbContext : DbContext
+public partial class FoodAndDrinkShopDbContext : DbContext, IDBContext
 {
+    private IDbContextTransaction? _currentTransaction;
+
     public FoodAndDrinkShopDbContext()
     {
     }
@@ -1847,4 +1852,139 @@ public partial class FoodAndDrinkShopDbContext : DbContext
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+    #region Transaction Management
+
+    public IDbContextTransaction BeginTransaction()
+    {
+        if (_currentTransaction != null)
+        {
+            throw new InvalidOperationException("A transaction is already in progress.");
+        }
+
+        _currentTransaction = Database.BeginTransaction();
+        return _currentTransaction;
+    }
+
+    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        if (_currentTransaction != null)
+        {
+            throw new InvalidOperationException("A transaction is already in progress.");
+        }
+
+        _currentTransaction = await Database.BeginTransactionAsync(cancellationToken);
+        return _currentTransaction;
+    }
+
+    public IDbContextTransaction BeginTransaction(IsolationLevel isolationLevel)
+    {
+        if (_currentTransaction != null)
+        {
+            throw new InvalidOperationException("A transaction is already in progress.");
+        }
+
+        _currentTransaction = Database.BeginTransaction(isolationLevel);
+        return _currentTransaction;
+    }
+
+    public async Task<IDbContextTransaction> BeginTransactionAsync(IsolationLevel isolationLevel, CancellationToken cancellationToken = default)
+    {
+        if (_currentTransaction != null)
+        {
+            throw new InvalidOperationException("A transaction is already in progress.");
+        }
+
+        _currentTransaction = await Database.BeginTransactionAsync(isolationLevel, cancellationToken);
+        return _currentTransaction;
+    }
+
+    public void CommitTransaction()
+    {
+        if (_currentTransaction == null)
+        {
+            throw new InvalidOperationException("No transaction in progress to commit.");
+        }
+
+        try
+        {
+            _currentTransaction.Commit();
+        }
+        finally
+        {
+            _currentTransaction.Dispose();
+            _currentTransaction = null;
+        }
+    }
+
+    public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        if (_currentTransaction == null)
+        {
+            throw new InvalidOperationException("No transaction in progress to commit.");
+        }
+
+        try
+        {
+            await _currentTransaction.CommitAsync(cancellationToken);
+        }
+        finally
+        {
+            await _currentTransaction.DisposeAsync();
+            _currentTransaction = null;
+        }
+    }
+
+    public void RollbackTransaction()
+    {
+        if (_currentTransaction == null)
+        {
+            throw new InvalidOperationException("No transaction in progress to rollback.");
+        }
+
+        try
+        {
+            _currentTransaction.Rollback();
+        }
+        finally
+        {
+            _currentTransaction.Dispose();
+            _currentTransaction = null;
+        }
+    }
+
+    public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        if (_currentTransaction == null)
+        {
+            throw new InvalidOperationException("No transaction in progress to rollback.");
+        }
+
+        try
+        {
+            await _currentTransaction.RollbackAsync(cancellationToken);
+        }
+        finally
+        {
+            await _currentTransaction.DisposeAsync();
+            _currentTransaction = null;
+        }
+    }
+
+    public override void Dispose()
+    {
+        _currentTransaction?.Dispose();
+        base.Dispose();
+    }
+
+    public override async ValueTask DisposeAsync()
+    {
+        if (_currentTransaction != null)
+        {
+            await _currentTransaction.DisposeAsync();
+        }
+        await base.DisposeAsync();
+    }
+
+    #endregion
 }

@@ -19,9 +19,9 @@ public partial class SaleEvent
 
     public string SaleEventDiscountCode { get; set; } = null!;
 
-    public virtual ICollection<DetailSaleEvent> DetailSaleEvents { get; init; } = [];
+    public virtual ICollection<DetailSaleEvent> DetailSaleEvents { get; set; } = [];
 
-    public virtual ICollection<SaleEventImage> SaleEventImages { get; init; } = [];
+    public virtual ICollection<SaleEventImage> SaleEventImages { get; set; } = [];
 
-    public virtual ICollection<Invoice> Invoices { get; init; } = [];
+    public virtual ICollection<Invoice> Invoices { get; set; } = [];
 }

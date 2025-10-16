@@ -11,5 +11,5 @@ public partial class Bank
 
     public bool? BankStatus { get; set; }
 
-    public virtual ICollection<UserPaymentMethod> UserPaymentMethods { get; init; } = [];
+    public virtual ICollection<UserPaymentMethod> UserPaymentMethods { get; set; } = [];
 }

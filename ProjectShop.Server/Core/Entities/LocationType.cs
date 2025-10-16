@@ -11,5 +11,5 @@ public partial class LocationType
 
     public bool? LocationTypeStatus { get; set; }
 
-    public virtual ICollection<Location> Locations { get; init; } = [];
+    public virtual ICollection<Location> Locations { get; set; } = [];
 }

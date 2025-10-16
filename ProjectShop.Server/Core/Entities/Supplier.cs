@@ -23,7 +23,7 @@ public partial class Supplier
 
     public virtual Location CompanyLocation { get; set; } = null!;
 
-    public virtual ICollection<Product> Products { get; init; } = [];
+    public virtual ICollection<Product> Products { get; set; } = [];
 
     public virtual Location StoreLocation { get; set; } = null!;
 }

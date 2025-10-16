@@ -25,7 +25,7 @@ public partial class Employee
 
     public decimal EmployeeSalary { get; set; }
 
-    public virtual ICollection<DisposeProduct> DisposeProducts { get; init; } = [];
+    public virtual ICollection<DisposeProduct> DisposeProducts { get; set; } = [];
 
     public virtual LocationCity? EmployeeCity { get; set; }
 
@@ -33,7 +33,7 @@ public partial class Employee
 
     public virtual LocationWard? EmployeeWard { get; set; }
 
-    public virtual ICollection<Invoice> Invoices { get; init; } = [];
+    public virtual ICollection<Invoice> Invoices { get; set; } = [];
 
     public virtual Location Location { get; set; } = null!;
 

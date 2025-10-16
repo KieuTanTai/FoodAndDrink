@@ -13,9 +13,9 @@ public partial class Inventory
 
     public DateTime InventoryLastUpdatedDate { get; set; }
 
-    public virtual ICollection<DetailInventory> DetailInventories { get; init; } = [];
+    public virtual ICollection<DetailInventory> DetailInventories { get; set; } = [];
 
     public virtual Location Location { get; set; } = null!;
 
-    public virtual ICollection<ProductLot> ProductLots { get; init; } = [];
+    public virtual ICollection<ProductLot> ProductLots { get; set; } = [];
 }

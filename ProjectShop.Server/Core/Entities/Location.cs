@@ -27,15 +27,15 @@ public partial class Location
 
     public bool? LocationStatus { get; set; }
 
-    public virtual ICollection<DisposeProduct> DisposeProducts { get; init; } = [];
+    public virtual ICollection<DisposeProduct> DisposeProducts { get; set; } = [];
 
-    public virtual ICollection<Employee> Employees { get; init; } = [];
+    public virtual ICollection<Employee> Employees { get; set; } = [];
 
-    public virtual ICollection<Inventory> Inventories { get; init; } = [];
+    public virtual ICollection<Inventory> Inventories { get; set; } = [];
 
-    public virtual ICollection<InventoryMovement> InventoryMovementDestinationLocations { get; init; } = [];
+    public virtual ICollection<InventoryMovement> InventoryMovementDestinationLocations { get; set; } = [];
 
-    public virtual ICollection<InventoryMovement> InventoryMovementSourceLocations { get; init; } = [];
+    public virtual ICollection<InventoryMovement> InventoryMovementSourceLocations { get; set; } = [];
 
     public virtual LocationCity LocationCity { get; set; } = null!;
 
@@ -45,7 +45,7 @@ public partial class Location
 
     public virtual LocationWard LocationWard { get; set; } = null!;
 
-    public virtual ICollection<Supplier> SupplierCompanyLocations { get; init; } = [];
+    public virtual ICollection<Supplier> SupplierCompanyLocations { get; set; } = [];
 
-    public virtual ICollection<Supplier> SupplierStoreLocations { get; init; } = [];
+    public virtual ICollection<Supplier> SupplierStoreLocations { get; set; } = [];
 }

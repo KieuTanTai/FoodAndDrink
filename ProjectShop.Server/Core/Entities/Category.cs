@@ -11,5 +11,5 @@ public partial class Category
 
     public bool? CategoryStatus { get; set; }
 
-    public virtual ICollection<ProductCategory> ProductCategories { get; init; } = [];
+    public virtual ICollection<ProductCategory> ProductCategories { get; set; } = [];
 }

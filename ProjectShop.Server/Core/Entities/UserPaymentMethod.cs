@@ -33,5 +33,5 @@ public partial class UserPaymentMethod
 
     public virtual Customer Customer { get; set; } = null!;
 
-    public virtual ICollection<Invoice> Invoices { get; init; } = [];
+    public virtual ICollection<Invoice> Invoices { get; set; } = [];
 }

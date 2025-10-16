@@ -13,5 +13,5 @@ public partial class Cart
 
     public virtual Customer Customer { get; set; } = null!;
 
-    public virtual ICollection<DetailCart> DetailCarts { get; init; } = [];
+    public virtual ICollection<DetailCart> DetailCarts { get; set; } = [];
 }

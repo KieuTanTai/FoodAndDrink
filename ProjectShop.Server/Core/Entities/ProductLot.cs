@@ -11,7 +11,7 @@ public partial class ProductLot
 
     public DateTime ProductLotCreatedDate { get; init; }
 
-    public virtual ICollection<DetailInventoryMovement> DetailInventoryMovements { get; init; } = [];
+    public virtual ICollection<DetailInventoryMovement> DetailInventoryMovements { get; set; } = [];
 
     public virtual Inventory Inventory { get; set; } = null!;
 }

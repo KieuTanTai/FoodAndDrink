@@ -13,13 +13,13 @@ public partial class Customer
 
     public DateTime CustomerRegistrationDate { get; init; }
 
-    public virtual ICollection<Cart> Carts { get; init; } = [];
+    public virtual ICollection<Cart> Carts { get; set; } = [];
 
-    public virtual ICollection<CustomerAddress> CustomerAddresses { get; init; } = [];
+    public virtual ICollection<CustomerAddress> CustomerAddresses { get; set; } = [];
 
-    public virtual ICollection<Invoice> Invoices { get; init; } = [];
+    public virtual ICollection<Invoice> Invoices { get; set; } = [];
 
     public virtual Person Person { get; set; } = null!;
 
-    public virtual ICollection<UserPaymentMethod> UserPaymentMethods { get; init; } = [];
+    public virtual ICollection<UserPaymentMethod> UserPaymentMethods { get; set; } = [];
 }

@@ -13,5 +13,5 @@ public partial class Country
 
     public bool? CountryStatus { get; set; }
 
-    public virtual ICollection<Product> Products { get; init; } = [];
+    public virtual ICollection<Product> Products { get; set; } = [];
 }

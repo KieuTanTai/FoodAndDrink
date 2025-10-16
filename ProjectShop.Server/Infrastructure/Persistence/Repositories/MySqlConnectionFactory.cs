@@ -1,5 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using ProjectShop.Server.Core.Interfaces.IData;
+
 using System.Data;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories

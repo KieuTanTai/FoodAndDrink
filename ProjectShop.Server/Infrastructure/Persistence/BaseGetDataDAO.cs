@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using ProjectShop.Server.Core.Enums;
-using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using System.Data;
 

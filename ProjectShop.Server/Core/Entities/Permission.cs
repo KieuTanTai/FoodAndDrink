@@ -17,7 +17,7 @@ public partial class Permission
 
     public DateTime PermissionLastUpdatedDate { get; set; }
 
-    public virtual ICollection<AccountAdditionalPermission> AccountAdditionalPermissions { get; init; } = [];
+    public virtual ICollection<AccountAdditionalPermission> AccountAdditionalPermissions { get; set; } = [];
 
-    public virtual ICollection<RolePermission> RolePermissions { get; init; } = [];
+    public virtual ICollection<RolePermission> RolePermissions { get; set; } = [];
 }

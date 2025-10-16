@@ -15,11 +15,11 @@ public partial class Account
 
     public DateTime AccountLastUpdatedDate { get; set; }
 
-    public bool? AccountStatus { get; set; }
+    public bool AccountStatus { get; set; }
 
-    public virtual ICollection<AccountAdditionalPermission> AccountAdditionalPermissions { get; init; } = [];
+    public virtual ICollection<AccountAdditionalPermission> AccountAdditionalPermissions { get; set; } = [];
 
-    public virtual ICollection<AccountRole> AccountRoles { get; init; } = [];
+    public virtual ICollection<AccountRole> AccountRoles { get; set; } = [];
 
     public virtual Person? Person { get; set; }
 }

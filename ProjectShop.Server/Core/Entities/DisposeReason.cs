@@ -9,5 +9,5 @@ public partial class DisposeReason
 
     public string DisposeReasonName { get; set; } = null!;
 
-    public virtual ICollection<DisposeProduct> DisposeProducts { get; init; } = [];
+    public virtual ICollection<DisposeProduct> DisposeProducts { get; set; } = [];
 }

@@ -23,11 +23,11 @@ public partial class Invoice
 
     public virtual Customer Customer { get; set; } = null!;
 
-    public virtual ICollection<DetailInvoice> DetailInvoices { get; init; } = [];
+    public virtual ICollection<DetailInvoice> DetailInvoices { get; set; } = [];
 
     public virtual Employee Employee { get; set; } = null!;
 
     public virtual UserPaymentMethod? PaymentMethod { get; set; }
 
-    public virtual ICollection<SaleEvent> SaleEvents { get; init; } = [];
+    public virtual ICollection<SaleEvent> SaleEvents { get; set; } = [];
 }
