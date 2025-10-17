@@ -1,15 +1,50 @@
+using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class RoleRepository : Repository<Role>, IRoleRepository
+    public class RoleRepository(IDBContext context) : Repository<Role>(context), IRoleRepository
     {
-        public RoleRepository(IDBContext context) : base(context)
+        public async Task<Role?> GetByNameAsync(string roleName, CancellationToken cancellationToken = default)
         {
+            throw new NotImplementedException();
         }
 
-        // TODO: Implement all methods from IRoleRepository
+        public async Task<IEnumerable<Role>> GetByNamesAsync(IEnumerable<string> roleNames, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Role>> SearchByNameAsync(string searchTerm, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Role>> GetByStatusAsync(bool? status, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Role>> GetByCreatedDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Role>> GetByLastUpdatedDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Role?> GetByIdWithPermissionsAsync(uint roleId, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Role>> GetAllWithPermissionsAsync(CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

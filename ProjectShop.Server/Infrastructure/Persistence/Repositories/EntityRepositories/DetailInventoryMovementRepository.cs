@@ -1,15 +1,25 @@
+using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class DetailInventoryMovementRepository : Repository<DetailInventoryMovement>, IDetailInventoryMovementRepository
+    public class DetailInventoryMovementRepository(IDBContext context) : Repository<DetailInventoryMovement>(context), IDetailInventoryMovementRepository
     {
-        public DetailInventoryMovementRepository(IDBContext context) : base(context)
+        public async Task<IEnumerable<DetailInventoryMovement>> GetByInventoryMovementIdAsync(uint inventoryMovementId, CancellationToken cancellationToken = default)
         {
+            throw new NotImplementedException();
         }
 
-        // TODO: Implement all methods from IDetailInventoryMovementRepository
+        public async Task<IEnumerable<DetailInventoryMovement>> GetByProductLotIdAsync(uint productLotId, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<DetailInventoryMovement>> GetByProductBarcodeAsync(string productBarcode, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

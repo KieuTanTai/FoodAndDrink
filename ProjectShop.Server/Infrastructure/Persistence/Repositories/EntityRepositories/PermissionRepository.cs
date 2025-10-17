@@ -1,15 +1,45 @@
+using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class PermissionRepository : Repository<Permission>, IPermissionRepository
+    public class PermissionRepository(IDBContext context) : Repository<Permission>(context), IPermissionRepository
     {
-        public PermissionRepository(IDBContext context) : base(context)
+        public async Task<Permission?> GetByNameAsync(string permissionName, CancellationToken cancellationToken = default)
         {
+            throw new NotImplementedException();
         }
 
-        // TODO: Implement all methods from IPermissionRepository
+        public async Task<IEnumerable<Permission>> GetByNamesAsync(IEnumerable<string> permissionNames, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Permission>> SearchByNameAsync(string searchTerm, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Permission>> GetByStatusAsync(bool? status, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Permission>> GetByCreatedDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Permission>> GetByLastUpdatedDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Permission?> GetByIdWithRolesAsync(uint permissionId, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

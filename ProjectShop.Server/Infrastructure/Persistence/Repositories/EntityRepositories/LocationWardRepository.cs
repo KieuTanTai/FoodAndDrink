@@ -1,15 +1,25 @@
+using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class LocationWardRepository : Repository<LocationWard>, ILocationWardRepository
+    public class LocationWardRepository(IDBContext context) : Repository<LocationWard>(context), ILocationWardRepository
     {
-        public LocationWardRepository(IDBContext context) : base(context)
+        public async Task<IEnumerable<LocationWard>> GetByLocationDistrictIdAsync(uint locationDistrictId, CancellationToken cancellationToken = default)
         {
+            throw new NotImplementedException();
         }
 
-        // TODO: Implement all methods from ILocationWardRepository
+        public async Task<LocationWard?> GetByNameAsync(string wardName, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<LocationWard>> SearchByNameAsync(string searchTerm, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,15 +1,20 @@
+using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class ProductSnackRepository : Repository<ProductSnack>, IProductSnackRepository
+    public class ProductSnackRepository(IDBContext context) : Repository<ProductSnack>(context), IProductSnackRepository
     {
-        public ProductSnackRepository(IDBContext context) : base(context)
+        public async Task<ProductSnack?> GetByProductBarcodeAsync(string productBarcode, CancellationToken cancellationToken = default)
         {
+            throw new NotImplementedException();
         }
 
-        // TODO: Implement all methods from IProductSnackRepository
+        public async Task<IEnumerable<ProductSnack>> GetByWeightRangeAsync(decimal minWeight, decimal maxWeight, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

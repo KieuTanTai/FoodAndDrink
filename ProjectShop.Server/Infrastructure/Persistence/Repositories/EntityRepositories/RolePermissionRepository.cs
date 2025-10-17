@@ -1,15 +1,30 @@
+using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class RolePermissionRepository : Repository<RolePermission>, IRolePermissionRepository
+    public class RolePermissionRepository(IDBContext context) : Repository<RolePermission>(context), IRolePermissionRepository
     {
-        public RolePermissionRepository(IDBContext context) : base(context)
+        public async Task<IEnumerable<RolePermission>> GetByRoleIdAsync(uint roleId, CancellationToken cancellationToken = default)
         {
+            throw new NotImplementedException();
         }
 
-        // TODO: Implement all methods from IRolePermissionRepository
+        public async Task<IEnumerable<RolePermission>> GetByPermissionIdAsync(uint permissionId, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<RolePermission?> GetByRoleIdAndPermissionIdAsync(uint roleId, uint permissionId, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<RolePermission>> GetByCreatedDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

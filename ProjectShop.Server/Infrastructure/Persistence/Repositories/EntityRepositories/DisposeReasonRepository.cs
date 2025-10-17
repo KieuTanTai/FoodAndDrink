@@ -1,15 +1,20 @@
+using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class DisposeReasonRepository : Repository<DisposeReason>, IDisposeReasonRepository
+    public class DisposeReasonRepository(IDBContext context) : Repository<DisposeReason>(context), IDisposeReasonRepository
     {
-        public DisposeReasonRepository(IDBContext context) : base(context)
+        public async Task<DisposeReason?> GetByNameAsync(string reasonName, CancellationToken cancellationToken = default)
         {
+            throw new NotImplementedException();
         }
 
-        // TODO: Implement all methods from IDisposeReasonRepository
+        public async Task<IEnumerable<DisposeReason>> SearchByNameAsync(string searchTerm, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

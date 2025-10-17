@@ -1,59 +1,14 @@
+using System.Globalization;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
+using ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
 {
-    /// <summary>
-    /// Base repository implementation using EF Core
-    /// </summary>
-    /// <typeparam name="TEntity">Entity type</typeparam>
-    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
+    public class Repository<TEntity>(IDBContext context) : QueryRepository<TEntity>(context), IRepository<TEntity> where TEntity : class
     {
-        protected readonly IDBContext _context;
-        protected readonly DbSet<TEntity> _dbSet;
-
-        public Repository(IDBContext context)
-        {
-            _context = context;
-            _dbSet = context.Set<TEntity>();
-        }
-
-        #region Query Operations
-
-        public virtual async Task<TEntity?> GetByIdAsync(object id, CancellationToken cancellationToken = default)
-        {
-            return await _dbSet.FindAsync(new[] { id }, cancellationToken);
-        }
-
-        public virtual async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
-        {
-            return await _dbSet.ToListAsync(cancellationToken);
-        }
-
-        public virtual async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
-        {
-            return await _dbSet.Where(predicate).ToListAsync(cancellationToken);
-        }
-
-        public virtual async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
-        {
-            return await _dbSet.FirstOrDefaultAsync(predicate, cancellationToken);
-        }
-
-        public virtual async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
-        {
-            return await _dbSet.AnyAsync(predicate, cancellationToken);
-        }
-
-        public virtual async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
-        {
-            return await _dbSet.CountAsync(predicate, cancellationToken);
-        }
-
-        #endregion
-
         #region Command Operations
 
         public virtual async Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default)
@@ -83,18 +38,47 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public virtual async Task DeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
+        public virtual async Task DeleteAsync(TEntity entity, bool isSoftDelete = false, CancellationToken cancellationToken = default)
         {
+            if (isSoftDelete)
+            {
+                await SoftDeleteAsync(entity, cancellationToken);
+                return;
+            }
+
             _dbSet.Remove(entity);
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public virtual async Task DeleteRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+        public virtual async Task DeleteRangeAsync(IEnumerable<TEntity> entities, bool isSoftDelete = false,
+            Action<TEntity>? updateFieldFunc = null, CancellationToken cancellationToken = default)
         {
+            if (isSoftDelete && updateFieldFunc != null)
+            {
+                await SoftDeleteRangeAsync(entities, updateFieldFunc, cancellationToken);
+                return;
+            }
+
             _dbSet.RemoveRange(entities);
             await _context.SaveChangesAsync(cancellationToken);
         }
+        #endregion
 
+        #region Custom Delete Operations
+        private async Task SoftDeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
+        {
+            _dbSet.Update(entity);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        private async Task SoftDeleteRangeAsync(IEnumerable<TEntity> entities, Action<TEntity> updateFieldFunc, CancellationToken cancellationToken = default)
+        {
+            var entityList = entities.ToList();
+            foreach (var entity in entityList)
+                updateFieldFunc(entity);
+            _dbSet.UpdateRange(entityList);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
         #endregion
     }
 }

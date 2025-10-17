@@ -1,15 +1,40 @@
+using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class SupplierRepository : Repository<Supplier>, ISupplierRepository
+    public class SupplierRepository(IDBContext context) : Repository<Supplier>(context), ISupplierRepository
     {
-        public SupplierRepository(IDBContext context) : base(context)
+        public async Task<Supplier?> GetByNameAsync(string supplierName, CancellationToken cancellationToken = default)
         {
+            throw new NotImplementedException();
         }
 
-        // TODO: Implement all methods from ISupplierRepository
+        public async Task<IEnumerable<Supplier>> GetByNamesAsync(IEnumerable<string> supplierNames, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Supplier>> SearchByNameAsync(string searchTerm, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Supplier>> GetByStatusAsync(bool? status, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Supplier?> GetByIdWithProductsAsync(uint supplierId, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Supplier>> GetAllWithProductsAsync(CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

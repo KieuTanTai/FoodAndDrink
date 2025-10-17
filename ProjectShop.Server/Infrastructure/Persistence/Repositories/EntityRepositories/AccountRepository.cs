@@ -6,14 +6,8 @@ using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    /// <summary>
-    /// Account repository implementation using EF Core
-    /// </summary>
-    public class AccountRepository : Repository<Account>, IAccountRepository
+    public class AccountRepository(IDBContext context) : Repository<Account>(context), IAccountRepository
     {
-        public AccountRepository(IDBContext context) : base(context)
-        {
-        }
 
         #region Query by UserName
 

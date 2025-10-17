@@ -1,15 +1,20 @@
+using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class ProductFruitRepository : Repository<ProductFruit>, IProductFruitRepository
+    public class ProductFruitRepository(IDBContext context) : Repository<ProductFruit>(context), IProductFruitRepository
     {
-        public ProductFruitRepository(IDBContext context) : base(context)
+        public async Task<ProductFruit?> GetByProductBarcodeAsync(string productBarcode, CancellationToken cancellationToken = default)
         {
+            throw new NotImplementedException();
         }
 
-        // TODO: Implement all methods from IProductFruitRepository
+        public async Task<IEnumerable<ProductFruit>> GetByOriginAsync(string origin, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,15 +1,25 @@
+using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class BankRepository : Repository<Bank>, IBankRepository
+    public class BankRepository(IDBContext context) : Repository<Bank>(context), IBankRepository
     {
-        public BankRepository(IDBContext context) : base(context)
+        public async Task<Bank?> GetByNameAsync(string bankName, CancellationToken cancellationToken = default)
         {
+            throw new NotImplementedException();
         }
 
-        // TODO: Implement all methods from IBankRepository
+        public async Task<IEnumerable<Bank>> GetByStatusAsync(bool? status, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Bank>> SearchByNameAsync(string searchTerm, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
