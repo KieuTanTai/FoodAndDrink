@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
+using ProjectShop.Server.Core.Interfaces.IValidate;
 
-namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
+namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
 {
-    public class QueryRepository<TEntity>(IDBContext context) : IQueryRepository<TEntity> where TEntity : class
+    public class QueryRepository<TEntity>(IDBContext context, IMaxGetRecord maxGetRecord, string columnIdName="Id") : IQueryRepository<TEntity> where TEntity : class
     {
+        protected readonly string _colIdName = columnIdName;
+        protected readonly uint _maxGetReturn = maxGetRecord.MaxGetRecord;
         protected readonly IDBContext _context = context;
         protected readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
 
@@ -18,6 +21,12 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public virtual async Task<TEntity?> GetByIdAsync(object id, CancellationToken cancellationToken = default)
         {
             return await _dbSet.FindAsync([id], cancellationToken);
+        }
+
+        public virtual async Task<IEnumerable<TEntity>> GetByIdsAsync(IEnumerable<object> ids, CancellationToken cancellationToken = default)
+        {
+            var idList = ids.ToList();
+            return await _dbSet.Where(e => idList.Contains(EF.Property<object>(e, _colIdName))).ToListAsync(cancellationToken);
         }
 
         public virtual async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -46,5 +55,6 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         }
 
         #endregion
+
     }
 }

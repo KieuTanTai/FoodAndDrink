@@ -1,3 +1,5 @@
+using System.Data;
+using Microsoft.EntityFrameworkCore.Storage;
 using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
@@ -184,22 +186,22 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
             UserPaymentMethods = userPaymentMethodRepository;
         }
 
-        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
             return await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
+        public async Task BeginTransactionAsync(CancellationToken cancellationToken)
         {
             await _context.BeginTransactionAsync(cancellationToken);
         }
 
-        public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
+        public async Task CommitTransactionAsync(CancellationToken cancellationToken)
         {
             await _context.CommitTransactionAsync(cancellationToken);
         }
 
-        public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
+        public async Task RollbackTransactionAsync(CancellationToken cancellationToken)
         {
             await _context.RollbackTransactionAsync(cancellationToken);
         }
@@ -207,6 +209,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
         public void Dispose()
         {
             _context?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -3,11 +3,12 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
+using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
 {
-    public class Repository<TEntity>(IDBContext context) : QueryRepository<TEntity>(context), IRepository<TEntity> where TEntity : class
+    public class Repository<TEntity>(IDBContext context, IMaxGetRecord maxGetRecord) : QueryRepository<TEntity>(context, maxGetRecord), IRepository<TEntity> where TEntity : class
     {
         #region Command Operations
 

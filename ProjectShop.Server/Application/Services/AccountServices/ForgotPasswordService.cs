@@ -1,99 +1,151 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Data.SqlTypes;
+using Microsoft.EntityFrameworkCore;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IContext;
+using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ValueObjects;
+using ProjectShop.Server.Core.ValueObjects.PlatformRules;
 
 namespace ProjectShop.Server.Application.Services.AccountServices
 {
     public class ForgotPasswordService : IForgotPasswordServices
     {
-        private readonly IDBContext _dbContext;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IHashPassword _hashPassword;
         private readonly ILogService _logger;
 
-        public ForgotPasswordService(IDBContext dbContext, IHashPassword hashPassword, ILogService logger)
+        public ForgotPasswordService(IUnitOfWork unitOfWork, IHashPassword hashPassword, ILogService logger)
         {
-            _dbContext = dbContext;
+            _unitOfWork = unitOfWork;
             _hashPassword = hashPassword;
             _logger = logger;
         }
 
-        public async Task<JsonLogEntry> UpdatePasswordAsync(string username, string password)
+        public async Task<JsonLogEntry> UpdatePasswordAsync(string userName, string password, CancellationToken cancellationToken)
         {
-            await using var transaction = await _dbContext.BeginTransactionAsync();
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+            _logger.LogInfo<Account, ForgotPasswordService>($"Starting transaction to update password for account with userName {userName}.");
             try
             {
-                Account? entity = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.UserName == username);
-                if (entity == null)
-                    return _logger.JsonLogWarning<Account, ForgotPasswordService>($"Account with username {username} does not exist.");
-                if (!await _hashPassword.IsPasswordHashed(password))
-                    entity.Password = await _hashPassword.HashPasswordAsync(password);
-                int affectedRows = await _dbContext.SaveChangesAsync();
+                await HelperUpdatePasswordForAccountAsync(userName, cancellationToken);
+                int affectedRows = await _unitOfWork.SaveChangesAsync(cancellationToken);
                 if (affectedRows == 0)
                 {
-                    await transaction.RollbackAsync();
-                    return _logger.JsonLogWarning<Account, ForgotPasswordService>($"Failed to update the account with username {username}.");
+                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                    return _logger.JsonLogWarning<Account, ForgotPasswordService>($"Failed to update the account with userName {userName}.");
                 }
-                await transaction.CommitAsync();
-                return _logger.JsonLogInfo<Account, ForgotPasswordService>($"Successfully updated the password for account with username {username}.", affectedRows: affectedRows);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                return _logger.JsonLogInfo<Account, ForgotPasswordService>($"Successfully updated the password for account with userName {userName}.", affectedRows: affectedRows);
+            }
+            catch (SqlNullValueException ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                return _logger.JsonLogError<Account, ForgotPasswordService>($"Account with userName {userName} not found.", ex);
+            }
+            catch (TaskCanceledException ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                return _logger.JsonLogError<Account, ForgotPasswordService>($"Operation to update the account with userName {userName} was canceled.", ex);
+            }
+            catch (OperationCanceledException ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                return _logger.JsonLogError<Account, ForgotPasswordService>($"Operation to update the account with userName {userName} was canceled.", ex);
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
-                return _logger.JsonLogError<Account, ForgotPasswordService>($"An error occurred while updating the account with username {username}.", ex);
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                return _logger.JsonLogError<Account, ForgotPasswordService>($"An error occurred while updating the account with userName {userName}.", ex);
             }
         }
 
-        public async Task<IEnumerable<JsonLogEntry>> UpdatePasswordAsync(List<string> usernames, List<string> passwords)
+        public async Task<IEnumerable<JsonLogEntry>> UpdatePasswordAsync(List<FrontEndUpdatePasswordAccount> frontEndUpdatePasswordAccounts,
+            CancellationToken cancellationToken)
         {
             List<JsonLogEntry> logEntries = [];
-            await using var transaction = await _dbContext.BeginTransactionAsync();
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                IEnumerable<Account> entities = await _dbContext.Accounts
-                    .Where(a => usernames.Contains(a.UserName))
-                    .ToListAsync();
-
-                if (entities == null || !entities.Any())
-                {
-                    logEntries.Add(_logger.JsonLogWarning<Account, ForgotPasswordService>("No accounts found for the provided usernames."));
-                    return logEntries;
-                }
-
-                entities = await PasswordMapping(entities, passwords);
-                int affectedRows = await _dbContext.SaveChangesAsync();
+                int affectedRows = await _unitOfWork.SaveChangesAsync(cancellationToken);
                 if (affectedRows == 0)
                 {
-                    await transaction.RollbackAsync();
+                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                     logEntries.Add(_logger.JsonLogWarning<Account, ForgotPasswordService>("Failed to update passwords for multiple accounts."));
                     return logEntries;
                 }
-                await transaction.CommitAsync();
-                logEntries.Add(_logger.JsonLogInfo<Account, ForgotPasswordService>($"Successfully updated passwords for {affectedRows} accounts.", affectedRows: affectedRows));
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                logEntries.Add(_logger.JsonLogInfo<Account, ForgotPasswordService>($"Successfully updated passwords for {affectedRows} accounts.",
+                    affectedRows: affectedRows));
+                return logEntries;
+            }
+            catch (SqlNullValueException ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                logEntries.Add(_logger.JsonLogError<Account, ForgotPasswordService>("One or more accounts not found while updating multiple accounts.", ex));
+                return logEntries;
+            }
+            catch (TaskCanceledException ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                logEntries.Add(_logger.JsonLogError<Account, ForgotPasswordService>("Operation to update multiple accounts was canceled.", ex));
+                return logEntries;
+            }
+            catch (OperationCanceledException ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                logEntries.Add(_logger.JsonLogError<Account, ForgotPasswordService>("Operation to update multiple accounts was canceled.", ex));
                 return logEntries;
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 logEntries.Add(_logger.JsonLogError<Account, ForgotPasswordService>("An error occurred while updating multiple accounts.", ex));
                 return logEntries;
             }
         }
 
-        private async Task<IEnumerable<Account>> PasswordMapping(IEnumerable<Account> entities, IEnumerable<string> passwords)
+        #region Helper methods for main public methods (for isolate from main methods)
+        private async Task HelperUpdatePasswordForAccountAsync(string userName, CancellationToken cancellationToken = default)
         {
-            int length = passwords.Count();
-            for (int i = 0; i < length; i++)
-                if (!await _hashPassword.IsPasswordHashed(passwords.ElementAt(i)))
-                    entities.ElementAt(i).Password = await _hashPassword.HashPasswordAsync(passwords.ElementAt(i));
-            for (int i = 0; i < length; i++)
-                if (entities.ElementAt(i) == null)
-                    throw new InvalidOperationException($"Account with username {entities.ElementAt(i).UserName} does not exist.");
-                else
-                    entities.ElementAt(i).Password = passwords.ElementAt(i);
+            Account account = await HelperGetAccountByUserNameAsync(userName, cancellationToken);
+            if (!await _hashPassword.IsPasswordHashed(account.Password))
+                account.Password = await _hashPassword.HashPasswordAsync(account.Password);
+        }
+
+        private async Task HelperUpdatePasswordForAccountsAsync(IEnumerable<FrontEndUpdatePasswordAccount> frontEndUpdatePasswordAccounts,
+        CancellationToken cancellationToken = default)
+        {
+            List<string> userNames = [.. frontEndUpdatePasswordAccounts.Select(account => account.UserName)];
+            List<Account> entities = await HelperGetAccountsByUserNamesAsync(userNames, cancellationToken);
+            entities = await HelperPasswordMappingAsync(entities);
+        }
+        #endregion
+
+        #region  Helper methods fetching accounts and password mapping (for isolate from main methods) 
+        private async Task<Account> HelperGetAccountByUserNameAsync(string userName, CancellationToken cancellationToken)
+        {
+            Account entity = await _unitOfWork.Accounts.GetByUserNameAsync(userName, cancellationToken)
+                ?? throw new SqlNullValueException("Account not found!");
+            return entity;
+        }
+
+        private async Task<List<Account>> HelperGetAccountsByUserNamesAsync(List<string> userNames, CancellationToken cancellationToken)
+        {
+            IEnumerable<Account> entities = await _unitOfWork.Accounts.GetByUserNamesAsync(userNames, cancellationToken);
+            if (entities == null || !entities.Any())
+                throw new SqlNullValueException("No accounts found for the provided userNames.");
+            return [..entities];
+        }
+
+        private async Task<List<Account>> HelperPasswordMappingAsync(List<Account> entities)
+        {
+            foreach (var account in entities)
+                if (!await _hashPassword.IsPasswordHashed(account.Password))
+                    account.Password = await _hashPassword.HashPasswordAsync(account.Password);
             return entities;
         }
+        #endregion
     }
 }

@@ -1,22 +1,7 @@
 {
-    "rules-path": {
-        "platform-rules": {
-            "path": "PlatformRules/platform-rules.json",
-            "enabled": true
-        }, 
-        "frontend-rules": {
-            "path": "PlatformRules/FrontendRules/frontend-rules.json",
-            "enabled": true
-        },
-        "backend-rules": {
-            "path": "PlatformRules/BackendRules/backend-rules.json",
-            "enabled": true
-        }
-
-    },
     "custom-rules": {
         "expiry-cookie": {
-            "type": "cookieExpiry",
+            "type": "cookie-expiry-days",
             "maxAgeDays": 7,
             "enabled": true
         },
@@ -34,7 +19,17 @@
             "type": "message-timeout",
             "maxMessageTimeout": 3000,
             "enabled": true
+        },
+        "cache-expiry-minutes": {
+            "type": "cache-expiry-minutes",
+            "maxCacheExpiryMinutes": 60,
+            "enabled": true
+        },
+        "max-return-records": {
+            "type": "max-return-records",
+            "maxRecords": 200,
+            "enabled": true
         }
     },
-    "rules-version": "1.0.0"
+    "rules-version": "2.0.0"
 }

@@ -4,6 +4,6 @@ namespace ProjectShop.Server.Infrastructure.Services
 {
     public class MaxGetRecordService : IMaxGetRecord
     {
-        public int MaxGetRecord { get; set; }
+        public uint MaxGetRecord { get; set; }
     }
 }

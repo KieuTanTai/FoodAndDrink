@@ -2,6 +2,6 @@
 {
     public interface IMaxGetRecord
     {
-        int MaxGetRecord { get; }
+        uint MaxGetRecord { get; }
     }
 }

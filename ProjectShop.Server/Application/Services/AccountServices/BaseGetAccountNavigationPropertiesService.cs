@@ -4,8 +4,11 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IContext;
+using ProjectShop.Server.Core.Interfaces.IRepositories;
+using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
 using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IServices._IBase;
 using ProjectShop.Server.Core.Interfaces.IValidate;
@@ -16,15 +19,15 @@ namespace ProjectShop.Server.Application.Services.AccountServices
 {
     public class BaseGetAccountNavigationPropertiesService : IBaseGetNavigationPropertyServices<Account, AccountNavigationOptions>
     {
-        private readonly IDBContext _context;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogService _logger;
         private readonly IServiceResultFactory<BaseGetAccountNavigationPropertiesService> _serviceResultFactory;
         private readonly IBaseHelperReturnTEntityService<BaseGetAccountNavigationPropertiesService> _baseHelperReturnAccountService;
-        public BaseGetAccountNavigationPropertiesService(IDBContext context, ILogService logger,
+        public BaseGetAccountNavigationPropertiesService(IUnitOfWork unitOfWork, ILogService logger,
             IServiceResultFactory<BaseGetAccountNavigationPropertiesService> serviceResultFactory,
             IBaseHelperReturnTEntityService<BaseGetAccountNavigationPropertiesService> baseHelperReturnAccountService)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
             _logger = logger;
             _serviceResultFactory = serviceResultFactory;
             _baseHelperReturnAccountService = baseHelperReturnAccountService;

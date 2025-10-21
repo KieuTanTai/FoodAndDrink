@@ -9,6 +9,7 @@ using ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositor
 using ProjectShop.Server.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using ProjectShop.Server.Core.Entities.Context;
+using ProjectShop.Server.Core.Enums;
 
 namespace ProjectShop.Server.Infrastructure.Configuration
 {
@@ -22,17 +23,22 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddSingleton<IClock, SystemClockService>();
             services.AddSingleton<ILogService, LogService>();
             services.AddSingleton<IClock>(provider => new FakeClockService { UtcNow = new DateTime(2030, 12, 31) });
-            services.AddSingleton<IMaxGetRecord>(provider => new MaxGetRecordService { MaxGetRecord = 500 });
+            services.AddSingleton<IMaxGetRecord>(provider => new MaxGetRecordService { MaxGetRecord = 200 });
 
             string connectionString = AppConfigConnection.GetConnectionString();
             if (string.IsNullOrEmpty(connectionString))
                 throw new InvalidOperationException("Connection string is incorrect or empty. Please check configuration.");
-
+                
+            // Default to a safe value
+            uint maxQueryRules = ReadConfigRulesJson.Get(EPlatformRules.MAX_GET_RECORDS);
+            if (maxQueryRules == 0)
+                maxQueryRules = 200;
+            services.AddSingleton<IMaxGetRecord>(new MaxGetRecordService { MaxGetRecord = maxQueryRules });
             services.AddSingleton<IDbConnectionFactory>(provider => new MySqlConnectionFactory(connectionString));
 
             // Add DbContext with connection string from configuration
             services.AddDbContext<FoodAndDrinkShopDbContext>(options =>
-                options.UseMySql(connectionString, Microsoft.EntityFrameworkCore.ServerVersion.Parse("12.0.2-mariadb")));
+                options.UseMySql(connectionString, ServerVersion.Parse("12.0.2-mariadb")));
 
             // Register IDBContext interface for dependency injection
             // IDBContext extends IFoodAndDrinkShopDbContext, so both can be injected

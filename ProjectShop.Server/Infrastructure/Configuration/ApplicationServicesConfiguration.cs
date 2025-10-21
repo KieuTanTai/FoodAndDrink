@@ -18,7 +18,8 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddTransient(typeof(IGetMultipleServices<,,>), typeof(BaseGetResultsService<,,>));
             services.AddTransient(typeof(IBaseHelperReturnTEntityService<>), typeof(BaseHelperReturnTEntityService<>));
 
-
+            // NOTE: Get Account Permission 
+            
             return services;
         }
     }

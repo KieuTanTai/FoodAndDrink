@@ -10,6 +10,7 @@ namespace ProjectShop.Server.Core.Interfaces.IRepositories
     {
         // Query operations
         Task<TEntity?> GetByIdAsync(object id, CancellationToken cancellationToken = default);
+        Task<IEnumerable<TEntity>> GetByIdsAsync(IEnumerable<object> ids, CancellationToken cancellationToken = default);
         Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
         Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
         Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
