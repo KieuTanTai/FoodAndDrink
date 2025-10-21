@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Interfaces.IValidate;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class InventoryMovementRepository(IDBContext context, IMaxGetRecord maxGetRecord) : Repository<InventoryMovement>(context, maxGetRecord), IInventoryMovementRepository
+    public class InventoryMovementRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : Repository<InventoryMovement>(context, maxGetRecord), IInventoryMovementRepository
     {
         public async Task<IEnumerable<InventoryMovement>> GetByInventoryIdAsync(uint inventoryId, CancellationToken cancellationToken = default)
         {

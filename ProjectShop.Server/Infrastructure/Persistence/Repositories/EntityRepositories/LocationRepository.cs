@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Interfaces.IValidate;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class LocationRepository(IDBContext context, IMaxGetRecord maxGetRecord) : Repository<Location>(context, maxGetRecord), ILocationRepository
+    public class LocationRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : Repository<Location>(context, maxGetRecord), ILocationRepository
     {
         public async Task<IEnumerable<Location>> GetByLocationTypeIdAsync(uint locationTypeId, CancellationToken cancellationToken = default)
         {

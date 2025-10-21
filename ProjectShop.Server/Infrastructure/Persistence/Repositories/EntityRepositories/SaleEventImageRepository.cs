@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Interfaces.IValidate;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class SaleEventImageRepository(IDBContext context, IMaxGetRecord maxGetRecord) : Repository<SaleEventImage>(context, maxGetRecord), ISaleEventImageRepository
+    public class SaleEventImageRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : Repository<SaleEventImage>(context, maxGetRecord), ISaleEventImageRepository
     {
         public async Task<IEnumerable<SaleEventImage>> GetBySaleEventIdAsync(uint saleEventId, CancellationToken cancellationToken = default)
         {

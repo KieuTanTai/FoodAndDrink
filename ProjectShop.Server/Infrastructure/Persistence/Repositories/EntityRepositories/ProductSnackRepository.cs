@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Interfaces.IValidate;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class ProductSnackRepository(IDBContext context, IMaxGetRecord maxGetRecord) : Repository<ProductSnack>(context, maxGetRecord), IProductSnackRepository
+    public class ProductSnackRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : Repository<ProductSnack>(context, maxGetRecord), IProductSnackRepository
     {
         public async Task<ProductSnack?> GetByProductBarcodeAsync(string productBarcode, CancellationToken cancellationToken = default)
         {

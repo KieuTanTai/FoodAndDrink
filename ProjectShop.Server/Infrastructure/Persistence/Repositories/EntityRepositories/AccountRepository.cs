@@ -7,7 +7,7 @@ using ProjectShop.Server.Core.Interfaces.IValidate;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class AccountRepository(IDBContext context, IMaxGetRecord maxGetRecord) : Repository<Account>(context, maxGetRecord), IAccountRepository
+    public class AccountRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : Repository<Account>(context, maxGetRecord), IAccountRepository
     {
         #region Query by UserName
 

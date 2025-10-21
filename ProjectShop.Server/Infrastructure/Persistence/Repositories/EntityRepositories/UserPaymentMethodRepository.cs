@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Interfaces.IValidate;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class UserPaymentMethodRepository(IDBContext context, IMaxGetRecord maxGetRecord) : Repository<UserPaymentMethod>(context, maxGetRecord), IUserPaymentMethodRepository
+    public class UserPaymentMethodRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : Repository<UserPaymentMethod>(context, maxGetRecord), IUserPaymentMethodRepository
     {
         public async Task<IEnumerable<UserPaymentMethod>> GetByAccountIdAsync(uint accountId, CancellationToken cancellationToken = default)
         {

@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Interfaces.IValidate;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class DisposeReasonRepository(IDBContext context, IMaxGetRecord maxGetRecord) : Repository<DisposeReason>(context, maxGetRecord), IDisposeReasonRepository
+    public class DisposeReasonRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : Repository<DisposeReason>(context, maxGetRecord), IDisposeReasonRepository
     {
         public async Task<DisposeReason?> GetByNameAsync(string reasonName, CancellationToken cancellationToken = default)
         {

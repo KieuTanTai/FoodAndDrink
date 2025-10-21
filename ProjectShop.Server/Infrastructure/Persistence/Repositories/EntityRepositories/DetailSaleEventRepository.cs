@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Interfaces.IValidate;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class DetailSaleEventRepository(IDBContext context, IMaxGetRecord maxGetRecord) : Repository<DetailSaleEvent>(context, maxGetRecord), IDetailSaleEventRepository
+    public class DetailSaleEventRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : Repository<DetailSaleEvent>(context, maxGetRecord), IDetailSaleEventRepository
     {
         public async Task<IEnumerable<DetailSaleEvent>> GetBySaleEventIdAsync(uint saleEventId, CancellationToken cancellationToken = default)
         {

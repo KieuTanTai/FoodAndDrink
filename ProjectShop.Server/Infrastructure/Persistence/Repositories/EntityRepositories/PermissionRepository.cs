@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Interfaces.IValidate;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class PermissionRepository(IDBContext context, IMaxGetRecord maxGetRecord) : Repository<Permission>(context, maxGetRecord), IPermissionRepository
+    public class PermissionRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : Repository<Permission>(context, maxGetRecord), IPermissionRepository
     {
         public async Task<Permission?> GetByNameAsync(string permissionName, CancellationToken cancellationToken = default)
         {

@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Interfaces.IValidate;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class CountryRepository(IDBContext context, IMaxGetRecord maxGetRecord) : Repository<Country>(context, maxGetRecord), ICountryRepository
+    public class CountryRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : Repository<Country>(context, maxGetRecord), ICountryRepository
     {
         public async Task<Country?> GetByNameAsync(string countryName, CancellationToken cancellationToken = default)
         {
