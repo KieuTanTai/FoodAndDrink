@@ -2,10 +2,11 @@ using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
+using ProjectShop.Server.Core.Interfaces.IValidate;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class ProductRepository(IDBContext context) : Repository<Product>(context), IProductRepository
+    public class ProductRepository(IDBContext context, IMaxGetRecord maxGetRecord) : Repository<Product>(context, maxGetRecord), IProductRepository
     {
         public async Task<Product?> GetByBarcodeAsync(string barcode, CancellationToken cancellationToken = default)
         {

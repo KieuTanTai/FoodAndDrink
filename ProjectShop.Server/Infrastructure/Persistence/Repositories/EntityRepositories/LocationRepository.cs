@@ -2,10 +2,11 @@ using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
+using ProjectShop.Server.Core.Interfaces.IValidate;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class LocationRepository(IDBContext context) : Repository<Location>(context), ILocationRepository
+    public class LocationRepository(IDBContext context, IMaxGetRecord maxGetRecord) : Repository<Location>(context, maxGetRecord), ILocationRepository
     {
         public async Task<IEnumerable<Location>> GetByLocationTypeIdAsync(uint locationTypeId, CancellationToken cancellationToken = default)
         {

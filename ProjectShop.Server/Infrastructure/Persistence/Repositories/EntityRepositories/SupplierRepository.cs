@@ -2,10 +2,11 @@ using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
+using ProjectShop.Server.Core.Interfaces.IValidate;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class SupplierRepository(IDBContext context) : Repository<Supplier>(context), ISupplierRepository
+    public class SupplierRepository(IDBContext context, IMaxGetRecord maxGetRecord) : Repository<Supplier>(context, maxGetRecord), ISupplierRepository
     {
         public async Task<Supplier?> GetByNameAsync(string supplierName, CancellationToken cancellationToken = default)
         {

@@ -3,12 +3,12 @@ using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
+using ProjectShop.Server.Core.Interfaces.IValidate;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class AccountRepository(IDBContext context) : Repository<Account>(context), IAccountRepository
+    public class AccountRepository(IDBContext context, IMaxGetRecord maxGetRecord) : Repository<Account>(context, maxGetRecord), IAccountRepository
     {
-
         #region Query by UserName
 
         public async Task<Account?> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default)

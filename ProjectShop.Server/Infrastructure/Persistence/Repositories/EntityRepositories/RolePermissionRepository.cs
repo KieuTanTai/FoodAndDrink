@@ -2,10 +2,11 @@ using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
+using ProjectShop.Server.Core.Interfaces.IValidate;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class RolePermissionRepository(IDBContext context) : Repository<RolePermission>(context), IRolePermissionRepository
+    public class RolePermissionRepository(IDBContext context, IMaxGetRecord maxGetRecord) : Repository<RolePermission>(context, maxGetRecord), IRolePermissionRepository
     {
         public async Task<IEnumerable<RolePermission>> GetByRoleIdAsync(uint roleId, CancellationToken cancellationToken = default)
         {
