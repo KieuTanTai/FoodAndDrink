@@ -40,10 +40,6 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddDbContext<FoodAndDrinkShopDbContext>(options =>
                 options.UseMySql(connectionString, ServerVersion.Parse("12.0.2-mariadb")));
 
-            // Register IDBContext interface for dependency injection
-            // IDBContext extends IFoodAndDrinkShopDbContext, so both can be injected
-            services.AddScoped<IDBContext>(sp => sp.GetRequiredService<FoodAndDrinkShopDbContext>());
-
             // Also register IFoodAndDrinkShopDbContext for those who prefer explicit naming
             services.AddScoped<IFoodAndDrinkShopDbContext>(sp => sp.GetRequiredService<FoodAndDrinkShopDbContext>());
 

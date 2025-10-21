@@ -9,7 +9,7 @@ using ProjectShop.Server.Core.Interfaces.IContext;
 
 namespace ProjectShop.Server.Core.Entities.Context;
 
-public partial class FoodAndDrinkShopDbContext : DbContext, IDBContext
+public partial class FoodAndDrinkShopDbContext : DbContext, IFoodAndDrinkShopDbContext
 {
     private IDbContextTransaction? _currentTransaction;
 

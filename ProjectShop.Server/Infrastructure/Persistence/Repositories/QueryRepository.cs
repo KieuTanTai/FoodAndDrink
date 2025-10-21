@@ -10,11 +10,12 @@ using ProjectShop.Server.Core.Interfaces.IValidate;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
 {
-    public class QueryRepository<TEntity>(IDBContext context, IMaxGetRecord maxGetRecord, string columnIdName="Id") : IQueryRepository<TEntity> where TEntity : class
+    public class QueryRepository<TEntity>(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord, string columnIdName = "Id") 
+        : IQueryRepository<TEntity> where TEntity : class
     {
         protected readonly string _colIdName = columnIdName;
         protected readonly uint _maxGetReturn = maxGetRecord.MaxGetRecord;
-        protected readonly IDBContext _context = context;
+        protected readonly IFoodAndDrinkShopDbContext _context = context;
         protected readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
 
         #region Query Operations
@@ -55,6 +56,5 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
         }
 
         #endregion
-
     }
 }
