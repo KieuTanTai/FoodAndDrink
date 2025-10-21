@@ -1,4 +1,5 @@
 using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
 {
@@ -27,7 +28,7 @@ namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
         Task<IEnumerable<Account>> GetByLastUpdatedMonthAndYearAsync(int year, int month, CancellationToken cancellationToken = default);
 
         // Query with navigation properties
-        Task<Account?> GetByIdWithNavigationAsync(uint accountId, CancellationToken cancellationToken = default);
-        Task<IEnumerable<Account>> GetAllWithNavigationAsync(CancellationToken cancellationToken = default);
+        Task<Account?> GetNavigationByIdAsync(uint accountId, AccountNavigationOptions options, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Account>> GetNavigationByIdsAsync(IEnumerable<uint> accountIds, AccountNavigationOptions options, CancellationToken cancellationToken = default);
     }
 }
