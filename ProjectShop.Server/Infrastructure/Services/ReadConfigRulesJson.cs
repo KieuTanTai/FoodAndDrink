@@ -17,7 +17,7 @@ namespace ProjectShop.Server.Infrastructure.Services
         {
             try
             {
-                string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../PlatformRules/");
+                string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../PlatformRules/");
                 _configurationRoot = new ConfigurationBuilder().SetBasePath(basePath)
                                         .AddJsonFile("platform-rules.json", optional: false, reloadOnChange: true).Build();
             }

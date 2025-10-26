@@ -10,7 +10,6 @@ using ProjectShop.Server.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using ProjectShop.Server.Core.Entities.Context;
 using ProjectShop.Server.Core.Enums;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace ProjectShop.Server.Infrastructure.Configuration
 {
