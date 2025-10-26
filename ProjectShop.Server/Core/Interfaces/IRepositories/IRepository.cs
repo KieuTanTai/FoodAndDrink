@@ -11,11 +11,11 @@ namespace ProjectShop.Server.Core.Interfaces.IRepositories
         // Command operations
         Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default);
         Task<IEnumerable<TEntity>> AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
-        Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default);
-        Task UpdateRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
+        Task<int> UpdateAsync(TEntity entity, CancellationToken cancellationToken = default);
+        Task<int> UpdateRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
 
         // NOTE: for both case (hard delete - soft delete)
-        Task DeleteAsync(TEntity entity, bool isSoftDelete = true, CancellationToken cancellationToken = default);
-        Task DeleteRangeAsync(IEnumerable<TEntity> entities, bool isSoftDelete = true, Action<TEntity>? action = null, CancellationToken cancellationToken = default);
+        Task<int> DeleteAsync(TEntity entity, bool isSoftDelete = true, CancellationToken cancellationToken = default);
+        Task<int> DeleteRangeAsync(IEnumerable<TEntity> entities, bool isSoftDelete = true, Action<TEntity>? action = null, CancellationToken cancellationToken = default);
     }
 }

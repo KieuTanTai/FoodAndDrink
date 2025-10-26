@@ -6,37 +6,38 @@ using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Application.Services._BaseServices
 {
-    public class BaseGetResultService<TEntity, TOptions, TServiceCall> : IGetSingleServices<TEntity, TOptions, TServiceCall>
+    public class BaseGetResultServices<TEntity, TServiceCall> : IGetSingleServices<TEntity, TServiceCall>
         where TEntity : class, new()
-        where TOptions : class
         where TServiceCall : class
     {
         private readonly ILogService _logger;
         private readonly IServiceResultFactory<TServiceCall> _serviceResultFactory;
-        private readonly IBaseGetNavigationPropertyServices<TEntity, TOptions> _navigationService;
 
-        public BaseGetResultService(ILogService logger,
-            IServiceResultFactory<TServiceCall> serviceResultFactory,
-            IBaseGetNavigationPropertyServices<TEntity, TOptions> navigationService)
+        public BaseGetResultServices(ILogService logger,
+            IServiceResultFactory<TServiceCall> serviceResultFactory)
         {
             _logger = logger;
             _serviceResultFactory = serviceResultFactory;
-            _navigationService = navigationService;
         }
 
-        public async Task<ServiceResult<TEntity>> GetAsync<TParam>(TParam param, Func<TParam, Task<TEntity?>> queryFunc, TOptions? options = null, [CallerMemberName] string? methodCall = null)
+        public async Task<ServiceResult<TEntity>> GetAsync<TParam>(TParam param, Func<TParam, CancellationToken, Task<TEntity?>> queryFunc,
+            CancellationToken cancellationToken, [CallerMemberName] string? methodCall = null)
         {
             ServiceResult<TEntity> result = new(true);
             try
             {
-                TEntity? entity = await queryFunc(param);
+                TEntity? entity = await queryFunc(param, cancellationToken);
                 if (entity == null)
                     return _serviceResultFactory.CreateServiceResult($"No Entity found with param: {param}.", new TEntity(), false, methodCall: methodCall);
-
-                if (options != null)
-                    result = await _navigationService.GetNavigationPropertyByOptionsAsync(entity, options, methodCall);
-                result.LogEntries = result.LogEntries!.Append(_logger.JsonLogInfo<TEntity, TServiceCall>($"Retrieved entity by param = {param} with options={options}.", methodCall: methodCall));
                 return result;
+            }
+            catch (TaskCanceledException ex)
+            {
+                return _serviceResultFactory.CreateServiceResult($"The operation was canceled while retrieving entity by param: {param}.", new TEntity(), false, ex, methodCall: methodCall);
+            }
+            catch (OperationCanceledException ex)
+            {
+                return _serviceResultFactory.CreateServiceResult($"The operation was canceled while retrieving entity by param: {param}.", new TEntity(), false, ex, methodCall: methodCall);
             }
             catch (Exception ex)
             {

@@ -2,6 +2,8 @@
 using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IServices._IBase;
 using ProjectShop.Server.Application.Services._BaseServices;
+using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
+using ProjectShop.Server.Application.Services.AccountServices;
 
 namespace ProjectShop.Server.Infrastructure.Configuration
 {
@@ -10,16 +12,19 @@ namespace ProjectShop.Server.Infrastructure.Configuration
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             // NOTE: BASE SERVICES (OPEN GENERIC)
-            services.AddTransient<IBaseAuthorizationServices, BaseAuthorizationService>();
-            services.AddTransient(typeof(IBaseHelperServices<>), typeof(BaseHelperService<>));
-            services.AddTransient(typeof(IBaseGetByTimeServices<,>), typeof(BaseGetByTimeService<,>));
-            services.AddTransient(typeof(IServiceResultFactory<>), typeof(ServiceResultFactory<>));
-            services.AddTransient(typeof(IGetSingleServices<,,>), typeof(BaseGetResultService<,,>));
-            services.AddTransient(typeof(IGetMultipleServices<,,>), typeof(BaseGetResultsService<,,>));
-            services.AddTransient(typeof(IBaseHelperReturnTEntityService<>), typeof(BaseHelperReturnTEntityService<>));
+            services.AddScoped<IBaseAuthorizationServices, BaseAuthorizationService>();
+            services.AddScoped(typeof(IBaseHelperServices<>), typeof(BaseHelperServices<>));
+            services.AddScoped(typeof(IServiceResultFactory<>), typeof(ServiceResultFactory<>));
+            services.AddScoped<IBasePasswordMappingServices, BasePasswordMappingServices>();
+            services.AddScoped(typeof(IGetSingleServices<,>), typeof(BaseGetResultServices<,>));
+            services.AddScoped(typeof(IGetMultipleServices<,>), typeof(BaseGetResultsServices<,>));
 
             // NOTE: Get Account Permission 
-            
+            services.AddScoped<ILoginServices, LoginServices>();
+            services.AddScoped<ISignupServices, SignupServices>();
+            services.AddScoped<IUpdatePasswordServices, UpdatePasswordServices>();
+            services.AddScoped<IUpdateAccountServices, UpdateAccountServices>();
+            services.AddScoped<ISearchAccountServices, SearchAccountServices>();
             return services;
         }
     }

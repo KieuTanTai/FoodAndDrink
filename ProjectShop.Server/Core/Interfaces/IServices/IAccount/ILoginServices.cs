@@ -1,9 +1,12 @@
-﻿using ProjectShop.Server.Core.ValueObjects;
+﻿using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.ValueObjects;
+using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Core.Interfaces.IServices.IAccount
 {
-    public interface ILoginServices<TEntity, TBoolean> where TEntity : class where TBoolean : class
+    public interface ILoginServices
     {
-        Task<ServiceResult<TEntity>> HandleLoginAsync(string username, string password, TBoolean? options = null);
+        Task<ServiceResult<Account>> HandleLoginAsync(string username, string password,
+            AccountNavigationOptions? options = null, CancellationToken cancellationToken = default);
     }
 }

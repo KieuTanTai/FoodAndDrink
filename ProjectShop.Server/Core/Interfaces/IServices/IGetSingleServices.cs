@@ -3,14 +3,14 @@ using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Core.Interfaces.IServices
 {
-    public interface IGetSingleServices<TEntity, TOptions, TServiceCall>
+    public interface IGetSingleServices<TEntity, TServiceCall>
         where TEntity : class, new()
-        where TOptions : class
         where TServiceCall : class
     {
         Task<ServiceResult<TEntity>> GetAsync<TParam>(
             TParam param,
-            Func<TParam, Task<TEntity?>> queryFunc,
-            TOptions? options = null, [CallerMemberName] string? methodCall = null);
+            Func<TParam, CancellationToken, Task<TEntity?>> queryFunc,
+            CancellationToken cancellationToken = default,
+            [CallerMemberName] string? methodCall = null);
     }
 }

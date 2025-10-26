@@ -1,20 +1,21 @@
 ﻿using ProjectShop.Server.Core.ValueObjects;
+using ProjectShop.Server.Core.Enums;
+using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Core.Interfaces.IServices.IAccount
 {
-    public interface ISearchAccountServices<TEntity, TOptions> where TEntity : class where TOptions : class
+    public interface ISearchAccountServices
     {
-        Task<ServiceResults<TEntity>> GetAllAsync(TOptions? options = null, int? maxGetCount = null);
-        Task<ServiceResult<TEntity>> GetByUserNameAsync(string userName, TOptions? options = null);
-        Task<ServiceResult<TEntity>> GetByAccountIdAsync(uint accountId, TOptions? options = null);
-        Task<ServiceResults<TEntity>> GetByCreatedDateMonthAndYearAsync(int year, int month, TOptions? options = null, int? maxGetCount = null);
-        Task<ServiceResults<TEntity>> GetByCreatedYearAsync<TCompareType>(int year, TCompareType compareType, TOptions? options = null, int? maxGetCount = null) where TCompareType : Enum;
-        Task<ServiceResults<TEntity>> GetByCreatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, TOptions? options = null, int? maxGetCount = null);
-        Task<ServiceResults<TEntity>> GetByCreatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, TOptions? options = null, int? maxGetCount = null) where TCompareType : Enum;
-        Task<ServiceResults<TEntity>> GetByLastUpdatedDateMonthAndYearAsync(int year, int month, TOptions? options = null, int? maxGetCount = null);
-        Task<ServiceResults<TEntity>> GetByLastUpdatedYearAsync<TCompareType>(int year, TCompareType compareType, TOptions? options = null, int? maxGetCount = null) where TCompareType : Enum;
-        Task<ServiceResults<TEntity>> GetByLastUpdatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, TOptions? options = null, int? maxGetCount = null);
-        Task<ServiceResults<TEntity>> GetByLastUpdatedDateTimeAsync<TCompareType>(DateTime dateTime, TCompareType compareType, TOptions? options = null, int? maxGetCount = null) where TCompareType : Enum;
-        Task<ServiceResults<TEntity>> GetByStatusAsync(bool status, TOptions? options = null, int? maxGetCount = null);
+        Task<ServiceResults<Account>> GetAllAsync(AccountNavigationOptions? options = null, CancellationToken cancellationToken = default);
+        Task<ServiceResult<Account>> GetByUserNameAsync(string userName, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default);
+        Task<ServiceResult<Account>> GetByAccountIdAsync(uint accountId, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default);
+        Task<ServiceResults<Account>> GetByCreatedYearAsync(int year, ECompareType compareType, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default);
+        Task<ServiceResults<Account>> GetByCreatedDateMonthAndYearAsync(int year, int month, ECompareType compareType, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default);
+        Task<ServiceResults<Account>> GetByCreatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default);
+        Task<ServiceResults<Account>> GetByLastUpdatedYearAsync(int year, ECompareType compareType, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default);
+        Task<ServiceResults<Account>> GetByLastUpdatedDateMonthAndYearAsync(int year, int month, ECompareType compareType, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default);
+        Task<ServiceResults<Account>> GetByLastUpdatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default);
+        Task<ServiceResults<Account>> GetByStatusAsync(bool status, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default);
     }
 }

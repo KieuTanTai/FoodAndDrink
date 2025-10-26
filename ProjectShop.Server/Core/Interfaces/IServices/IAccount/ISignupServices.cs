@@ -1,10 +1,11 @@
 ﻿using ProjectShop.Server.Core.ValueObjects;
+using ProjectShop.Server.Core.Entities;
 
 namespace ProjectShop.Server.Core.Interfaces.IServices.IAccount
 {
-    public interface ISignupServices<TEntity> where TEntity : class
+    public interface ISignupServices
     {
-        Task<ServiceResult<TEntity>> AddAccountAsync(TEntity entity);
-        Task<ServiceResults<TEntity>> AddAccountsAsync(IEnumerable<TEntity> entities);
+        Task<ServiceResult<Account>> AddAccountAsync(Account entity, CancellationToken cancellationToken = default);
+        Task<ServiceResults<Account>> AddAccountsAsync(IEnumerable<Account> entities, CancellationToken cancellationToken = default);
     }
 }

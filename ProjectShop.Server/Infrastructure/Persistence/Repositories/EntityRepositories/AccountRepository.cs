@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
@@ -8,7 +9,8 @@ using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class AccountRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : Repository<Account>(context, maxGetRecord), IAccountRepository
+    public class AccountRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : 
+        Repository<Account>(context, maxGetRecord), IAccountRepository
     {
         #region Query by UserName
 
@@ -47,26 +49,95 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         #region Query by AccountCreatedDate
 
         public async Task<IEnumerable<Account>> GetByCreatedDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
-            => await GetByTimeAsync(a => a.AccountCreatedDate >= startDate && a.AccountCreatedDate <= endDate, cancellationToken);
+        {
+            if (endDate > DateTime.Now)
+                endDate = DateTime.Now;
+            if (startDate > endDate)
+                throw new ArgumentException("Start date must be less than or equal to end date.");
+            if (startDate == endDate)
+                return await GetByTimeAsync(a => a.AccountCreatedDate.Date == startDate.Date, cancellationToken);
+            return await GetByTimeAsync(a => a.AccountCreatedDate >= startDate && a.AccountCreatedDate <= endDate.AddDays(1), cancellationToken);
+        }
 
-        public async Task<IEnumerable<Account>> GetByCreatedYearAsync(int year, CancellationToken cancellationToken = default)
-            => await GetByTimeAsync(a => a.AccountCreatedDate.Year == year, cancellationToken);
+        public async Task<IEnumerable<Account>> GetByCreatedYearAsync(int year, ECompareType eCompareType, CancellationToken cancellationToken = default)
+        {
+            Func<Account, bool> predicate = eCompareType switch
+            {
+                ECompareType.EQUAL => account => account.AccountCreatedDate.Year == year,
+                ECompareType.LESS_THAN => account => account.AccountCreatedDate.Year < year,
+                ECompareType.LESS_THAN_OR_EQUAL => account => account.AccountCreatedDate.Year <= year,
+                ECompareType.GREATER_THAN => account => account.AccountCreatedDate.Year > year,
+                ECompareType.GREATER_THAN_OR_EQUAL => account => account.AccountCreatedDate.Year >= year,
+                _ => throw new InvalidOperationException($"Invalid compare type: {eCompareType}")
+            };
+            return await GetByTimeAsync(predicate, cancellationToken);
+        }
 
-        public async Task<IEnumerable<Account>> GetByCreatedMonthAndYearAsync(int year, int month, CancellationToken cancellationToken = default)
-            => await GetByTimeAsync(a => a.AccountCreatedDate.Year == year && a.AccountCreatedDate.Month == month, cancellationToken);
+        public async Task<IEnumerable<Account>> GetByCreatedMonthAndYearAsync(int year, int month, ECompareType eCompareType, CancellationToken cancellationToken = default)
+        {
+            Func<Account, bool> predicate = eCompareType switch
+            {
+                ECompareType.EQUAL => account => account.AccountCreatedDate.Year == year && account.AccountCreatedDate.Month == month,
+                ECompareType.LESS_THAN => account => account.AccountCreatedDate.Year < year 
+                    || (account.AccountCreatedDate.Year == year && account.AccountCreatedDate.Month < month),
+                ECompareType.LESS_THAN_OR_EQUAL => account => account.AccountCreatedDate.Year < year 
+                    || (account.AccountCreatedDate.Year == year && account.AccountCreatedDate.Month <= month),
+                ECompareType.GREATER_THAN => account => account.AccountCreatedDate.Year > year 
+                    || (account.AccountCreatedDate.Year == year && account.AccountCreatedDate.Month > month),
+                ECompareType.GREATER_THAN_OR_EQUAL => account => account.AccountCreatedDate.Year > year 
+                    || (account.AccountCreatedDate.Year == year && account.AccountCreatedDate.Month >= month),
+                _ => throw new InvalidOperationException($"Invalid compare type: {eCompareType}")
+            };
+            return await GetByTimeAsync(predicate, cancellationToken);
+        }
 
         #endregion
 
         #region Query by AccountLastUpdatedDate
 
         public async Task<IEnumerable<Account>> GetByLastUpdatedDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
-            => await GetByTimeAsync(a => a.AccountLastUpdatedDate >= startDate && a.AccountLastUpdatedDate <= endDate, cancellationToken);
+        {
+            if (endDate > DateTime.Now)
+                endDate = DateTime.Now;
+            if (startDate > endDate)
+                throw new ArgumentException("Start date must be less than or equal to end date.");
+            if (startDate == endDate)
+                return await GetByTimeAsync(a => a.AccountLastUpdatedDate.Date == startDate.Date, cancellationToken);
+            return await GetByTimeAsync(a => a.AccountLastUpdatedDate >= startDate && a.AccountLastUpdatedDate <= endDate.AddDays(1), cancellationToken);
+        }
 
-        public async Task<IEnumerable<Account>> GetByLastUpdatedYearAsync(int year, CancellationToken cancellationToken = default)
-            => await GetByTimeAsync(a => a.AccountLastUpdatedDate.Year == year, cancellationToken);
+        public async Task<IEnumerable<Account>> GetByLastUpdatedYearAsync(int year, ECompareType eCompareType, CancellationToken cancellationToken = default)
+        {
+            Func<Account, bool> predicate = eCompareType switch
+            {
+                ECompareType.EQUAL => account => account.AccountLastUpdatedDate.Year == year,
+                ECompareType.LESS_THAN => account => account.AccountLastUpdatedDate.Year < year,
+                ECompareType.LESS_THAN_OR_EQUAL => account => account.AccountLastUpdatedDate.Year <= year,
+                ECompareType.GREATER_THAN => account => account.AccountLastUpdatedDate.Year > year,
+                ECompareType.GREATER_THAN_OR_EQUAL => account => account.AccountLastUpdatedDate.Year >= year,
+                _ => throw new InvalidOperationException($"Invalid compare type: {eCompareType}")
+            };
+            return await GetByTimeAsync(predicate, cancellationToken);
+            }
 
-        public async Task<IEnumerable<Account>> GetByLastUpdatedMonthAndYearAsync(int year, int month, CancellationToken cancellationToken = default)
-            => await GetByTimeAsync(a => a.AccountLastUpdatedDate.Year == year && a.AccountLastUpdatedDate.Month == month, cancellationToken);
+        public async Task<IEnumerable<Account>> GetByLastUpdatedMonthAndYearAsync(int year, int month,
+            ECompareType eCompareType, CancellationToken cancellationToken = default)
+        {
+            Func<Account, bool> predicate = eCompareType switch
+            {
+                ECompareType.EQUAL => account => account.AccountLastUpdatedDate.Year == year && account.AccountLastUpdatedDate.Month == month,
+                ECompareType.LESS_THAN => account => account.AccountLastUpdatedDate.Year < year
+                    || (account.AccountLastUpdatedDate.Year == year && account.AccountLastUpdatedDate.Month < month),
+                ECompareType.LESS_THAN_OR_EQUAL => account => account.AccountLastUpdatedDate.Year < year
+                    || (account.AccountLastUpdatedDate.Year == year && account.AccountLastUpdatedDate.Month <= month),
+                ECompareType.GREATER_THAN => account => account.AccountLastUpdatedDate.Year > year
+                    || (account.AccountLastUpdatedDate.Year == year && account.AccountLastUpdatedDate.Month > month),
+                ECompareType.GREATER_THAN_OR_EQUAL => account => account.AccountLastUpdatedDate.Year > year
+                    || (account.AccountLastUpdatedDate.Year == year && account.AccountLastUpdatedDate.Month >= month),
+                _ => throw new InvalidOperationException($"Invalid compare type: {eCompareType}")
+            };
+            return await GetByTimeAsync(predicate, cancellationToken);
+        }
 
         #endregion
 
@@ -89,7 +160,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task ExplicitLoadAsync(Account account, AccountNavigationOptions options, CancellationToken cancellationToken = default)
+        public async Task<Account> ExplicitLoadAsync(Account account, AccountNavigationOptions options, CancellationToken cancellationToken)
         {
             if (options.IsGetPerson)
                 await _context.Entry(account).Reference(acc => acc.Person).LoadAsync(cancellationToken);
@@ -97,9 +168,11 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
                 await _context.Entry(account).Collection(acc => acc.AccountAdditionalPermissions).LoadAsync(cancellationToken);
             if (options.IsGetAccountRoles)
                 await _context.Entry(account).Collection(acc => acc.AccountRoles).LoadAsync(cancellationToken);
+            return account;
         }
 
-        public async Task ExplicitLoadAsync(IEnumerable<Account> accounts, AccountNavigationOptions options, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Account>> ExplicitLoadAsync(IEnumerable<Account> accounts, AccountNavigationOptions options,
+            CancellationToken cancellationToken)
         {
             List<Person> persons = [];
             List<AccountAdditionalPermission> additionalPermissions = [];
@@ -112,7 +185,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (options.IsGetAccountRoles)
                 roles = await _context.AccountRoles.Where(role => accountIds.Contains(role.AccountId)).ToListAsync(cancellationToken);
 
-            MappingToAccounts(accounts, persons, additionalPermissions, roles);
+            return MappingToAccounts(accounts, persons, additionalPermissions, roles);
         }
 
         #endregion
@@ -131,11 +204,11 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             return query;
         }
 
-        private static void MappingToAccounts(IEnumerable<Account> accounts, List<Person> persons,
+        private static IEnumerable<Account> MappingToAccounts(IEnumerable<Account> accounts, List<Person> persons,
             List<AccountAdditionalPermission> accountAdditionalPermissions, List<AccountRole> roles)
         {
             if (accounts == null || !accounts.Any())
-                return;
+                return [];
             Dictionary<uint, Person> personsDict = [];
             ILookup<uint, AccountAdditionalPermission> permissionsLookup = Enumerable.Empty<AccountAdditionalPermission>().ToLookup(key => default(uint));
             ILookup<uint, AccountRole> rolesLookup = Enumerable.Empty<AccountRole>().ToLookup(key => default(uint));
@@ -148,15 +221,15 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
                 rolesLookup = roles.ToLookup(role => role.AccountId);
 
             // mapping
-            foreach (Account account in accounts) 
+            foreach (Account account in accounts)
             {
                 if (personsDict.TryGetValue(account.AccountId, out var person))
                     account.Person = person ?? new();
                 account.AccountAdditionalPermissions = [.. permissionsLookup[account.AccountId]];
                 account.AccountRoles = [.. rolesLookup[account.AccountId]];
             }
+            return accounts;
         }
-
         #endregion
     }
 }

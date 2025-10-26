@@ -4,7 +4,7 @@ using ProjectShop.Server.Core.ValueObjects.PlatformRules;
 
 namespace ProjectShop.Server.Core.Interfaces.IServices.IAccount
 {
-    public interface IForgotPasswordServices
+    public interface IUpdatePasswordServices
     {
         Task<JsonLogEntry> UpdatePasswordAsync(string userName, string newPassword, CancellationToken cancellationToken = default);
         Task<IEnumerable<JsonLogEntry>> UpdatePasswordAsync(List<FrontEndUpdatePasswordAccount> frontEndUpdatePasswordAccounts, CancellationToken cancellationToken = default);

@@ -28,58 +28,52 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
             return entityList;
         }
 
-        public virtual async Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
+        public virtual async Task<int> UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
             _dbSet.Update(entity);
-            await _context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public virtual async Task UpdateRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+        public virtual async Task<int> UpdateRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
         {
             _dbSet.UpdateRange(entities);
-            await _context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public virtual async Task DeleteAsync(TEntity entity, bool isSoftDelete = false, CancellationToken cancellationToken = default)
+        public virtual async Task<int> DeleteAsync(TEntity entity, bool isSoftDelete = false, CancellationToken cancellationToken = default)
         {
             if (isSoftDelete)
-            {
-                await SoftDeleteAsync(entity, cancellationToken);
-                return;
-            }
+                return await SoftDeleteAsync(entity, cancellationToken);
 
             _dbSet.Remove(entity);
-            await _context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public virtual async Task DeleteRangeAsync(IEnumerable<TEntity> entities, bool isSoftDelete = false,
+        public virtual async Task<int> DeleteRangeAsync(IEnumerable<TEntity> entities, bool isSoftDelete = false,
             Action<TEntity>? updateFieldFunc = null, CancellationToken cancellationToken = default)
         {
             if (isSoftDelete && updateFieldFunc != null)
-            {
-                await SoftDeleteRangeAsync(entities, updateFieldFunc, cancellationToken);
-                return;
-            }
+                return await SoftDeleteRangeAsync(entities, updateFieldFunc, cancellationToken);
 
             _dbSet.RemoveRange(entities);
-            await _context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
         #endregion
 
         #region Custom Delete Operations
-        private async Task SoftDeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
+        private async Task<int> SoftDeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
             _dbSet.Update(entity);
-            await _context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
 
-        private async Task SoftDeleteRangeAsync(IEnumerable<TEntity> entities, Action<TEntity> updateFieldFunc, CancellationToken cancellationToken = default)
+        private async Task<int> SoftDeleteRangeAsync(IEnumerable<TEntity> entities, Action<TEntity> updateFieldAction, CancellationToken cancellationToken = default)
         {
             var entityList = entities.ToList();
             foreach (var entity in entityList)
-                updateFieldFunc(entity);
+                updateFieldAction(entity);
             _dbSet.UpdateRange(entityList);
-            await _context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
         #endregion
     }
