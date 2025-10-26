@@ -12,13 +12,11 @@ using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 namespace ProjectShop.Server.Application.Services.AccountServices
 {
     public class SearchAccountServices(IUnitOfWork unit,
-        IBaseHelperServices<Account> helper, IServiceResultFactory<SearchAccountServices> serviceResultFactory,
-        IBaseGetByTimeServices<Account, AccountNavigationOptions> byTimeService, ILogService logService) : ISearchAccountServices
+        IBaseHelperServices<Account> helper, IServiceResultFactory<SearchAccountServices> serviceResultFactory, ILogService logService) : ISearchAccountServices
     {
         private readonly IUnitOfWork _unit = unit;
         private readonly IBaseHelperServices<Account> _helper = helper;
         private readonly ILogService _logService = logService;
-        private readonly IBaseGetByTimeServices<Account, AccountNavigationOptions> _byTimeService = byTimeService;
         private readonly IServiceResultFactory<SearchAccountServices> _serviceResultFactory = serviceResultFactory;
 
         public async Task<ServiceResults<Account>> GetAllAsync(AccountNavigationOptions? options,CancellationToken cancellationToken)
