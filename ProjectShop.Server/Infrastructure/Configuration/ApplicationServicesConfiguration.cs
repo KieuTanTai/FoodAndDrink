@@ -12,7 +12,6 @@ namespace ProjectShop.Server.Infrastructure.Configuration
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             // NOTE: BASE SERVICES (OPEN GENERIC)
-            services.AddScoped<IBaseAuthorizationServices, BaseAuthorizationService>();
             services.AddScoped(typeof(IBaseHelperServices<>), typeof(BaseHelperServices<>));
             services.AddScoped(typeof(IServiceResultFactory<>), typeof(ServiceResultFactory<>));
             services.AddScoped<IBasePasswordMappingServices, BasePasswordMappingServices>();
