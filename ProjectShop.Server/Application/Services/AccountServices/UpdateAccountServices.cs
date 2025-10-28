@@ -129,8 +129,8 @@ namespace ProjectShop.Server.Application.Services.AccountServices
                     return _logger.JsonLogWarning<Account, UpdateAccountServices>($"Account with input {input} does not exist.");
                 }
 
-                if (!await _hashPassword.IsPasswordValidAsync(newPassword))
-                    account.Password = await _hashPassword.HashPasswordAsync(newPassword);
+                if (!await _hashPassword.IsPasswordValidAsync(newPassword, cancellationToken))
+                    account.Password = await _hashPassword.HashPasswordAsync(newPassword, cancellationToken);
                 else
                     account.Password = newPassword;
 

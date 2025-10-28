@@ -14,22 +14,22 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
     {
         #region Query by UserName
 
-        public async Task<Account?> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default)
+        public async Task<Account?> GetByUserNameAsync(string userName, CancellationToken cancellationToken)
         => await _dbSet.FirstOrDefaultAsync(account => account.UserName == userName, cancellationToken);
 
-        public async Task<Account?> GetByUserNameAndPasswordAsync(string userName, string password, CancellationToken cancellationToken = default)
+        public async Task<Account?> GetByUserNameAndPasswordAsync(string userName, string password, CancellationToken cancellationToken)
         => await _dbSet.FirstOrDefaultAsync(account => account.UserName == userName && account.Password == password, cancellationToken);
 
-        public async Task<IEnumerable<Account>> GetByUserNamesAsync(IEnumerable<string> userNames, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Account>> GetByUserNamesAsync(IEnumerable<string> userNames, CancellationToken cancellationToken)
         => await _dbSet
-                .Where(a => userNames.Contains(a.UserName))
+                .Where(account => userNames.Contains(account.UserName))
                 .ToListAsync(cancellationToken);
 
         #endregion
 
         #region Query by Status
 
-        public async Task<IEnumerable<Account>> GetByStatusAsync(bool status, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Account>> GetByStatusAsync(bool status, CancellationToken cancellationToken)
         => await _dbSet
                 .Where(account => account.AccountStatus == status)
                 .ToListAsync(cancellationToken);
@@ -38,16 +38,16 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         #region Query by AccountCreatedDate
 
-        public async Task<IEnumerable<Account>> GetByCreatedDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Account>> GetByCreatedDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken)
             => await GetByDateTimeRangeAsync(startDate, endDate, account => account.AccountCreatedDate, cancellationToken);
 
-        public async Task<IEnumerable<Account>> GetByCreatedYearAsync(int year, ECompareType eCompareType, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Account>> GetByCreatedYearAsync(int year, ECompareType eCompareType, CancellationToken cancellationToken)
         {
             Func<Account, bool> predicate = await GetCompareConditions(year, eCompareType, account => account.AccountCreatedDate);
             return await GetByTimeAsync(predicate, cancellationToken);
         }
 
-        public async Task<IEnumerable<Account>> GetByCreatedMonthAndYearAsync(int month, int year, ECompareType eCompareType, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Account>> GetByCreatedMonthAndYearAsync(int month, int year, ECompareType eCompareType, CancellationToken cancellationToken)
         {
             Func<Account, bool> predicate = await GetCompareConditions(month, year, eCompareType, account => account.AccountCreatedDate);
             return await GetByTimeAsync(predicate, cancellationToken);
@@ -57,17 +57,17 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         #region Query by AccountLastUpdatedDate
 
-        public async Task<IEnumerable<Account>> GetByLastUpdatedDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Account>> GetByLastUpdatedDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken)
             => await GetByDateTimeRangeAsync(startDate, endDate, account => account.AccountLastUpdatedDate, cancellationToken);
 
-        public async Task<IEnumerable<Account>> GetByLastUpdatedYearAsync(int year, ECompareType eCompareType, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Account>> GetByLastUpdatedYearAsync(int year, ECompareType eCompareType, CancellationToken cancellationToken)
         {
             Func<Account, bool> predicate = await GetCompareConditions(year, eCompareType, account => account.AccountCreatedDate);
             return await GetByTimeAsync(predicate, cancellationToken);
             }
 
         public async Task<IEnumerable<Account>> GetByLastUpdatedMonthAndYearAsync(int month, int year,
-            ECompareType eCompareType, CancellationToken cancellationToken = default)
+            ECompareType eCompareType, CancellationToken cancellationToken)
         {
             Func<Account, bool> predicate = await GetCompareConditions(month, year, eCompareType, account => account.AccountLastUpdatedDate);
             return await GetByTimeAsync(predicate, cancellationToken);
@@ -77,14 +77,14 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         #region Query with Navigation Properties
 
-        public async Task<Account?> GetNavigationByIdAsync(uint accountId, AccountNavigationOptions options, CancellationToken cancellationToken = default)
+        public async Task<Account?> GetNavigationByIdAsync(uint accountId, AccountNavigationOptions options, CancellationToken cancellationToken)
         {
             IQueryable<Account> query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query.FirstOrDefaultAsync(account => account.AccountId == accountId, cancellationToken);
         }
 
-        public async Task<IEnumerable<Account>> GetNavigationByIdsAsync(IEnumerable<uint> accountIds, AccountNavigationOptions options, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Account>> GetNavigationByIdsAsync(IEnumerable<uint> accountIds, AccountNavigationOptions options, CancellationToken cancellationToken)
         {
             IQueryable<Account> query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
@@ -133,7 +133,6 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
                 query = query.Include(account => account.AccountAdditionalPermissions);
             if (options.IsGetAccountRoles)
                 query = query.Include(account => account.AccountRoles);
-
             return query;
         }
 

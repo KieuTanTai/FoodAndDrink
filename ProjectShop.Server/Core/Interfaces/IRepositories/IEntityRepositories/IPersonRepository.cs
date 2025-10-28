@@ -1,11 +1,14 @@
 using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
 {
     /// <summary>
     /// Person repository interface with specific query methods
     /// </summary>
-    public interface IPersonRepository : IRepository<Person>
+    public interface IPersonRepository : IRepository<Person>,
+        IBaseGetByCreatedAndLastUpdatedDate<Person>,
+        IBaseExplicitLoadRepository<Person, PersonNavigationOptions>
     {
         // Query by AccountId
         Task<Person?> GetByAccountIdAsync(uint accountId, CancellationToken cancellationToken = default);
@@ -21,17 +24,13 @@ namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
 
         // Query by Name
         Task<IEnumerable<Person>> SearchByNameAsync(string searchTerm, CancellationToken cancellationToken = default);
-        Task<IEnumerable<Person>> GetByFullNameAsync(string firstName, string lastName, CancellationToken cancellationToken = default);
+        Task<Person?> GetByFullNameAsync(string name, CancellationToken cancellationToken = default);
 
         // Query by Gender
         Task<IEnumerable<Person>> GetByGenderAsync(bool isMale, CancellationToken cancellationToken = default);
 
         // Query by Status
         Task<IEnumerable<Person>> GetByStatusAsync(bool? status, CancellationToken cancellationToken = default);
-
-        // Query by dates
-        Task<IEnumerable<Person>> GetByCreatedDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
-        Task<IEnumerable<Person>> GetByLastUpdatedDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
 
         // Query with navigation properties
         Task<Person?> GetByIdWithNavigationAsync(uint personId, CancellationToken cancellationToken = default);

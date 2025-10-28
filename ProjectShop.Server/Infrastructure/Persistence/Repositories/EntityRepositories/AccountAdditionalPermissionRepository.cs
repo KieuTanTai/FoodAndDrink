@@ -72,8 +72,8 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<AccountAdditionalPermission> ExplicitLoadAsync(AccountAdditionalPermission entity, AccountAdditionalPermissionNavigationOptions options,
-            CancellationToken cancellationToken)
+        public async Task<AccountAdditionalPermission> ExplicitLoadAsync(AccountAdditionalPermission entity,
+            AccountAdditionalPermissionNavigationOptions options, CancellationToken cancellationToken)
         {
             if (options.IsGetAccount)
                 await _context.Entry(entity).Reference(entity => entity.Account).LoadAsync(cancellationToken);
