@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ProjectShop.Server.Core.Constants;
 using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
 {
-    public class QueryRepository<TEntity>(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord, string? primaryKeyName = null) 
+    public class QueryRepository<TEntity>(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord, string? primaryKeyName = null)
         : IQueryRepository<TEntity> where TEntity : class
     {
         protected readonly string _colIdName = primaryKeyName ?? typeof(TEntity).Name + EntityPrimaryKeyNames.IdSuffix;
@@ -75,6 +76,47 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
                 .Take((int)_maxGetReturn)
                 .ToListAsync(cancellationToken);
         }
+
+        // Helper methods for get DateTime methods
+        protected async Task<IEnumerable<TEntity>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate,
+           Func<TEntity, DateTime> dateTimeConditions, CancellationToken cancellationToken = default)
+        {
+            if (endDate > DateTime.Now)
+                endDate = DateTime.Now;
+            if (startDate > endDate)
+                throw new ArgumentException("Start date must be less than or equal to end date.");
+            if (startDate == endDate)
+                return await GetByTimeAsync(entity => dateTimeConditions(entity).Date == startDate.Date, cancellationToken);
+            return await GetByTimeAsync(entity => dateTimeConditions(entity) >= startDate && dateTimeConditions(entity) <= endDate.AddDays(1), cancellationToken);
+        }
+
+        protected async Task<Func<TEntity, bool>> GetCompareConditions(int year, ECompareType compareType,
+            Func<TEntity, DateTime> dateTimeConditions)
+            => compareType switch
+            {
+                ECompareType.EQUAL => entity => dateTimeConditions(entity).Year == year,
+                ECompareType.LESS_THAN => entity => dateTimeConditions(entity).Year < year,
+                ECompareType.LESS_THAN_OR_EQUAL => entity => dateTimeConditions(entity).Year <= year,
+                ECompareType.GREATER_THAN => entity => dateTimeConditions(entity).Year > year,
+                ECompareType.GREATER_THAN_OR_EQUAL => entity => dateTimeConditions(entity).Year >= year,
+                _ => throw new InvalidOperationException($"Invalid compare type: {compareType}")
+            };
+
+        protected async Task<Func<TEntity, bool>> GetCompareConditions(int month, int year, ECompareType compareType,
+            Func<TEntity, DateTime> dateTimeConditions)
+            => compareType switch
+            {
+                ECompareType.EQUAL => entity => dateTimeConditions(entity).Year == year && dateTimeConditions(entity).Month == month,
+                ECompareType.LESS_THAN => entity => dateTimeConditions(entity).Year < year
+                    || (dateTimeConditions(entity).Year == year && dateTimeConditions(entity).Month < month),
+                ECompareType.LESS_THAN_OR_EQUAL => entity => dateTimeConditions(entity).Year < year
+                    || (dateTimeConditions(entity).Year == year && dateTimeConditions(entity).Month <= month),
+                ECompareType.GREATER_THAN => entity => dateTimeConditions(entity).Year > year
+                    || (dateTimeConditions(entity).Year == year && dateTimeConditions(entity).Month > month),
+                ECompareType.GREATER_THAN_OR_EQUAL => entity => dateTimeConditions(entity).Year > year
+                    || (dateTimeConditions(entity).Year == year && dateTimeConditions(entity).Month >= month),
+                _ => throw new InvalidOperationException($"Invalid compare type: {compareType}")
+            };
 
         #endregion
     }
