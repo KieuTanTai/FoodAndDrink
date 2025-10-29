@@ -5,13 +5,18 @@ namespace ProjectShop.Server.Infrastructure.Services
 {
     public static class BaseAuthorizationService
     {
-        public static ClaimsPrincipal GetClaimsPrincipalByIdAsync(uint userId)
+        public static ClaimsPrincipal GetCurrentUser(HttpContext httpContext)
         {
-            if (userId == 0)
-                throw new ArgumentException("UserId cannot be zero.", nameof(userId));
-            if (ClaimsPrincipal.Current == null)
-                throw new InvalidOperationException("No current ClaimsPrincipal is available.");
-            return ClaimsPrincipal.Current;
+            ArgumentNullException.ThrowIfNull(httpContext);
+            return httpContext.User;
         }
+
+        public static string GetCurrentUserName(HttpContext httpContext)
+        {
+            ArgumentNullException.ThrowIfNull(httpContext);
+            ClaimsPrincipal user = GetCurrentUser(httpContext);
+            return user.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty;
+        }
+
     }
 }

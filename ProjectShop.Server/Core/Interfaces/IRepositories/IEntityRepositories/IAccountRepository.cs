@@ -4,7 +4,7 @@ using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
 {
-    public interface IAccountRepository : IRepository<Account>, IBaseExplicitLoadRepository<Account, AccountNavigationOptions>, 
+    public interface IAccountRepository : IRepository<Account>, IBaseExplicitLoadRepository<Account, AccountNavigationOptions>,
         IBaseGetByCreatedAndLastUpdatedDate<Account>
     {
         // Query by UserName
@@ -14,5 +14,9 @@ namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
 
         // Query by AccountStatus
         Task<IEnumerable<Account>> GetByStatusAsync(bool status, CancellationToken cancellationToken = default);
+
+        // More Explicit Load Methods
+        Task<Account?> GetNavigationByIdAsync(uint id, bool isGetAuth, bool isGetPermission, CancellationToken cancellationToken = default);
+        Task<Account> ExplicitLoadAsync(Account entity, bool isGetAuth, bool isGetPermission, CancellationToken cancellationToken = default);
     }
 }

@@ -12,6 +12,8 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
     public class PersonRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : Repository<Person>(context, maxGetRecord),
         IPersonRepository
     {
+        #region Query by foreign id
+
         public async Task<Person?> GetByAccountIdAsync(uint accountId, CancellationToken cancellationToken)
             => await _dbSet.FirstOrDefaultAsync(person => person.AccountId == accountId, cancellationToken);
 
@@ -41,6 +43,8 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<IEnumerable<Person>> GetByStatusAsync(bool? status, CancellationToken cancellationToken)
             => await _dbSet.Where(person => person.PersonStatus == status).ToListAsync(cancellationToken);
+
+        #endregion
 
         #region Query by PersonCreatedDate
 

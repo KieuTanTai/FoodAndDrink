@@ -28,16 +28,15 @@ namespace ProjectShop.Server.Application.Services.AccountServices
             _serviceResultFactory = serviceResultFactory;
             _logger = logger;
         }
-
-        public async Task<ServiceResult<Account>> HandleLoginAsync(string userName, string password,
-            AccountNavigationOptions? options, CancellationToken cancellationToken)
+        
+        public async Task<ServiceResult<Account>> HandleGetAuthLoginAsync(string username, string password, bool isGetRole, bool isGetPermission, CancellationToken cancellationToken)
         {
             ServiceResult<Account> result = new(true);
             try
             {
-                Account? account = await _unit.Accounts.GetByUserNameAsync(userName, cancellationToken);
+                Account? account = await _unit.Accounts.GetByUserNameAsync(username, cancellationToken);
                 if (account == null)
-                    return _serviceResultFactory.CreateServiceResult($"Account with username '{userName}' not found.", new Account(), false);
+                    return _serviceResultFactory.CreateServiceResult($"Account with username '{username}' not found.", new Account(), false);
                 // validate account status and password
                 if (!account.AccountStatus)
                     return _serviceResultFactory.CreateServiceResult($"Account is inactive.", new Account(), false);
@@ -46,9 +45,9 @@ namespace ProjectShop.Server.Application.Services.AccountServices
                 if (!await _hashPassword.ComparePasswordsAsync(accountPassword, password, cancellationToken))
                     return _serviceResultFactory.CreateServiceResult($"Invalid password.", new Account(), false);
 
-                if (options != null)
-                    account = await _unit.Accounts.ExplicitLoadAsync(account, options, cancellationToken);
-                result.LogEntries = result.LogEntries!.Append(_logger.JsonLogInfo<Account, LoginServices>($"Login successful for user: {userName}"));
+                account = await _unit.Accounts.ExplicitLoadAsync(account, isGetRole, isGetPermission, cancellationToken);
+                result.LogEntries = result.LogEntries!.Append(_logger.JsonLogInfo<Account, LoginServices>($"Login successful for user: {username}"));
+                result.Data = account;
                 return result;
             }
             catch (TaskCanceledException ex)

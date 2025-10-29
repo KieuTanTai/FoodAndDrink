@@ -121,6 +121,40 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             return MappingToAccounts(accounts, persons, additionalPermissions, roles);
         }
 
+        public async Task<Account?> GetNavigationByIdAsync(uint id, bool isGetAuth, bool isGetPermission, CancellationToken cancellationToken)
+        {
+            IQueryable<Account> query = _dbSet.AsQueryable();
+            query = ApplyNavigationOptionsForAuth(query, isGetAuth, isGetPermission);
+            return await query.FirstOrDefaultAsync(account => account.AccountId == id, cancellationToken);
+        }
+
+        public async Task<Account> ExplicitLoadAsync(Account entity, bool isGetAuth, bool isGetPermission, CancellationToken cancellationToken)
+        {
+            if (isGetAuth || isGetPermission)
+            {
+                await _context.Entry(entity)
+                    .Collection(account => account.AccountAdditionalPermissions)
+                    .Query()
+                    .Include(permission => permission.Permission)
+                    .LoadAsync(cancellationToken);
+
+                await _context.Entry(entity)
+                    .Collection(account => account.AccountRoles)
+                    .Query()
+                    .Include(role => role.Role)
+                        .ThenInclude(role => role.RolePermissions)
+                            .ThenInclude(rolePermission => rolePermission.Permission)
+                    .LoadAsync(cancellationToken);
+            }
+            else if (isGetAuth && !isGetPermission)
+            {
+                await _context.Entry(entity)
+                    .Collection(account => account.AccountRoles)
+                    .LoadAsync(cancellationToken);
+            }
+            return entity;
+        }
+
         #endregion
 
         #region Helper Methods for Mapping and Apply Navigation Options
@@ -133,6 +167,27 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
                 query = query.Include(account => account.AccountAdditionalPermissions);
             if (options.IsGetAccountRoles)
                 query = query.Include(account => account.AccountRoles);
+            return query;
+        }
+
+        private static IQueryable<Account> ApplyNavigationOptionsForAuth(IQueryable<Account> query, bool isGetAuth, bool isGetPermission)
+        {
+            if (isGetAuth || isGetPermission)
+            {
+                query = query
+                    .Include(account => account.AccountAdditionalPermissions)
+                        .ThenInclude(permission => permission.Permission)
+                    .Include(account => account.AccountRoles)
+                        .ThenInclude(role => role.Role)
+                            .ThenInclude(role => role.RolePermissions)
+                                .ThenInclude(rolePermission => rolePermission.Permission);
+            }
+            else if (isGetAuth && !isGetPermission)
+            {
+                query = query
+                    .Include(account => account.AccountRoles);
+            }
+                  
             return query;
         }
 

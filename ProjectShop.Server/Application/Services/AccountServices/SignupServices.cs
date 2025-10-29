@@ -1,4 +1,5 @@
-﻿using ProjectShop.Server.Core.Entities;
+﻿using System.Security.Claims;
+using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IServices;
@@ -6,6 +7,7 @@ using ProjectShop.Server.Core.Interfaces.IServices._IBase;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ValueObjects;
+using ProjectShop.Server.Infrastructure.Services;
 
 namespace ProjectShop.Server.Application.Services.AccountServices
 {
@@ -41,7 +43,7 @@ namespace ProjectShop.Server.Application.Services.AccountServices
                 if (!await _hashPassword.IsPasswordValidAsync(entity.Password))
                     return _serviceResultFactory.CreateServiceResult("Password does not meet the required criteria.", entity, false);
 
-                entity.Password = await _hashPassword.HashPasswordAsync(entity.Password);
+                entity.Password = await _hashPassword.HashPasswordAsync(entity.Password, cancellationToken);
                 entity = await _unit.Accounts.AddAsync(entity, cancellationToken);
                 if (entity.AccountId <= 0)
                 {
@@ -74,7 +76,7 @@ namespace ProjectShop.Server.Application.Services.AccountServices
             }
         }
 
-        public async Task<ServiceResults<Account>> AddAccountsAsync(IEnumerable<Account> entities, CancellationToken cancellationToken)
+        public async Task<ServiceResults<Account>> AddAccountsAsync(IEnumerable<Account> entities, HttpContext httpContext, CancellationToken cancellationToken = default)
         {
             List<JsonLogEntry> logEntries = [];
             await _unit.BeginTransactionAsync(cancellationToken);
@@ -117,6 +119,14 @@ namespace ProjectShop.Server.Application.Services.AccountServices
             }
         }
 
+        private static bool IsHavePermissionAsync(HttpContext httpContext)
+        {
+            ClaimsPrincipal principal = BaseAuthorizationService.GetCurrentUser(httpContext);
+            if (principal == null)
+                return false;
+            return principal.IsInRole("Admin");
+        }
+        
         private async Task<IEnumerable<Account>> HashPasswordAsync(IEnumerable<Account> entities)
         {
             foreach (Account entity in entities)
