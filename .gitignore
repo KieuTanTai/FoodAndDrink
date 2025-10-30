@@ -9,6 +9,7 @@ build/
 Others/
 package-lock.json
 *.lock
+ProjectShop.Server.Tests/*
 
 # Visual Studio Code
 .vscode/
