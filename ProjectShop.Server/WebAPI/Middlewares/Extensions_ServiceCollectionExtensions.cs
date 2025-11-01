@@ -31,14 +31,6 @@ public static class ServiceCollectionExtensions
                 options.SlidingExpiration = true;
             });
 
-        // Nếu bạn muốn dùng thêm 1 scheme "Cookies" riêng biệt, có thể giữ lại đoạn này:
-        // services.AddAuthentication("Cookies")
-        //     .AddCookie("Cookies", options =>
-        //     {
-        //         options.LoginPath = "/login";
-        //         options.LogoutPath = "/logout";
-        //     });
-
         return services;
     }
 

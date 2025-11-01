@@ -26,7 +26,7 @@ namespace ProjectShop.Server.Application.Services.AccountServices
             => await UpdateAccountStatusAsync(userName, status, _unit.Accounts.GetByUserNameAsync, cancellationToken);
 
         public async Task<IEnumerable<JsonLogEntry>> UpdateAccountStatusByUserNamesAsync(IEnumerable<string> userNames, bool status, CancellationToken cancellationToken)
-            => await UpdateAccountStatusAsync(userNames, status, _unit.Accounts.GetByUserNamesAsync, cancellationToken);
+            => await UpdateAccountStatusAsync(userNames, status, (userNames, token) => _unit.Accounts.GetByUserNamesAsync(userNames, cancellationToken: token), cancellationToken);
 
         public async Task<IEnumerable<JsonLogEntry>> UpdateAccountStatusAsync(IEnumerable<uint> accountIds, bool status, CancellationToken cancellationToken)
             => await UpdateAccountStatusAsync(accountIds.Select(id => id.ToString()), status, _unit.Accounts.GetByIdsAsync, cancellationToken);

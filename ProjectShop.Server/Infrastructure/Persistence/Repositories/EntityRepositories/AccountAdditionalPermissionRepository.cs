@@ -9,45 +9,79 @@ using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class AccountAdditionalPermissionRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : 
+    public class AccountAdditionalPermissionRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) :
         Repository<AccountAdditionalPermission>(context, maxGetRecord), IAccountAdditionalPermissionRepository
     {
         #region  Query by foreign id
 
-        public async Task<AccountAdditionalPermission?> GetByAccountIdAndPermissionIdAsync
-            (uint accountId, uint permissionId, CancellationToken cancellationToken)
+        public async Task<AccountAdditionalPermission?> GetByAccountIdAndPermissionIdAsync(uint accountId, uint permissionId, CancellationToken cancellationToken)
             => await _dbSet.FirstOrDefaultAsync(permission => permission.AccountId == accountId && permission.PermissionId == permissionId, cancellationToken);
 
-        public async Task<IEnumerable<AccountAdditionalPermission>> GetByAccountIdAsync(uint accountId, CancellationToken cancellationToken)
-            => await _dbSet.Where(permission => permission.AccountId == accountId).ToListAsync(cancellationToken);
+        public async Task<IEnumerable<AccountAdditionalPermission>> GetByAccountIdAsync(uint accountId, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
+        {
+            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
+                pageSize = _maxGetReturn;
+            return await _dbSet
+                .Where(permission => permission.AccountId == accountId)
+                .Skip((int)(fromRecord ?? 0))
+                .Take((int)pageSize)
+                .ToListAsync(cancellationToken);
+        }
 
-        public async Task<IEnumerable<AccountAdditionalPermission>> GetByIsGrantedAsync(bool isGranted, CancellationToken cancellationToken)
-            => await _dbSet.Where(permission => permission.IsGranted == isGranted).ToListAsync(cancellationToken);
+        public async Task<IEnumerable<AccountAdditionalPermission>> GetByIsGrantedAsync(bool isGranted, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
+        {
+            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
+                pageSize = _maxGetReturn;
+            return await _dbSet
+                .Where(permission => permission.IsGranted == isGranted)
+                .Skip((int)(fromRecord ?? 0))
+                .Take((int)pageSize)
+                .ToListAsync(cancellationToken);
+        }
 
-        public async Task<IEnumerable<AccountAdditionalPermission>> GetByPermissionIdAsync(uint permissionId, CancellationToken cancellationToken)
-            => await _dbSet.Where(permission => permission.PermissionId == permissionId).ToListAsync(cancellationToken);
+        public async Task<IEnumerable<AccountAdditionalPermission>> GetByPermissionIdAsync(uint permissionId, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
+        {
+            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
+                pageSize = _maxGetReturn;
+            return await _dbSet
+                .Where(permission => permission.PermissionId == permissionId)
+                .Skip((int)(fromRecord ?? 0))
+                .Take((int)pageSize)
+                .ToListAsync(cancellationToken);
+        }
 
         #endregion
 
         #region Query by status and time
-        public async Task<IEnumerable<AccountAdditionalPermission>> GetByStatusAsync(bool status, CancellationToken cancellationToken)
-            => await _dbSet.Where(permission => permission.AdditionalPermissionStatus == status).ToListAsync(cancellationToken);
+        public async Task<IEnumerable<AccountAdditionalPermission>> GetByStatusAsync(bool status, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
+        {
+            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
+                pageSize = _maxGetReturn;
+            return await _dbSet
+                .Where(permission => permission.AdditionalPermissionStatus == status)
+                .Skip((int)(fromRecord ?? 0))
+                .Take((int)pageSize)
+                .ToListAsync(cancellationToken);
+        }
 
-        public async Task<IEnumerable<AccountAdditionalPermission>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken)
-            => await GetByDateTimeRangeAsync(startDate, endDate, permission => permission.AdditionalPermissionAssignedDate, cancellationToken);
+        public async Task<IEnumerable<AccountAdditionalPermission>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, uint? fromRecord,
+            uint? pageSize, CancellationToken cancellationToken)
+            => await GetByDateTimeRangeAsync(startDate, endDate, permission => permission.AdditionalPermissionAssignedDate, fromRecord, pageSize, cancellationToken);
 
-        public async Task<IEnumerable<AccountAdditionalPermission>> GetByMonthAndYearAsync(int month, int year, ECompareType eCompareType, CancellationToken cancellationToken)
+        public async Task<IEnumerable<AccountAdditionalPermission>> GetByMonthAndYearAsync(int month, int year, ECompareType eCompareType,
+            uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             Func<AccountAdditionalPermission, bool> predicate = await GetCompareConditions(month, year, eCompareType,
                 permission => permission.AdditionalPermissionAssignedDate);
-            return await GetByTimeAsync(predicate, cancellationToken);
+            return await GetByTimeAsync(predicate, fromRecord, pageSize, cancellationToken);
         }
 
-        public async Task<IEnumerable<AccountAdditionalPermission>> GetByYearAsync(int year, ECompareType eCompareType, CancellationToken cancellationToken)
+        public async Task<IEnumerable<AccountAdditionalPermission>> GetByYearAsync(int year, ECompareType eCompareType, uint? fromRecord,
+            uint? pageSize, CancellationToken cancellationToken)
         {
             Func<AccountAdditionalPermission, bool> predicate = await GetCompareConditions(year, eCompareType,
                 permission => permission.AdditionalPermissionAssignedDate);
-            return await GetByTimeAsync(predicate, cancellationToken);
+            return await GetByTimeAsync(predicate, fromRecord, pageSize, cancellationToken);
         }
 
         #endregion
@@ -63,12 +97,16 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         }
 
         public async Task<IEnumerable<AccountAdditionalPermission>> GetNavigationByIdsAsync(IEnumerable<uint> ids, AccountAdditionalPermissionNavigationOptions options,
-            CancellationToken cancellationToken)
+            uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
+            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
+                pageSize = _maxGetReturn;
             IQueryable<AccountAdditionalPermission> queryable = _dbSet.AsQueryable();
             queryable = ApplyNavigationOptions(queryable, options);
             return await queryable
                 .Where(additional => ids.Contains(additional.AccountAdditionalPermissionId))
+                .Skip((int)(fromRecord ?? 0))
+                .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
 
@@ -83,7 +121,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         }
 
         public async Task<IEnumerable<AccountAdditionalPermission>> ExplicitLoadAsync(IEnumerable<AccountAdditionalPermission> entities,
-            AccountAdditionalPermissionNavigationOptions options, CancellationToken cancellationToken)
+            AccountAdditionalPermissionNavigationOptions options, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             List<Permission> permissions = [];
             List<Account> accounts = [];
@@ -98,7 +136,6 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         #endregion
 
         #region Helper Methods for Mapping and Apply Navigation Options
-
 
         private static IQueryable<AccountAdditionalPermission> ApplyNavigationOptions(IQueryable<AccountAdditionalPermission> query,
             AccountAdditionalPermissionNavigationOptions options)

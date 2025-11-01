@@ -7,9 +7,9 @@ namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
         IBaseGetByDateTime<AccountRole>,
         IBaseExplicitLoadRepository<AccountRole, AccountRoleNavigationOptions>
     {
-        Task<IEnumerable<AccountRole>> GetByAccountIdAsync(uint accountId, CancellationToken cancellationToken = default);
-        Task<IEnumerable<AccountRole>> GetByRoleIdAsync(uint roleId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<AccountRole>> GetByAccountIdAsync(uint accountId, uint? fromRecord = 0, uint? pageSize = 10, CancellationToken cancellationToken = default);
+        Task<IEnumerable<AccountRole>> GetByRoleIdAsync(uint roleId, uint? fromRecord = 0, uint? pageSize = 10, CancellationToken cancellationToken = default);
         Task<AccountRole?> GetByAccountIdAndRoleIdAsync(uint accountId, uint roleId, CancellationToken cancellationToken = default);
-        Task<IEnumerable<AccountRole>> GetByStatusAsync(bool? status, CancellationToken cancellationToken = default);
+        Task<IEnumerable<AccountRole>> GetByStatusAsync(bool? status, uint? fromRecord = 0, uint? pageSize = 10, CancellationToken cancellationToken = default);
     }
 }

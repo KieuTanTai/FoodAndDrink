@@ -14,65 +14,95 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
     {
         #region Query by AccountId and RoleId
 
-        public async Task<AccountRole?> GetByAccountIdAndRoleIdAsync(uint accountId, uint roleId, CancellationToken cancellationToken = default)
+        public async Task<AccountRole?> GetByAccountIdAndRoleIdAsync(uint accountId, uint roleId, CancellationToken cancellationToken)
             => await _dbSet.FirstOrDefaultAsync(ar => ar.AccountId == accountId && ar.RoleId == roleId, cancellationToken);
 
-        public async Task<IEnumerable<AccountRole>> GetByAccountIdAsync(uint accountId, CancellationToken cancellationToken = default)
-            => await _dbSet.Where(ar => ar.AccountId == accountId).ToListAsync(cancellationToken);
+        public async Task<IEnumerable<AccountRole>> GetByAccountIdAsync(uint accountId, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
+        {
+            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
+                pageSize = _maxGetReturn;
+            return await _dbSet
+                .Where(ar => ar.AccountId == accountId)
+                .Skip((int)(fromRecord ?? 0))
+                .Take((int)pageSize)
+                .ToListAsync(cancellationToken);
+        }
 
-        public async Task<IEnumerable<AccountRole>> GetByRoleIdAsync(uint roleId, CancellationToken cancellationToken = default)
-            => await _dbSet.Where(ar => ar.RoleId == roleId).ToListAsync(cancellationToken);
+        public async Task<IEnumerable<AccountRole>> GetByRoleIdAsync(uint roleId, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
+        {
+            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
+                pageSize = _maxGetReturn;
+            return await _dbSet
+                .Where(ar => ar.RoleId == roleId)
+                .Skip((int)(fromRecord ?? 0))
+                .Take((int)pageSize)
+                .ToListAsync(cancellationToken);
+        }
 
         #endregion
 
         #region Query by Status
 
-        public async Task<IEnumerable<AccountRole>> GetByStatusAsync(bool? status, CancellationToken cancellationToken = default)
-            => await _dbSet.Where(ar => ar.AccountRoleStatus == status).ToListAsync(cancellationToken);
+        public async Task<IEnumerable<AccountRole>> GetByStatusAsync(bool? status, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
+        {
+            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
+                pageSize = _maxGetReturn;
+            return await _dbSet
+                .Where(ar => ar.AccountRoleStatus == status)
+                .Skip((int)(fromRecord ?? 0))
+                .Take((int)pageSize)
+                .ToListAsync(cancellationToken);
+        }
 
         #endregion
 
         #region Query by AccountRoleAssignedDate
 
-        public async Task<IEnumerable<AccountRole>> GetByAssignedDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
-            => await GetByDateTimeRangeAsync(startDate, endDate, ar => ar.AccountRoleAssignedDate, cancellationToken);
+        public async Task<IEnumerable<AccountRole>> GetByAssignedDateRangeAsync(DateTime startDate, DateTime endDate, uint? fromRecord, uint? pageSize,
+            CancellationToken cancellationToken)
+            => await GetByDateTimeRangeAsync(startDate, endDate, ar => ar.AccountRoleAssignedDate, fromRecord, pageSize, cancellationToken);
 
-        public Task<IEnumerable<AccountRole>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
-            => GetByAssignedDateRangeAsync(startDate, endDate, cancellationToken);
+        public Task<IEnumerable<AccountRole>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
+            => GetByAssignedDateRangeAsync(startDate, endDate, fromRecord, pageSize, cancellationToken);
 
-        public async Task<IEnumerable<AccountRole>> GetByYearAsync(int year, ECompareType eCompareType, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<AccountRole>> GetByYearAsync(int year, ECompareType eCompareType, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             Func<AccountRole, bool> predicate = await GetCompareConditions(year, eCompareType, ar => ar.AccountRoleAssignedDate);
-            return await GetByTimeAsync(predicate, cancellationToken);
+            return await GetByTimeAsync(predicate, fromRecord, pageSize, cancellationToken);
         }
 
-        public async Task<IEnumerable<AccountRole>> GetByMonthAndYearAsync(int month, int year, ECompareType eCompareType, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<AccountRole>> GetByMonthAndYearAsync(int month, int year, ECompareType eCompareType, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             Func<AccountRole, bool> predicate = await GetCompareConditions(month, year, eCompareType, ar => ar.AccountRoleAssignedDate);
-            return await GetByTimeAsync(predicate, cancellationToken);
+            return await GetByTimeAsync(predicate, fromRecord, pageSize, cancellationToken);
         }
 
         #endregion
 
         #region Query with Navigation Properties
 
-        public async Task<AccountRole?> GetNavigationByIdAsync(uint id, AccountRoleNavigationOptions options, CancellationToken cancellationToken = default)
+        public async Task<AccountRole?> GetNavigationByIdAsync(uint id, AccountRoleNavigationOptions options, CancellationToken cancellationToken)
         {
             IQueryable<AccountRole> query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query.FirstOrDefaultAsync(ar => ar.AccountRoleId == id, cancellationToken);
         }
 
-        public async Task<IEnumerable<AccountRole>> GetNavigationByIdsAsync(IEnumerable<uint> ids, AccountRoleNavigationOptions options, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<AccountRole>> GetNavigationByIdsAsync(IEnumerable<uint> ids, AccountRoleNavigationOptions options, uint? fromRecord,
+            uint? pageSize, CancellationToken cancellationToken)
         {
+            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
+                pageSize = _maxGetReturn;
             IQueryable<AccountRole> query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query
                 .Where(ar => ids.Contains(ar.AccountRoleId))
+                .Skip((int)(fromRecord ?? 0))
+                .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<AccountRole> ExplicitLoadAsync(AccountRole entity, AccountRoleNavigationOptions options, CancellationToken cancellationToken = default)
+        public async Task<AccountRole> ExplicitLoadAsync(AccountRole entity, AccountRoleNavigationOptions options, CancellationToken cancellationToken)
         {
             if (options.IsGetAccount)
                 await _context.Entry(entity).Reference(ar => ar.Account).LoadAsync(cancellationToken);
@@ -81,7 +111,8 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             return entity;
         }
 
-        public async Task<IEnumerable<AccountRole>> ExplicitLoadAsync(IEnumerable<AccountRole> entities, AccountRoleNavigationOptions options, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<AccountRole>> ExplicitLoadAsync(IEnumerable<AccountRole> entities, AccountRoleNavigationOptions options,
+            uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             List<Account> accounts = [];
             List<Role> roles = [];

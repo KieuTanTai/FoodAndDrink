@@ -1348,7 +1348,7 @@ public partial class FoodAndDrinkShopDbContext : DbContext, IFoodAndDrinkShopDbC
 
         modelBuilder.Entity<ProductCategory>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
+            entity.HasKey(e => e.ProductCategoryId).HasName("PRIMARY");
 
             entity.ToTable("product_categories");
 
@@ -1356,9 +1356,9 @@ public partial class FoodAndDrinkShopDbContext : DbContext, IFoodAndDrinkShopDbC
 
             entity.HasIndex(e => new { e.CategoryId, e.ProductBarcode }, "uniq_category_product").IsUnique();
 
-            entity.Property(e => e.Id)
+            entity.Property(e => e.ProductCategoryId)
                 .HasColumnType("int(10) unsigned")
-                .HasColumnName("id");
+                .HasColumnName("product_category_id");
             entity.Property(e => e.CategoryId)
                 .HasColumnType("int(10) unsigned")
                 .HasColumnName("category_id");

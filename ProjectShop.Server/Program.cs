@@ -1,5 +1,4 @@
 ﻿using ProjectShop.Server.Infrastructure.Configuration;
-using ProjectShop.Server.Infrastructure.Persistence;
 using ProjectShop.Server.Infrastructure.Services;
 using ProjectShop.Server.Extensions;
 using ProjectShop.Server.WebAPI.Middlewares;
@@ -20,7 +19,7 @@ try
 }
 catch (Exception ex)
 {
-    System.Console.WriteLine($"Application startup failed: {ex.Message}");
+    Console.WriteLine($"Application startup failed: {ex.Message}");
     Environment.Exit(1);
 }
 

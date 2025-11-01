@@ -8,10 +8,10 @@ namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
         IBaseGetByDateTime<AccountAdditionalPermission>,
         IBaseExplicitLoadRepository<AccountAdditionalPermission, AccountAdditionalPermissionNavigationOptions>
     {
-        Task<IEnumerable<AccountAdditionalPermission>> GetByAccountIdAsync(uint accountId, CancellationToken cancellationToken = default);
-        Task<IEnumerable<AccountAdditionalPermission>> GetByPermissionIdAsync(uint permissionId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<AccountAdditionalPermission>> GetByAccountIdAsync(uint accountId, uint? fromRecord = 0, uint? pageSize = 10, CancellationToken cancellationToken = default);
+        Task<IEnumerable<AccountAdditionalPermission>> GetByPermissionIdAsync(uint permissionId, uint? fromRecord = 0, uint? pageSize = 10, CancellationToken cancellationToken = default);
         Task<AccountAdditionalPermission?> GetByAccountIdAndPermissionIdAsync(uint accountId, uint permissionId, CancellationToken cancellationToken = default);
-        Task<IEnumerable<AccountAdditionalPermission>> GetByIsGrantedAsync(bool isGranted = true, CancellationToken cancellationToken = default);
-        Task<IEnumerable<AccountAdditionalPermission>> GetByStatusAsync(bool status = true, CancellationToken cancellationToken = default);
+        Task<IEnumerable<AccountAdditionalPermission>> GetByIsGrantedAsync(bool isGranted = true, uint? fromRecord = 0, uint? pageSize = 10, CancellationToken cancellationToken = default);
+        Task<IEnumerable<AccountAdditionalPermission>> GetByStatusAsync(bool status = true, uint? fromRecord = 0, uint? pageSize = 10, CancellationToken cancellationToken = default);
     }
 }

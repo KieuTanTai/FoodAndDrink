@@ -19,11 +19,11 @@ namespace ProjectShop.Server.Application.Services.AccountServices
         private readonly ILogService _logService = logService;
         private readonly IServiceResultFactory<SearchAccountServices> _serviceResultFactory = serviceResultFactory;
 
-        public async Task<ServiceResults<Account>> GetAllAsync(AccountNavigationOptions? options,CancellationToken cancellationToken)
-            => await GenericGetEntitiesAsync(_unit.Accounts.GetAllAsync, options, "No accounts found.", cancellationToken);
-        public async Task<ServiceResults<Account>> GetByStatusAsync(bool status, AccountNavigationOptions? options,CancellationToken cancellationToken)
-            => await GenericGetEntitiesAsync((token) => _unit.Accounts.GetByStatusAsync(status, token), options,
-                $"No accounts found with status {status}.", cancellationToken);
+        public async Task<ServiceResults<Account>> GetAllWithOffsetAsync(uint? fromRecord, uint? pageSize, AccountNavigationOptions? options,CancellationToken cancellationToken)
+            => await GenericGetEntitiesAsync(_unit.Accounts.GetAllWithOffsetAsync, options, fromRecord, pageSize, "No accounts found.", cancellationToken);
+        public async Task<ServiceResults<Account>> GetByStatusAsync(bool status, uint? fromRecord, uint? pageSize, AccountNavigationOptions? options,CancellationToken cancellationToken)
+            => await GenericGetEntitiesAsync((fromRecord, pageSize, token) => _unit.Accounts.GetByStatusAsync(status, fromRecord, pageSize, token), options,
+                fromRecord, pageSize, $"No accounts found with status {status}.", cancellationToken);
 
         public async Task<ServiceResult<Account>> GetByUserNameAsync(string userName, AccountNavigationOptions? options,CancellationToken cancellationToken)
             => await GenericGetEntityAsync((token) => _unit.Accounts.GetByUserNameAsync(userName, token), options,
@@ -33,29 +33,35 @@ namespace ProjectShop.Server.Application.Services.AccountServices
             => await GenericGetEntityAsync((token) => _unit.Accounts.GetByIdAsync(accountId, token), options,
                 $"No account found with ID {accountId}.", cancellationToken);
 
-        public async Task<ServiceResults<Account>> GetByCreatedDateMonthAndYearAsync(int year, int month, ECompareType compareType, AccountNavigationOptions? options, CancellationToken cancellationToken)
-            => await GenericGetEntitiesAsync((token) => _unit.Accounts.GetByCreatedMonthAndYearAsync(year, month, compareType, token), options,
-                $"No accounts found created in {month}/{year} with comparison type {compareType}.", cancellationToken);
+        public async Task<ServiceResults<Account>> GetByCreatedDateMonthAndYearAsync(int year, int month, ECompareType compareType,
+            uint? fromRecord, uint? pageSize, AccountNavigationOptions? options, CancellationToken cancellationToken)
+            => await GenericGetEntitiesAsync((fromRecord, pageSize, token) => _unit.Accounts.GetByCreatedMonthAndYearAsync(year, month, compareType, fromRecord, pageSize, token),
+             options, fromRecord, pageSize, $"No accounts found created in {month}/{year} with comparison type {compareType}.", cancellationToken);
 
-        public async Task<ServiceResults<Account>> GetByCreatedYearAsync(int year, ECompareType compareType, AccountNavigationOptions? options,CancellationToken cancellationToken) 
-            => await GenericGetEntitiesAsync((token) => _unit.Accounts.GetByCreatedYearAsync(year, compareType, token), options,
-                $"No accounts found created in year {year} with comparison type {compareType}.", cancellationToken);
+        public async Task<ServiceResults<Account>> GetByCreatedYearAsync(int year, ECompareType compareType,
+            uint? fromRecord, uint? pageSize, AccountNavigationOptions? options, CancellationToken cancellationToken)
+            => await GenericGetEntitiesAsync((fromRecord, pageSize, token) => _unit.Accounts.GetByCreatedYearAsync(year, compareType, fromRecord, pageSize, token), options,
+                fromRecord, pageSize, $"No accounts found created in year {year} with comparison type {compareType}.", cancellationToken);
 
-        public async Task<ServiceResults<Account>> GetByCreatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, AccountNavigationOptions? options, CancellationToken cancellationToken)
-            => await GenericGetEntitiesAsync((token) => _unit.Accounts.GetByCreatedDateRangeAsync(startDate, endDate, token), options,
-                $"No accounts found created between {startDate} and {endDate}.", cancellationToken);
+        public async Task<ServiceResults<Account>> GetByCreatedDateTimeRangeAsync(DateTime startDate, DateTime endDate,
+            uint? fromRecord, uint? pageSize, AccountNavigationOptions? options, CancellationToken cancellationToken)
+            => await GenericGetEntitiesAsync((fromRecord, pageSize, token) => _unit.Accounts.GetByCreatedDateRangeAsync(startDate, endDate, fromRecord, pageSize, token), options,
+                fromRecord, pageSize, $"No accounts found created between {startDate} and {endDate}.", cancellationToken);
 
-        public async Task<ServiceResults<Account>> GetByLastUpdatedDateMonthAndYearAsync(int year, int month, ECompareType compareType, AccountNavigationOptions? options, CancellationToken cancellationToken)
-            => await GenericGetEntitiesAsync((token) => _unit.Accounts.GetByLastUpdatedMonthAndYearAsync(year, month, compareType, token), options,
-                $"No accounts found last updated in {month}/{year} with comparison type {compareType}.", cancellationToken);
+        public async Task<ServiceResults<Account>> GetByLastUpdatedDateMonthAndYearAsync(int year, int month, ECompareType compareType,
+            uint? fromRecord, uint? pageSize, AccountNavigationOptions? options, CancellationToken cancellationToken)
+            => await GenericGetEntitiesAsync((fromRecord, pageSize, token) => _unit.Accounts.GetByLastUpdatedMonthAndYearAsync(year, month, compareType, fromRecord, pageSize, token),
+             options, fromRecord, pageSize, $"No accounts found last updated in {month}/{year} with comparison type {compareType}.", cancellationToken);
 
-        public async Task<ServiceResults<Account>> GetByLastUpdatedYearAsync(int year, ECompareType compareType, AccountNavigationOptions? options, CancellationToken cancellationToken)
-            => await GenericGetEntitiesAsync((token) => _unit.Accounts.GetByLastUpdatedYearAsync(year, compareType, token), options,
-                $"No accounts found last updated in year {year} with comparison type {compareType}.", cancellationToken);
+        public async Task<ServiceResults<Account>> GetByLastUpdatedYearAsync(int year, ECompareType compareType, uint? fromRecord, uint? pageSize,
+            AccountNavigationOptions? options, CancellationToken cancellationToken)
+            => await GenericGetEntitiesAsync((fromRecord, pageSize, token) => _unit.Accounts.GetByLastUpdatedYearAsync(year, compareType, fromRecord, pageSize, token), options,
+                fromRecord, pageSize, $"No accounts found last updated in year {year} with comparison type {compareType}.", cancellationToken);
 
-        public async Task<ServiceResults<Account>> GetByLastUpdatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, AccountNavigationOptions? options, CancellationToken cancellationToken)
-            => await GenericGetEntitiesAsync((token) => _unit.Accounts.GetByLastUpdatedDateRangeAsync(startDate, endDate, token), options,
-                $"No accounts found last updated between {startDate} and {endDate}.", cancellationToken);
+        public async Task<ServiceResults<Account>> GetByLastUpdatedDateTimeRangeAsync(DateTime startDate, DateTime endDate, uint? fromRecord, uint? pageSize,
+            AccountNavigationOptions? options, CancellationToken cancellationToken)
+            => await GenericGetEntitiesAsync((fromRecord, pageSize, token) => _unit.Accounts.GetByLastUpdatedDateRangeAsync(startDate, endDate, fromRecord, pageSize, token),
+            options, fromRecord, pageSize, $"No accounts found last updated between {startDate} and {endDate}.", cancellationToken);
 
         // Helper method to reduce code duplication
         private async Task<ServiceResult<Account>> GenericGetEntityAsync(
@@ -101,15 +107,16 @@ namespace ProjectShop.Server.Application.Services.AccountServices
         }
 
         private async Task<ServiceResults<Account>> GenericGetEntitiesAsync(
-            Func<CancellationToken, Task<IEnumerable<Account>>> getFunc,
+            Func<uint?, uint?, CancellationToken, Task<IEnumerable<Account>>> getFunc,
             AccountNavigationOptions? options,
+            uint? fromRecord, uint? pageSize,
             string notFoundMessage,
             CancellationToken cancellationToken = default)
         {
             ServiceResults<Account> results = new(true);
             try
             {
-                IEnumerable<Account> accounts = await getFunc(cancellationToken);
+                IEnumerable<Account> accounts = await getFunc(fromRecord, pageSize, cancellationToken);
                 if (!accounts.Any())
                 {
                     results.IsSuccess = false;
@@ -118,7 +125,7 @@ namespace ProjectShop.Server.Application.Services.AccountServices
                 }
 
                 if (options != null)
-                    accounts = await _unit.Accounts.ExplicitLoadAsync(accounts, options, cancellationToken);
+                    accounts = await _unit.Accounts.ExplicitLoadAsync(accounts, options, fromRecord, pageSize, cancellationToken);
                 results.Data = accounts;
                 return results;
             }

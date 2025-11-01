@@ -15,8 +15,8 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddScoped(typeof(IBaseHelperServices<>), typeof(BaseHelperServices<>));
             services.AddScoped(typeof(IServiceResultFactory<>), typeof(ServiceResultFactory<>));
             services.AddScoped<IBasePasswordMappingServices, BasePasswordMappingServices>();
-            services.AddScoped(typeof(IGetSingleServices<,>), typeof(BaseGetResultServices<,>));
-            services.AddScoped(typeof(IGetMultipleServices<,>), typeof(BaseGetResultsServices<,>));
+            // services.AddScoped(typeof(IGetSingleServices<,>), typeof(BaseGetResultServices<,>));
+            // services.AddScoped(typeof(IGetMultipleServices<,>), typeof(BaseGetResultsServices<,>));
 
             // NOTE: Get Account Permission 
             services.AddScoped<ILoginServices, LoginServices>();

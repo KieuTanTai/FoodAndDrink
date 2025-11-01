@@ -8,10 +8,12 @@ namespace ProjectShop.Server.Core.Interfaces.IRepositories
 {
     public interface IBaseGetByDateTime<TEntity> where TEntity : class
     {
-        Task<IEnumerable<TEntity>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
-        Task<IEnumerable<TEntity>> GetByYearAsync(int year, ECompareType eCompareType,
+        // Query by TEntityDate
+        Task<IEnumerable<TEntity>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, uint? fromRecord = 0, uint? pageSize = 10,
             CancellationToken cancellationToken = default);
-        Task<IEnumerable<TEntity>> GetByMonthAndYearAsync(int month, int year, ECompareType eCompareType,
+        Task<IEnumerable<TEntity>> GetByYearAsync(int year, ECompareType eCompareType, uint? fromRecord = 0, uint? pageSize = 10,
+            CancellationToken cancellationToken = default);
+        Task<IEnumerable<TEntity>> GetByMonthAndYearAsync(int month, int year, ECompareType eCompareType, uint? fromRecord = 0, uint? pageSize = 10,
             CancellationToken cancellationToken = default);
     }
 }

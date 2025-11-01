@@ -11,25 +11,16 @@ using ProjectShop.Server.Infrastructure.Services;
 
 namespace ProjectShop.Server.Application.Services.AccountServices
 {
-    public class SignupServices : ISignupServices
+    public class SignupServices(
+        IUnitOfWork unit,
+        IBaseHelperServices<Account> helper,
+        IHashPassword hashPassword, ILogService logger, IServiceResultFactory<SignupServices> serviceResultFactory) : ISignupServices
     {
-        private readonly IUnitOfWork _unit;
-        private readonly IBaseHelperServices<Account> _helper;
-        private readonly IHashPassword _hashPassword;
-        private readonly ILogService _logger;
-        private readonly IServiceResultFactory<SignupServices> _serviceResultFactory;
-
-        public SignupServices(
-            IUnitOfWork unit,
-            IBaseHelperServices<Account> helper,
-            IHashPassword hashPassword, ILogService logger, IServiceResultFactory<SignupServices> serviceResultFactory)
-        {
-            _unit = unit;
-            _logger = logger;
-            _helper = helper;
-            _hashPassword = hashPassword;
-            _serviceResultFactory = serviceResultFactory;
-        }
+        private readonly IUnitOfWork _unit = unit;
+        private readonly IBaseHelperServices<Account> _helper = helper;
+        private readonly IHashPassword _hashPassword = hashPassword;
+        private readonly ILogService _logger = logger;
+        private readonly IServiceResultFactory<SignupServices> _serviceResultFactory = serviceResultFactory;
 
         //NOTE: SIGNUP FUNCTIONALITY
         public async Task<ServiceResult<Account>> AddAccountAsync(Account entity, CancellationToken cancellationToken)
@@ -83,7 +74,7 @@ namespace ProjectShop.Server.Application.Services.AccountServices
             try
             {
                 IEnumerable<string> userNames = entities.Select(account => account.UserName);
-                if (await _helper.DoNoneOfIdsExistAsync(userNames, _unit.Accounts.GetByUserNamesAsync, cancellationToken))
+                if (await _helper.DoNoneOfIdsExistAsync(userNames, (userNames, token) => _unit.Accounts.GetByUserNamesAsync(userNames, cancellationToken: token), cancellationToken))
                 {
                     logEntries.Add(_logger.JsonLogWarning<Account, SignupServices>("One or more accounts with the same usernames already exist."));
                     return _serviceResultFactory.CreateServiceResults<Account>([], logEntries, false);

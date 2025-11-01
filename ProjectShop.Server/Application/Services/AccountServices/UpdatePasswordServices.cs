@@ -11,7 +11,8 @@ using ProjectShop.Server.Core.ValueObjects.PlatformRules;
 
 namespace ProjectShop.Server.Application.Services.AccountServices
 {
-    public class UpdatePasswordServices(IUnitOfWork unitOfWork, IHashPassword hashPassword, ILogService logger, IBasePasswordMappingServices basePasswordMappingServices) : IUpdatePasswordServices
+    public class UpdatePasswordServices(IUnitOfWork unitOfWork, IHashPassword hashPassword, ILogService logger, IBasePasswordMappingServices basePasswordMappingServices) 
+        : IUpdatePasswordServices
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IHashPassword _hashPassword = hashPassword;
@@ -132,7 +133,7 @@ namespace ProjectShop.Server.Application.Services.AccountServices
 
         private async Task<List<Account>> HelperGetAccountsByUserNamesAsync(List<string> userNames, CancellationToken cancellationToken)
         {
-            IEnumerable<Account> entities = await _unitOfWork.Accounts.GetByUserNamesAsync(userNames, cancellationToken);
+            IEnumerable<Account> entities = await _unitOfWork.Accounts.GetByUserNamesAsync(userNames, cancellationToken: cancellationToken);
             if (entities == null || !entities.Any())
                 throw new SqlNullValueException("No accounts found for the provided userNames.");
             return [..entities];

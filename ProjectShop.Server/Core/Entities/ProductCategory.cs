@@ -5,7 +5,7 @@ namespace ProjectShop.Server.Core.Entities;
 
 public partial class ProductCategory
 {
-    public uint Id { get; init; }
+    public uint ProductCategoryId { get; init; }
 
     public uint CategoryId { get; private set; }
 

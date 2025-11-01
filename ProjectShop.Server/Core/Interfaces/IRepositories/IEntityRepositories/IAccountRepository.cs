@@ -10,10 +10,10 @@ namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
         // Query by UserName
         Task<Account?> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default);
         Task<Account?> GetByUserNameAndPasswordAsync(string userName, string password, CancellationToken cancellationToken = default);
-        Task<IEnumerable<Account>> GetByUserNamesAsync(IEnumerable<string> userNames, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Account>> GetByUserNamesAsync(IEnumerable<string> userNames, uint? fromRecord = 0, uint? pageSize = 10, CancellationToken cancellationToken = default);
 
         // Query by AccountStatus
-        Task<IEnumerable<Account>> GetByStatusAsync(bool status, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Account>> GetByStatusAsync(bool status, uint? fromRecord = 0, uint? pageSize = 10, CancellationToken cancellationToken = default);
 
         // More Explicit Load Methods
         Task<Account?> GetNavigationByIdAsync(uint id, bool isGetAuth, bool isGetPermission, CancellationToken cancellationToken = default);

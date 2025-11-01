@@ -1,4 +1,4 @@
-@ProjectShop.Server_HostAddress = http://localhost:5294
+@ProjectShop.Server_HostAddress = https://localhost:5294
 
 GET {{ProjectShop.Server_HostAddress}}/weatherforecast/
 Accept: application/json

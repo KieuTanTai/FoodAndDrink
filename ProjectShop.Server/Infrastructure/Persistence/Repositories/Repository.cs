@@ -8,7 +8,7 @@ using ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositor
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
 {
-    public class Repository<TEntity>(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord, string? primaryKeyName = null) 
+    public class Repository<TEntity>(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord, string primaryKeyName = "") 
     : QueryRepository<TEntity>(context, maxGetRecord, primaryKeyName), IRepository<TEntity> where TEntity : class
     {
         #region Command Operations
