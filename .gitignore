@@ -10,6 +10,7 @@ Others/
 package-lock.json
 *.lock
 ProjectShop.Server.Tests/*
+ProjectShop.Server/TODO_LOG.md
 
 # Visual Studio Code
 .vscode/
