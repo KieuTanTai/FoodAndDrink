@@ -1,4 +1,4 @@
-﻿namespace ProjectShop.Server.Core.ValueObjects
+﻿namespace ProjectShop.Server.Core.ValueObjects.FrontEndRequestsForAccount
 {
     public class AccountUpdateStatusRequest
     {

@@ -9,26 +9,23 @@ using ProjectShop.Server.Core.ValueObjects.PlatformRules;
 
 namespace ProjectShop.Server.Application.Services.AccountServices
 {
-    public class UpdateAccountServices(IUnitOfWork unit, IHashPassword hashPassword, ILogService logger, IBasePasswordMappingServices basePasswordMappingServices,
-        IBaseHelperServices<Account> helper)
+    public class UpdateAccountServices(IUnitOfWork unit, ILogService logger)
         : IUpdateAccountServices
     {
         private readonly IUnitOfWork _unit = unit;
-        private readonly IHashPassword _hashPassword = hashPassword;
         private readonly ILogService _logger = logger;
-        private readonly IBasePasswordMappingServices _basePasswordMappingServices = basePasswordMappingServices;
-        private readonly IBaseHelperServices<Account> _helper = helper;
 
-        public async Task<JsonLogEntry> UpdateAccountStatusAsync(uint accountId, bool status, CancellationToken cancellationToken)
+        //!TODO: Check Permission before call method update account
+        public async Task<JsonLogEntry> UpdateAccountStatusAsync(uint accountId, bool status, HttpContext httpContext, CancellationToken cancellationToken)
             => await UpdateAccountStatusAsync(accountId.ToString(), status, _unit.Accounts.GetByIdAsync, cancellationToken);
 
-        public async Task<JsonLogEntry> UpdateAccountStatusByUserNameAsync(string userName, bool status, CancellationToken cancellationToken)
+        public async Task<JsonLogEntry> UpdateAccountStatusByUserNameAsync(string userName, bool status, HttpContext httpContext, CancellationToken cancellationToken)
             => await UpdateAccountStatusAsync(userName, status, _unit.Accounts.GetByUserNameAsync, cancellationToken);
 
-        public async Task<IEnumerable<JsonLogEntry>> UpdateAccountStatusByUserNamesAsync(IEnumerable<string> userNames, bool status, CancellationToken cancellationToken)
+        public async Task<IEnumerable<JsonLogEntry>> UpdateAccountStatusByUserNamesAsync(IEnumerable<string> userNames, bool status, HttpContext httpContext, CancellationToken cancellationToken)
             => await UpdateAccountStatusAsync(userNames, status, (userNames, token) => _unit.Accounts.GetByUserNamesAsync(userNames, cancellationToken: token), cancellationToken);
 
-        public async Task<IEnumerable<JsonLogEntry>> UpdateAccountStatusAsync(IEnumerable<uint> accountIds, bool status, CancellationToken cancellationToken)
+        public async Task<IEnumerable<JsonLogEntry>> UpdateAccountStatusAsync(IEnumerable<uint> accountIds, bool status, HttpContext httpContext, CancellationToken cancellationToken)
             => await UpdateAccountStatusAsync(accountIds.Select(id => id.ToString()), status, _unit.Accounts.GetByIdsAsync, cancellationToken);
 
         // Helper properties to access DAOs
@@ -113,41 +110,6 @@ namespace ProjectShop.Server.Application.Services.AccountServices
                 await _unit.RollbackTransactionAsync(cancellationToken);
                 logEntries.Add(_logger.JsonLogError<Account, UpdateAccountServices>("An error occurred while updating the account statuses.", ex));
                 return logEntries;
-            }
-        }
-
-        private async Task<JsonLogEntry> UpdateAccountPasswordAsync(string input, string newPassword, Func<string, CancellationToken, Task<Account?>> getFunc,
-            CancellationToken cancellationToken)
-        {
-            await _unit.BeginTransactionAsync(cancellationToken);
-            try
-            {
-                Account? account = await getFunc(input, cancellationToken);
-                if (account == null)
-                {
-                    await _unit.RollbackTransactionAsync(cancellationToken);
-                    return _logger.JsonLogWarning<Account, UpdateAccountServices>($"Account with input {input} does not exist.");
-                }
-
-                if (!await _hashPassword.IsPasswordValidAsync(newPassword, cancellationToken))
-                    account.Password = await _hashPassword.HashPasswordAsync(newPassword, cancellationToken);
-                else
-                    account.Password = newPassword;
-
-                int affectedRows = await _unit.Accounts.UpdateAsync(account, cancellationToken);
-                if (affectedRows == 0)
-                {
-                    await _unit.RollbackTransactionAsync(cancellationToken);
-                    return _logger.JsonLogWarning<Account, UpdateAccountServices>($"Failed to update the account password for {input}.");
-                }
-
-                await _unit.CommitTransactionAsync(cancellationToken);
-                return _logger.JsonLogInfo<Account, UpdateAccountServices>($"Updated password for account {input}.", affectedRows: affectedRows);
-            }
-            catch (Exception ex)
-            {
-                await _unit.RollbackTransactionAsync(cancellationToken);
-                return _logger.JsonLogError<Account, UpdateAccountServices>($"An error occurred while updating the account password for {input}.", ex);
             }
         }
     }

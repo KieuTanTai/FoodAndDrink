@@ -22,6 +22,8 @@ namespace ProjectShop.Server.Application.Services._BaseServices
             int count = entities.Count;
             for (int i = 0; i < count; i++)
             {
+                if (await _hashPassword.ComparePasswordsAsync(entities[i].Password, newPasswords[i], cancellationToken))
+                    continue;
                 if (!await _hashPassword.IsPasswordHashedAsync(newPasswords[i], cancellationToken))
                     entities[i].Password = await _hashPassword.HashPasswordAsync(newPasswords[i], cancellationToken);
                 else

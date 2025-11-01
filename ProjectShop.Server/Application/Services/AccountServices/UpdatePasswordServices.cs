@@ -7,7 +7,7 @@ using ProjectShop.Server.Core.Interfaces.IServices._IBase;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ValueObjects;
-using ProjectShop.Server.Core.ValueObjects.PlatformRules;
+using ProjectShop.Server.Core.ValueObjects.FrontEndRequestsForAccount;
 
 namespace ProjectShop.Server.Application.Services.AccountServices
 {
@@ -19,13 +19,13 @@ namespace ProjectShop.Server.Application.Services.AccountServices
         private readonly ILogService _logger = logger;
         private readonly IBasePasswordMappingServices _basePasswordMappingServices = basePasswordMappingServices;
 
-        public async Task<JsonLogEntry> UpdatePasswordAsync(string userName, string password, CancellationToken cancellationToken)
+        public async Task<JsonLogEntry> UpdatePasswordAsync(string userName, string password, HttpContext httpContext, CancellationToken cancellationToken)
         {
             _logger.LogInfo<Account, UpdatePasswordServices>($"Starting transaction to update password for account with userName {userName}.");
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                Account account = await HelperUpdatePasswordForAccountAsync(userName, cancellationToken);
+                Account account = await HelperUpdatePasswordForAccountAsync(userName, password, cancellationToken);
                 int affectedRows = await _unitOfWork.Accounts.UpdateAsync(account ,cancellationToken);
                 if (affectedRows == 0)
                 {
@@ -57,7 +57,7 @@ namespace ProjectShop.Server.Application.Services.AccountServices
             }
         }
 
-        public async Task<IEnumerable<JsonLogEntry>> UpdatePasswordAsync(List<FrontEndUpdatePasswordAccount> frontEndUpdatePasswordAccounts,
+        public async Task<IEnumerable<JsonLogEntry>> UpdatePasswordAsync(List<FrontEndUpdatePasswordAccount> frontEndUpdatePasswordAccounts, HttpContext httpContext,
             CancellationToken cancellationToken)
         {
             List<JsonLogEntry> logEntries = [];
@@ -104,11 +104,11 @@ namespace ProjectShop.Server.Application.Services.AccountServices
         }
 
         #region Helper methods for main public methods (for isolate from main methods)
-        private async Task<Account> HelperUpdatePasswordForAccountAsync(string userName, CancellationToken cancellationToken = default)
+        private async Task<Account> HelperUpdatePasswordForAccountAsync(string userName, string password, CancellationToken cancellationToken = default)
         {
             Account account = await HelperGetAccountByUserNameAsync(userName, cancellationToken);
-            if (!await _hashPassword.IsPasswordHashedAsync(account.Password, cancellationToken))
-                account.Password = await _hashPassword.HashPasswordAsync(account.Password, cancellationToken);
+            if (!await _hashPassword.IsPasswordHashedAsync(password, cancellationToken))
+                account.Password = await _hashPassword.HashPasswordAsync(password, cancellationToken);
             return account;
         }
 

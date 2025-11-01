@@ -26,14 +26,14 @@ namespace ProjectShop.Server.Application.Services.AccountServices
         public async Task<ServiceResult<Account>> AddAccountAsync(Account entity, CancellationToken cancellationToken)
         {
             List<JsonLogEntry> logEntries = [];
-            await _unit.BeginTransactionAsync(cancellationToken);
             try
             {
                 if (await _helper.IsExistObject(entity.UserName, _unit.Accounts.GetByUserNameAsync, cancellationToken))
                     return _serviceResultFactory.CreateServiceResult("Account with the same username already exists.", entity, false);
-                if (!await _hashPassword.IsPasswordValidAsync(entity.Password))
+                if (!await _hashPassword.IsPasswordValidAsync(entity.Password, cancellationToken))
                     return _serviceResultFactory.CreateServiceResult("Password does not meet the required criteria.", entity, false);
 
+                await _unit.BeginTransactionAsync(cancellationToken);
                 entity.Password = await _hashPassword.HashPasswordAsync(entity.Password, cancellationToken);
                 entity = await _unit.Accounts.AddAsync(entity, cancellationToken);
                 if (entity.AccountId <= 0)
@@ -70,7 +70,6 @@ namespace ProjectShop.Server.Application.Services.AccountServices
         public async Task<ServiceResults<Account>> AddAccountsAsync(IEnumerable<Account> entities, HttpContext httpContext, CancellationToken cancellationToken = default)
         {
             List<JsonLogEntry> logEntries = [];
-            await _unit.BeginTransactionAsync(cancellationToken);
             try
             {
                 IEnumerable<string> userNames = entities.Select(account => account.UserName);
@@ -79,6 +78,8 @@ namespace ProjectShop.Server.Application.Services.AccountServices
                     logEntries.Add(_logger.JsonLogWarning<Account, SignupServices>("One or more accounts with the same usernames already exist."));
                     return _serviceResultFactory.CreateServiceResults<Account>([], logEntries, false);
                 }
+
+                await _unit.BeginTransactionAsync(cancellationToken);
                 entities = await HashPasswordAsync(entities);
                 entities = await _unit.Accounts.AddRangeAsync(entities, cancellationToken);
                 if (!entities.Any())

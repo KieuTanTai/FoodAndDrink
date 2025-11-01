@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Policy;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -11,10 +12,13 @@ using Microsoft.Identity.Client;
 using MySqlX.XDevAPI.Common;
 using OpenQA.Selenium.Interactions;
 using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ValueObjects;
+using ProjectShop.Server.Core.ValueObjects.FrontEndRequestsForAccount;
 using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
+using ProjectShop.Server.Core.ValueObjects.PlatformRules;
 
 namespace ProjectShop.Server.WebAPI.Controllers
 {
@@ -105,6 +109,214 @@ namespace ProjectShop.Server.WebAPI.Controllers
             }
         }
 
+        [HttpGet("all-accounts")]
+        public async Task<IActionResult> GetAllAccountsAsync([FromQuery] uint? fromRecord = 0, [FromQuery] uint? pageSize = 10, AccountNavigationOptions? options = null,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                ServiceResults<Account> result = await _accountServices.GetAllWithOffsetAsync(fromRecord, pageSize, options, cancellationToken);
+                if (!result.IsSuccess)
+                {
+                    _logger.LogWarning("Failed to retrieve all accounts: {ErrorMessage}", result.LogEntries?.LastOrDefault()?.Message);
+                    return NotFound("No accounts found.");
+                }
+
+                _logger.LogInformation("All accounts retrieved successfully.");
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving all accounts.");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("by-status")]
+        public async Task<IActionResult> GetAccountsByStatusAsync([FromQuery] bool isActive, [FromQuery] uint? fromRecord = 0,
+            [FromQuery] uint? pageSize = 10, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                ServiceResults<Account> result = await _accountServices.GetByStatusAsync(isActive, fromRecord, pageSize, options, cancellationToken);
+                if (!result.IsSuccess)
+                {
+                    _logger.LogWarning("Failed to retrieve accounts by status {IsActive}: {ErrorMessage}", isActive, result.LogEntries?.LastOrDefault()?.Message);
+                    return NotFound("No accounts found with the specified status.");
+                }
+
+                _logger.LogInformation("Accounts retrieved successfully by status: {IsActive}", isActive);
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving accounts by status {IsActive}.", isActive);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("by-created-year")]
+        public async Task<IActionResult> GetAccountsByCreatedYearAsync([FromQuery] int year, [FromQuery] ECompareType compareType,
+            [FromQuery] uint? fromRecord = 0, [FromQuery] uint? pageSize = 10, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default)
+        {
+            if (year <= 0 || year > DateTime.Now.Year)
+                return BadRequest("Invalid year provided.");
+            try
+            {
+                ServiceResults<Account> result = await _accountServices.GetByCreatedYearAsync(year, compareType, fromRecord, pageSize, options, cancellationToken);
+                if (!result.IsSuccess)
+                {
+                    _logger.LogWarning("Failed to retrieve accounts by created year {Year} with comparison {CompareType}: {ErrorMessage}",
+                        year, compareType, result.LogEntries?.LastOrDefault()?.Message);
+                    return NotFound("No accounts found with the specified created year.");
+                }
+
+                _logger.LogInformation("Accounts retrieved successfully by created year: {Year} with comparison {CompareType}", year, compareType);
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving accounts by created year {Year} with comparison {CompareType}.", year, compareType);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("by-created-month-and-year")]
+        public async Task<IActionResult> GetAccountsByCreatedMonthAndYearAsync([FromQuery] int year, [FromQuery] int month,
+            [FromQuery] ECompareType compareType, [FromQuery] uint? fromRecord = 0, [FromQuery] uint? pageSize = 10,
+            AccountNavigationOptions? options = null, CancellationToken cancellationToken = default)
+        {
+            if (year <= 0 || year > DateTime.Now.Year || month < 1 || month > 12)
+                return BadRequest("Invalid month or year provided.");
+            try
+            {
+                ServiceResults<Account> result = await _accountServices.GetByCreatedDateMonthAndYearAsync(year, month, compareType, fromRecord, pageSize, options, cancellationToken);
+                if (!result.IsSuccess)
+                {
+                    _logger.LogWarning("Failed to retrieve accounts by created month {Month}/{Year} with comparison {CompareType}: {ErrorMessage}",
+                        month, year, compareType, result.LogEntries?.LastOrDefault()?.Message);
+                    return NotFound("No accounts found with the specified created month and year.");
+                }
+
+                _logger.LogInformation("Accounts retrieved successfully by created month: {Month}/{Year} with comparison {CompareType}", month, year, compareType);
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving accounts by created month {Month}/{Year} with comparison {CompareType}.", month, year, compareType);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("by-created-date-range")]
+        public async Task<IActionResult> GetAccountsByCreatedDateRangeAsync([FromQuery] DateTime startDate, [FromQuery] DateTime endDate,
+            [FromQuery] uint? fromRecord = 0, [FromQuery] uint? pageSize = 10, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default)
+        {
+            if (startDate > endDate)
+                return BadRequest("Start date must be less than or equal to end date.");
+            if (startDate > DateTime.Now || endDate > DateTime.Now)
+                return BadRequest("Date range must be within the last year and not in the future.");
+            try
+            {
+                ServiceResults<Account> result = await _accountServices.GetByCreatedDateTimeRangeAsync(startDate, endDate, fromRecord, pageSize, options, cancellationToken);
+                if (!result.IsSuccess)
+                {
+                    _logger.LogWarning("Failed to retrieve accounts by created date range {StartDate} to {EndDate}: {ErrorMessage}",
+                        startDate, endDate, result.LogEntries?.LastOrDefault()?.Message);
+                    return NotFound("No accounts found within the specified created date range.");
+                }
+
+                _logger.LogInformation("Accounts retrieved successfully by created date range: {StartDate} to {EndDate}", startDate, endDate);
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving accounts by created date range {StartDate} to {EndDate}.", startDate, endDate);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("by-last-updated-year")]
+        public async Task<IActionResult> GetAccountsByLastUpdatedYearAsync([FromQuery] int year, [FromQuery] ECompareType compareType,
+            [FromQuery] uint? fromRecord = 0, [FromQuery] uint? pageSize = 10, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default)
+        {
+            if (year <= 0 || year > DateTime.Now.Year)
+                return BadRequest("Invalid year provided.");
+            try
+            {
+                ServiceResults<Account> result = await _accountServices.GetByLastUpdatedYearAsync(year, compareType, fromRecord, pageSize, options, cancellationToken);
+                if (!result.IsSuccess)
+                {
+                    _logger.LogWarning("Failed to retrieve accounts by last updated year {Year} with comparison {CompareType}: {ErrorMessage}",
+                        year, compareType, result.LogEntries?.LastOrDefault()?.Message);
+                    return NotFound("No accounts found with the specified last updated year.");
+                }
+
+                _logger.LogInformation("Accounts retrieved successfully by last updated year: {Year} with comparison {CompareType}", year, compareType);
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving accounts by last updated year {Year} with comparison {CompareType}.", year, compareType);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("by-last-updated-month-and-year")]
+        public async Task<IActionResult> GetAccountsByLastUpdatedMonthAndYearAsync([FromQuery] int year, [FromQuery] int month,
+            [FromQuery] ECompareType compareType, [FromQuery] uint? fromRecord = 0, [FromQuery] uint? pageSize = 10,
+            AccountNavigationOptions? options = null, CancellationToken cancellationToken = default)
+        {
+            if (year <= 0 || year > DateTime.Now.Year || month < 1 || month > 12)
+                return BadRequest("Invalid month or year provided.");
+            try
+            {
+                ServiceResults<Account> result = await _accountServices.GetByLastUpdatedDateMonthAndYearAsync(year, month, compareType, fromRecord, pageSize, options, cancellationToken);
+                if (!result.IsSuccess)
+                {
+                    _logger.LogWarning("Failed to retrieve accounts by last updated month {Month}/{Year} with comparison {CompareType}: {ErrorMessage}",
+                        month, year, compareType, result.LogEntries?.LastOrDefault()?.Message);
+                    return NotFound("No accounts found with the specified last updated month and year.");
+                }
+
+                _logger.LogInformation("Accounts retrieved successfully by last updated month: {Month}/{Year} with comparison {CompareType}", month, year, compareType);
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving accounts by last updated month {Month}/{Year} with comparison {CompareType}.", month, year, compareType);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("by-last-updated-date-range")]
+        public async Task<IActionResult> GetAccountsByLastUpdatedDateRangeAsync([FromQuery] DateTime startDate, [FromQuery] DateTime endDate,
+            [FromQuery] uint? fromRecord = 0, [FromQuery] uint? pageSize = 10, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default)
+        {
+            if (startDate > endDate)
+                return BadRequest("Start date must be less than or equal to end date.");
+            if (startDate > DateTime.Now || endDate > DateTime.Now)
+                return BadRequest("Date range must be within the last year and not in the future.");
+            try
+            {
+                ServiceResults<Account> result = await _accountServices.GetByLastUpdatedDateTimeRangeAsync(startDate, endDate, fromRecord, pageSize, options, cancellationToken);
+                if (!result.IsSuccess)
+                {
+                    _logger.LogWarning("Failed to retrieve accounts by last updated date range {StartDate} to {EndDate}: {ErrorMessage}",
+                        startDate, endDate, result.LogEntries?.LastOrDefault()?.Message);
+                    return NotFound("No accounts found within the specified last updated date range.");
+                }
+
+                _logger.LogInformation("Accounts retrieved successfully by last updated date range: {StartDate} to {EndDate}", startDate, endDate);
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving accounts by last updated date range {StartDate} to {EndDate}.", startDate, endDate);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
         #endregion
 
         #region HttpPost Actions
@@ -180,6 +392,9 @@ namespace ProjectShop.Server.WebAPI.Controllers
             if (accounts == null || !accounts.Any())
                 return BadRequest("No accounts provided for addition.");
 
+            if (accounts.Any(account => account.AccountId == 0 || string.IsNullOrEmpty(account.UserName) || string.IsNullOrEmpty(account.Password)))
+                return BadRequest("Each account must have a valid AccountId, UserName, and Password.");
+
             try
             {
                 ServiceResults<Account> result = await _accountServices.AddAccountsAsync(accounts, HttpContext, cancellationToken);
@@ -221,10 +436,183 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         #endregion
 
+        #region HttpPut Actions
+
+        [HttpPut("update-account-status")]
+        public async Task<IActionResult> UpdateAccountStatusAsync([FromBody] AccountUpdateStatusRequest request, CancellationToken cancellationToken = default)
+        {
+            if (request == null)
+                return BadRequest("Request body is null.");
+
+            // Validate that at least one identifier is provided
+            if (request.AccountId == 0 && string.IsNullOrEmpty(request.UserName))
+                return BadRequest("Either Account ID or Username must be provided.");
+
+            try
+            {
+                JsonLogEntry result;
+
+                // Prioritize AccountId if provided, otherwise use UserName
+                if (request.AccountId > 0)
+                {
+                    result = await _accountServices.UpdateAccountStatusAsync(request.AccountId, request.Status, HttpContext, cancellationToken);
+                    if (!result.AffectedRows.HasValue || result.AffectedRows.Value == 0)
+                    {
+                        _logger.LogWarning("Failed to update account {AccountId} status: {ErrorMessage}", request.AccountId, result.Message);
+                        return BadRequest(result.Message);
+                    }
+                    _logger.LogInformation("Account {AccountId} status updated successfully to {Status}.", request.AccountId, request.Status);
+                }
+                else
+                {
+                    result = await _accountServices.UpdateAccountStatusByUserNameAsync(request.UserName, request.Status, HttpContext, cancellationToken);
+                    if (!result.AffectedRows.HasValue || result.AffectedRows.Value == 0)
+                    {
+                        _logger.LogWarning("Failed to update account status for username {UserName}: {ErrorMessage}", request.UserName, result.Message);
+                        return BadRequest(result.Message);
+                    }
+                    _logger.LogInformation("Account status for username {UserName} updated successfully to {Status}.", request.UserName, request.Status);
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating account status.");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpPut("update-password")]
+        public async Task<IActionResult> UpdatePasswordAsync([FromBody] AccountUpdatePasswordRequest request, CancellationToken cancellationToken = default)
+        {
+            if (request == null)
+                return BadRequest("Request body is null.");
+
+            // Validate that at least one identifier is provided
+            if (request.AccountId == 0 && string.IsNullOrEmpty(request.UserName))
+                return BadRequest("Either Account ID or Username must be provided.");
+
+            if (string.IsNullOrEmpty(request.NewPassword))
+                return BadRequest("New password must be provided.");
+
+            try
+            {
+                JsonLogEntry result;
+
+                // Service only has UpdatePasswordAsync(userName, newPassword), so we need to get username first if only AccountId is provided
+                string userName = request.UserName;
+                if (request.AccountId > 0 && string.IsNullOrEmpty(userName))
+                {
+                    // Get account by ID to retrieve username
+                    ServiceResult<Account> accountResult = await _accountServices.GetByAccountIdAsync(request.AccountId, null, cancellationToken);
+                    if (!accountResult.IsSuccess || accountResult.Data == null)
+                    {
+                        _logger.LogWarning("Failed to find account {AccountId} for password update.", request.AccountId);
+                        return BadRequest("Account not found.");
+                    }
+                    userName = accountResult.Data.UserName;
+                }
+
+                result = await _accountServices.UpdatePasswordAsync(userName, request.NewPassword, HttpContext, cancellationToken);
+                if (!result.AffectedRows.HasValue || result.AffectedRows.Value == 0)
+                {
+                    _logger.LogWarning("Failed to update password for username {UserName}: {ErrorMessage}", userName, result.Message);
+                    return BadRequest(result.Message);
+                }
+
+                _logger.LogInformation("Password for username {UserName} updated successfully.", userName);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating password.");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpPut("update-multiple-accounts-status")]
+        public async Task<IActionResult> UpdateMultipleAccountsStatusAsync([FromBody] IEnumerable<AccountUpdateStatusRequest> requests, CancellationToken cancellationToken = default)
+        {
+            if (requests == null || !requests.Any())
+                return BadRequest("Request body is null or empty.");
+
+            HashSet<bool> statusSet = [.. requests.Select(r => r.Status)];
+            if (statusSet.Count > 1)
+                return BadRequest("All requests must have the same status value.");
+
+            // Validate all requests
+            if (requests.Any(request => request.AccountId == 0 && string.IsNullOrEmpty(request.UserName)))
+                return BadRequest($"{requests.Count(request => request.AccountId == 0 && string.IsNullOrEmpty(request.UserName))} request(s) have neither Account ID nor Username.");
+            if (requests.Any(request => request.AccountId > 0 && !string.IsNullOrEmpty(request.UserName)))
+                return BadRequest($@"{requests.Count(request => request.AccountId > 0 && !string.IsNullOrEmpty(request.UserName))} request(s) have both Account ID and Username. 
+                    Please provide only one identifier per request.");
+
+            try
+            {
+                bool targetStatus = requests.First().Status;
+                var targetUpdateBy = requests.First().AccountId > 0 ? "AccountId" : "UserName";
+                IEnumerable<JsonLogEntry> results = [];
+                if (targetUpdateBy == "AccountId")
+                {
+                    var accountIds = requests.Select(r => r.AccountId).Distinct();
+                    results = await _accountServices.UpdateAccountStatusAsync(accountIds, targetStatus, HttpContext, cancellationToken);
+                }
+                else
+                {
+                    var userNames = requests.Select(r => r.UserName).Distinct();
+                    results = await _accountServices.UpdateAccountStatusByUserNamesAsync(userNames, targetStatus, HttpContext, cancellationToken);
+                }
+                if (results == null || !results.Any())
+                {
+                    _logger.LogWarning("No accounts were updated in the batch status update.");
+                    return BadRequest("No accounts were updated.");
+                }
+                _logger.LogInformation("Batch account status update completed. Total requests: {TotalCount}, Results returned: {ResultCount}",
+                    requests.Count(), results.Count());
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating multiple accounts status.");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpPut("update-multiple-passwords")]
+        public async Task<IActionResult> UpdateMultiplePasswordsAsync([FromBody] IEnumerable<FrontEndUpdatePasswordAccount> requests, CancellationToken cancellationToken = default)
+        {
+            if (requests == null || !requests.Any())
+                return BadRequest("Request body is null or empty.");
+            // Validate all requests
+            if (requests.Any(request => string.IsNullOrEmpty(request.UserName) || string.IsNullOrEmpty(request.Password)))
+                return BadRequest($@"{requests.Count(request => string.IsNullOrEmpty(request.UserName) || string.IsNullOrEmpty(request.Password))} 
+                    request(s) have invalid Username or Password.");
+            try
+            {
+                var results = await _accountServices.UpdatePasswordAsync([.. requests], HttpContext, cancellationToken);
+                if (results == null || !results.Any())
+                {
+                    _logger.LogWarning("No passwords were updated in the batch password update.");
+                    return BadRequest("No passwords were updated.");
+                }
+                _logger.LogInformation("Batch password update completed. Total requests: {TotalCount}, Results returned: {ResultCount}",
+                    requests.Count(), results.Count());
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating multiple passwords.");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        #endregion
+
         #region Helper Methods for ClaimsPrincipal
         //! TODO: Change to setup Admin Role if Have for Principal
         //? Helper Method to Create ClaimsPrincipal
-        
+
         private async Task SetUserClaimsAsync(Account account, bool isRememberMe = false)
         {
             ClaimsPrincipal claimsPrincipal = CreateClaimsPrincipalAsync(account);
