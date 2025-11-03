@@ -16,10 +16,10 @@ function SignupForm({ onSuccess, onLoginLinkClick }: SignupFormProps) {
                async (data: UISignupData): Promise<AccountModel> => {
                     try {
                          const result = await signup(data);
-                         if (!(result instanceof Array) && result.data && result.data.userName !== "") {
+                         if (!(result instanceof Array) && result && result.userName !== "") {
                               onSuccess();
                               showMessage("Đăng ký thành công! Vui lòng đăng nhập.", "success");
-                              return result.data;
+                              return result;
                          }
                          else if (result instanceof Array)
                               showMessage(result[0].message ?? "lỗi khi đăng kí, kiểm tra lại thông tin ", "error");

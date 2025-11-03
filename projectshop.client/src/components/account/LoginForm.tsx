@@ -18,11 +18,11 @@ function LoginForm({ onSuccess, onForgotPasswordLinkClick, onRegisterLinkClick }
                { email: "", password: "", rememberMe: false },
                async (data: UILoginData): Promise<AccountModel> => {
                     try {
-                         const result = await login(data, { isGetCustomer: true });
+                         const result = await login(data);
 
-                         if (result.data && result.data.userName !== "") {
-                              onSuccess(result.data);
-                              return result.data;
+                         if (result && result.userName !== "") {
+                              onSuccess(result);
+                              return result;
                          } else {
                               showMessage("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.", "error");
                               return {} as AccountModel;
@@ -87,7 +87,7 @@ function LoginForm({ onSuccess, onForgotPasswordLinkClick, onRegisterLinkClick }
                                    placeholder="Mật khẩu"
                                    value={formData.password}
                                    disabled={isSubmitting}
-                                   onChange={(e) => handleChange(e, false, true)}
+                                   onChange={(e) => handleChange(e, false, false)}
                                    onCopy={handleCopy}
                                    className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm placeholder-gray-400 shadow-sm focus:outline-none"
                               />

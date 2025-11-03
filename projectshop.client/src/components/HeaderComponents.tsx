@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faCartShopping, faMagnifyingGlass, faPhoneVolume, faTruckFast } from '@fortawesome/free-solid-svg-icons';
-import HeaderAccount from "../utils/HeaderAccount";
+import HeaderAccount from "../pages/account/HeaderAccount";
 
 function Header() {
      const [query, setQuery] = useState('');

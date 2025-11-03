@@ -1,26 +1,24 @@
-// import Cookies from 'js-cookie';
 import type { UILoginData } from '../ui-props/accounts/Login';
 import type { UISignupData } from '../ui-props/accounts/Signup';
 import type { AccountModel } from '../models/AccountModel';
-import type { UIForgotPasswordData } from '../ui-props/accounts/ForgotPassword';
-import type { ServiceResult } from '../value-objects/ServiceResult';
-import type { AccountNavigationOptions } from '../value-objects/get-navigation-property-options/AccountNavigationOptions';
 import { InvalidValueError } from '../value-objects/custom-error/invalidValueError';
 import type { JsonLogEntry } from '../value-objects/JsonLogEntry';
 import axios, { isAxiosError, type AxiosResponse } from 'axios';
 
-export async function login(form: UILoginData, navigation: AccountNavigationOptions): Promise<ServiceResult<AccountModel>> {
+export async function login(form: UILoginData): Promise<AccountModel> {
      try {
-          const response = await axios.post('https://localhost:5294/api/accountservices/login', form, {
-               params: {
-                    isGetEmployee: navigation.isGetEmployee,
-                    isGetCustomer: navigation.isGetCustomer,
-                    isGetRolesOfUsers: navigation.isGetRolesOfUsers,
-               }, withCredentials: form.rememberMe
-          });
-          const result = response.data as ServiceResult<AccountModel>;
+          const response = await axios.post('https://localhost:5294/api/account/login', 
+               {
+                    Email: form.email,
+                    Password: form.password,
+                    RememberMe: form.rememberMe
+               },
+               {
+                    withCredentials: true  // PHẢI Ở ĐÂY - trong config, không phải trong body!
+               }
+          );
+          const result = response.data as AccountModel;
           console.log(result);
-          // setCookie(result);
           return result;
      } catch (error) {
           if (error instanceof InvalidValueError)
@@ -29,11 +27,11 @@ export async function login(form: UILoginData, navigation: AccountNavigationOpti
      }
 }
 
-export async function signup(form: UISignupData): Promise<ServiceResult<AccountModel> | JsonLogEntry[]> {
+export async function signup(form: UISignupData): Promise<AccountModel | JsonLogEntry[]> {
      try {
           const sendData = { Email: form.email, Password: form.password };
-          const response: AxiosResponse<ServiceResult<AccountModel>> = await axios.post(
-               'https://localhost:5294/api/accountservices/signup',
+          const response: AxiosResponse<AccountModel> = await axios.post(
+               'https://localhost:5294/api/account/register',
                sendData
           );
           console.log('[signup] Kết quả trả về:', response.data);
@@ -56,28 +54,11 @@ export async function signup(form: UISignupData): Promise<ServiceResult<AccountM
      }
 }
 
-export async function getCurrentAccount(navigation: AccountNavigationOptions): Promise<ServiceResult<AccountModel>> {
-     try {
-          const response = await axios.get('https://localhost:5294/api/accountservices/me', {
-               params: {
-                    isGetEmployee: navigation.isGetEmployee,
-                    isGetCustomer: navigation.isGetCustomer,
-                    isGetRolesOfUsers: navigation.isGetRolesOfUsers,
-               }, withCredentials: true
-          });
-          return response.data as ServiceResult<AccountModel>;
-     } catch (error) {
-          if (error instanceof Error)
-               console.error(error.message);
-          return Promise.reject();
-     }
-}
-
 export async function checkExistedByEmail(email: string): Promise<boolean> {
      try {
-          const response = await axios.get('https://localhost:5294/api/accountservices/by-username',
-               { params: { userName: email, isCheckExisted: true } });
-          if (response && response.status)
+          const response = await axios.get('https://localhost:5294/api/account/by-username',
+               { params: { userName: email } });
+          if (response && response.status === 200)
                return true;
           return false;
      } catch (error) {
@@ -87,23 +68,16 @@ export async function checkExistedByEmail(email: string): Promise<boolean> {
      }
 }
 
-export async function forgotPassword(form: UIForgotPasswordData): Promise<JsonLogEntry> {
-     try {
-          const response = await axios.post('https://localhost:5294/api/accountservices/forgot-password', form);
-          return response.data as JsonLogEntry;
-     } catch (error) {
-          throw new Error('Forgot password request failed', error as { cause?: Error } | undefined);
-     }
-}
-
 export async function logout() {
      try {
-          const response = await axios.delete('https://localhost:5294/api/accountservices/logout', { withCredentials: true });
+          const response = await axios.delete('https://localhost:5294/api/account/logout', { withCredentials: true });
           return response.data as string;
      } catch (error) {
           throw new Error('Error when fetch to logout api', error as { cause?: Error } | undefined);
      }
 }
+
+export async function forgotPassword() {}
 
 // async function setCookie(account: ServiceResult<AccountModel>) {
 //      if (account)

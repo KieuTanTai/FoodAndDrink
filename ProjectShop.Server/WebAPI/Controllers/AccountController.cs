@@ -23,9 +23,20 @@ using ProjectShop.Server.Core.ValueObjects.PlatformRules;
 namespace ProjectShop.Server.WebAPI.Controllers
 {
     [Route("api/[controller]")]
-    public class AccountController(IAccountServices accountServices, ILogger<AccountController> logger, ILogService logService) : ControllerBase
+    public class AccountController(
+        ILoginServices loginServices,
+        ISignupServices signupServices,
+        ISearchAccountServices searchAccountServices,
+        IUpdateAccountServices updateAccountServices,
+        IUpdatePasswordServices updatePasswordServices,
+        ILogger<AccountController> logger,
+        ILogService logService) : ControllerBase
     {
-        private readonly IAccountServices _accountServices = accountServices;
+        private readonly ILoginServices _loginServices = loginServices;
+        private readonly ISignupServices _signupServices = signupServices;
+        private readonly ISearchAccountServices _searchAccountServices = searchAccountServices;
+        private readonly IUpdateAccountServices _updateAccountServices = updateAccountServices;
+        private readonly IUpdatePasswordServices _updatePasswordServices = updatePasswordServices;
         private readonly ILogger<AccountController> _logger = logger;
         private readonly ILogService _logService = logService;
 
@@ -44,7 +55,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
                     return Unauthorized("Invalid user identifier.");
 
                 uint accountId = Convert.ToUInt32(userId);
-                ServiceResult<Account> result = await _accountServices.GetByAccountIdAsync(accountId, options, cancellationToken);
+                ServiceResult<Account> result = await _searchAccountServices.GetByAccountIdAsync(accountId, options, cancellationToken);
                 if (!result.IsSuccess)
                 {
                     _logger.LogWarning("Failed to retrieve current user: {ErrorMessage}", result.LogEntries?.LastOrDefault()?.Message);
@@ -68,7 +79,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 return BadRequest("Account ID must be provided.");
             try
             {
-                ServiceResult<Account> result = await _accountServices.GetByAccountIdAsync(accountId, options, cancellationToken);
+                ServiceResult<Account> result = await _searchAccountServices.GetByAccountIdAsync(accountId, options, cancellationToken);
                 if (!result.IsSuccess)
                 {
                     _logger.LogWarning("Failed to retrieve user by account ID {AccountId}: {ErrorMessage}", accountId, result.LogEntries?.LastOrDefault()?.Message);
@@ -92,7 +103,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 return BadRequest("Username must be provided.");
             try
             {
-                ServiceResult<Account> result = await _accountServices.GetByUserNameAsync(userName, options, cancellationToken);
+                ServiceResult<Account> result = await _searchAccountServices.GetByUserNameAsync(userName, options, cancellationToken);
                 if (!result.IsSuccess)
                 {
                     _logger.LogWarning("Failed to retrieve user by username {UserName}: {ErrorMessage}", userName, result.LogEntries?.LastOrDefault()?.Message);
@@ -115,7 +126,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
         {
             try
             {
-                ServiceResults<Account> result = await _accountServices.GetAllWithOffsetAsync(fromRecord, pageSize, options, cancellationToken);
+                ServiceResults<Account> result = await _searchAccountServices.GetAllWithOffsetAsync(fromRecord, pageSize, options, cancellationToken);
                 if (!result.IsSuccess)
                 {
                     _logger.LogWarning("Failed to retrieve all accounts: {ErrorMessage}", result.LogEntries?.LastOrDefault()?.Message);
@@ -138,7 +149,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
         {
             try
             {
-                ServiceResults<Account> result = await _accountServices.GetByStatusAsync(isActive, fromRecord, pageSize, options, cancellationToken);
+                ServiceResults<Account> result = await _searchAccountServices.GetByStatusAsync(isActive, fromRecord, pageSize, options, cancellationToken);
                 if (!result.IsSuccess)
                 {
                     _logger.LogWarning("Failed to retrieve accounts by status {IsActive}: {ErrorMessage}", isActive, result.LogEntries?.LastOrDefault()?.Message);
@@ -163,7 +174,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 return BadRequest("Invalid year provided.");
             try
             {
-                ServiceResults<Account> result = await _accountServices.GetByCreatedYearAsync(year, compareType, fromRecord, pageSize, options, cancellationToken);
+                ServiceResults<Account> result = await _searchAccountServices.GetByCreatedYearAsync(year, compareType, fromRecord, pageSize, options, cancellationToken);
                 if (!result.IsSuccess)
                 {
                     _logger.LogWarning("Failed to retrieve accounts by created year {Year} with comparison {CompareType}: {ErrorMessage}",
@@ -190,7 +201,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 return BadRequest("Invalid month or year provided.");
             try
             {
-                ServiceResults<Account> result = await _accountServices.GetByCreatedDateMonthAndYearAsync(year, month, compareType, fromRecord, pageSize, options, cancellationToken);
+                ServiceResults<Account> result = await _searchAccountServices.GetByCreatedDateMonthAndYearAsync(year, month, compareType, fromRecord, pageSize, options, cancellationToken);
                 if (!result.IsSuccess)
                 {
                     _logger.LogWarning("Failed to retrieve accounts by created month {Month}/{Year} with comparison {CompareType}: {ErrorMessage}",
@@ -218,7 +229,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 return BadRequest("Date range must be within the last year and not in the future.");
             try
             {
-                ServiceResults<Account> result = await _accountServices.GetByCreatedDateTimeRangeAsync(startDate, endDate, fromRecord, pageSize, options, cancellationToken);
+                ServiceResults<Account> result = await _searchAccountServices.GetByCreatedDateTimeRangeAsync(startDate, endDate, fromRecord, pageSize, options, cancellationToken);
                 if (!result.IsSuccess)
                 {
                     _logger.LogWarning("Failed to retrieve accounts by created date range {StartDate} to {EndDate}: {ErrorMessage}",
@@ -244,7 +255,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 return BadRequest("Invalid year provided.");
             try
             {
-                ServiceResults<Account> result = await _accountServices.GetByLastUpdatedYearAsync(year, compareType, fromRecord, pageSize, options, cancellationToken);
+                ServiceResults<Account> result = await _searchAccountServices.GetByLastUpdatedYearAsync(year, compareType, fromRecord, pageSize, options, cancellationToken);
                 if (!result.IsSuccess)
                 {
                     _logger.LogWarning("Failed to retrieve accounts by last updated year {Year} with comparison {CompareType}: {ErrorMessage}",
@@ -271,7 +282,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 return BadRequest("Invalid month or year provided.");
             try
             {
-                ServiceResults<Account> result = await _accountServices.GetByLastUpdatedDateMonthAndYearAsync(year, month, compareType, fromRecord, pageSize, options, cancellationToken);
+                ServiceResults<Account> result = await _searchAccountServices.GetByLastUpdatedDateMonthAndYearAsync(year, month, compareType, fromRecord, pageSize, options, cancellationToken);
                 if (!result.IsSuccess)
                 {
                     _logger.LogWarning("Failed to retrieve accounts by last updated month {Month}/{Year} with comparison {CompareType}: {ErrorMessage}",
@@ -299,7 +310,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 return BadRequest("Date range must be within the last year and not in the future.");
             try
             {
-                ServiceResults<Account> result = await _accountServices.GetByLastUpdatedDateTimeRangeAsync(startDate, endDate, fromRecord, pageSize, options, cancellationToken);
+                ServiceResults<Account> result = await _searchAccountServices.GetByLastUpdatedDateTimeRangeAsync(startDate, endDate, fromRecord, pageSize, options, cancellationToken);
                 if (!result.IsSuccess)
                 {
                     _logger.LogWarning("Failed to retrieve accounts by last updated date range {StartDate} to {EndDate}: {ErrorMessage}",
@@ -330,7 +341,8 @@ namespace ProjectShop.Server.WebAPI.Controllers
             try
             {
                 // Check if request has valid credentials (email and password not empty)
-                bool hasValidRequestCredentials = !string.IsNullOrEmpty(request.Email?.Trim()) && !string.IsNullOrEmpty(request.Password?.Trim());
+                bool hasValidRequestCredentials = !string.IsNullOrEmpty(request.Email?.Trim()) &&
+                    !string.IsNullOrEmpty(request.Password?.Trim());
 
                 // If request has valid credentials, use them for login
                 if (hasValidRequestCredentials)
@@ -369,7 +381,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
                     UserName = registerRequest.Email.Trim(),
                     Password = registerRequest.Password.Trim(),
                 };
-                ServiceResult<Account> result = await _accountServices.AddAccountAsync(newAccount, cancellationToken);
+                ServiceResult<Account> result = await _signupServices.AddAccountAsync(newAccount, cancellationToken);
                 if (!result.IsSuccess)
                 {
                     _logger.LogWarning("Registration failed for user {Email}: {ErrorMessage}", registerRequest.Email, result.LogEntries?.LastOrDefault()?.Message);
@@ -397,7 +409,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
             try
             {
-                ServiceResults<Account> result = await _accountServices.AddAccountsAsync(accounts, HttpContext, cancellationToken);
+                ServiceResults<Account> result = await _signupServices.AddAccountsAsync(accounts, HttpContext, cancellationToken);
                 if (!result.IsSuccess)
                 {
                     _logger.LogWarning("Adding multiple accounts failed: {ErrorMessage}", result.LogEntries?.LastOrDefault()?.Message);
@@ -455,7 +467,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 // Prioritize AccountId if provided, otherwise use UserName
                 if (request.AccountId > 0)
                 {
-                    result = await _accountServices.UpdateAccountStatusAsync(request.AccountId, request.Status, HttpContext, cancellationToken);
+                    result = await _updateAccountServices.UpdateAccountStatusAsync(request.AccountId, request.Status, HttpContext, cancellationToken);
                     if (!result.AffectedRows.HasValue || result.AffectedRows.Value == 0)
                     {
                         _logger.LogWarning("Failed to update account {AccountId} status: {ErrorMessage}", request.AccountId, result.Message);
@@ -465,7 +477,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 }
                 else
                 {
-                    result = await _accountServices.UpdateAccountStatusByUserNameAsync(request.UserName, request.Status, HttpContext, cancellationToken);
+                    result = await _updateAccountServices.UpdateAccountStatusByUserNameAsync(request.UserName, request.Status, HttpContext, cancellationToken);
                     if (!result.AffectedRows.HasValue || result.AffectedRows.Value == 0)
                     {
                         _logger.LogWarning("Failed to update account status for username {UserName}: {ErrorMessage}", request.UserName, result.Message);
@@ -505,7 +517,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 if (request.AccountId > 0 && string.IsNullOrEmpty(userName))
                 {
                     // Get account by ID to retrieve username
-                    ServiceResult<Account> accountResult = await _accountServices.GetByAccountIdAsync(request.AccountId, null, cancellationToken);
+                    ServiceResult<Account> accountResult = await _searchAccountServices.GetByAccountIdAsync(request.AccountId, null, cancellationToken);
                     if (!accountResult.IsSuccess || accountResult.Data == null)
                     {
                         _logger.LogWarning("Failed to find account {AccountId} for password update.", request.AccountId);
@@ -514,7 +526,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
                     userName = accountResult.Data.UserName;
                 }
 
-                result = await _accountServices.UpdatePasswordAsync(userName, request.NewPassword, HttpContext, cancellationToken);
+                result = await _updatePasswordServices.UpdatePasswordAsync(userName, request.NewPassword, HttpContext, cancellationToken);
                 if (!result.AffectedRows.HasValue || result.AffectedRows.Value == 0)
                 {
                     _logger.LogWarning("Failed to update password for username {UserName}: {ErrorMessage}", userName, result.Message);
@@ -556,12 +568,12 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 if (targetUpdateBy == "AccountId")
                 {
                     var accountIds = requests.Select(r => r.AccountId).Distinct();
-                    results = await _accountServices.UpdateAccountStatusAsync(accountIds, targetStatus, HttpContext, cancellationToken);
+                    results = await _updateAccountServices.UpdateAccountStatusAsync(accountIds, targetStatus, HttpContext, cancellationToken);
                 }
                 else
                 {
                     var userNames = requests.Select(r => r.UserName).Distinct();
-                    results = await _accountServices.UpdateAccountStatusByUserNamesAsync(userNames, targetStatus, HttpContext, cancellationToken);
+                    results = await _updateAccountServices.UpdateAccountStatusByUserNamesAsync(userNames, targetStatus, HttpContext, cancellationToken);
                 }
                 if (results == null || !results.Any())
                 {
@@ -590,7 +602,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
                     request(s) have invalid Username or Password.");
             try
             {
-                var results = await _accountServices.UpdatePasswordAsync([.. requests], HttpContext, cancellationToken);
+                var results = await _updatePasswordServices.UpdatePasswordAsync([.. requests], HttpContext, cancellationToken);
                 if (results == null || !results.Any())
                 {
                     _logger.LogWarning("No passwords were updated in the batch password update.");
@@ -623,11 +635,21 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 ExpiresUtc = isRememberMe ? DateTimeOffset.UtcNow.AddDays(14) : DateTimeOffset.UtcNow.AddHours(1),
                 AllowRefresh = true
             };
+            
+            _logger.LogInformation("Setting user claims for account {AccountId}, Remembe    rMe: {RememberMe}, IsPersistent: {IsPersistent}", 
+                account.AccountId, isRememberMe, authProperties.IsPersistent);
+            
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, authProperties);
+            
+            _logger.LogInformation("Cookie should be set. Response headers count: {Count}", HttpContext.Response.Headers.Count);
         }
 
         private static ClaimsPrincipal CreateClaimsPrincipalAsync(Account account)
         {
+            if (account == null)
+                throw new ArgumentNullException(nameof(account),
+                    "Account cannot be null when creating ClaimsPrincipal.");
+
             List<Claim> claims =
             [
                 new (ClaimTypes.NameIdentifier, account.AccountId.ToString()),
@@ -678,22 +700,33 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 return BadRequest("Invalid cookie data.");
             }
 
-            ServiceResult<Account> cookieResult = await _accountServices.GetByUserNameAsync(userName, null, cancellationToken);
-            if (cookieResult.IsSuccess && cookieResult.Data != null)
+            try
             {
-                _logger.LogInformation("User {UserName} logged in successfully using cookies.", userName);
-                return Ok(cookieResult.Data);
-            }
+                ServiceResult<Account> cookieResult = await _searchAccountServices.GetByUserNameAsync(userName,
+                    null, cancellationToken);
+                if (cookieResult.IsSuccess && cookieResult.Data != null)
+                {
+                    await SetUserClaimsAsync(cookieResult.Data, true);
+                    _logger.LogInformation("User {UserName} logged in successfully using cookies.", userName);
+                    return Ok(cookieResult.Data);
+                }
 
-            _logger.LogWarning("Cookie validation failed for user {UserName}.", userName);
-            return BadRequest();
+                _logger.LogWarning("Cookie validation failed for user {UserName}.", userName);
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred during cookie validation for user {UserName}.", userName);
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         private async Task<IActionResult> HelperAccountLoginAsync(FELoginRequest account, CancellationToken cancellationToken = default)
         {
             try
             {
-                ServiceResult<Account> result = await _accountServices.HandleGetAuthLoginAsync(account.Email.Trim(), account.Password.Trim(), true, false, cancellationToken);
+                ServiceResult<Account> result = await _loginServices.HandleGetAuthLoginAsync(account.Email.Trim(), account.Password.Trim(), true,
+                    false, cancellationToken);
                 if (!result.IsSuccess)
                 {
                     _logger.LogWarning("Login failed for user {Email}: {ErrorMessage}", account.Email, result.LogEntries?.LastOrDefault()?.Message);

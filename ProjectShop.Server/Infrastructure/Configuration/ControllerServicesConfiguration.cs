@@ -1,4 +1,5 @@
-﻿using ProjectShop.Server.WebAPI.Controllers;
+﻿using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
+using ProjectShop.Server.WebAPI.Controllers;
 
 namespace ProjectShop.Server.Infrastructure.Configuration
 {

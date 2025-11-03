@@ -29,6 +29,13 @@ public static class ServiceCollectionExtensions
                 options.LogoutPath = "/logout";
                 options.ExpireTimeSpan = TimeSpan.FromDays(7);
                 options.SlidingExpiration = true;
+                
+                // Cookie settings for CORS and HTTPS
+                options.Cookie.Name = ".AspNetCore.Cookies";
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Require HTTPS
+                options.Cookie.SameSite = SameSiteMode.None; // Allow cross-origin cookies
+                options.Cookie.IsEssential = true; // Essential for authentication
             });
 
         return services;
@@ -36,8 +43,6 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddCustomOpenApi(this IServiceCollection services)
     {
-        // Bạn đã dùng builder.Services.AddOpenApi(); nếu là extension bạn tự định nghĩa thì có thể giữ nguyên,
-        // còn không thì có thể cấu hình swagger tại đây nếu muốn.
         services.AddOpenApi();
         return services;
     }

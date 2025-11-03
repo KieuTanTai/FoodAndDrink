@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
-import LoginModal from "../modal/components/account/LoginModal";
-import SignupModal from "../modal/components/account/SignupModal";
-import type { AccountModel } from "../models/AccountModel";
-import { getCurrentAccount, logout } from "../api/auth-api";
-import { useMessageModalProvider } from "../hooks/useMessageModalContext";
-import ForgotPasswordModal from "../modal/components/account/ForgotPasswordModal";
-import useFixedScrollbarCompensate from "../hooks/useScrollbarCompensate";
+import LoginModal from "../../modal/components/account/LoginModal";
+import SignupModal from "../../modal/components/account/SignupModal";
+import type { AccountModel } from "../../models/AccountModel";
+import { useMessageModalProvider } from "../../hooks/useMessageModalContext";
+import ForgotPasswordModal from "../../modal/components/account/ForgotPasswordModal";
+import useFixedScrollbarCompensate from "../../hooks/useScrollbarCompensate";
+import { login, logout } from "../../api/auth-api";
 
 
 function HeaderAccount() {
@@ -26,10 +26,10 @@ function HeaderAccount() {
     async function fetchAccount() {
       try {
         if (currentAccount) return; // Nếu đã có tài khoản, không cần gọi API nữa
-        const result = await getCurrentAccount({ isGetCustomer: true });
-        if (result.data && result.data.userName !== "") {
-          setCurrentAccount(result.data);
-          console.log("Current account:", result.data.customer?.name);
+        const result = await login({email: "", password: "", rememberMe: true });
+        if (result && result.userName !== "") {
+          setCurrentAccount(result);
+          console.log("Current account:", result.userName);
         }
         else
           setCurrentAccount(null);
@@ -118,7 +118,7 @@ function HeaderAccount() {
         onRequestClose={closeModal}
         onSuccess={(account: AccountModel) => {
           setCurrentAccount(account);
-          showMessage(`Đăng nhập thành công! ${account.customer?.name}`, "success");
+          showMessage(`Đăng nhập thành công! ${account.userName}`, "success");
           closeModal();
         }}
         dictLinksClick={{
