@@ -24,9 +24,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
+
+            var cursor = fromRecord ?? 0;
+
             return await _dbSet
                 .Where(a => userNames.Contains(a.UserName))
-                .Skip((int)(fromRecord ?? 0))
+                .Where(a => a.AccountId > cursor)
+                .OrderBy(a => a.AccountId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
@@ -39,9 +43,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
+
+            var cursor = fromRecord ?? 0;
+
             return await _dbSet
                 .Where(account => account.AccountStatus == status)
-                .Skip((int)(fromRecord ?? 0))
+                .Where(account => account.AccountId > cursor)
+                .OrderBy(account => account.AccountId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
@@ -106,11 +114,15 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
+
+            var cursor = fromRecord ?? 0;
+
             IQueryable<Account> query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query
                 .Where(a => accountIds.Contains(a.AccountId))
-                .Skip((int)(fromRecord ?? 0))
+                .Where(a => a.AccountId > cursor)
+                .OrderBy(a => a.AccountId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }

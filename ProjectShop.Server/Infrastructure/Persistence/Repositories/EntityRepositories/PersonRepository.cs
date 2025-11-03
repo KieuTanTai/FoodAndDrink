@@ -36,9 +36,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
+
+            var cursor = fromRecord;
+
             return await _dbSet
                 .Where(person => person.PersonName.Contains(searchTerm))
-                .Skip((int)fromRecord)
+                .Where(person => person.PersonId > cursor)
+                .OrderBy(person => person.PersonId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
@@ -50,9 +54,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
+
+            var cursor = fromRecord;
+
             return await _dbSet
                 .Where(person => person.PersonGender == isMale)
-                .Skip((int)fromRecord)
+                .Where(person => person.PersonId > cursor)
+                .OrderBy(person => person.PersonId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
@@ -61,9 +69,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
+
+            var cursor = fromRecord;
+
             return await _dbSet
                 .Where(person => person.PersonStatus == status)
-                .Skip((int)fromRecord)
+                .Where(person => person.PersonId > cursor)
+                .OrderBy(person => person.PersonId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
@@ -132,11 +144,15 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
+
+            var cursor = fromRecord ?? 0;
+
             IQueryable<Person> query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query
                 .Where(person => ids.Contains(person.PersonId))
-                .Skip((int)(fromRecord ?? 0))
+                .Where(person => person.PersonId > cursor)
+                .OrderBy(person => person.PersonId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }

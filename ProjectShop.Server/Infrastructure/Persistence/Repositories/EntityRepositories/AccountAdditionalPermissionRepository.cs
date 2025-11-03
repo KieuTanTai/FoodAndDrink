@@ -21,9 +21,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
+
+            var cursor = fromRecord ?? 0;
+
             return await _dbSet
                 .Where(permission => permission.AccountId == accountId)
-                .Skip((int)(fromRecord ?? 0))
+                .Where(permission => permission.AccountAdditionalPermissionId > cursor)
+                .OrderBy(permission => permission.AccountAdditionalPermissionId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
@@ -32,9 +36,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
+
+            var cursor = fromRecord ?? 0;
+
             return await _dbSet
                 .Where(permission => permission.IsGranted == isGranted)
-                .Skip((int)(fromRecord ?? 0))
+                .Where(permission => permission.AccountAdditionalPermissionId > cursor)
+                .OrderBy(permission => permission.AccountAdditionalPermissionId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
@@ -43,9 +51,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
+
+            var cursor = fromRecord ?? 0;
+
             return await _dbSet
                 .Where(permission => permission.PermissionId == permissionId)
-                .Skip((int)(fromRecord ?? 0))
+                .Where(permission => permission.AccountAdditionalPermissionId > cursor)
+                .OrderBy(permission => permission.AccountAdditionalPermissionId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
@@ -57,9 +69,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
+
+            var cursor = fromRecord ?? 0;
+
             return await _dbSet
                 .Where(permission => permission.AdditionalPermissionStatus == status)
-                .Skip((int)(fromRecord ?? 0))
+                .Where(permission => permission.AccountAdditionalPermissionId > cursor)
+                .OrderBy(permission => permission.AccountAdditionalPermissionId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
@@ -101,11 +117,15 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
+
+            var cursor = fromRecord ?? 0;
+
             IQueryable<AccountAdditionalPermission> queryable = _dbSet.AsQueryable();
             queryable = ApplyNavigationOptions(queryable, options);
             return await queryable
                 .Where(additional => ids.Contains(additional.AccountAdditionalPermissionId))
-                .Skip((int)(fromRecord ?? 0))
+                .Where(additional => additional.AccountAdditionalPermissionId > cursor)
+                .OrderBy(additional => additional.AccountAdditionalPermissionId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }

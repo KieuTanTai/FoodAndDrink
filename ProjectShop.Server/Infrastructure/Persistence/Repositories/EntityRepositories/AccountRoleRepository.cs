@@ -21,9 +21,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
+
+            var cursor = fromRecord ?? 0;
+
             return await _dbSet
                 .Where(ar => ar.AccountId == accountId)
-                .Skip((int)(fromRecord ?? 0))
+                .Where(ar => ar.AccountRoleId > cursor)
+                .OrderBy(ar => ar.AccountRoleId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
@@ -32,9 +36,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
+
+            var cursor = fromRecord ?? 0;
+
             return await _dbSet
                 .Where(ar => ar.RoleId == roleId)
-                .Skip((int)(fromRecord ?? 0))
+                .Where(ar => ar.AccountRoleId > cursor)
+                .OrderBy(ar => ar.AccountRoleId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
@@ -47,9 +55,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
+
+            var cursor = fromRecord ?? 0;
+
             return await _dbSet
                 .Where(ar => ar.AccountRoleStatus == status)
-                .Skip((int)(fromRecord ?? 0))
+                .Where(ar => ar.AccountRoleId > cursor)
+                .OrderBy(ar => ar.AccountRoleId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
@@ -93,11 +105,15 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
+
+            var cursor = fromRecord ?? 0;
+
             IQueryable<AccountRole> query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query
                 .Where(ar => ids.Contains(ar.AccountRoleId))
-                .Skip((int)(fromRecord ?? 0))
+                .Where(ar => ar.AccountRoleId > cursor)
+                .OrderBy(ar => ar.AccountRoleId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }

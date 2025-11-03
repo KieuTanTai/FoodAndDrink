@@ -23,21 +23,27 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
         protected readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
 
         #region Query Operations
-        public virtual async Task<TEntity?> GetByIdAsync(object id, CancellationToken cancellationToken = default)
+        public virtual async Task<TEntity?> GetByIdAsync(uint id, CancellationToken cancellationToken = default)
             => await _dbSet.FindAsync([id], cancellationToken);
 
-        public virtual async Task<IEnumerable<TEntity>> GetByIdsAsync(IEnumerable<object> ids, CancellationToken cancellationToken = default)
+        public virtual async Task<IEnumerable<TEntity>> GetByIdsAsync(IEnumerable<uint> ids, CancellationToken cancellationToken = default)
         {
             var idList = ids.ToList();
-            return await _dbSet.Where(e => idList.Contains(EF.Property<object>(e, _colIdName))).Take((int)_maxGetReturn).ToListAsync(cancellationToken);
+            return await _dbSet.Where(e => idList.Contains(EF.Property<uint>(e, _colIdName))).Take((int)_maxGetReturn).ToListAsync(cancellationToken);
         }
 
         public virtual async Task<IEnumerable<TEntity>> GetAllWithOffsetAsync(uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
-            fromRecord ??= 0;
-            return await _dbSet.Skip((int)fromRecord).Take((int)pageSize).ToListAsync(cancellationToken);
+
+            var cursor = fromRecord ?? 0;
+
+            return await _dbSet
+                .Where(entity => EF.Property<uint>(entity, _colIdName) > cursor)
+                .OrderBy(entity => EF.Property<uint>(entity, _colIdName))
+                .Take((int)pageSize)
+                .ToListAsync(cancellationToken);
         }
 
         public virtual async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, uint? fromRecord,
@@ -45,8 +51,15 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
-            fromRecord ??= 0;
-            return await _dbSet.Where(predicate).Skip((int)fromRecord).Take((int)pageSize).ToListAsync(cancellationToken);
+
+            var cursor = fromRecord ?? 0;
+
+            return await _dbSet
+                .Where(predicate)
+                .Where(entity => EF.Property<uint>(entity, _colIdName) > cursor)
+                .OrderBy(entity => EF.Property<uint>(entity, _colIdName))
+                .Take((int)pageSize)
+                .ToListAsync(cancellationToken);
         }
 
         public virtual async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken)
@@ -67,10 +80,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
 
+            var cursor = fromRecord ?? 0;
             var valueList = columnValues.ToList();
+
             return await _dbSet
                 .Where(e => valueList.Contains(EF.Property<TColumn>(e, columnName)))
-                .Skip((int)(fromRecord ?? 0))
+                .Where(e => EF.Property<uint>(e, _colIdName) > cursor)
+                .OrderBy(e => EF.Property<uint>(e, _colIdName))
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
@@ -81,9 +97,12 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
 
+            var cursor = fromRecord ?? 0;
+
             return await _dbSet
                 .Where(e => compareConditions(e))
-                .Skip((int)(fromRecord ?? 0))
+                .Where(e => EF.Property<uint>(e, _colIdName) > cursor)
+                .OrderBy(e => EF.Property<uint>(e, _colIdName))
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
@@ -133,7 +152,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
         #endregion
 
         #region Private Helper Methods for Entity Types
-        
+
         private static bool IsProductBarcodeEntity(Type entityType)
         {
             var barcodeEntities = new[]
