@@ -15,19 +15,17 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         #region Query by AccountId and RoleId
 
         public async Task<AccountRole?> GetByAccountIdAndRoleIdAsync(uint accountId, uint roleId, CancellationToken cancellationToken)
-            => await _dbSet.FirstOrDefaultAsync(ar => ar.AccountId == accountId && ar.RoleId == roleId, cancellationToken);
+            => await _dbSet.FirstOrDefaultAsync(accountRole => accountRole.AccountId == accountId && accountRole.RoleId == roleId, cancellationToken);
 
         public async Task<IEnumerable<AccountRole>> GetByAccountIdAsync(uint accountId, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
-
             var cursor = fromRecord ?? 0;
 
             return await _dbSet
-                .Where(ar => ar.AccountId == accountId)
-                .Where(ar => ar.AccountRoleId > cursor)
-                .OrderBy(ar => ar.AccountRoleId)
+                .Where(accountRole => accountRole.AccountId == accountId && accountRole.AccountRoleId > cursor)
+                .OrderBy(accountRole => accountRole.AccountRoleId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
@@ -36,13 +34,11 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
-
             var cursor = fromRecord ?? 0;
 
             return await _dbSet
-                .Where(ar => ar.RoleId == roleId)
-                .Where(ar => ar.AccountRoleId > cursor)
-                .OrderBy(ar => ar.AccountRoleId)
+                .Where(accountRole => accountRole.RoleId == roleId && accountRole.AccountRoleId > cursor)
+                .OrderBy(accountRole => accountRole.AccountRoleId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
@@ -55,13 +51,11 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
-
             var cursor = fromRecord ?? 0;
 
             return await _dbSet
-                .Where(ar => ar.AccountRoleStatus == status)
-                .Where(ar => ar.AccountRoleId > cursor)
-                .OrderBy(ar => ar.AccountRoleId)
+                .Where(accountRole => accountRole.AccountRoleStatus == status && accountRole.AccountRoleId > cursor)
+                .OrderBy(accountRole => accountRole.AccountRoleId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
@@ -97,7 +91,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             IQueryable<AccountRole> query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
-            return await query.FirstOrDefaultAsync(ar => ar.AccountRoleId == id, cancellationToken);
+            return await query.FirstOrDefaultAsync(accountRole => accountRole.AccountRoleId == id, cancellationToken);
         }
 
         public async Task<IEnumerable<AccountRole>> GetNavigationByIdsAsync(IEnumerable<uint> ids, AccountRoleNavigationOptions options, uint? fromRecord,
@@ -111,9 +105,8 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             IQueryable<AccountRole> query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query
-                .Where(ar => ids.Contains(ar.AccountRoleId))
-                .Where(ar => ar.AccountRoleId > cursor)
-                .OrderBy(ar => ar.AccountRoleId)
+                .Where(accountRole => ids.Contains(accountRole.AccountRoleId) && accountRole.AccountRoleId > cursor)
+                .OrderBy(accountRole => accountRole.AccountRoleId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
@@ -121,9 +114,9 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<AccountRole> ExplicitLoadAsync(AccountRole entity, AccountRoleNavigationOptions options, CancellationToken cancellationToken)
         {
             if (options.IsGetAccount)
-                await _context.Entry(entity).Reference(ar => ar.Account).LoadAsync(cancellationToken);
+                await _context.Entry(entity).Reference(accountRole => accountRole.Account).LoadAsync(cancellationToken);
             if (options.IsGetRole)
-                await _context.Entry(entity).Reference(ar => ar.Role).LoadAsync(cancellationToken);
+                await _context.Entry(entity).Reference(accountRole => accountRole.Role).LoadAsync(cancellationToken);
             return entity;
         }
 
@@ -132,8 +125,8 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             List<Account> accounts = [];
             List<Role> roles = [];
-            var accountIds = entities.Select(ar => ar.AccountId).Distinct().ToList();
-            var roleIds = entities.Select(ar => ar.RoleId).Distinct().ToList();
+            var accountIds = entities.Select(accountRole => accountRole.AccountId).Distinct().ToList();
+            var roleIds = entities.Select(accountRole => accountRole.RoleId).Distinct().ToList();
 
             if (options.IsGetAccount)
                 accounts = await _context.Accounts.Where(account => accountIds.Contains(account.AccountId)).ToListAsync(cancellationToken);
@@ -150,9 +143,9 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         private static IQueryable<AccountRole> ApplyNavigationOptions(IQueryable<AccountRole> query, AccountRoleNavigationOptions options)
         {
             if (options.IsGetAccount)
-                query = query.Include(ar => ar.Account);
+                query = query.Include(accountRole => accountRole.Account);
             if (options.IsGetRole)
-                query = query.Include(ar => ar.Role);
+                query = query.Include(accountRole => accountRole.Role);
 
             return query;
         }

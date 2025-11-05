@@ -21,12 +21,10 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
-
             var cursor = fromRecord ?? 0;
 
             return await _dbSet
-                .Where(permission => permission.AccountId == accountId)
-                .Where(permission => permission.AccountAdditionalPermissionId > cursor)
+                .Where(permission => permission.AccountId == accountId && permission.AccountAdditionalPermissionId > cursor)
                 .OrderBy(permission => permission.AccountAdditionalPermissionId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
@@ -36,12 +34,10 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
-
             var cursor = fromRecord ?? 0;
 
             return await _dbSet
-                .Where(permission => permission.IsGranted == isGranted)
-                .Where(permission => permission.AccountAdditionalPermissionId > cursor)
+                .Where(permission => permission.IsGranted == isGranted && permission.AccountAdditionalPermissionId > cursor)
                 .OrderBy(permission => permission.AccountAdditionalPermissionId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
@@ -51,12 +47,10 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
-
             var cursor = fromRecord ?? 0;
 
             return await _dbSet
-                .Where(permission => permission.PermissionId == permissionId)
-                .Where(permission => permission.AccountAdditionalPermissionId > cursor)
+                .Where(permission => permission.PermissionId == permissionId && permission.AccountAdditionalPermissionId > cursor)
                 .OrderBy(permission => permission.AccountAdditionalPermissionId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
@@ -69,12 +63,10 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
-
             var cursor = fromRecord ?? 0;
 
             return await _dbSet
-                .Where(permission => permission.AdditionalPermissionStatus == status)
-                .Where(permission => permission.AccountAdditionalPermissionId > cursor)
+                .Where(permission => permission.AdditionalPermissionStatus == status && permission.AccountAdditionalPermissionId > cursor)
                 .OrderBy(permission => permission.AccountAdditionalPermissionId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
@@ -117,14 +109,12 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
-
             var cursor = fromRecord ?? 0;
 
             IQueryable<AccountAdditionalPermission> queryable = _dbSet.AsQueryable();
             queryable = ApplyNavigationOptions(queryable, options);
             return await queryable
-                .Where(additional => ids.Contains(additional.AccountAdditionalPermissionId))
-                .Where(additional => additional.AccountAdditionalPermissionId > cursor)
+                .Where(additional => ids.Contains(additional.AccountAdditionalPermissionId) && additional.AccountAdditionalPermissionId > cursor)
                 .OrderBy(additional => additional.AccountAdditionalPermissionId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);

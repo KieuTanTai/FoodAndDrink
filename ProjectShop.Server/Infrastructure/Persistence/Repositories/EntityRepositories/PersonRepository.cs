@@ -144,14 +144,12 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
                 pageSize = _maxGetReturn;
-
             var cursor = fromRecord ?? 0;
 
             IQueryable<Person> query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query
-                .Where(person => ids.Contains(person.PersonId))
-                .Where(person => person.PersonId > cursor)
+                .Where(person => ids.Contains(person.PersonId) && person.PersonId > cursor)
                 .OrderBy(person => person.PersonId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
