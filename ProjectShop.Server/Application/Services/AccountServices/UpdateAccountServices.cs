@@ -1,11 +1,8 @@
 ﻿using ProjectShop.Server.Core.Entities;
-using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
-using ProjectShop.Server.Core.Interfaces.IServices._IBase;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ValueObjects;
-using ProjectShop.Server.Core.ValueObjects.PlatformRules;
 
 namespace ProjectShop.Server.Application.Services.AccountServices
 {
@@ -17,7 +14,7 @@ namespace ProjectShop.Server.Application.Services.AccountServices
 
         //!TODO: Check Permission before call method update account
         public async Task<JsonLogEntry> UpdateAccountStatusAsync(uint accountId, bool status, HttpContext httpContext, CancellationToken cancellationToken)
-            => await UpdateAccountStatusAsync(accountId.ToString(), status, _unit.Accounts.GetByIdAsync, cancellationToken);
+            => await UpdateAccountStatusAsync(accountId, status, _unit.Accounts.GetByIdAsync, cancellationToken);
 
         public async Task<JsonLogEntry> UpdateAccountStatusByUserNameAsync(string userName, bool status, HttpContext httpContext, CancellationToken cancellationToken)
             => await UpdateAccountStatusAsync(userName, status, _unit.Accounts.GetByUserNameAsync, cancellationToken);
@@ -26,11 +23,11 @@ namespace ProjectShop.Server.Application.Services.AccountServices
             => await UpdateAccountStatusAsync(userNames, status, (userNames, token) => _unit.Accounts.GetByUserNamesAsync(userNames, cancellationToken: token), cancellationToken);
 
         public async Task<IEnumerable<JsonLogEntry>> UpdateAccountStatusAsync(IEnumerable<uint> accountIds, bool status, HttpContext httpContext, CancellationToken cancellationToken)
-            => await UpdateAccountStatusAsync(accountIds.Select(id => id.ToString()), status, _unit.Accounts.GetByIdsAsync, cancellationToken);
+            => await UpdateAccountStatusAsync(accountIds.Select(id => id), status, _unit.Accounts.GetByIdsAsync, cancellationToken);
 
         // Helper properties to access DAOs
-        private async Task<JsonLogEntry> UpdateAccountStatusAsync(string input, bool status, Func<string, CancellationToken, Task<Account?>> getFunc,
-            CancellationToken cancellationToken)
+        private async Task<JsonLogEntry> UpdateAccountStatusAsync<InputType>(InputType input, bool status, Func<InputType, CancellationToken, Task<Account?>> getFunc,
+            CancellationToken cancellationToken) where InputType : notnull
         {
             await _unit.BeginTransactionAsync(cancellationToken);
             try
@@ -65,8 +62,8 @@ namespace ProjectShop.Server.Application.Services.AccountServices
             }
         }
 
-        private async Task<IEnumerable<JsonLogEntry>> UpdateAccountStatusAsync(IEnumerable<string> inputs, bool status,
-            Func<IEnumerable<string>, CancellationToken, Task<IEnumerable<Account>>> getFunc, CancellationToken cancellationToken)
+        private async Task<IEnumerable<JsonLogEntry>> UpdateAccountStatusAsync<InputType>(IEnumerable<InputType> inputs, bool status,
+            Func<IEnumerable<InputType>, CancellationToken, Task<IEnumerable<Account>>> getFunc, CancellationToken cancellationToken) where InputType : notnull
         {
             List<JsonLogEntry> logEntries = [];
             await _unit.BeginTransactionAsync(cancellationToken);

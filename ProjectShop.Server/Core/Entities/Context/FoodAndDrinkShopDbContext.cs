@@ -774,64 +774,32 @@ public partial class FoodAndDrinkShopDbContext : DbContext, IFoodAndDrinkShopDbC
                 .ToTable("employee")
                 .UseCollation("utf8mb4_uca1400_ai_ci");
 
-            entity.HasIndex(e => e.EmployeeCityId, "employee_city_id");
-
-            entity.HasIndex(e => e.EmployeeDistrictId, "employee_district_id");
-
-            entity.HasIndex(e => e.EmployeeWardId, "employee_ward_id");
-
-            entity.HasIndex(e => e.LocationId, "location_id");
+            entity.HasIndex(e => e.EmployeeWorkLocationId, "employee_work_location_id");
 
             entity.HasIndex(e => e.PersonId, "person_id").IsUnique();
 
             entity.Property(e => e.EmployeeId)
                 .HasColumnType("int(10) unsigned")
                 .HasColumnName("employee_id");
-            entity.Property(e => e.EmployeeCityId)
-                .HasColumnType("int(10) unsigned")
-                .HasColumnName("employee_city_id");
-            entity.Property(e => e.EmployeeDistrictId)
-                .HasColumnType("int(10) unsigned")
-                .HasColumnName("employee_district_id");
+            entity.Property(e => e.EmployeeIdentificationCard)
+                .HasMaxLength(12)
+                .HasColumnName("employee_identification_card");
             entity.Property(e => e.EmployeeHireDate)
                 .HasDefaultValueSql("current_timestamp()")
                 .HasColumnType("datetime")
                 .HasColumnName("employee_hire_date");
-            entity.Property(e => e.EmployeeHouseNumber)
-                .HasMaxLength(20)
-                .HasDefaultValueSql("''")
-                .HasColumnName("employee_house_number");
             entity.Property(e => e.EmployeeSalary)
                 .HasPrecision(10, 2)
                 .HasColumnName("employee_salary");
-            entity.Property(e => e.EmployeeStreet)
-                .HasMaxLength(40)
-                .HasDefaultValueSql("''")
-                .HasColumnName("employee_street");
-            entity.Property(e => e.EmployeeWardId)
+            entity.Property(e => e.EmployeeWorkLocationId)
                 .HasColumnType("int(10) unsigned")
-                .HasColumnName("employee_ward_id");
-            entity.Property(e => e.LocationId)
-                .HasColumnType("int(10) unsigned")
-                .HasColumnName("location_id");
+                .HasColumnName("employee_work_location_id");
             entity.Property(e => e.PersonId)
                 .HasColumnType("int(10) unsigned")
                 .HasColumnName("person_id");
 
-            entity.HasOne(d => d.EmployeeCity).WithMany(p => p.Employees)
-                .HasForeignKey(d => d.EmployeeCityId)
-                .HasConstraintName("employee_ibfk_5");
-
-            entity.HasOne(d => d.EmployeeDistrict).WithMany(p => p.Employees)
-                .HasForeignKey(d => d.EmployeeDistrictId)
-                .HasConstraintName("employee_ibfk_3");
-
-            entity.HasOne(d => d.EmployeeWard).WithMany(p => p.Employees)
-                .HasForeignKey(d => d.EmployeeWardId)
-                .HasConstraintName("employee_ibfk_2");
-
-            entity.HasOne(d => d.Location).WithMany(p => p.Employees)
-                .HasForeignKey(d => d.LocationId)
+            entity.HasOne(d => d.EmployeeWorkLocation).WithMany(p => p.Employees)
+                .HasForeignKey(d => d.EmployeeWorkLocationId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("employee_ibfk_4");
 

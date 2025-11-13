@@ -22,9 +22,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<IEnumerable<Account>> GetByUserNamesAsync(IEnumerable<string> userNames, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
-            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
-                pageSize = _maxGetReturn;
-
+            pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
             return await _dbSet
@@ -40,8 +38,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<IEnumerable<Account>> GetByStatusAsync(bool status, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
-            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
-                pageSize = _maxGetReturn;
+            pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
             return await _dbSet
@@ -57,21 +54,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<IEnumerable<Account>> GetByCreatedDateRangeAsync(DateTime startDate, DateTime endDate, uint? fromRecord, uint? pageSize,
             CancellationToken cancellationToken)
-            => await GetByDateTimeRangeAsync(startDate, endDate, account => account.AccountCreatedDate, fromRecord, pageSize, cancellationToken);
-
-        public async Task<IEnumerable<Account>> GetByCreatedYearAsync(int year, ECompareType eCompareType, uint? fromRecord, uint? pageSize,
-             CancellationToken cancellationToken)
-        {
-            Func<Account, bool> predicate = await GetCompareConditions(year, eCompareType, account => account.AccountCreatedDate);
-            return await GetByTimeAsync(predicate, fromRecord, pageSize, cancellationToken);
-        }
-
-        public async Task<IEnumerable<Account>> GetByCreatedMonthAndYearAsync(int month, int year, ECompareType eCompareType, uint? fromRecord, uint? pageSize,
-         CancellationToken cancellationToken)
-        {
-            Func<Account, bool> predicate = await GetCompareConditions(month, year, eCompareType, account => account.AccountCreatedDate);
-            return await GetByTimeAsync(predicate, fromRecord, pageSize, cancellationToken);
-        }
+            => await GetByDateTimeRangeAsync(startDate, endDate, account => account.AccountCreatedDate, true, fromRecord, pageSize, cancellationToken);
 
         #endregion
 
@@ -79,20 +62,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<IEnumerable<Account>> GetByLastUpdatedDateRangeAsync(DateTime startDate, DateTime endDate, uint? fromRecord, uint? pageSize,
             CancellationToken cancellationToken)
-            => await GetByDateTimeRangeAsync(startDate, endDate, account => account.AccountLastUpdatedDate, fromRecord, pageSize, cancellationToken);
-
-        public async Task<IEnumerable<Account>> GetByLastUpdatedYearAsync(int year, ECompareType eCompareType, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
-        {
-            Func<Account, bool> predicate = await GetCompareConditions(year, eCompareType, account => account.AccountLastUpdatedDate);
-            return await GetByTimeAsync(predicate, fromRecord, pageSize, cancellationToken);
-        }
-
-        public async Task<IEnumerable<Account>> GetByLastUpdatedMonthAndYearAsync(int month, int year,
-            ECompareType eCompareType, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
-        {
-            Func<Account, bool> predicate = await GetCompareConditions(month, year, eCompareType, account => account.AccountLastUpdatedDate);
-            return await GetByTimeAsync(predicate, fromRecord, pageSize, cancellationToken);
-        }
+            => await GetByDateTimeRangeAsync(startDate, endDate, account => account.AccountLastUpdatedDate, true, fromRecord, pageSize, cancellationToken);
 
         #endregion
 
@@ -109,8 +79,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<IEnumerable<Account>> GetNavigationByIdsAsync(IEnumerable<uint> accountIds, AccountNavigationOptions options,
             uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
-            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
-                pageSize = _maxGetReturn;
+            pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
             IQueryable<Account> query = _dbSet.AsQueryable();
@@ -133,13 +102,12 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             return account;
         }
 
-        public async Task<IEnumerable<Account>> ExplicitLoadAsync(IEnumerable<Account> accounts, AccountNavigationOptions options,
-            uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Account>> ExplicitLoadAsync(IEnumerable<Account> accounts, AccountNavigationOptions options, CancellationToken cancellationToken)
         {
             List<Person> persons = [];
             List<AccountAdditionalPermission> additionalPermissions = [];
             List<AccountRole> roles = [];
-            var accountIds = accounts.Select(account => account.AccountId).ToList();
+            var accountIds = accounts.Select(account => account.AccountId).Distinct().ToList();
 
             if (options.IsGetPerson)
                 persons = await _context.People.Where(person => accountIds.Contains(person.AccountId)).ToListAsync(cancellationToken);

@@ -1,8 +1,6 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using ProjectShop.Server.Core.Constants;
-using ProjectShop.Server.Core.Entities;
-using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IValidate;
@@ -34,8 +32,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
 
         public virtual async Task<IEnumerable<TEntity>> GetAllWithOffsetAsync(uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
-            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
-                pageSize = _maxGetReturn;
+            pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
             return await _dbSet
@@ -48,8 +45,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
         public virtual async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, uint? fromRecord,
             uint? pageSize, CancellationToken cancellationToken)
         {
-            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
-                pageSize = _maxGetReturn;
+            pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
             return await _dbSet
@@ -72,79 +68,68 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
         #endregion
 
         #region Helper methods for generic repositories
+
+        protected uint ValidateAndNormalizePageSize(uint? pageSize)
+        {
+            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
+                return _maxGetReturn;
+            return pageSize.Value;
+        }
+
         protected async Task<IEnumerable<TEntity>> GetByColumnAsync<TColumn>(string columnName, IEnumerable<TColumn> columnValues,
             uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
-            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
-                pageSize = _maxGetReturn;
-
+            pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
             var valueList = columnValues.ToList();
 
             return await _dbSet
-                .Where(entity =>valueList.Contains(EF.Property<TColumn>(entity, columnName)))
-                .Where(entity =>EF.Property<uint>(entity, _colIdName) > cursor)
-                .OrderBy(entity =>EF.Property<uint>(entity, _colIdName))
+                .Where(entity => valueList.Contains(EF.Property<TColumn>(entity, columnName)))
+                .Where(entity => EF.Property<uint>(entity, _colIdName) > cursor)
+                .OrderBy(entity => EF.Property<uint>(entity, _colIdName))
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);
         }
 
-        protected async Task<IEnumerable<TEntity>> GetByTimeAsync(Func<TEntity, bool> compareConditions, uint? fromRecord,
-            uint? pageSize, CancellationToken cancellationToken)
-        {
-            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
-                pageSize = _maxGetReturn;
-            var cursor = fromRecord ?? 0;
-
-            return await _dbSet
-                .Where(entity =>compareConditions(entity))
-                .Where(entity =>EF.Property<uint>(entity, _colIdName) > cursor)
-                .OrderBy(entity =>EF.Property<uint>(entity, _colIdName))
-                .Take((int)pageSize)
-                .ToListAsync(cancellationToken);
-        }
-
-        // Helper methods for get DateTime methods
         protected async Task<IEnumerable<TEntity>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate,
-           Func<TEntity, DateTime> dateTimeConditions, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
+           Func<TEntity, DateTime> dateTimeConditions, bool isTracking = true, uint? fromRecord = 0, uint? pageSize = 10, CancellationToken cancellationToken = default)
         {
             if (endDate > DateTime.Now)
                 endDate = DateTime.Now;
             if (startDate > endDate)
                 throw new ArgumentException("Start date must be less than or equal to end date.");
             if (startDate == endDate)
-                return await GetByTimeAsync(entity => dateTimeConditions(entity).Date == startDate.Date, fromRecord, pageSize, cancellationToken);
+                return await GetByTimeAsync(entity => dateTimeConditions(entity).Date == startDate.Date, isTracking, fromRecord, pageSize, cancellationToken);
             return await GetByTimeAsync(entity => dateTimeConditions(entity) >= startDate
-                && dateTimeConditions(entity) <= endDate.AddDays(1), fromRecord, pageSize, cancellationToken);
+                && dateTimeConditions(entity) <= endDate.AddDays(1), isTracking, fromRecord, pageSize, cancellationToken);
         }
 
-        protected async Task<Func<TEntity, bool>> GetCompareConditions(int year, ECompareType compareType,
-            Func<TEntity, DateTime> dateTimeConditions)
-            => compareType switch
-            {
-                ECompareType.EQUAL => entity => dateTimeConditions(entity).Year == year,
-                ECompareType.LESS_THAN => entity => dateTimeConditions(entity).Year < year,
-                ECompareType.LESS_THAN_OR_EQUAL => entity => dateTimeConditions(entity).Year <= year,
-                ECompareType.GREATER_THAN => entity => dateTimeConditions(entity).Year > year,
-                ECompareType.GREATER_THAN_OR_EQUAL => entity => dateTimeConditions(entity).Year >= year,
-                _ => throw new InvalidOperationException($"Invalid compare type: {compareType}")
-            };
+        private async Task<IEnumerable<TEntity>> GetByTimeAsync(Func<TEntity, bool> compareConditions, bool isTracking, uint? fromRecord,
+            uint? pageSize, CancellationToken cancellationToken)
+        {
+            pageSize = ValidateAndNormalizePageSize(pageSize);
+            var cursor = fromRecord ?? 0;
 
-        protected async Task<Func<TEntity, bool>> GetCompareConditions(int month, int year, ECompareType compareType,
-            Func<TEntity, DateTime> dateTimeConditions)
-            => compareType switch
+            if (isTracking)
             {
-                ECompareType.EQUAL => entity => dateTimeConditions(entity).Year == year && dateTimeConditions(entity).Month == month,
-                ECompareType.LESS_THAN => entity => dateTimeConditions(entity).Year < year
-                    || (dateTimeConditions(entity).Year == year && dateTimeConditions(entity).Month < month),
-                ECompareType.LESS_THAN_OR_EQUAL => entity => dateTimeConditions(entity).Year < year
-                    || (dateTimeConditions(entity).Year == year && dateTimeConditions(entity).Month <= month),
-                ECompareType.GREATER_THAN => entity => dateTimeConditions(entity).Year > year
-                    || (dateTimeConditions(entity).Year == year && dateTimeConditions(entity).Month > month),
-                ECompareType.GREATER_THAN_OR_EQUAL => entity => dateTimeConditions(entity).Year > year
-                    || (dateTimeConditions(entity).Year == year && dateTimeConditions(entity).Month >= month),
-                _ => throw new InvalidOperationException($"Invalid compare type: {compareType}")
-            };
+                return await Task.Run(() => _dbSet
+                    .Where(entity => compareConditions(entity))
+                    .Where(entity => EF.Property<uint>(entity, _colIdName) > cursor)
+                    .OrderBy(entity => EF.Property<uint>(entity, _colIdName))
+                    .Take((int)pageSize)
+                    .ToList(), cancellationToken);
+            }
+            else
+            {
+                return await Task.Run(() => _dbSet
+                    .AsNoTracking()
+                    .Where(entity => compareConditions(entity))
+                    .Where(entity => EF.Property<uint>(entity, _colIdName) > cursor)
+                    .OrderBy(entity => EF.Property<uint>(entity, _colIdName))
+                    .Take((int)pageSize)
+                    .ToList(), cancellationToken);
+            }
+        }
 
         #endregion
 

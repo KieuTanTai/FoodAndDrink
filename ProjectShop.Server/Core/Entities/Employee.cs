@@ -9,17 +9,9 @@ public partial class Employee
 
     public uint PersonId { get; private set; }
 
-    public string? EmployeeHouseNumber { get; set; }
+    public string EmployeeIdentificationCard { get; set; } = null!;
 
-    public string EmployeeStreet { get; set; } = null!;
-
-    public uint? EmployeeWardId { get; private set; }
-
-    public uint? EmployeeDistrictId { get; private set; }
-
-    public uint? EmployeeCityId { get; private set; }
-
-    public uint LocationId { get; private set; }
+    public uint EmployeeWorkLocationId { get; private set; }
 
     public DateTime EmployeeHireDate { get; init; }
 
@@ -27,15 +19,9 @@ public partial class Employee
 
     public virtual ICollection<DisposeProduct> DisposeProducts { get; set; } = [];
 
-    public virtual LocationCity? EmployeeCity { get; set; }
-
-    public virtual LocationDistrict? EmployeeDistrict { get; set; }
-
-    public virtual LocationWard? EmployeeWard { get; set; }
-
     public virtual ICollection<Invoice> Invoices { get; set; } = [];
 
-    public virtual Location Location { get; set; } = null!;
+    public virtual Location EmployeeWorkLocation { get; set; } = null!;
 
     public virtual Person Person { get; set; } = null!;
 }

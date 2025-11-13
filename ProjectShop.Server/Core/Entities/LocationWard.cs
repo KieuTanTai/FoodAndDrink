@@ -13,7 +13,5 @@ public partial class LocationWard
 
     public virtual ICollection<CustomerAddress> CustomerAddresses { get; set; } = [];
 
-    public virtual ICollection<Employee> Employees { get; set; } = [];
-
     public virtual ICollection<Location> Locations { get; set; } = [];
 }

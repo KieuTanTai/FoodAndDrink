@@ -166,59 +166,6 @@ namespace ProjectShop.Server.WebAPI.Controllers
             }
         }
 
-        [HttpGet("by-created-year")]
-        public async Task<IActionResult> GetAccountsByCreatedYearAsync([FromQuery] int year, [FromQuery] ECompareType compareType,
-            [FromQuery] uint? fromRecord = 0, [FromQuery] uint? pageSize = 10, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default)
-        {
-            if (year <= 0 || year > DateTime.Now.Year)
-                return BadRequest("Invalid year provided.");
-            try
-            {
-                ServiceResults<Account> result = await _searchAccountServices.GetByCreatedYearAsync(year, compareType, fromRecord, pageSize, options, cancellationToken);
-                if (!result.IsSuccess)
-                {
-                    _logger.LogWarning("Failed to retrieve accounts by created year {Year} with comparison {CompareType}: {ErrorMessage}",
-                        year, compareType, result.LogEntries?.LastOrDefault()?.Message);
-                    return NotFound("No accounts found with the specified created year.");
-                }
-
-                _logger.LogInformation("Accounts retrieved successfully by created year: {Year} with comparison {CompareType}", year, compareType);
-                return Ok(result.Data);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while retrieving accounts by created year {Year} with comparison {CompareType}.", year, compareType);
-                return StatusCode(500, "Internal server error");
-            }
-        }
-
-        [HttpGet("by-created-month-and-year")]
-        public async Task<IActionResult> GetAccountsByCreatedMonthAndYearAsync([FromQuery] int year, [FromQuery] int month,
-            [FromQuery] ECompareType compareType, [FromQuery] uint? fromRecord = 0, [FromQuery] uint? pageSize = 10,
-            AccountNavigationOptions? options = null, CancellationToken cancellationToken = default)
-        {
-            if (year <= 0 || year > DateTime.Now.Year || month < 1 || month > 12)
-                return BadRequest("Invalid month or year provided.");
-            try
-            {
-                ServiceResults<Account> result = await _searchAccountServices.GetByCreatedDateMonthAndYearAsync(year, month, compareType, fromRecord, pageSize, options, cancellationToken);
-                if (!result.IsSuccess)
-                {
-                    _logger.LogWarning("Failed to retrieve accounts by created month {Month}/{Year} with comparison {CompareType}: {ErrorMessage}",
-                        month, year, compareType, result.LogEntries?.LastOrDefault()?.Message);
-                    return NotFound("No accounts found with the specified created month and year.");
-                }
-
-                _logger.LogInformation("Accounts retrieved successfully by created month: {Month}/{Year} with comparison {CompareType}", month, year, compareType);
-                return Ok(result.Data);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while retrieving accounts by created month {Month}/{Year} with comparison {CompareType}.", month, year, compareType);
-                return StatusCode(500, "Internal server error");
-            }
-        }
-
         [HttpGet("by-created-date-range")]
         public async Task<IActionResult> GetAccountsByCreatedDateRangeAsync([FromQuery] DateTime startDate, [FromQuery] DateTime endDate,
             [FromQuery] uint? fromRecord = 0, [FromQuery] uint? pageSize = 10, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default)
@@ -243,59 +190,6 @@ namespace ProjectShop.Server.WebAPI.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while retrieving accounts by created date range {StartDate} to {EndDate}.", startDate, endDate);
-                return StatusCode(500, "Internal server error");
-            }
-        }
-
-        [HttpGet("by-last-updated-year")]
-        public async Task<IActionResult> GetAccountsByLastUpdatedYearAsync([FromQuery] int year, [FromQuery] ECompareType compareType,
-            [FromQuery] uint? fromRecord = 0, [FromQuery] uint? pageSize = 10, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default)
-        {
-            if (year <= 0 || year > DateTime.Now.Year)
-                return BadRequest("Invalid year provided.");
-            try
-            {
-                ServiceResults<Account> result = await _searchAccountServices.GetByLastUpdatedYearAsync(year, compareType, fromRecord, pageSize, options, cancellationToken);
-                if (!result.IsSuccess)
-                {
-                    _logger.LogWarning("Failed to retrieve accounts by last updated year {Year} with comparison {CompareType}: {ErrorMessage}",
-                        year, compareType, result.LogEntries?.LastOrDefault()?.Message);
-                    return NotFound("No accounts found with the specified last updated year.");
-                }
-
-                _logger.LogInformation("Accounts retrieved successfully by last updated year: {Year} with comparison {CompareType}", year, compareType);
-                return Ok(result.Data);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while retrieving accounts by last updated year {Year} with comparison {CompareType}.", year, compareType);
-                return StatusCode(500, "Internal server error");
-            }
-        }
-
-        [HttpGet("by-last-updated-month-and-year")]
-        public async Task<IActionResult> GetAccountsByLastUpdatedMonthAndYearAsync([FromQuery] int year, [FromQuery] int month,
-            [FromQuery] ECompareType compareType, [FromQuery] uint? fromRecord = 0, [FromQuery] uint? pageSize = 10,
-            AccountNavigationOptions? options = null, CancellationToken cancellationToken = default)
-        {
-            if (year <= 0 || year > DateTime.Now.Year || month < 1 || month > 12)
-                return BadRequest("Invalid month or year provided.");
-            try
-            {
-                ServiceResults<Account> result = await _searchAccountServices.GetByLastUpdatedDateMonthAndYearAsync(year, month, compareType, fromRecord, pageSize, options, cancellationToken);
-                if (!result.IsSuccess)
-                {
-                    _logger.LogWarning("Failed to retrieve accounts by last updated month {Month}/{Year} with comparison {CompareType}: {ErrorMessage}",
-                        month, year, compareType, result.LogEntries?.LastOrDefault()?.Message);
-                    return NotFound("No accounts found with the specified last updated month and year.");
-                }
-
-                _logger.LogInformation("Accounts retrieved successfully by last updated month: {Month}/{Year} with comparison {CompareType}", month, year, compareType);
-                return Ok(result.Data);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while retrieving accounts by last updated month {Month}/{Year} with comparison {CompareType}.", month, year, compareType);
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -635,12 +529,12 @@ namespace ProjectShop.Server.WebAPI.Controllers
                 ExpiresUtc = isRememberMe ? DateTimeOffset.UtcNow.AddDays(14) : DateTimeOffset.UtcNow.AddHours(1),
                 AllowRefresh = true
             };
-            
-            _logger.LogInformation("Setting user claims for account {AccountId}, Remembe    rMe: {RememberMe}, IsPersistent: {IsPersistent}", 
+
+            _logger.LogInformation("Setting user claims for account {AccountId}, Remembe    rMe: {RememberMe}, IsPersistent: {IsPersistent}",
                 account.AccountId, isRememberMe, authProperties.IsPersistent);
-            
+
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, authProperties);
-            
+
             _logger.LogInformation("Cookie should be set. Response headers count: {Count}", HttpContext.Response.Headers.Count);
         }
 

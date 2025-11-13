@@ -15,7 +15,6 @@ namespace ProjectShop.Server.Core.Interfaces.IRepositories
             CancellationToken cancellationToken = default);
         Task<TEntity> ExplicitLoadAsync(TEntity entity, TOptions options, CancellationToken cancellationToken = default);
 
-        Task<IEnumerable<TEntity>> ExplicitLoadAsync(IEnumerable<TEntity> entities, TOptions options, uint? fromRecord = 0, uint? pageSize = 10,
-            CancellationToken cancellationToken = default);
+        Task<IEnumerable<TEntity>> ExplicitLoadAsync(IEnumerable<TEntity> entities, TOptions options, CancellationToken cancellationToken = default);
     }
 }

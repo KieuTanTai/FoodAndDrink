@@ -31,8 +31,5 @@ namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
 
         // Query by Status
         Task<IEnumerable<Person>> GetByStatusAsync(bool? status, uint fromRecord = 0, uint? pageSize = 10, CancellationToken cancellationToken = default);
-
-        // Query with navigation properties
-        Task<Person?> GetByIdWithNavigationAsync(uint personId, CancellationToken cancellationToken = default);
     }
 }

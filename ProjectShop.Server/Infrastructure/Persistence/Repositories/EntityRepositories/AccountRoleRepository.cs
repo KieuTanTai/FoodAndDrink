@@ -19,8 +19,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<IEnumerable<AccountRole>> GetByAccountIdAsync(uint accountId, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
-            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
-                pageSize = _maxGetReturn;
+            pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
             return await _dbSet
@@ -32,8 +31,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<IEnumerable<AccountRole>> GetByRoleIdAsync(uint roleId, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
-            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
-                pageSize = _maxGetReturn;
+            pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
             return await _dbSet
@@ -49,8 +47,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<IEnumerable<AccountRole>> GetByStatusAsync(bool? status, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
-            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
-                pageSize = _maxGetReturn;
+            pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
             return await _dbSet
@@ -63,25 +60,8 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         #endregion
 
         #region Query by AccountRoleAssignedDate
-
-        public async Task<IEnumerable<AccountRole>> GetByAssignedDateRangeAsync(DateTime startDate, DateTime endDate, uint? fromRecord, uint? pageSize,
-            CancellationToken cancellationToken)
-            => await GetByDateTimeRangeAsync(startDate, endDate, ar => ar.AccountRoleAssignedDate, fromRecord, pageSize, cancellationToken);
-
-        public Task<IEnumerable<AccountRole>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
-            => GetByAssignedDateRangeAsync(startDate, endDate, fromRecord, pageSize, cancellationToken);
-
-        public async Task<IEnumerable<AccountRole>> GetByYearAsync(int year, ECompareType eCompareType, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
-        {
-            Func<AccountRole, bool> predicate = await GetCompareConditions(year, eCompareType, ar => ar.AccountRoleAssignedDate);
-            return await GetByTimeAsync(predicate, fromRecord, pageSize, cancellationToken);
-        }
-
-        public async Task<IEnumerable<AccountRole>> GetByMonthAndYearAsync(int month, int year, ECompareType eCompareType, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
-        {
-            Func<AccountRole, bool> predicate = await GetCompareConditions(month, year, eCompareType, ar => ar.AccountRoleAssignedDate);
-            return await GetByTimeAsync(predicate, fromRecord, pageSize, cancellationToken);
-        }
+        public Task<IEnumerable<AccountRole>> GetByAssignDateRangeAsync(DateTime startDate, DateTime endDate, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
+            => GetByDateTimeRangeAsync(startDate, endDate, accountRole => accountRole.AccountRoleAssignedDate, true, fromRecord, pageSize, cancellationToken);
 
         #endregion
 
@@ -97,9 +77,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<IEnumerable<AccountRole>> GetNavigationByIdsAsync(IEnumerable<uint> ids, AccountRoleNavigationOptions options, uint? fromRecord,
             uint? pageSize, CancellationToken cancellationToken)
         {
-            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
-                pageSize = _maxGetReturn;
-
+            pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
             IQueryable<AccountRole> query = _dbSet.AsQueryable();
@@ -120,8 +98,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             return entity;
         }
 
-        public async Task<IEnumerable<AccountRole>> ExplicitLoadAsync(IEnumerable<AccountRole> entities, AccountRoleNavigationOptions options,
-            uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
+        public async Task<IEnumerable<AccountRole>> ExplicitLoadAsync(IEnumerable<AccountRole> entities, AccountRoleNavigationOptions options, CancellationToken cancellationToken)
         {
             List<Account> accounts = [];
             List<Role> roles = [];

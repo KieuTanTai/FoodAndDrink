@@ -34,9 +34,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<IEnumerable<Person>> SearchByNameAsync(string searchTerm, uint fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
-            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
-                pageSize = _maxGetReturn;
-
+            pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord;
 
             return await _dbSet
@@ -52,9 +50,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<IEnumerable<Person>> GetByGenderAsync(bool isMale, uint fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
-            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
-                pageSize = _maxGetReturn;
-
+            pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord;
 
             return await _dbSet
@@ -67,9 +63,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<IEnumerable<Person>> GetByStatusAsync(bool? status, uint fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
-            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
-                pageSize = _maxGetReturn;
-
+            pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord;
 
             return await _dbSet
@@ -82,56 +76,17 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         #endregion
 
-        #region Query by PersonCreatedDate
+        #region Query by PersonCreatedDate & by PersonLastUpdatedDate
 
         public async Task<IEnumerable<Person>> GetByCreatedDateRangeAsync(DateTime startDate, DateTime endDate, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
-            => await GetByDateTimeRangeAsync(startDate, endDate, person => person.PersonCreatedDate, fromRecord, pageSize, cancellationToken);
-
-        public async Task<IEnumerable<Person>> GetByCreatedYearAsync(int year, ECompareType eCompareType, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
-        {
-            Func<Person, bool> predicate = await GetCompareConditions(year, eCompareType, person => person.PersonCreatedDate);
-            return await GetByTimeAsync(predicate, fromRecord, pageSize, cancellationToken);
-        }
-
-        public async Task<IEnumerable<Person>> GetByCreatedMonthAndYearAsync(int month, int year, ECompareType eCompareType, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
-        {
-            Func<Person, bool> predicate = await GetCompareConditions(month, year, eCompareType, person => person.PersonCreatedDate);
-            return await GetByTimeAsync(predicate, fromRecord, pageSize, cancellationToken);
-        }
-
-        #endregion
-
-        #region Query by PersonLastUpdatedDate
+            => await GetByDateTimeRangeAsync(startDate, endDate, person => person.PersonCreatedDate, true, fromRecord, pageSize, cancellationToken);
 
         public async Task<IEnumerable<Person>> GetByLastUpdatedDateRangeAsync(DateTime startDate, DateTime endDate, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
-            => await GetByDateTimeRangeAsync(startDate, endDate, person => person.PersonLastUpdatedDate, fromRecord, pageSize, cancellationToken);
-
-        public async Task<IEnumerable<Person>> GetByLastUpdatedYearAsync(int year, ECompareType eCompareType, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
-        {
-            Func<Person, bool> predicate = await GetCompareConditions(year, eCompareType, person => person.PersonLastUpdatedDate);
-            return await GetByTimeAsync(predicate, fromRecord, pageSize, cancellationToken);
-        }
-
-        public async Task<IEnumerable<Person>> GetByLastUpdatedMonthAndYearAsync(int month, int year, ECompareType eCompareType, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
-        {
-            Func<Person, bool> predicate = await GetCompareConditions(month, year, eCompareType, person => person.PersonLastUpdatedDate);
-            return await GetByTimeAsync(predicate, fromRecord, pageSize, cancellationToken);
-        }
+            => await GetByDateTimeRangeAsync(startDate, endDate, person => person.PersonLastUpdatedDate, true, fromRecord, pageSize, cancellationToken);
 
         #endregion
 
         #region Query with Navigation Properties
-
-        public async Task<Person?> GetByIdWithNavigationAsync(uint personId, CancellationToken cancellationToken)
-        {
-            var options = new PersonNavigationOptions
-            {
-                IsGetAccount = true,
-                IsGetCustomer = true,
-                IsGetEmployee = true
-            };
-            return await GetNavigationByIdAsync(personId, options, cancellationToken);
-        }
 
         public async Task<Person?> GetNavigationByIdAsync(uint id, PersonNavigationOptions options, CancellationToken cancellationToken)
         {
@@ -142,8 +97,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<IEnumerable<Person>> GetNavigationByIdsAsync(IEnumerable<uint> ids, PersonNavigationOptions options, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
-            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
-                pageSize = _maxGetReturn;
+            pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
             IQueryable<Person> query = _dbSet.AsQueryable();
@@ -166,12 +120,12 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             return entity;
         }
 
-        public async Task<IEnumerable<Person>> ExplicitLoadAsync(IEnumerable<Person> entities, PersonNavigationOptions options, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Person>> ExplicitLoadAsync(IEnumerable<Person> entities, PersonNavigationOptions options, CancellationToken cancellationToken)
         {
             List<Account> accounts = [];
             List<Customer> customers = [];
             List<Employee> employees = [];
-            var personIds = entities.Select(person => person.PersonId).ToList();
+            var personIds = entities.Select(person => person.PersonId).Distinct().ToList();
 
             if (options.IsGetAccount)
             {

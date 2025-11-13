@@ -1,4 +1,5 @@
 using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
 {
@@ -8,27 +9,22 @@ namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
     public interface IEmployeeRepository : IRepository<Employee>
     {
         // Query by PersonId
-        Task<Employee?> GetByPersonIdAsync(uint personId, CancellationToken cancellationToken = default);
-        Task<IEnumerable<Employee>> GetByPersonIdsAsync(IEnumerable<uint> personIds, CancellationToken cancellationToken = default);
-
-        // Query by Position
-        Task<IEnumerable<Employee>> GetByPositionAsync(string position, CancellationToken cancellationToken = default);
+        Task<Employee?> GetByPersonIdAsync(uint personId, CancellationToken cancellationToken);
+        Task<IEnumerable<Employee>> GetByPersonIdsAsync(IEnumerable<uint> personIds, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken);
 
         // Query by Salary
-        Task<IEnumerable<Employee>> GetBySalaryRangeAsync(decimal minSalary, decimal maxSalary, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Employee>> GetBySalaryRangeAsync(decimal minSalary, decimal maxSalary, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken);
 
         // Query by HireDate
-        Task<IEnumerable<Employee>> GetByHireDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
-        Task<IEnumerable<Employee>> GetByHireYearAsync(int year, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Employee>> GetByHireDateRangeAsync(DateTime startDate, DateTime endDate, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken);
 
         // Query by Status
-        Task<IEnumerable<Employee>> GetByStatusAsync(bool? status, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Employee>> GetByStatusAsync(bool? status, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken);
 
-        // Query with navigation properties
-        Task<Employee?> GetByIdWithNavigationAsync(uint employeeId, CancellationToken cancellationToken = default);
-        Task<IEnumerable<Employee>> GetAllWithNavigationAsync(CancellationToken cancellationToken = default);
-
-        // Business queries
-        Task<IEnumerable<Employee>> GetActiveEmployeesAsync(CancellationToken cancellationToken = default);
+        // Query with Navigation Properties
+        Task<Employee?> GetNavigationByIdAsync(uint id, EmployeeNavigationOptions options, CancellationToken cancellationToken);
+        Task<IEnumerable<Employee>> GetNavigationByIdsAsync(IEnumerable<uint> ids, EmployeeNavigationOptions options, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken);
+        Task<Employee> ExplicitLoadAsync(Employee entity, EmployeeNavigationOptions options, CancellationToken cancellationToken);
+        Task<IEnumerable<Employee>> ExplicitLoadAsync(IEnumerable<Employee> entities, EmployeeNavigationOptions options, CancellationToken cancellationToken);
     }
 }
