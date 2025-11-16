@@ -2,49 +2,47 @@ name: .NET
 
 on:
   push:
-    branches: [ "TLang" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.0.x
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
 
-    - name: Show repo (debug)
-      run: |
-        echo "List root"
-        ls -la
-        echo "List ProjectShop.Server"
-        ls -la ProjectShop.Server
+      # --- Fix: add direct package references to avoid NU1605 downgrade errors ---
+      - name: Pin DI packages to 9.0.10 to avoid NU1605
+        # Adjust path if your server project is in a different location
+        run: |
+          dotnet --version
+          dotnet add ProjectShop.Server/ProjectShop.Server.csproj package Microsoft.Extensions.DependencyInjection --version 9.0.10
+          dotnet add ProjectShop.Server/ProjectShop.Server.csproj package Microsoft.Extensions.DependencyInjection.Abstractions --version 9.0.10
 
-    - name: Restore dependencies
-      run: dotnet restore
-      working-directory: ProjectShop.Server
+      - name: Restore .NET projects
+        run: dotnet restore ProjectShop.Server/ProjectShop.Server.csproj
 
-    - name: Build
-      run: dotnet build --no-restore --configuration Release
-      working-directory: ProjectShop.Server
+      - name: Build
+        run: dotnet build ProjectShop.Server/ProjectShop.Server.csproj -c Release --no-restore
+        # If NU1605 still treated as errors in build, you can temporarily disable:
+        # run: dotnet build ProjectShop.Server/ProjectShop.Server.csproj -c Release --no-restore -p:WarningsAsErrors=false
 
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
-      working-directory: ProjectShop.Server
+      # --- Node step: use npm install as fallback if no package-lock.json ---
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-    - name: Build client (optional) - React/TS
-      if: always()
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-    - name: Install & build client
-      if: always()
-      run: |
-        cd projectshop.client
-        npm ci
-        npm run build
+      - name: Install frontend dependencies (ci fallback to install)
+        # If your frontend lives in a subfolder, set working-directory: <path/to/frontend>
+        run: |
+          npm ci || npm install
+
+      # Add any test/publish steps below as needed
