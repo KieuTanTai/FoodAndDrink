@@ -2,9 +2,10 @@ name: .NET
 
 on:
   push:
-    branches: [ main ]
+    branches: [ TLang ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -12,37 +13,83 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
 
-      # --- Fix: add direct package references to avoid NU1605 downgrade errors ---
-      - name: Pin DI packages to 9.0.10 to avoid NU1605
-        # Adjust path if your server project is in a different location
+      - name: Show runner info (debug)
         run: |
-          dotnet --version
-          dotnet add ProjectShop.Server/ProjectShop.Server.csproj package Microsoft.Extensions.DependencyInjection --version 9.0.10
-          dotnet add ProjectShop.Server/ProjectShop.Server.csproj package Microsoft.Extensions.DependencyInjection.Abstractions --version 9.0.10
+          echo "PWD: $(pwd)"
+          ls -la
+          ls -la ProjectShop.Server || true
+          ls -la projectshop.client || true
+
+      - name: Pin DI packages to 9.0.10 (if server project exists)
+        if: always()
+        run: |
+          if [ -f ProjectShop.Server/ProjectShop.Server.csproj ]; then
+            dotnet --version
+            dotnet add ProjectShop.Server/ProjectShop.Server.csproj package Microsoft.Extensions.DependencyInjection --version 9.0.10
+            dotnet add ProjectShop.Server/ProjectShop.Server.csproj package Microsoft.Extensions.DependencyInjection.Abstractions --version 9.0.10
+          else
+            echo "ProjectShop.Server/ProjectShop.Server.csproj not found — skipping pin step"
+          fi
 
       - name: Restore .NET projects
-        run: dotnet restore ProjectShop.Server/ProjectShop.Server.csproj
+        run: |
+          if [ -f ProjectShop.Server/ProjectShop.Server.csproj ]; then
+            dotnet restore ProjectShop.Server/ProjectShop.Server.csproj
+          else
+            echo "ERROR: ProjectShop.Server/ProjectShop.Server.csproj not found"
+            exit 1
+          fi
 
-      - name: Build
+      - name: Build server
         run: dotnet build ProjectShop.Server/ProjectShop.Server.csproj -c Release --no-restore
-        # If NU1605 still treated as errors in build, you can temporarily disable:
-        # run: dotnet build ProjectShop.Server/ProjectShop.Server.csproj -c Release --no-restore -p:WarningsAsErrors=false
 
-      # --- Node step: use npm install as fallback if no package-lock.json ---
+      - name: Publish server (optional)
+        run: dotnet publish ProjectShop.Server/ProjectShop.Server.csproj -c Release -o ./artifacts/publish
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+          cache: 'npm'
 
-      - name: Install frontend dependencies (ci fallback to install)
-        # If your frontend lives in a subfolder, set working-directory: <path/to/frontend>
+      - name: Install and build frontend (projectshop.client)
+        working-directory: projectshop.client
         run: |
+          if [ ! -f package.json ]; then
+            echo "No package.json in projectshop.client — skipping frontend steps"
+            exit 0
+          fi
           npm ci || npm install
+          if grep -q "\"build\"" package.json; then
+            npm run build
+          elif grep -q "\"build:react\"" package.json; then
+            npm run build:react
+          elif grep -q "\"build:vue\"" package.json; then
+            npm run build:vue
+          else
+            echo "No recognized build script; skipping frontend build"
+          fi
 
-      # Add any test/publish steps below as needed
+      - name: Upload frontend build artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: |
+            projectshop.client/dist
+            projectshop.client/build
+
+      - name: Upload server publish artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-publish
+          path: artifacts/publish
