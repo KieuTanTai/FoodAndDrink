@@ -8,7 +8,7 @@ namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
     /// </summary>
     public interface IPersonRepository : IRepository<Person>,
         IBaseGetByCreatedAndLastUpdatedDate<Person>,
-        IBaseExplicitLoadRepository<Person, PersonNavigationOptions>
+        IBaseExplicitLoadRepository<Person, uint, PersonNavigationOptions>
     {
         // Query by AccountId
         Task<Person?> GetByAccountIdAsync(uint accountId, CancellationToken cancellationToken = default);

@@ -5,7 +5,7 @@ using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
 {
     public interface IAccountAdditionalPermissionRepository : IRepository<AccountAdditionalPermission>,
-        IBaseExplicitLoadRepository<AccountAdditionalPermission, AccountAdditionalPermissionNavigationOptions>
+        IBaseExplicitLoadRepository<AccountAdditionalPermission, uint, AccountAdditionalPermissionNavigationOptions>
     {
         Task<IEnumerable<AccountAdditionalPermission>> GetByAccountIdAsync(uint accountId, uint? fromRecord = 0, uint? pageSize = null, CancellationToken cancellationToken = default);
         Task<IEnumerable<AccountAdditionalPermission>> GetByPermissionIdAsync(uint permissionId, uint? fromRecord = 0, uint? pageSize = null, CancellationToken cancellationToken = default);

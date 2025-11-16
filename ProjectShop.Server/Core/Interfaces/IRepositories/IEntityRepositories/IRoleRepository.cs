@@ -6,7 +6,7 @@ namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
     /// <summary>
     /// Role repository interface with specific query methods
     /// </summary>
-    public interface IRoleRepository : IRepository<Role>, IBaseExplicitLoadRepository<Role, RoleNavigationOptions>
+    public interface IRoleRepository : IRepository<Role>, IBaseExplicitLoadRepository<Role, uint, RoleNavigationOptions>
     {
         // Query by RoleName
         Task<Role?> GetByNameAsync(string roleName, CancellationToken cancellationToken = default);

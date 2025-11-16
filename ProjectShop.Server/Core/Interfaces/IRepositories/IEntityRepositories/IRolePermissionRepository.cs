@@ -3,7 +3,7 @@ using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
 {
-    public interface IRolePermissionRepository : IRepository<RolePermission>, IBaseExplicitLoadRepository<RolePermission, RolePermissionNavigationOptions>
+    public interface IRolePermissionRepository : IRepository<RolePermission>, IBaseExplicitLoadRepository<RolePermission, uint, RolePermissionNavigationOptions>
     {
         // Query by RoleId
         Task<IEnumerable<RolePermission>> GetByRoleIdAsync(uint roleId, uint? fromRecord = 0, uint? pageSize = null, CancellationToken cancellationToken = default);

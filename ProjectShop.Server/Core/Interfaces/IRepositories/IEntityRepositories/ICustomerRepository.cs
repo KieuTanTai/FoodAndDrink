@@ -6,7 +6,7 @@ namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
     /// <summary>
     /// Customer repository interface with specific query methods
     /// </summary>
-    public interface ICustomerRepository : IRepository<Customer>, IBaseExplicitLoadRepository<Customer, CustomerNavigationOptions>
+    public interface ICustomerRepository : IRepository<Customer>, IBaseExplicitLoadRepository<Customer, uint, CustomerNavigationOptions>
     {
         // Query by PersonId
         Task<Customer?> GetByPersonIdAsync(uint personId, CancellationToken cancellationToken = default);

@@ -4,7 +4,7 @@ using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
 {
-    public interface IAccountRepository : IRepository<Account>, IBaseExplicitLoadRepository<Account, AccountNavigationOptions>,
+    public interface IAccountRepository : IRepository<Account>, IBaseExplicitLoadRepository<Account, uint, AccountNavigationOptions>,
         IBaseGetByCreatedAndLastUpdatedDate<Account>
     {
         // Query by UserName

@@ -6,7 +6,7 @@ namespace ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories
     /// <summary>
     /// Permission repository interface with specific query methods
     /// </summary>
-    public interface IPermissionRepository : IRepository<Permission>, IBaseExplicitLoadRepository<Permission, PermissionNavigationOptions>,
+    public interface IPermissionRepository : IRepository<Permission>, IBaseExplicitLoadRepository<Permission, uint, PermissionNavigationOptions>,
         IBaseGetByCreatedAndLastUpdatedDate<Permission>
     {
         // Query by PermissionName
