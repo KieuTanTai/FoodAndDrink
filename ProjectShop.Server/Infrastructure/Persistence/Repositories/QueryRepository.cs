@@ -3,11 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using ProjectShop.Server.Core.Constants;
 using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
-using ProjectShop.Server.Core.Interfaces.IValidate;
+using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
 {
-    public class QueryRepository<TEntity>(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord, string primaryKeyName = "")
+    public class QueryRepository<TEntity>(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule,
+        IDefaultPageSizeRule defaultPageSizeRule, string primaryKeyName = "")
         : IQueryRepository<TEntity> where TEntity : class
     {
         protected readonly string _colIdName = !string.IsNullOrEmpty(primaryKeyName)
@@ -16,7 +17,8 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
                 ? EntityPrimaryKeyNames.ProductBarcode
                 : typeof(TEntity).Name + EntityPrimaryKeyNames.IdSuffix;
 
-        protected readonly uint _maxGetReturn = maxGetRecord.MaxGetRecord;
+        protected readonly uint _maxGetReturn = maxReturnRecordsRule.MaxRecords;
+        protected readonly uint _defaultPageSize = defaultPageSizeRule.DefaultPageSize;
         protected readonly IFoodAndDrinkShopDbContext _context = context;
         protected readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
 
@@ -71,8 +73,17 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
 
         protected uint ValidateAndNormalizePageSize(uint? pageSize)
         {
-            if (pageSize == null || pageSize == 0 || pageSize > _maxGetReturn)
+            // If pageSize is null, use default page size from platform rules
+            if (pageSize == null)
+                return _defaultPageSize;
+
+            // If pageSize is 0 or exceeds max, use max return records
+            if (pageSize == 0)
+                return _defaultPageSize;
+
+            if (pageSize > _maxGetReturn)
                 return _maxGetReturn;
+
             return pageSize.Value;
         }
 
@@ -92,7 +103,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
         }
 
         protected async Task<IEnumerable<TEntity>> GetByDateTimeRangeAsync(DateTime startDate, DateTime endDate,
-           Func<TEntity, DateTime> dateTimeConditions, bool isTracking = true, uint? fromRecord = 0, uint? pageSize = 10, CancellationToken cancellationToken = default)
+           Func<TEntity, DateTime> dateTimeConditions, bool isTracking = true, uint? fromRecord = 0, uint? pageSize = null, CancellationToken cancellationToken = default)
         {
             if (endDate > DateTime.Now)
                 endDate = DateTime.Now;

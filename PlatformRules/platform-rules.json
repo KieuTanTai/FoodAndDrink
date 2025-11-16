@@ -29,6 +29,18 @@
             "type": "max-return-records",
             "maxRecords": 200,
             "enabled": true
+        },
+        // new rule for default page size
+        "default-page-size": {
+            "type": "default-page-size",
+            "defaultPageSize": 10,
+            "enabled": true
+        },
+        // new rule for rate limiting
+        "rate-limiting": {
+            "type": "rate-limiting",
+            "maxRequestsPerMinute": 100,
+            "enabled": true
         }
     },
     "rules-version": "2.0.0"

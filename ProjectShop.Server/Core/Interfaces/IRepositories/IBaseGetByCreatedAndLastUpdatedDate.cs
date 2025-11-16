@@ -7,10 +7,10 @@ namespace ProjectShop.Server.Core.Interfaces.IRepositories
 {
     public interface IBaseGetByCreatedAndLastUpdatedDate<TEntity> where TEntity : class
     {
-        Task<IEnumerable<TEntity>> GetByCreatedDateRangeAsync(DateTime startDate, DateTime endDate, uint? fromRecord = 0, uint? pageSize = 10,
+        Task<IEnumerable<TEntity>> GetByCreatedDateRangeAsync(DateTime startDate, DateTime endDate, uint? fromRecord = 0, uint? pageSize = null,
             CancellationToken cancellationToken = default);
 
-        Task<IEnumerable<TEntity>> GetByLastUpdatedDateRangeAsync(DateTime startDate, DateTime endDate, uint? fromRecord = 0, uint? pageSize = 10,
+        Task<IEnumerable<TEntity>> GetByLastUpdatedDateRangeAsync(DateTime startDate, DateTime endDate, uint? fromRecord = 0, uint? pageSize = null,
             CancellationToken cancellationToken = default);
     }
 }

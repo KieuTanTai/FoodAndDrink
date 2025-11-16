@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class CartRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule) : Repository<Cart>(context, maxReturnRecordsRule), ICartRepository
+    public class CartRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule, IDefaultPageSizeRule defaultPageSizeRule) : Repository<Cart>(context, maxReturnRecordsRule, defaultPageSizeRule), ICartRepository
     {
         public async Task<IEnumerable<Cart>> GetByCustomerIdAsync(uint customerId, CancellationToken cancellationToken = default)
         {

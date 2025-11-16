@@ -11,7 +11,7 @@ namespace ProjectShop.Server.Core.Interfaces.IRepositories
     {
         // Query with navigation properties
         Task<TEntity?> GetNavigationByIdAsync(uint id, TOptions options, CancellationToken cancellationToken = default);
-        Task<IEnumerable<TEntity>> GetNavigationByIdsAsync(IEnumerable<uint> ids, TOptions options, uint? fromRecord = 0, uint? pageSize = 10,
+        Task<IEnumerable<TEntity>> GetNavigationByIdsAsync(IEnumerable<uint> ids, TOptions options, uint? fromRecord = 0, uint? pageSize = null,
             CancellationToken cancellationToken = default);
         Task<TEntity> ExplicitLoadAsync(TEntity entity, TOptions options, CancellationToken cancellationToken = default);
 

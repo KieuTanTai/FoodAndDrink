@@ -9,8 +9,8 @@ using ProjectShop.Server.Core.Enums;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class AccountRoleRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule) :
-        Repository<AccountRole>(context, maxReturnRecordsRule), IAccountRoleRepository
+    public class AccountRoleRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule, IDefaultPageSizeRule defaultPageSizeRule) :
+        Repository<AccountRole>(context, maxReturnRecordsRule, defaultPageSizeRule), IAccountRoleRepository
     {
         #region Query by AccountId and RoleId
 

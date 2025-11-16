@@ -8,8 +8,8 @@ using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class EmployeeRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule)
-        : Repository<Employee>(context, maxReturnRecordsRule), IEmployeeRepository
+    public class EmployeeRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule, IDefaultPageSizeRule defaultPageSizeRule)
+        : Repository<Employee>(context, maxReturnRecordsRule, defaultPageSizeRule), IEmployeeRepository
     {
         #region Query by PersonId
 

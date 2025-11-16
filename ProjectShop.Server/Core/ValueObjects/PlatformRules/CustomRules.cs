@@ -11,6 +11,8 @@ namespace ProjectShop.Server.Core.ValueObjects.PlatformRules
         public ExpiryFetchTimeoutRule ExpiryFetchTimeoutRule { get; init; } = new();
         public ExpiryTryTimeoutRule ExpiryTryTimeoutRule { get; init; } = new();
         public MessageTimeoutRule MessageTimeoutRule { get; init; } = new();
+        public DefaultPageSizeRule DefaultPageSizeRule { get; init; } = new();
+        public RateLimitingRule RateLimitingRule { get; init; } = new();
 
         public CustomRules() { }
 
@@ -20,12 +22,15 @@ namespace ProjectShop.Server.Core.ValueObjects.PlatformRules
         }
 
         public CustomRules(ExpiryCookieRule expiryCookieRule, ExpiryFetchTimeoutRule expiryFetchTimeoutRule,
-                            ExpiryTryTimeoutRule expiryTryTimeoutRule, MessageTimeoutRule messageTimeoutRule)
+                            ExpiryTryTimeoutRule expiryTryTimeoutRule, MessageTimeoutRule messageTimeoutRule,
+                            DefaultPageSizeRule defaultPageSizeRule, RateLimitingRule rateLimitingRule)
         {
             ExpiryCookieRule = expiryCookieRule;
             ExpiryFetchTimeoutRule = expiryFetchTimeoutRule;
             ExpiryTryTimeoutRule = expiryTryTimeoutRule;
             MessageTimeoutRule = messageTimeoutRule;
+            DefaultPageSizeRule = defaultPageSizeRule;
+            RateLimitingRule = rateLimitingRule;
         }
 
     }

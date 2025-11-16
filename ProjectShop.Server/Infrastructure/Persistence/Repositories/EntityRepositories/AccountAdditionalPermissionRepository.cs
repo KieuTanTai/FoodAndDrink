@@ -9,8 +9,8 @@ using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class AccountAdditionalPermissionRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule) :
-        Repository<AccountAdditionalPermission>(context, maxReturnRecordsRule), IAccountAdditionalPermissionRepository
+    public class AccountAdditionalPermissionRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule, IDefaultPageSizeRule defaultPageSizeRule) :
+        Repository<AccountAdditionalPermission>(context, maxReturnRecordsRule, defaultPageSizeRule), IAccountAdditionalPermissionRepository
     {
         #region  Query by foreign id
 

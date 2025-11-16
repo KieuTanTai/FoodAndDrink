@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class RolePermissionRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule) : Repository<RolePermission>(context, maxReturnRecordsRule), IRolePermissionRepository
+    public class RolePermissionRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule, IDefaultPageSizeRule defaultPageSizeRule) : Repository<RolePermission>(context, maxReturnRecordsRule, defaultPageSizeRule), IRolePermissionRepository
     {
         public async Task<IEnumerable<RolePermission>> GetByRoleIdAsync(uint roleId, CancellationToken cancellationToken = default)
         {

@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class BankRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule) : Repository<Bank>(context, maxReturnRecordsRule), IBankRepository
+    public class BankRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule, IDefaultPageSizeRule defaultPageSizeRule) : Repository<Bank>(context, maxReturnRecordsRule, defaultPageSizeRule), IBankRepository
     {
         public async Task<Bank?> GetByNameAsync(string bankName, CancellationToken cancellationToken = default)
         {

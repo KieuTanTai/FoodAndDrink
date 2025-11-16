@@ -3,13 +3,14 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
-using ProjectShop.Server.Core.Interfaces.IValidate;
+using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 using ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories
 {
-    public class Repository<TEntity>(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord, string primaryKeyName = "") 
-    : QueryRepository<TEntity>(context, maxGetRecord, primaryKeyName), IRepository<TEntity> where TEntity : class
+    public class Repository<TEntity>(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule,
+        IDefaultPageSizeRule defaultPageSizeRule, string primaryKeyName = "")
+    : QueryRepository<TEntity>(context, maxReturnRecordsRule, defaultPageSizeRule, primaryKeyName), IRepository<TEntity> where TEntity : class
     {
         #region Command Operations
 

@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class PersonRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule) : Repository<Person>(context, maxReturnRecordsRule),
-        IPersonRepository
+    public class PersonRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule, IDefaultPageSizeRule defaultPageSizeRule) 
+        : Repository<Person>(context, maxReturnRecordsRule, defaultPageSizeRule), IPersonRepository
     {
         #region Query by foreign id
 
@@ -32,7 +32,20 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<IEnumerable<Person>> GetByPhonesAsync(IEnumerable<string> phones, CancellationToken cancellationToken)
             => await _dbSet.Where(person => phones.Contains(person.PersonPhone)).ToListAsync(cancellationToken);
 
-        public async Task<IEnumerable<Person>> SearchByNameAsync(string searchTerm, uint fromRecord, uint? pageSize, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Person>> SearchManyByNamesAsync(IEnumerable<string> names, uint fromRecord, uint? pageSize, CancellationToken cancellationToken)
+        {
+            pageSize = ValidateAndNormalizePageSize(pageSize);
+            var cursor = fromRecord;
+
+            return await _dbSet
+                .Where(person => names.Contains(person.PersonName))
+                .Where(person => person.PersonId > cursor)
+                .OrderBy(person => person.PersonId)
+                .Take((int)pageSize)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<IEnumerable<Person>> SearchByNameContainsAsync(string searchTerm, uint fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord;

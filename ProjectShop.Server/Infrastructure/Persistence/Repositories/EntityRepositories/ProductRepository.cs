@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class ProductRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule) : Repository<Product>(context, maxReturnRecordsRule), IProductRepository
+    public class ProductRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule, IDefaultPageSizeRule defaultPageSizeRule) : Repository<Product>(context, maxReturnRecordsRule, defaultPageSizeRule), IProductRepository
     {
         public async Task<Product?> GetByBarcodeAsync(string barcode, CancellationToken cancellationToken = default)
         {

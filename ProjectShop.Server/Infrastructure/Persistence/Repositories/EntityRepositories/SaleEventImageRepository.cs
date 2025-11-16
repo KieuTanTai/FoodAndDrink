@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class SaleEventImageRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule) : Repository<SaleEventImage>(context, maxReturnRecordsRule), ISaleEventImageRepository
+    public class SaleEventImageRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule, IDefaultPageSizeRule defaultPageSizeRule) : Repository<SaleEventImage>(context, maxReturnRecordsRule, defaultPageSizeRule), ISaleEventImageRepository
     {
         public async Task<IEnumerable<SaleEventImage>> GetBySaleEventIdAsync(uint saleEventId, CancellationToken cancellationToken = default)
         {

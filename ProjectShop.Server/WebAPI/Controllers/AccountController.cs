@@ -121,7 +121,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
         }
 
         [HttpGet("all-accounts")]
-        public async Task<IActionResult> GetAllAccountsAsync([FromQuery] uint? fromRecord = 0, [FromQuery] uint? pageSize = 10, AccountNavigationOptions? options = null,
+        public async Task<IActionResult> GetAllAccountsAsync([FromQuery] uint? fromRecord = 0, [FromQuery] uint? pageSize = null, AccountNavigationOptions? options = null,
             CancellationToken cancellationToken = default)
         {
             try
@@ -145,7 +145,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         [HttpGet("by-status")]
         public async Task<IActionResult> GetAccountsByStatusAsync([FromQuery] bool isActive, [FromQuery] uint? fromRecord = 0,
-            [FromQuery] uint? pageSize = 10, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default)
+            [FromQuery] uint? pageSize = null, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -168,7 +168,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         [HttpGet("by-created-date-range")]
         public async Task<IActionResult> GetAccountsByCreatedDateRangeAsync([FromQuery] DateTime startDate, [FromQuery] DateTime endDate,
-            [FromQuery] uint? fromRecord = 0, [FromQuery] uint? pageSize = 10, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default)
+            [FromQuery] uint? fromRecord = 0, [FromQuery] uint? pageSize = null, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default)
         {
             if (startDate > endDate)
                 return BadRequest("Start date must be less than or equal to end date.");
@@ -196,7 +196,7 @@ namespace ProjectShop.Server.WebAPI.Controllers
 
         [HttpGet("by-last-updated-date-range")]
         public async Task<IActionResult> GetAccountsByLastUpdatedDateRangeAsync([FromQuery] DateTime startDate, [FromQuery] DateTime endDate,
-            [FromQuery] uint? fromRecord = 0, [FromQuery] uint? pageSize = 10, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default)
+            [FromQuery] uint? fromRecord = 0, [FromQuery] uint? pageSize = null, AccountNavigationOptions? options = null, CancellationToken cancellationToken = default)
         {
             if (startDate > endDate)
                 return BadRequest("Start date must be less than or equal to end date.");

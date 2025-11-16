@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class DisposeReasonRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule) : Repository<DisposeReason>(context, maxReturnRecordsRule), IDisposeReasonRepository
+    public class DisposeReasonRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule, IDefaultPageSizeRule defaultPageSizeRule) : Repository<DisposeReason>(context, maxReturnRecordsRule, defaultPageSizeRule), IDisposeReasonRepository
     {
         public async Task<DisposeReason?> GetByNameAsync(string reasonName, CancellationToken cancellationToken = default)
         {

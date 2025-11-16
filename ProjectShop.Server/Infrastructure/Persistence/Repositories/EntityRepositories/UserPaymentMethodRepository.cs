@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class UserPaymentMethodRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule) : Repository<UserPaymentMethod>(context, maxReturnRecordsRule), IUserPaymentMethodRepository
+    public class UserPaymentMethodRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule, IDefaultPageSizeRule defaultPageSizeRule) : Repository<UserPaymentMethod>(context, maxReturnRecordsRule, defaultPageSizeRule), IUserPaymentMethodRepository
     {
         public async Task<IEnumerable<UserPaymentMethod>> GetByAccountIdAsync(uint accountId, CancellationToken cancellationToken = default)
         {

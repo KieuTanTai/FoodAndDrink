@@ -1,5 +1,6 @@
 ﻿using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Interfaces.IData;
+using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
@@ -21,17 +22,15 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddSingleton<IClock, SystemClockService>();
             services.AddSingleton<ILogService, LogService>();
             services.AddSingleton<IClock>(provider => new FakeClockService { UtcNow = new DateTime(2030, 12, 31) });
-            services.AddSingleton<IMaxGetRecord>(provider => new MaxGetRecordService { MaxGetRecord = 200 });
 
-            string connectionString = AppConfigConnection.GetConnectionString();
-            if (string.IsNullOrEmpty(connectionString))
-                throw new InvalidOperationException("Connection string is incorrect or empty. Please check configuration.");
-                
-            // Default to a safe value
-            uint maxQueryRules = ReadConfigRulesJson.Get(EPlatformRules.MAX_GET_RECORDS);
-            if (maxQueryRules == 0)
-                maxQueryRules = 200;
-            services.AddSingleton<IMaxGetRecord>(new MaxGetRecordService { MaxGetRecord = maxQueryRules });
+            // Database Configuration
+            string connectionString = GetConnectionString();
+            uint maxQueryRules = GetMaxQueryRules();
+            uint defaultPageSize = GetDefaultPageSize();
+
+            // Register Platform Rules as Singletons
+            services.AddSingleton<IMaxReturnRecordsRule>(provider => new MaxReturnRecordsRuleService { MaxRecords = maxQueryRules });
+            services.AddSingleton<IDefaultPageSizeRule>(provider => new DefaultPageSizeRuleService { DefaultPageSize = defaultPageSize });
             services.AddSingleton<IDbConnectionFactory>(provider => new MySqlConnectionFactory(connectionString));
 
             // Add DbContext with connection string from configuration
@@ -111,6 +110,27 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;
+        }
+
+        private static string GetConnectionString()
+            => AppConfigConnection.GetConnectionString() ?? throw new InvalidOperationException("Connection string is incorrect or empty. Please check configuration.");
+
+        private static uint GetMaxQueryRules()
+        {
+            // Default to a safe value
+            uint maxQueryRules = ReadConfigRulesJson.Get(EPlatformRules.MAX_GET_RECORDS);
+            if (maxQueryRules == 0)
+                maxQueryRules = 200;
+            return maxQueryRules;
+        }
+
+        private static uint GetDefaultPageSize()
+        {
+            // Default to a safe value
+            uint defaultPageSize = ReadConfigRulesJson.Get(EPlatformRules.DEFAULT_PAGE_SIZE);
+            if (defaultPageSize == 0)
+                defaultPageSize = 10;
+            return defaultPageSize;
         }
     }
 }

@@ -34,6 +34,8 @@ namespace ProjectShop.Server.Infrastructure.Services
             {
                 EPlatformRules.MAX_GET_RECORDS => ReadConfigRulesJson.GetRulesMaxReturnRecords(name),
                 EPlatformRules.COOKIE_EXPIRY_DAYS => ReadConfigRulesJson.GetCookieExpiryDays(name),
+                EPlatformRules.DEFAULT_PAGE_SIZE => ReadConfigRulesJson.GetDefaultPageSize(name),
+                EPlatformRules.RATE_LIMITING => ReadConfigRulesJson.GetRateLimiting(name),
                 _ => 0,
             };
         }
@@ -48,6 +50,18 @@ namespace ProjectShop.Server.Infrastructure.Services
         {
             var expiryDays = _configurationRoot.GetSection(name).Value;
             return uint.TryParse(expiryDays, out var result) ? result : 0;
+        }
+
+        private static uint GetDefaultPageSize(string name = "custom-rules:default-page-size")
+        {
+            var defaultPageSize = _configurationRoot.GetSection(name).GetValue<uint>("defaultPageSize");
+            return defaultPageSize > 0 ? defaultPageSize : 10; // Default to 10 if not configured
+        }
+
+        private static uint GetRateLimiting(string name = "custom-rules:rate-limiting")
+        {
+            var maxRequests = _configurationRoot.GetSection(name).GetValue<uint>("maxRequestsPerMinute");
+            return maxRequests > 0 ? maxRequests : 100; // Default to 100 if not configured
         }
     }
 }
