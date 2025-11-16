@@ -2,11 +2,11 @@ using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
-using ProjectShop.Server.Core.Interfaces.IValidate;
+using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class RoleRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : Repository<Role>(context, maxGetRecord), IRoleRepository
+    public class RoleRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule) : Repository<Role>(context, maxReturnRecordsRule), IRoleRepository
     {
         public async Task<Role?> GetByNameAsync(string roleName, CancellationToken cancellationToken = default)
         {

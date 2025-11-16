@@ -2,11 +2,11 @@ using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
-using ProjectShop.Server.Core.Interfaces.IValidate;
+using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class DisposeProductRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : Repository<DisposeProduct>(context, maxGetRecord), IDisposeProductRepository
+    public class DisposeProductRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule) : Repository<DisposeProduct>(context, maxReturnRecordsRule), IDisposeProductRepository
     {
         public async Task<IEnumerable<DisposeProduct>> GetByDisposeReasonIdAsync(uint disposeReasonId, CancellationToken cancellationToken = default)
         {

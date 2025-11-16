@@ -2,15 +2,15 @@ using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
-using ProjectShop.Server.Core.Interfaces.IValidate;
+using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 using Microsoft.EntityFrameworkCore;
 using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class AccountAdditionalPermissionRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) :
-        Repository<AccountAdditionalPermission>(context, maxGetRecord), IAccountAdditionalPermissionRepository
+    public class AccountAdditionalPermissionRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule) :
+        Repository<AccountAdditionalPermission>(context, maxReturnRecordsRule), IAccountAdditionalPermissionRepository
     {
         #region  Query by foreign id
 

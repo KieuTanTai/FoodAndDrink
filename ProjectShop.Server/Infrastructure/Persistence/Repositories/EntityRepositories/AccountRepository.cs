@@ -4,13 +4,13 @@ using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
-using ProjectShop.Server.Core.Interfaces.IValidate;
+using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class AccountRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) :
-        Repository<Account>(context, maxGetRecord), IAccountRepository
+    public class AccountRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule) :
+        Repository<Account>(context, maxReturnRecordsRule), IAccountRepository
     {
         #region Query by UserName
 
@@ -20,13 +20,25 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<Account?> GetByUserNameAndPasswordAsync(string userName, string password, CancellationToken cancellationToken)
             => await _dbSet.FirstOrDefaultAsync(account => account.UserName == userName && account.Password == password, cancellationToken);
 
-        public async Task<IEnumerable<Account>> GetByUserNamesAsync(IEnumerable<string> userNames, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Account>> GetManyByUserNamesAsync(IEnumerable<string> userNames, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
             return await _dbSet
                 .Where(account => userNames.Contains(account.UserName) && account.AccountId > cursor)
+                .OrderBy(account => account.AccountId)
+                .Take((int)pageSize)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<IEnumerable<Account>> SearchByUserNameContainsAsync(string searchTerm, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
+        {
+            pageSize = ValidateAndNormalizePageSize(pageSize);
+            var cursor = fromRecord ?? 0;
+
+            return await _dbSet
+                .Where(account => account.UserName.Contains(searchTerm) && account.AccountId > cursor)
                 .OrderBy(account => account.AccountId)
                 .Take((int)pageSize)
                 .ToListAsync(cancellationToken);

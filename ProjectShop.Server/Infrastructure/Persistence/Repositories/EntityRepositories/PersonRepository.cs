@@ -2,14 +2,14 @@ using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
-using ProjectShop.Server.Core.Interfaces.IValidate;
+using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class PersonRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : Repository<Person>(context, maxGetRecord),
+    public class PersonRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule) : Repository<Person>(context, maxReturnRecordsRule),
         IPersonRepository
     {
         #region Query by foreign id

@@ -2,11 +2,11 @@ using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
-using ProjectShop.Server.Core.Interfaces.IValidate;
+using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class UserPaymentMethodRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : Repository<UserPaymentMethod>(context, maxGetRecord), IUserPaymentMethodRepository
+    public class UserPaymentMethodRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule) : Repository<UserPaymentMethod>(context, maxReturnRecordsRule), IUserPaymentMethodRepository
     {
         public async Task<IEnumerable<UserPaymentMethod>> GetByAccountIdAsync(uint accountId, CancellationToken cancellationToken = default)
         {

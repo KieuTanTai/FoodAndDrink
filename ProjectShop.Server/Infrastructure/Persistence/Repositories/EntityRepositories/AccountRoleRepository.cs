@@ -3,14 +3,14 @@ using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
-using ProjectShop.Server.Core.Interfaces.IValidate;
+using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 using ProjectShop.Server.Core.Enums;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class AccountRoleRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) :
-        Repository<AccountRole>(context, maxGetRecord), IAccountRoleRepository
+    public class AccountRoleRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule) :
+        Repository<AccountRole>(context, maxReturnRecordsRule), IAccountRoleRepository
     {
         #region Query by AccountId and RoleId
 

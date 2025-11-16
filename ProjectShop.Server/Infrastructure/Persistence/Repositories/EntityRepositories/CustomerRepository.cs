@@ -3,13 +3,13 @@ using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
-using ProjectShop.Server.Core.Interfaces.IValidate;
+using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class CustomerRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord)
-        : Repository<Customer>(context, maxGetRecord), ICustomerRepository
+    public class CustomerRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule)
+        : Repository<Customer>(context, maxReturnRecordsRule), ICustomerRepository
     {
         #region Query by PersonId
 

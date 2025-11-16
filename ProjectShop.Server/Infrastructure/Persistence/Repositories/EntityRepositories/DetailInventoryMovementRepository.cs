@@ -2,11 +2,11 @@ using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
-using ProjectShop.Server.Core.Interfaces.IValidate;
+using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 
 namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
 {
-    public class DetailInventoryMovementRepository(IFoodAndDrinkShopDbContext context, IMaxGetRecord maxGetRecord) : Repository<DetailInventoryMovement>(context, maxGetRecord), IDetailInventoryMovementRepository
+    public class DetailInventoryMovementRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule) : Repository<DetailInventoryMovement>(context, maxReturnRecordsRule), IDetailInventoryMovementRepository
     {
         public async Task<IEnumerable<DetailInventoryMovement>> GetByInventoryMovementIdAsync(uint inventoryMovementId, CancellationToken cancellationToken = default)
         {
