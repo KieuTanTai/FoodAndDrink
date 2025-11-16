@@ -1,0 +1,46 @@
+using ProjectShop.Server.Core.Interfaces.IContext;
+using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Interfaces.IRepositories;
+using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
+using ProjectShop.Server.Core.Interfaces.IPlatformRules;
+
+namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories
+{
+    public class SaleEventRepository(IFoodAndDrinkShopDbContext context, IMaxReturnRecordsRule maxReturnRecordsRule, IDefaultPageSizeRule defaultPageSizeRule) : Repository<SaleEvent>(context, maxReturnRecordsRule, defaultPageSizeRule), ISaleEventRepository
+    {
+        public async Task<SaleEvent?> GetByNameAsync(string saleEventName, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<SaleEvent>> SearchByNameAsync(string searchTerm, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<SaleEvent>> GetByStatusAsync(bool? status, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<SaleEvent>> GetByStartDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<SaleEvent>> GetByEndDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<SaleEvent>> GetActiveSaleEventsAsync(CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<SaleEvent?> GetByIdWithDetailsAsync(uint saleEventId, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

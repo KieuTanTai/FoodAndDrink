@@ -19,12 +19,22 @@
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy">
       <Version>9.*-*</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="9.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="9.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
     <PackageReference Include="MySql.Data" Version="9.4.0" />
+    <PackageReference Include="NUnit" Version="4.4.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
+    <PackageReference Include="Selenium.WebDriver" Version="4.38.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,11 +44,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application\Services\Account\AccountRoles\" />
     <Folder Include="Application\Services\Account\Customer\" />
     <Folder Include="Application\Services\Account\Employee\" />
-    <Folder Include="Application\Services\Product\" />
-    <Folder Include="Core\Entities\GetNavigationPropertyOptions\" />
+    <Folder Include="Application\Services\Location\Inventory\" />
+    <Folder Include="Application\Services\Supplier\" />
+    <Folder Include="Core\Interfaces\IServices\ILocation\" />
+    <Folder Include="Core\ValueObjects\GetNavigationPropertyOptions\" />
     <Folder Include="Core\Interfaces\IServices\ICategory\" />
   </ItemGroup>
 

@@ -1,11 +1,16 @@
-﻿using ProjectShop.Server.Core.Entities;
+﻿using ProjectShop.Server.Core.Interfaces.IContext;
 using ProjectShop.Server.Core.Interfaces.IData;
-using ProjectShop.Server.Core.Interfaces.IData.IUniqueDAO;
+using ProjectShop.Server.Core.Interfaces.IPlatformRules;
 using ProjectShop.Server.Core.Interfaces.IValidate;
-using ProjectShop.Server.Infrastructure.Data;
+using ProjectShop.Server.Core.Interfaces.IRepositories;
+using ProjectShop.Server.Core.Interfaces.IRepositories.IEntityRepositories;
 using ProjectShop.Server.Infrastructure.Persistence;
 using ProjectShop.Server.Infrastructure.Persistence.Repositories;
+using ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepositories;
 using ProjectShop.Server.Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
+using ProjectShop.Server.Core.Entities.Context;
+using ProjectShop.Server.Core.Enums;
 
 namespace ProjectShop.Server.Infrastructure.Configuration
 {
@@ -13,100 +18,119 @@ namespace ProjectShop.Server.Infrastructure.Configuration
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
         {
-            services.AddSingleton<IStringChecker, StringChecker>();
-            services.AddSingleton<IStringConverter, StringConverter>();
-            services.AddSingleton<IColumnService, ColumnService>();
-            services.AddSingleton<IHashPassword, HashPaswordService>();
+            services.AddSingleton<IHashPassword, HashPasswordServices>();
             services.AddSingleton<IClock, SystemClockService>();
+            services.AddSingleton<ILogService, LogService>();
             services.AddSingleton<IClock>(provider => new FakeClockService { UtcNow = new DateTime(2030, 12, 31) });
 
-            string connectionString = AppConfigConnection.GetConnectionString();
-            if (string.IsNullOrEmpty(connectionString))
-                throw new InvalidOperationException("Connection string is incorrect or empty. Please check configuration.");
+            // Database Configuration
+            string connectionString = GetConnectionString();
+            uint maxQueryRules = GetMaxQueryRules();
+            uint defaultPageSize = GetDefaultPageSize();
+
+            // Register Platform Rules as Singletons
+            services.AddSingleton<IMaxReturnRecordsRule>(provider => new MaxReturnRecordsRuleService { MaxRecords = maxQueryRules });
+            services.AddSingleton<IDefaultPageSizeRule>(provider => new DefaultPageSizeRuleService { DefaultPageSize = defaultPageSize });
             services.AddSingleton<IDbConnectionFactory>(provider => new MySqlConnectionFactory(connectionString));
 
-            // Registering DAOs
-            services.AddScoped<IDAO<AccountModel>, AccountDAO>();
-            services.AddTransient<IDAO<BankModel>, BankDAO>();
-            services.AddTransient<IDAO<CartModel>, CartDAO>();
-            services.AddTransient<IDAO<CategoryModel>, CategoryDAO>();
-            services.AddTransient<IDAO<CustomerAddressModel>, CustomerAddressDAO>();
-            services.AddTransient<IDAO<CustomerModel>, CustomerDAO>();
-            services.AddTransient<IDAO<DetailCartModel>, DetailCartDAO>();
-            services.AddTransient<IDAO<DetailInventoryModel>, DetailInventoryDAO>();
-            services.AddTransient<INoneUpdateDAO<DetailInventoryMovementModel>, DetailInventoryMovementDAO>();
-            services.AddTransient<INoneUpdateDAO<DetailInvoiceModel>, DetailInvoiceDAO>();
-            services.AddTransient<INoneUpdateDAO<DetailProductLotModel>, DetailProductLotDAO>();
-            services.AddTransient<INoneUpdateDAO<DetailSaleEventModel>, DetailSaleEventDAO>();
-            services.AddTransient<INoneUpdateDAO<DisposeProductModel>, DisposeProductDAO>();
-            services.AddTransient<IDAO<DisposeReasonModel>, DisposeReasonDAO>();
-            services.AddTransient<IDAO<EmployeeModel>, EmployeeDAO>();
-            services.AddTransient<IDAO<InventoryModel>, InventoryDAO>();
-            services.AddTransient<INoneUpdateDAO<InventoryMovementModel>, InventoryMovementDAO>();
-            services.AddTransient<INoneUpdateDAO<InvoiceModel>, InvoiceDAO>();
-            services.AddTransient<INoneUpdateDAO<InvoiceDiscountModel>, InvoiceDiscountDAO>();
-            services.AddTransient<IDAO<LocationCityModel>, LocationCityDAO>();
-            services.AddTransient<IDAO<LocationModel>, LocationDAO>();
-            services.AddTransient<IDAO<LocationDistrictModel>, LocationDistrictDAO>();
-            services.AddTransient<IDAO<LocationTypeModel>, LocationTypeDAO>();
-            services.AddTransient<IDAO<LocationWardModel>, LocationWardDAO>();
-            services.AddTransient<IDAO<ProductCategoriesModel>, ProductCateogriesDAO>();
-            services.AddTransient<IDAO<ProductModel>, ProductDAO>();
-            services.AddTransient<IDAO<ProductImageModel>, ProductImageDAO>();
-            services.AddTransient<INoneUpdateDAO<ProductLotModel>, ProductLotDAO>();
-            services.AddTransient<INoneUpdateDAO<ProductLotInventoryModel>, ProductLotInventoryDAO>();
-            services.AddTransient<IDAO<RoleModel>, RoleDAO>();
-            services.AddScoped<IDAO<RolesOfUserModel>, RoleOfUserDAO>();
-            services.AddTransient<IDAO<SaleEventModel>, SaleEventDAO>();
-            services.AddTransient<IDAO<SaleEventImageModel>, SaleEventImageDAO>();
-            services.AddTransient<IDAO<SupplierModel>, SupplierDAO>();
-            services.AddTransient<IDAO<UserPaymentMethodModel>, UserPaymentMethodDAO>();
+            // Add DbContext with connection string from configuration
+            services.AddDbContext<FoodAndDrinkShopDbContext>(options =>
+                options.UseMySql(connectionString, ServerVersion.Parse("12.0.2-mariadb")));
 
-            // Registering unique DAOs
-            services.AddScoped<IAccountDAO<AccountModel>, AccountDAO>();
-            services.AddTransient<IGetRelativeAsync<BankModel>, BankDAO>();
-            services.AddTransient<IGetByStatusAsync<BankModel>, BankDAO>();
-            services.AddTransient<ICartDAO<CartModel>, CartDAO>();
-            services.AddTransient<IGetByStatusAsync<CategoryModel>, CategoryDAO>();
-            services.AddTransient<IGetRelativeAsync<CategoryModel>, CategoryDAO>();
-            services.AddTransient<ICustomerAddressDAO<CustomerAddressModel>, CustomerAddressDAO>();
-            services.AddTransient<IPersonDAO<CustomerModel>, CustomerDAO>();
-            services.AddTransient<IDetailCartDAO<DetailCartModel>, DetailCartDAO>();
-            services.AddTransient<IDetailInventoryDAO<DetailInventoryModel>, DetailInventoryDAO>();
-            services.AddTransient<IDetailInventoryMovementDAO<DetailInventoryMovementModel>, DetailInventoryMovementDAO>();
-            services.AddTransient<IDetailInvoiceDAO<DetailInvoiceModel>, DetailInvoiceDAO>();
-            services.AddTransient<IDetailProductLotDAO<DetailProductLotModel, DetailProductLotKey>, DetailProductLotDAO>();
-            services.AddTransient<IDetailSaleEventDAO<DetailSaleEventModel>, DetailSaleEventDAO>();
-            services.AddTransient<IDisposeProductDAO<DisposeProductModel>, DisposeProductDAO>();
-            services.AddTransient<IGetRelativeAsync<DisposeReasonModel>, DisposeReasonDAO>();
-            services.AddTransient<IEmployeeDAO<EmployeeModel>, EmployeeDAO>();
-            services.AddTransient<IInventoryDAO<InventoryModel>, InventoryDAO>();
-            services.AddTransient<IInventoryMovementDAO<InventoryMovementModel>, InventoryMovementDAO>();
-            services.AddTransient<IInvoiceDAO<InvoiceModel>, InvoiceDAO>();
-            services.AddTransient<IInvoiceDiscountDAO<InvoiceDiscountModel, InvoiceDiscountKey>, InvoiceDiscountDAO>();
-            services.AddTransient<ILocationDAO<LocationModel>, LocationDAO>();
-            services.AddTransient<IGetRelativeAsync<LocationCityModel>, LocationCityDAO>();
-            services.AddTransient<IGetByStatusAsync<LocationCityModel>, LocationCityDAO>();
-            services.AddTransient<IGetRelativeAsync<LocationDistrictModel>, LocationDistrictDAO>();
-            services.AddTransient<IGetByStatusAsync<LocationDistrictModel>, LocationDistrictDAO>();
-            services.AddTransient<IGetRelativeAsync<LocationTypeModel>, LocationTypeDAO>();
-            services.AddTransient<IGetByStatusAsync<LocationTypeModel>, LocationTypeDAO>();
-            services.AddTransient<IGetRelativeAsync<LocationWardModel>, LocationWardDAO>();
-            services.AddTransient<IGetByStatusAsync<LocationWardModel>, LocationWardDAO>();
-            services.AddTransient<IProductCategoriesDAO<ProductCategoriesModel, ProductCategoriesKey>, ProductCateogriesDAO>();
-            services.AddTransient<IPersonDAO<EmployeeModel>, EmployeeDAO>();
-            services.AddTransient<IPersonDAO<CustomerModel>, CustomerDAO>();
-            services.AddTransient<IProductDAO<ProductModel>, ProductDAO>();
-            services.AddTransient<IProductImageDAO<ProductImageModel>, ProductImageDAO>();
-            services.AddTransient<IProductLotDAO<ProductLotModel>, ProductLotDAO>();
-            services.AddTransient<IProductLotInventoryDAO<ProductLotInventoryModel, ProductLotInventoryKey>, ProductLotInventoryDAO>();
-            services.AddTransient<IRoleDAO<RoleModel>, RoleDAO>();
-            services.AddScoped<IRoleOfUserDAO<RolesOfUserModel, RolesOfUserKey>, RoleOfUserDAO>();
-            services.AddTransient<ISaleEventDAO<SaleEventModel>, SaleEventDAO>();
-            services.AddTransient<ISaleEventImageDAO<SaleEventImageModel>, SaleEventImageDAO>();
-            services.AddTransient<ISupplierDAO<SupplierModel>, SupplierDAO>();
-            services.AddTransient<IUserPaymentMethodDAO<UserPaymentMethodModel>, UserPaymentMethodDAO>();
+            // Also register IFoodAndDrinkShopDbContext for those who prefer explicit naming
+            services.AddScoped<IFoodAndDrinkShopDbContext>(sp => sp.GetRequiredService<FoodAndDrinkShopDbContext>());
+
+            // Register Base Repository
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+            // Register Main Entity Repositories
+            services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+            services.AddScoped<IPersonRepository, PersonRepository>();
+            services.AddScoped<IInventoryRepository, InventoryRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IPermissionRepository, PermissionRepository>();
+            services.AddScoped<ISupplierRepository, SupplierRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+
+            // Register Junction Table Repositories
+            services.AddScoped<IAccountRoleRepository, AccountRoleRepository>();
+            services.AddScoped<IAccountAdditionalPermissionRepository, AccountAdditionalPermissionRepository>();
+            services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
+            services.AddScoped<IProductCategoryRepository, ProductCategoryRepository>();
+
+            // Register Lookup Table Repositories
+            services.AddScoped<IBankRepository, BankRepository>();
+            services.AddScoped<ICountryRepository, CountryRepository>();
+            services.AddScoped<IDisposeReasonRepository, DisposeReasonRepository>();
+            services.AddScoped<ILocationTypeRepository, LocationTypeRepository>();
+
+            // Register Location Hierarchy Repositories
+            services.AddScoped<ILocationRepository, LocationRepository>();
+            services.AddScoped<ILocationCityRepository, LocationCityRepository>();
+            services.AddScoped<ILocationDistrictRepository, LocationDistrictRepository>();
+            services.AddScoped<ILocationWardRepository, LocationWardRepository>();
+
+            // Register Product Type Repositories
+            services.AddScoped<IProductDrinkRepository, ProductDrinkRepository>();
+            services.AddScoped<IProductFruitRepository, ProductFruitRepository>();
+            services.AddScoped<IProductMeatRepository, ProductMeatRepository>();
+            services.AddScoped<IProductSnackRepository, ProductSnackRepository>();
+            services.AddScoped<IProductVegetableRepository, ProductVegetableRepository>();
+
+            // Register Product Related Repositories
+            services.AddScoped<IProductImageRepository, ProductImageRepository>();
+            services.AddScoped<IProductLotRepository, ProductLotRepository>();
+            services.AddScoped<IDetailProductLotRepository, DetailProductLotRepository>();
+
+            // Register Sale & Event Repositories
+            services.AddScoped<ISaleEventRepository, SaleEventRepository>();
+            services.AddScoped<ISaleEventImageRepository, SaleEventImageRepository>();
+            services.AddScoped<IDetailSaleEventRepository, DetailSaleEventRepository>();
+
+            // Register Cart & Invoice Detail Repositories
+            services.AddScoped<ICartRepository, CartRepository>();
+            services.AddScoped<IDetailCartRepository, DetailCartRepository>();
+            services.AddScoped<IDetailInvoiceRepository, DetailInvoiceRepository>();
+
+            // Register Inventory Management Repositories
+            services.AddScoped<IDetailInventoryRepository, DetailInventoryRepository>();
+            services.AddScoped<IInventoryMovementRepository, InventoryMovementRepository>();
+            services.AddScoped<IDetailInventoryMovementRepository, DetailInventoryMovementRepository>();
+
+            // Register Dispose & User Detail Repositories
+            services.AddScoped<IDisposeProductRepository, DisposeProductRepository>();
+            services.AddScoped<ICustomerAddressRepository, CustomerAddressRepository>();
+            services.AddScoped<IUserPaymentMethodRepository, UserPaymentMethodRepository>();
+
+            // Register Unit of Work
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             return services;
+        }
+
+        private static string GetConnectionString()
+            => AppConfigConnection.GetConnectionString() ?? throw new InvalidOperationException("Connection string is incorrect or empty. Please check configuration.");
+
+        private static uint GetMaxQueryRules()
+        {
+            // Default to a safe value
+            uint maxQueryRules = ReadConfigRulesJson.Get(EPlatformRules.MAX_GET_RECORDS);
+            if (maxQueryRules == 0)
+                maxQueryRules = 200;
+            return maxQueryRules;
+        }
+
+        private static uint GetDefaultPageSize()
+        {
+            // Default to a safe value
+            uint defaultPageSize = ReadConfigRulesJson.Get(EPlatformRules.DEFAULT_PAGE_SIZE);
+            if (defaultPageSize == 0)
+                defaultPageSize = 10;
+            return defaultPageSize;
         }
     }
 }

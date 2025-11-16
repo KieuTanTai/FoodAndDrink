@@ -9,6 +9,8 @@ build/
 Others/
 package-lock.json
 *.lock
+ProjectShop.Server.Tests/*
+ProjectShop.Server/TODO_LOG.md
 
 # Visual Studio Code
 .vscode/
@@ -56,6 +58,7 @@ artifacts/
 # Configuration files with sensitive data
 appsettings.Development.json
 appsettings.Local.json
+launchSettings.json
 appsettings.Production.json
 **/appsettings.*.json
 !**/appsettings.json
@@ -597,6 +600,27 @@ TestResults/
 coverage/
 *.lcov
 .nyc_output
+
+# Test files (ignore all test files)
+**/*test*.js
+**/*test*.ts
+**/*test*.tsx
+**/*test*.cs
+**/*test*.java
+**/*test*.py
+**/*Test*.js
+**/*Test*.ts
+**/*Test*.tsx
+**/*Test*.cs
+**/*Test*.java
+**/*Test*.py
+**/test*/
+**/tests/
+**/__tests__/
+**/*.spec.*
+**/*.test.*
+**/jest.config.*
+**/setupTests.*
 
 ##################################
 # Backup files

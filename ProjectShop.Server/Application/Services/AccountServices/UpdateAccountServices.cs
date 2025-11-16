@@ -1,0 +1,113 @@
+﻿using ProjectShop.Server.Core.Entities;
+using ProjectShop.Server.Core.Interfaces.IRepositories;
+using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
+using ProjectShop.Server.Core.Interfaces.IValidate;
+using ProjectShop.Server.Core.ValueObjects;
+
+namespace ProjectShop.Server.Application.Services.AccountServices
+{
+    public class UpdateAccountServices(IUnitOfWork unit, ILogService logger)
+        : IUpdateAccountServices
+    {
+        private readonly IUnitOfWork _unit = unit;
+        private readonly ILogService _logger = logger;
+
+        //!TODO: Check Permission before call method update account
+        public async Task<JsonLogEntry> UpdateAccountStatusAsync(uint accountId, bool status, HttpContext httpContext, CancellationToken cancellationToken)
+            => await UpdateAccountStatusAsync(accountId, status, _unit.Accounts.GetByIdAsync, cancellationToken);
+
+        public async Task<JsonLogEntry> UpdateAccountStatusByUserNameAsync(string userName, bool status, HttpContext httpContext, CancellationToken cancellationToken)
+            => await UpdateAccountStatusAsync(userName, status, _unit.Accounts.GetByUserNameAsync, cancellationToken);
+
+        public async Task<IEnumerable<JsonLogEntry>> UpdateAccountStatusByUserNamesAsync(IEnumerable<string> userNames, bool status, HttpContext httpContext, CancellationToken cancellationToken)
+            => await UpdateAccountStatusAsync(userNames, status, (userNames, token) => _unit.Accounts.GetByUserNamesAsync(userNames, cancellationToken: token), cancellationToken);
+
+        public async Task<IEnumerable<JsonLogEntry>> UpdateAccountStatusAsync(IEnumerable<uint> accountIds, bool status, HttpContext httpContext, CancellationToken cancellationToken)
+            => await UpdateAccountStatusAsync(accountIds.Select(id => id), status, _unit.Accounts.GetByIdsAsync, cancellationToken);
+
+        // Helper properties to access DAOs
+        private async Task<JsonLogEntry> UpdateAccountStatusAsync<InputType>(InputType input, bool status, Func<InputType, CancellationToken, Task<Account?>> getFunc,
+            CancellationToken cancellationToken) where InputType : notnull
+        {
+            await _unit.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                Account? account = await getFunc(input, cancellationToken);
+                if (account == null)
+                {
+                    await _unit.RollbackTransactionAsync(cancellationToken);
+                    return _logger.JsonLogWarning<Account, UpdateAccountServices>($"Account with input {input} does not exist.");
+                }
+                if (account.AccountStatus == status)
+                {
+                    await _unit.RollbackTransactionAsync(cancellationToken);
+                    return _logger.JsonLogInfo<Account, UpdateAccountServices>($"Account {input} already has the desired status.");
+                }
+
+                account.AccountStatus = status;
+                int affectedRows = await _unit.Accounts.UpdateAsync(account, cancellationToken);
+                if (affectedRows == 0)
+                {
+                    await _unit.RollbackTransactionAsync(cancellationToken);
+                    return _logger.JsonLogWarning<Account, UpdateAccountServices>($"Failed to update the account status for {input}.");
+                }
+
+                await _unit.CommitTransactionAsync(cancellationToken);
+                return _logger.JsonLogInfo<Account, UpdateAccountServices>($"Updated status for account {input}.", affectedRows: affectedRows);
+            }
+            catch (Exception ex)
+            {
+                await _unit.RollbackTransactionAsync(cancellationToken);
+                return _logger.JsonLogError<Account, UpdateAccountServices>($"An error occurred while updating the account status for {input}.", ex);
+            }
+        }
+
+        private async Task<IEnumerable<JsonLogEntry>> UpdateAccountStatusAsync<InputType>(IEnumerable<InputType> inputs, bool status,
+            Func<IEnumerable<InputType>, CancellationToken, Task<IEnumerable<Account>>> getFunc, CancellationToken cancellationToken) where InputType : notnull
+        {
+            List<JsonLogEntry> logEntries = [];
+            await _unit.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                IEnumerable<Account> accounts = await getFunc(inputs, cancellationToken);
+                if (accounts == null || !accounts.Any())
+                {
+                    await _unit.RollbackTransactionAsync(cancellationToken);
+                    logEntries.Add(_logger.JsonLogWarning<Account, UpdateAccountServices>("No accounts found for the provided inputs."));
+                    return logEntries;
+                }
+
+                foreach (Account account in accounts)
+                    account.AccountStatus = status;
+                int affectedRows = await _unit.Accounts.UpdateRangeAsync(accounts, cancellationToken);
+                if (affectedRows == 0)
+                {
+                    await _unit.RollbackTransactionAsync(cancellationToken);
+                    logEntries.Add(_logger.JsonLogWarning<Account, UpdateAccountServices>("Failed to update statuses for multiple accounts."));
+                    return logEntries;
+                }
+                await _unit.CommitTransactionAsync(cancellationToken);
+                logEntries.Add(_logger.JsonLogInfo<Account, UpdateAccountServices>("Updated statuses for multiple accounts.", affectedRows: affectedRows));
+                return logEntries;
+            }
+            catch (TaskCanceledException ex)
+            {
+                await _unit.RollbackTransactionAsync(cancellationToken);
+                logEntries.Add(_logger.JsonLogError<Account, UpdateAccountServices>("An error occurred while updating the account statuses.", ex));
+                return logEntries;
+            }
+            catch (OperationCanceledException ex)
+            {
+                await _unit.RollbackTransactionAsync(cancellationToken);
+                logEntries.Add(_logger.JsonLogError<Account, UpdateAccountServices>("An error occurred while updating the account statuses.", ex));
+                return logEntries;
+            }
+            catch (Exception ex)
+            {
+                await _unit.RollbackTransactionAsync(cancellationToken);
+                logEntries.Add(_logger.JsonLogError<Account, UpdateAccountServices>("An error occurred while updating the account statuses.", ex));
+                return logEntries;
+            }
+        }
+    }
+}

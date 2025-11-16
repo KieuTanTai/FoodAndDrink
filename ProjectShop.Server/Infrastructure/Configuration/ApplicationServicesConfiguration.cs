@@ -1,10 +1,9 @@
-﻿using ProjectShop.Server.Application.Services.Account;
-using ProjectShop.Server.Application.Services.Roles;
-using ProjectShop.Server.Core.Entities;
-using ProjectShop.Server.Core.Entities.GetNavigationPropertyOptions;
-using ProjectShop.Server.Core.Enums;
+﻿using ProjectShop.Server.Application.Services;
+using ProjectShop.Server.Core.Interfaces.IServices;
+using ProjectShop.Server.Core.Interfaces.IServices._IBase;
+using ProjectShop.Server.Application.Services._BaseServices;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
-using ProjectShop.Server.Core.Interfaces.IServices.Role;
+using ProjectShop.Server.Application.Services.AccountServices;
 
 namespace ProjectShop.Server.Infrastructure.Configuration
 {
@@ -12,20 +11,19 @@ namespace ProjectShop.Server.Infrastructure.Configuration
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            // NOTE: ACCOUNT SERVICES
-            services.AddTransient<ISearchAccountService<AccountModel, AccountNavigationOptions>, SearchAccountService>();
-            services.AddTransient<IUpdateAccountService, UpdateAccountService>();
-            services.AddTransient<IForgotPasswordService, ForgotPasswordService>();
-            services.AddScoped<ILoginService<AccountModel, AccountNavigationOptions>, LoginService>();
-            services.AddScoped<ISignupService<AccountModel>, SignupService>();
+            // NOTE: BASE SERVICES (OPEN GENERIC)
+            services.AddScoped(typeof(IBaseHelperServices<>), typeof(BaseHelperServices<>));
+            services.AddScoped(typeof(IServiceResultFactory<>), typeof(ServiceResultFactory<>));
+            services.AddScoped<IBasePasswordMappingServices, BasePasswordMappingServices>();
+            // services.AddScoped(typeof(IGetSingleServices<,>), typeof(BaseGetResultServices<,>));
+            // services.AddScoped(typeof(IGetMultipleServices<,>), typeof(BaseGetResultsServices<,>));
 
-            // NOTE: ROLES SERVICES
-            services.AddTransient<IAddAccountRoleService<RolesOfUserModel, RolesOfUserKey>, AddAccountRoleService>();
-            services.AddTransient<IAddRoleService<RoleModel>, AddRoleService>();
-            services.AddTransient<IUpdateRoleService, UpdateRoleService>();
-            services.AddTransient<IDeleteAccountRoleService<RolesOfUserKey>, DeleteAccountRoleService>();
-            services.AddTransient<ISearchAccountRoleService<RolesOfUserModel, RolesOfUserNavigationOptions, RolesOfUserKey>, SearchAccountRoleService>();
-            services.AddTransient<ISearchRoleService<RoleModel, RoleNavigationOptions>, SearchRoleService>();
+            // NOTE: Get Account Permission 
+            services.AddScoped<ILoginServices, LoginServices>();
+            services.AddScoped<ISignupServices, SignupServices>();
+            services.AddScoped<IUpdatePasswordServices, UpdatePasswordServices>();
+            services.AddScoped<IUpdateAccountServices, UpdateAccountServices>();
+            services.AddScoped<ISearchAccountServices, SearchAccountServices>();
             return services;
         }
     }

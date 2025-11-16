@@ -1,43 +1,31 @@
 ﻿using ProjectShop.Server.Infrastructure.Configuration;
-using ProjectShop.Server.Infrastructure.Persistence;
 using ProjectShop.Server.Infrastructure.Services;
+using ProjectShop.Server.Extensions;
+using ProjectShop.Server.WebAPI.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddCustomOpenApi();
+builder.Services.AddCustomCors();
+builder.Services.AddCustomAuthentication();
 
 try
 {
     builder.Services.AddInfrastructureServices();
     builder.Services.AddApplicationServices();
-    //builder.Services.AddControllerServices();
-    SnakeCaseMapperInitializer.RegisterAllEntities();
+    builder.WebHost.UseUrls("https://localhost:5294");
+    // SnakeCaseMapperInitializer.RegisterAllEntities(); // Removed - no longer needed
 }
 catch (Exception ex)
 {
-    System.Console.WriteLine($"Application startup failed: {ex.Message}");
+    Console.WriteLine($"Application startup failed: {ex.Message}");
     Environment.Exit(1);
 }
 
 var app = builder.Build();
 SqlTypeHandlerRegistration.Register();
 GetProviderService.SetServiceProvider(app.Services);
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.MapFallbackToFile("/index.html");
+app.UseCustomMiddlewares(app.Environment);
 
 app.Run();

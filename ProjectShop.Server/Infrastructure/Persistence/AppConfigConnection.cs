@@ -2,19 +2,26 @@
 {
     public class AppConfigConnection
     {
-        private static readonly IConfigurationRoot configurationRoot;
+        private static readonly IConfigurationRoot _configurationRoot;
 
         static AppConfigConnection()
         {
-            string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\");
-            configurationRoot = new ConfigurationBuilder().SetBasePath(basePath)
-                                    .AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true).Build();
+            try
+            {
+                string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../");
+                _configurationRoot = new ConfigurationBuilder().SetBasePath(basePath)
+                                        .AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true).Build();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("AppConfigConnection static constructor error: " + ex);
+                throw;
+            }
         }
         public static string GetConnectionString(string name = "DefaultConnection")
         {
-            var connectionString = configurationRoot.GetConnectionString(name);
-            if (connectionString == null)
-                connectionString = "";
+            var connectionString = _configurationRoot.GetConnectionString(name);
+            connectionString ??= "";
             return connectionString;
         }
     }

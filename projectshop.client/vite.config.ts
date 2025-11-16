@@ -7,6 +7,9 @@ import child_process from 'child_process';
 import { env } from 'process';
 import tailwindcss from '@tailwindcss/vite';
 
+// Đường dẫn đầy đủ tới dotnet9/dotnet
+const dotnetPath = path.join(env.HOME || '', 'dotnet9', 'dotnet');
+
 const baseFolder =
     env.APPDATA !== undefined && env.APPDATA !== ''
         ? `${env.APPDATA}/ASP.NET/https`
@@ -21,7 +24,7 @@ if (!fs.existsSync(baseFolder)) {
 }
 
 if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
-    if (0 !== child_process.spawnSync('dotnet', [
+    if (0 !== child_process.spawnSync(dotnetPath, [
         'dev-certs',
         'https',
         '--export-path',

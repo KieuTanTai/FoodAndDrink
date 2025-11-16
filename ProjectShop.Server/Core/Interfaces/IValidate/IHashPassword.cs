@@ -2,9 +2,9 @@
 {
     public interface IHashPassword
     {
-        Task<string> HashPasswordAsync(string password);
-        Task<bool> ComparePasswords(string hashedPassword, string password);
-        Task<bool> IsPasswordHashed(string password);
-        Task<bool> IsPasswordValidAsync(string password);
+        Task<string> HashPasswordAsync(string password, CancellationToken cancellationToken = default);
+        Task<bool> ComparePasswordsAsync(string hashedPassword, string password, CancellationToken cancellationToken = default);
+        Task<bool> IsPasswordHashedAsync(string password, CancellationToken cancellationToken = default);
+        Task<bool> IsPasswordValidAsync(string password, CancellationToken cancellationToken = default);
     }
 }
