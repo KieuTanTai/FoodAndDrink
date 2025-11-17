@@ -33,8 +33,8 @@ jobs:
         run: |
           if [ -f ProjectShop.Server/ProjectShop.Server.csproj ]; then
             dotnet --version
-            dotnet add ProjectShop.Server/ProjectShop.Server.csproj package Microsoft.Extensions.DependencyInjection --version 10.0.10
-            dotnet add ProjectShop.Server/ProjectShop.Server.csproj package Microsoft.Extensions.DependencyInjection.Abstractions --version 10.0.10
+            dotnet add ProjectShop.Server/ProjectShop.Server.csproj package Microsoft.Extensions.DependencyInjection --version 9.0.10
+            dotnet add ProjectShop.Server/ProjectShop.Server.csproj package Microsoft.Extensions.DependencyInjection.Abstractions --version 9.0.10
           else
             echo "ProjectShop.Server/ProjectShop.Server.csproj not found — skipping pin step"
           fi
