@@ -7,7 +7,7 @@ build/
 
 # Project specific
 Others/
-package-lock.json
+# package-lock.json
 *.lock
 ProjectShop.Server.Tests/*
 ProjectShop.Server/TODO_LOG.md
