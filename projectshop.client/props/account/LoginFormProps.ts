@@ -1,4 +1,4 @@
-import type { AccountModel } from "@/AccountModel";
+import type { AccountModel } from "@/models/AccountModel";
 
 export default interface LoginFormProps {
   onSuccess: (account: AccountModel) => void;
