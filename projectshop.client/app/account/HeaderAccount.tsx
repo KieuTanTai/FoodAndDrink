@@ -8,7 +8,7 @@ import useFixedScrollbarCompensate from "@/hooks/useScrollbarCompensate";
 import { login, logout } from "@/app/api/auth-api";
 import LoginModal from "@/modal/components/account/LoginModal";
 import SignupModal from "@/modal/components/account/SignupModal";
-import ForgotPasswordModal from "@/modal/components/account/ForgotPasswordModal";
+// import ForgotPasswordModal from "@/modal/components/account/ForgotPasswordModal";
 
 
 function HeaderAccount() {
@@ -135,7 +135,7 @@ function HeaderAccount() {
         dictLinksClick={{ login: () => openLogin() }}
       />
       {/* Forgot Password Modal */}
-      <ForgotPasswordModal
+      {/* <ForgotPasswordModal
         isOpen={openModal === "forgot-password"}
         onRequestClose={closeModal}
         onSuccess={() => {
@@ -143,7 +143,7 @@ function HeaderAccount() {
           showMessage("Đặt lại mật khẩu thành công! Vui lòng đăng nhập.", "success");
         }}
         dictLinksClick={{ login: () => openLogin() }}
-      />
+      /> */}
     </div>
   );
 }
