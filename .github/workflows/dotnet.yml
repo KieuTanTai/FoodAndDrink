@@ -59,6 +59,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
+          cache-dependency-path: 'projectshop.client/package-lock.json'
 
       - name: Install and build frontend (projectshop.client)
         working-directory: projectshop.client
