@@ -42,7 +42,7 @@ jobs:
       - name: Restore .NET projects
         run: |
           if [ -f ProjectShop.Server/ProjectShop.Server.csproj ]; then
-            dotnet restore ProjectShop.Server/ProjectShop.Server.csproj --framework net10.0
+            dotnet restore ProjectShop.Server/ProjectShop.Server.csproj
           else
             echo "ERROR: ProjectShop.Server/ProjectShop.Server.csproj not found"
             exit 1
