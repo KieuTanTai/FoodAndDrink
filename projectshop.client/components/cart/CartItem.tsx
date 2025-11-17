@@ -7,7 +7,7 @@ function CartItem({ item, onQuantityChange, onRemove }: CartItemProps) {
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
       <div className="relative grid grid-cols-[auto,1fr] items-center gap-4">
         <div>
-          <Image src={item.image} alt={item.name} className="h-20 w-20 rounded-lg object-cover" />
+          <Image src={item.image} alt={item.name} className="h-20 w-20 rounded-lg object-cover" width={60} height={60} />
         </div>
         <div className="grid grid-cols-1 items-center gap-y-4 sm:grid-cols-2">
           <div className="sm:pr-4">
