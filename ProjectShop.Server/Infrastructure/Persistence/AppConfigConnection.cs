@@ -8,7 +8,7 @@
         {
             try
             {
-                string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../");
+                var basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../");
                 _configurationRoot = new ConfigurationBuilder().SetBasePath(basePath)
                                         .AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true).Build();
             }

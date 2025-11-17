@@ -31,7 +31,7 @@ namespace ProjectShop.Server.Application.Services._BaseServices
         {
             try
             {
-                TEntity? existingObject = await daoFunc(input, cancellationToken);
+                var existingObject = await daoFunc(input, cancellationToken);
                 return existingObject != null;
             }
             catch (TaskCanceledException ex)
@@ -56,7 +56,7 @@ namespace ProjectShop.Server.Application.Services._BaseServices
         {
             try
             {
-                TEntity? existingObject = await daoFunc(input, cancellationToken);
+                var existingObject = await daoFunc(input, cancellationToken);
                 return existingObject != null;
             }
             catch (TaskCanceledException ex)
@@ -83,7 +83,7 @@ namespace ProjectShop.Server.Application.Services._BaseServices
                 return false;
             try
             {
-                IEnumerable<TEntity> existingObjects = await daoFunc(ids, cancellationToken);
+                var existingObjects = await daoFunc(ids, cancellationToken);
                 return existingObjects.Count() == ids.Count();
             }
             catch (TaskCanceledException ex)
@@ -110,7 +110,7 @@ namespace ProjectShop.Server.Application.Services._BaseServices
                 return false;
             try
             {
-                IEnumerable<TEntity> existingObjects = await daoFunc(ids, cancellationToken);
+                var existingObjects = await daoFunc(ids, cancellationToken);
                 return existingObjects.Count() == ids.Count();
             }
             catch (TaskCanceledException ex)
@@ -137,7 +137,7 @@ namespace ProjectShop.Server.Application.Services._BaseServices
                 return false;
             try
             {
-                IEnumerable<TEntity> existingObjects = await daoFunc(ids, cancellationToken);
+                var existingObjects = await daoFunc(ids, cancellationToken);
                 return !existingObjects.Any();
             }
             catch (TaskCanceledException ex)
@@ -164,7 +164,7 @@ namespace ProjectShop.Server.Application.Services._BaseServices
                 return false;
             try
             {
-                IEnumerable<TEntity> existingObjects = await daoFunc(ids, cancellationToken);
+                var existingObjects = await daoFunc(ids, cancellationToken);
                 return !existingObjects.Any();
             }
             catch (TaskCanceledException ex)

@@ -35,7 +35,7 @@ namespace ProjectShop.Server.Infrastructure.Services
 
         public string LogError<TEntity, TCurrentEntityCall>(string message, Exception? ex, [CallerMemberName] string? methodCall = null)
         {
-            string logs = "";
+            var logs = "";
             logs += $"----- ERROR in {typeof(TCurrentEntityCall).FullName} -----\n";
             logs += $"Method Call: {methodCall}\n";
             logs += $"Query Time: {DateTime.UtcNow:dd/MM/yyyy HH:mm:ss}\n";
@@ -55,7 +55,7 @@ namespace ProjectShop.Server.Infrastructure.Services
 
         public string LogInfo<TEntity, TCurrentEntityCall>(string message, [CallerMemberName] string? methodCall = null)
         {
-            string logs = "";
+            var logs = "";
             logs += $"----- INFO in {typeof(TCurrentEntityCall).FullName} -----\n";
             logs += $"Method Call: {methodCall}\n";
             logs += $"Query Time: {DateTime.UtcNow:dd/MM/yyyy HH:mm:ss}\n";
@@ -70,7 +70,7 @@ namespace ProjectShop.Server.Infrastructure.Services
 
         public string LogWarning<TEntity, TCurrentEntityCall>(string message, [CallerMemberName] string? methodCall = null)
         {
-            string logs = "";
+            var logs = "";
             logs += $"----- WARNING in {typeof(TCurrentEntityCall).FullName} -----\n";
             logs += $"Method Call: {methodCall}\n";
             logs += $"Query Time: {DateTime.UtcNow:dd/MM/yyyy HH:mm:ss}\n";
@@ -85,7 +85,7 @@ namespace ProjectShop.Server.Infrastructure.Services
 
         public string LogDebug<TEntity, TCurrentEntityCall>(string message, [CallerMemberName] string? methodCall = null)
         {
-            string logs = "";
+            var logs = "";
             logs += $"----- DEBUG in {typeof(TCurrentEntityCall).FullName} -----\n";
             logs += $"Method Call: {methodCall}\n";
             logs += $"Query Time: {DateTime.UtcNow:dd/MM/yyyy HH:mm:ss}\n";
@@ -100,7 +100,7 @@ namespace ProjectShop.Server.Infrastructure.Services
 
         private static JsonLogEntry CreateLogEntry<TEntity, TCurrentEntityCall>(string message, string? name, Exception? ex = null, int? affectedRows = null, [CallerMemberName] string? methodCall = null)
         {
-            bool isHaveAffectedRows = affectedRows.HasValue;
+            var isHaveAffectedRows = affectedRows.HasValue;
             if (isHaveAffectedRows && affectedRows < 0)
                 affectedRows = null;
             JsonLogEntry log = new()
@@ -132,8 +132,8 @@ namespace ProjectShop.Server.Infrastructure.Services
 
                 if (!Directory.Exists(logPath))
                     Directory.CreateDirectory(logPath);
-                string logFileName = $"log_{DateTime.UtcNow:yyyyMMdd}.json";
-                string logFilePath = Path.Combine(logPath, logFileName);
+                var logFileName = $"log_{DateTime.UtcNow:yyyyMMdd}.json";
+                var logFilePath = Path.Combine(logPath, logFileName);
 
                 using FileStream stream = new(logFilePath, FileMode.Append, FileAccess.Write, FileShare.Read);
                 await JsonSerializer.SerializeAsync(stream, log, _jsonOptions, cancellationToken);
@@ -167,8 +167,8 @@ namespace ProjectShop.Server.Infrastructure.Services
 
                 if (!Directory.Exists(logPath))
                     Directory.CreateDirectory(logPath);
-                string logFileName = $"log_{DateTime.UtcNow:yyyyMMdd}.json";
-                string logFilePath = Path.Combine(logPath, logFileName);
+                var logFileName = $"log_{DateTime.UtcNow:yyyyMMdd}.json";
+                var logFilePath = Path.Combine(logPath, logFileName);
 
                 using FileStream stream = new(logFilePath, FileMode.Append, FileAccess.Write, FileShare.Read);
                 foreach (var log in logs)
@@ -208,8 +208,8 @@ namespace ProjectShop.Server.Infrastructure.Services
                 if (!Directory.Exists(logPath))
                     Directory.CreateDirectory(logPath);
 
-                string logFileName = $"console_log_{DateTime.UtcNow:yyyyMMdd}.txt";
-                string logFilePath = Path.Combine(logPath, logFileName);
+                var logFileName = $"console_log_{DateTime.UtcNow:yyyyMMdd}.txt";
+                var logFilePath = Path.Combine(logPath, logFileName);
 
                 using FileStream stream = new(logFilePath, FileMode.Append, FileAccess.Write, FileShare.Read);
                 await stream.WriteAsync(Encoding.UTF8.GetBytes(logMessage), cancellationToken);
@@ -239,19 +239,19 @@ namespace ProjectShop.Server.Infrastructure.Services
 
         public async Task SaveJsonLogToFileAsync<TCurrentEntityCall>(JsonLogEntry log, CancellationToken cancellationToken = default)
         {
-            string logPath = GetLogPathByLayer<TCurrentEntityCall>();
+            var logPath = GetLogPathByLayer<TCurrentEntityCall>();
             await SaveJsonLogToFileAsync(log, logPath, cancellationToken);
         }
 
         public async Task SaveJsonLogsToFileAsync<TCurrentEntityCall>(IEnumerable<JsonLogEntry> logs, CancellationToken cancellationToken = default)
         {
-            string logPath = GetLogPathByLayer<TCurrentEntityCall>();
+            var logPath = GetLogPathByLayer<TCurrentEntityCall>();
             await SaveJsonLogsToFileAsync(logs, logPath, cancellationToken);
         }
 
         public async Task SaveLogStringToFileAsync<TCurrentEntityCall>(string logMessage, CancellationToken cancellationToken = default)
         {
-            string logPath = GetLogPathByLayer<TCurrentEntityCall>();
+            var logPath = GetLogPathByLayer<TCurrentEntityCall>();
             await SaveLogStringToFileAsync(logMessage, logPath, cancellationToken);
         }
 
@@ -261,7 +261,7 @@ namespace ProjectShop.Server.Infrastructure.Services
 
         private static string GetLogPathByLayer<TCurrentEntityCall>()
         {
-            string? fullName = typeof(TCurrentEntityCall).FullName;
+            var fullName = typeof(TCurrentEntityCall).FullName;
 
             if (string.IsNullOrEmpty(fullName))
                 return LogPathConstants.BaseLogDirectory;
@@ -306,8 +306,8 @@ namespace ProjectShop.Server.Infrastructure.Services
                 var firstLog = logs.FirstOrDefault();
                 if (firstLog != null)
                 {
-                    string layerPath = LogPathConstants.BaseLogDirectory;
-                    string? entityCallStr = firstLog.EntityCall?.ToString();
+                    var layerPath = LogPathConstants.BaseLogDirectory;
+                    var entityCallStr = firstLog.EntityCall?.ToString();
 
                     if (!string.IsNullOrEmpty(entityCallStr))
                     {

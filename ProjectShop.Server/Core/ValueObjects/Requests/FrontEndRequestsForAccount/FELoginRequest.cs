@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ProjectShop.Server.Core.ValueObjects.FrontEndRequestsForAccount
+namespace ProjectShop.Server.Core.ValueObjects.Requests.FrontEndRequestsForAccount
 {
     public class FELoginRequest
     {

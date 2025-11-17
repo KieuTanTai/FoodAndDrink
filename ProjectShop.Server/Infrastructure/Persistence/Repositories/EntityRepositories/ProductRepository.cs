@@ -19,7 +19,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<IEnumerable<Product>> GetByBarcodesAsync(IEnumerable<string> barcodes, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
-            string cursorBarcode = fromRecord?.ToString() ?? string.Empty;
+            var cursorBarcode = fromRecord?.ToString() ?? string.Empty;
             List<string> barcodesList = [.. barcodes];
 
             return await _dbSet
@@ -39,8 +39,8 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<IEnumerable<Product>> GetManyByNamesAsync(IEnumerable<string> productNames, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
-            string cursorBarcode = fromRecord?.ToString() ?? string.Empty;
-            List<string> namesList = productNames.ToList();
+            var cursorBarcode = fromRecord?.ToString() ?? string.Empty;
+            var namesList = productNames.ToList();
 
             return await _dbSet
                 .Where(productEntity => namesList.Contains(productEntity.ProductName) && string.Compare(productEntity.ProductBarcode, cursorBarcode) > 0)
@@ -52,7 +52,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<IEnumerable<Product>> SearchByNameContainsAsync(string searchTerm, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
-            string cursorBarcode = fromRecord?.ToString() ?? string.Empty;
+            var cursorBarcode = fromRecord?.ToString() ?? string.Empty;
 
             return await _dbSet
                 .Where(productEntity => productEntity.ProductName.Contains(searchTerm) && string.Compare(productEntity.ProductBarcode, cursorBarcode) > 0)
@@ -68,7 +68,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<IEnumerable<Product>> GetBySupplierIdAsync(uint supplierId, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
-            string cursorBarcode = fromRecord?.ToString() ?? string.Empty;
+            var cursorBarcode = fromRecord?.ToString() ?? string.Empty;
 
             return await _dbSet
                 .Where(productEntity => productEntity.SupplierId == supplierId && string.Compare(productEntity.ProductBarcode, cursorBarcode) > 0)
@@ -80,8 +80,8 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<IEnumerable<Product>> GetBySupplierIdsAsync(IEnumerable<uint> supplierIds, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
-            string cursorBarcode = fromRecord?.ToString() ?? string.Empty;
-            List<uint> supplierIdsList = supplierIds.ToList();
+            var cursorBarcode = fromRecord?.ToString() ?? string.Empty;
+            var supplierIdsList = supplierIds.ToList();
 
             return await _dbSet
                 .Where(productEntity => supplierIdsList.Contains(productEntity.SupplierId) && string.Compare(productEntity.ProductBarcode, cursorBarcode) > 0)
@@ -97,7 +97,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<IEnumerable<Product>> GetByCountryIdAsync(uint countryId, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
-            string cursorBarcode = fromRecord?.ToString() ?? string.Empty;
+            var cursorBarcode = fromRecord?.ToString() ?? string.Empty;
 
             return await _dbSet
                 .Where(productEntity => productEntity.CountryId == countryId && string.Compare(productEntity.ProductBarcode, cursorBarcode) > 0)
@@ -109,7 +109,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<IEnumerable<Product>> GetByCountryIdsAsync(IEnumerable<uint> countryIds, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
-            string cursorBarcode = fromRecord?.ToString() ?? string.Empty;
+            var cursorBarcode = fromRecord?.ToString() ?? string.Empty;
             List<uint> countryIdsList = [.. countryIds];
 
             return await _dbSet
@@ -126,7 +126,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<IEnumerable<Product>> GetByTypeAsync(string productType, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
-            string cursorBarcode = fromRecord?.ToString() ?? string.Empty;
+            var cursorBarcode = fromRecord?.ToString() ?? string.Empty;
 
             return await _dbSet
                 .Where(productEntity => productEntity.ProductType == productType && string.Compare(productEntity.ProductBarcode, cursorBarcode) > 0)
@@ -142,7 +142,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<IEnumerable<Product>> GetByStatusAsync(bool? status, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
-            string cursorBarcode = fromRecord?.ToString() ?? string.Empty;
+            var cursorBarcode = fromRecord?.ToString() ?? string.Empty;
 
             return await _dbSet
                 .Where(productEntity => productEntity.ProductStatus == status && string.Compare(productEntity.ProductBarcode, cursorBarcode) > 0)
@@ -158,7 +158,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<IEnumerable<Product>> GetByPriceRangeAsync(decimal minPrice, decimal maxPrice, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
-            string cursorBarcode = fromRecord?.ToString() ?? string.Empty;
+            var cursorBarcode = fromRecord?.ToString() ?? string.Empty;
 
             return await _dbSet
                 .Where(productEntity => productEntity.ProductBasePrice >= minPrice && productEntity.ProductBasePrice <= maxPrice && string.Compare(productEntity.ProductBarcode, cursorBarcode) > 0)
@@ -188,7 +188,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         // Product uses string barcode as PK
         public async Task<Product?> GetNavigationByIdAsync(string id, ProductNavigationOptions options, CancellationToken cancellationToken)
         {
-            IQueryable<Product> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query.FirstOrDefaultAsync(productEntity => productEntity.ProductBarcode == id, cancellationToken);
         }
@@ -197,10 +197,10 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             uint? pageSize, CancellationToken cancellationToken)
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
-            string cursorBarcode = fromRecord?.ToString() ?? string.Empty;
+            var cursorBarcode = fromRecord?.ToString() ?? string.Empty;
             List<string> barcodesList = [.. ids];
 
-            IQueryable<Product> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query
                 .Where(productEntity => barcodesList.Contains(productEntity.ProductBarcode) && string.Compare(productEntity.ProductBarcode, cursorBarcode) > 0)
@@ -351,12 +351,12 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             List<string> productBarcodes = [.. entities.Select(productEntity => productEntity.ProductBarcode).Distinct()];
 
-            (Dictionary<string, Country>? countriesDict, Dictionary<string, Supplier>? suppliersDict, Dictionary<string, ProductDrink>? productDrinksDict, Dictionary<string, ProductFruit>? productFruitsDict,
-                Dictionary<string, ProductMeat>? productMeatsDict, Dictionary<string, ProductSnack>? productSnacksDict, Dictionary<string, ProductVegetable>? productVegetablesDict) =
+            (var countriesDict, var suppliersDict, var productDrinksDict, var productFruitsDict,
+                var productMeatsDict, var productSnacksDict, var productVegetablesDict) =
                 await ExplicitLoadOneToOneAsync(entities, productBarcodes, options, cancellationToken);
 
-            (ILookup<string, DetailCart>? detailCartsLookup, ILookup<string, DetailInventory>? detailInventoriesLookup, ILookup<string, DetailInventoryMovement>? detailInventoryMovementsLookup, ILookup<string, DetailInvoice>? detailInvoicesLookup,
-                ILookup<string, DetailSaleEvent>? detailSaleEventsLookup, ILookup<string, DisposeProduct>? disposeProductsLookup, ILookup<string, ProductCategory>? productCategoriesLookup, ILookup<string, ProductImage>? productImagesLookup) =
+            (var detailCartsLookup, var detailInventoriesLookup, var detailInventoryMovementsLookup, var detailInvoicesLookup,
+                var detailSaleEventsLookup, var disposeProductsLookup, var productCategoriesLookup, var productImagesLookup) =
                 await ExplicitLoadOneToManyAsync(productBarcodes, options, cancellationToken);
 
             MappingOneToOneToProducts(entities, countriesDict, suppliersDict, productDrinksDict, productFruitsDict, productMeatsDict, productSnacksDict, productVegetablesDict);
@@ -371,13 +371,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             Dictionary<string, ProductMeat>?, Dictionary<string, ProductSnack>?, Dictionary<string, ProductVegetable>?)>
             ExplicitLoadOneToOneAsync(IEnumerable<Product> entities, List<string> productBarcodes, ProductNavigationOptions options, CancellationToken cancellationToken)
         {
-            Dictionary<string, Country>? countriesDict = await LoadCountriesDictionaryIfRequested(entities, options, cancellationToken);
-            Dictionary<string, Supplier>? suppliersDict = await LoadSuppliersDictionaryIfRequested(entities, options, cancellationToken);
-            Dictionary<string, ProductDrink>? productDrinksDict = await LoadProductDrinksDictionaryIfRequested(productBarcodes, options, cancellationToken);
-            Dictionary<string, ProductFruit>? productFruitsDict = await LoadProductFruitsDictionaryIfRequested(productBarcodes, options, cancellationToken);
-            Dictionary<string, ProductMeat>? productMeatsDict = await LoadProductMeatsDictionaryIfRequested(productBarcodes, options, cancellationToken);
-            Dictionary<string, ProductSnack>? productSnacksDict = await LoadProductSnacksDictionaryIfRequested(productBarcodes, options, cancellationToken);
-            Dictionary<string, ProductVegetable>? productVegetablesDict = await LoadProductVegetablesDictionaryIfRequested(productBarcodes, options, cancellationToken);
+            var countriesDict = await LoadCountriesDictionaryIfRequested(entities, options, cancellationToken);
+            var suppliersDict = await LoadSuppliersDictionaryIfRequested(entities, options, cancellationToken);
+            var productDrinksDict = await LoadProductDrinksDictionaryIfRequested(productBarcodes, options, cancellationToken);
+            var productFruitsDict = await LoadProductFruitsDictionaryIfRequested(productBarcodes, options, cancellationToken);
+            var productMeatsDict = await LoadProductMeatsDictionaryIfRequested(productBarcodes, options, cancellationToken);
+            var productSnacksDict = await LoadProductSnacksDictionaryIfRequested(productBarcodes, options, cancellationToken);
+            var productVegetablesDict = await LoadProductVegetablesDictionaryIfRequested(productBarcodes, options, cancellationToken);
 
             return (countriesDict, suppliersDict, productDrinksDict, productFruitsDict, productMeatsDict, productSnacksDict, productVegetablesDict);
         }
@@ -387,8 +387,8 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (!options.IsGetCountry)
                 return null;
 
-            List<uint> countryIds = entities.Select(productItem => productItem.CountryId).Distinct().ToList();
-            List<Country> countries = await _context.Countries
+            var countryIds = entities.Select(productItem => productItem.CountryId).Distinct().ToList();
+            var countries = await _context.Countries
                 .Where(countryEntity => countryIds.Contains(countryEntity.CountryId))
                 .ToListAsync(cancellationToken);
             return entities.ToDictionary(productItem => productItem.ProductBarcode, productItem => countries.First(countryEntity => countryEntity.CountryId == productItem.CountryId));
@@ -399,8 +399,8 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (!options.IsGetSupplier)
                 return null;
 
-            List<uint> supplierIds = entities.Select(productItem => productItem.SupplierId).Distinct().ToList();
-            List<Supplier> suppliers = await _context.Suppliers
+            var supplierIds = entities.Select(productItem => productItem.SupplierId).Distinct().ToList();
+            var suppliers = await _context.Suppliers
                 .Where(supplierEntity => supplierIds.Contains(supplierEntity.SupplierId))
                 .ToListAsync(cancellationToken);
             return entities.ToDictionary(productItem => productItem.ProductBarcode, productItem => suppliers.First(supplierEntity => supplierEntity.SupplierId == productItem.SupplierId));
@@ -411,7 +411,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (!options.IsGetProductDrink)
                 return null;
 
-            List<ProductDrink> productDrinks = await _context.ProductDrinks
+            var productDrinks = await _context.ProductDrinks
                 .Where(productDrinkEntity => productBarcodes.Contains(productDrinkEntity.ProductBarcode))
                 .ToListAsync(cancellationToken);
             return productDrinks.ToDictionary(productDrinkEntity => productDrinkEntity.ProductBarcode);
@@ -422,7 +422,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (!options.IsGetProductFruit)
                 return null;
 
-            List<ProductFruit> productFruits = await _context.ProductFruits
+            var productFruits = await _context.ProductFruits
                 .Where(productFruitEntity => productBarcodes.Contains(productFruitEntity.ProductBarcode))
                 .ToListAsync(cancellationToken);
             return productFruits.ToDictionary(productFruitEntity => productFruitEntity.ProductBarcode);
@@ -433,7 +433,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (!options.IsGetProductMeat)
                 return null;
 
-            List<ProductMeat> productMeats = await _context.ProductMeats
+            var productMeats = await _context.ProductMeats
                 .Where(productMeatEntity => productBarcodes.Contains(productMeatEntity.ProductBarcode))
                 .ToListAsync(cancellationToken);
             return productMeats.ToDictionary(productMeatEntity => productMeatEntity.ProductBarcode);
@@ -444,7 +444,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (!options.IsGetProductSnack)
                 return null;
 
-            List<ProductSnack> productSnacks = await _context.ProductSnacks
+            var productSnacks = await _context.ProductSnacks
                 .Where(productSnackEntity => productBarcodes.Contains(productSnackEntity.ProductBarcode))
                 .ToListAsync(cancellationToken);
             return productSnacks.ToDictionary(productSnackEntity => productSnackEntity.ProductBarcode);
@@ -455,7 +455,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (!options.IsGetProductVegetable)
                 return null;
 
-            List<ProductVegetable> productVegetables = await _context.ProductVegetables
+            var productVegetables = await _context.ProductVegetables
                 .Where(productVegetableEntity => productBarcodes.Contains(productVegetableEntity.ProductBarcode))
                 .ToListAsync(cancellationToken);
             return productVegetables.ToDictionary(productVegetableEntity => productVegetableEntity.ProductBarcode);
@@ -469,14 +469,14 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             ILookup<string, DetailSaleEvent>?, ILookup<string, DisposeProduct>?, ILookup<string, ProductCategory>?, ILookup<string, ProductImage>?)>
             ExplicitLoadOneToManyAsync(List<string> productBarcodes, ProductNavigationOptions options, CancellationToken cancellationToken)
         {
-            ILookup<string, DetailCart>? detailCartsLookup = await LoadDetailCartsLookupIfRequested(productBarcodes, options, cancellationToken);
-            ILookup<string, DetailInventory>? detailInventoriesLookup = await LoadDetailInventoriesLookupIfRequested(productBarcodes, options, cancellationToken);
-            ILookup<string, DetailInventoryMovement>? detailInventoryMovementsLookup = await LoadDetailInventoryMovementsLookupIfRequested(productBarcodes, options, cancellationToken);
-            ILookup<string, DetailInvoice>? detailInvoicesLookup = await LoadDetailInvoicesLookupIfRequested(productBarcodes, options, cancellationToken);
-            ILookup<string, DetailSaleEvent>? detailSaleEventsLookup = await LoadDetailSaleEventsLookupIfRequested(productBarcodes, options, cancellationToken);
-            ILookup<string, DisposeProduct>? disposeProductsLookup = await LoadDisposeProductsLookupIfRequested(productBarcodes, options, cancellationToken);
-            ILookup<string, ProductCategory>? productCategoriesLookup = await LoadProductCategoriesLookupIfRequested(productBarcodes, options, cancellationToken);
-            ILookup<string, ProductImage>? productImagesLookup = await LoadProductImagesLookupIfRequested(productBarcodes, options, cancellationToken);
+            var detailCartsLookup = await LoadDetailCartsLookupIfRequested(productBarcodes, options, cancellationToken);
+            var detailInventoriesLookup = await LoadDetailInventoriesLookupIfRequested(productBarcodes, options, cancellationToken);
+            var detailInventoryMovementsLookup = await LoadDetailInventoryMovementsLookupIfRequested(productBarcodes, options, cancellationToken);
+            var detailInvoicesLookup = await LoadDetailInvoicesLookupIfRequested(productBarcodes, options, cancellationToken);
+            var detailSaleEventsLookup = await LoadDetailSaleEventsLookupIfRequested(productBarcodes, options, cancellationToken);
+            var disposeProductsLookup = await LoadDisposeProductsLookupIfRequested(productBarcodes, options, cancellationToken);
+            var productCategoriesLookup = await LoadProductCategoriesLookupIfRequested(productBarcodes, options, cancellationToken);
+            var productImagesLookup = await LoadProductImagesLookupIfRequested(productBarcodes, options, cancellationToken);
 
             return (detailCartsLookup, detailInventoriesLookup, detailInventoryMovementsLookup, detailInvoicesLookup, detailSaleEventsLookup, disposeProductsLookup, productCategoriesLookup, productImagesLookup);
         }
@@ -486,7 +486,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (!options.IsGetDetailCarts)
                 return null;
 
-            List<DetailCart> detailCarts = await _context.DetailCarts
+            var detailCarts = await _context.DetailCarts
                 .Where(detailCartEntity => productBarcodes.Contains(detailCartEntity.ProductBarcode))
                 .ToListAsync(cancellationToken);
             return detailCarts.ToLookup(detailCartEntity => detailCartEntity.ProductBarcode);
@@ -497,7 +497,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (!options.IsGetDetailInventories)
                 return null;
 
-            List<DetailInventory> detailInventories = await _context.DetailInventories
+            var detailInventories = await _context.DetailInventories
                 .Where(detailInventoryEntity => productBarcodes.Contains(detailInventoryEntity.ProductBarcode))
                 .ToListAsync(cancellationToken);
             return detailInventories.ToLookup(detailInventoryEntity => detailInventoryEntity.ProductBarcode);
@@ -508,7 +508,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (!options.IsGetDetailInventoryMovements)
                 return null;
 
-            List<DetailInventoryMovement> detailInventoryMovements = await _context.DetailInventoryMovements
+            var detailInventoryMovements = await _context.DetailInventoryMovements
                 .Where(detailInventoryMovementEntity => productBarcodes.Contains(detailInventoryMovementEntity.ProductBarcode))
                 .ToListAsync(cancellationToken);
             return detailInventoryMovements.ToLookup(detailInventoryMovementEntity => detailInventoryMovementEntity.ProductBarcode);
@@ -519,7 +519,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (!options.IsGetDetailInvoices)
                 return null;
 
-            List<DetailInvoice> detailInvoices = await _context.DetailInvoices
+            var detailInvoices = await _context.DetailInvoices
                 .Where(detailInvoiceEntity => productBarcodes.Contains(detailInvoiceEntity.ProductBarcode))
                 .ToListAsync(cancellationToken);
             return detailInvoices.ToLookup(detailInvoiceEntity => detailInvoiceEntity.ProductBarcode);
@@ -530,7 +530,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (!options.IsGetDetailSaleEvents)
                 return null;
 
-            List<DetailSaleEvent> detailSaleEvents = await _context.DetailSaleEvents
+            var detailSaleEvents = await _context.DetailSaleEvents
                 .Where(detailSaleEventEntity => productBarcodes.Contains(detailSaleEventEntity.ProductBarcode))
                 .ToListAsync(cancellationToken);
             return detailSaleEvents.ToLookup(detailSaleEventEntity => detailSaleEventEntity.ProductBarcode);
@@ -541,7 +541,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (!options.IsGetDisposeProducts)
                 return null;
 
-            List<DisposeProduct> disposeProducts = await _context.DisposeProducts
+            var disposeProducts = await _context.DisposeProducts
                 .Where(disposeProductEntity => productBarcodes.Contains(disposeProductEntity.ProductBarcode))
                 .ToListAsync(cancellationToken);
             return disposeProducts.ToLookup(disposeProductEntity => disposeProductEntity.ProductBarcode);
@@ -552,7 +552,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (!options.IsGetProductCategories)
                 return null;
 
-            List<ProductCategory> productCategories = await _context.ProductCategories
+            var productCategories = await _context.ProductCategories
                 .Where(productCategoryEntity => productBarcodes.Contains(productCategoryEntity.ProductBarcode))
                 .ToListAsync(cancellationToken);
             return productCategories.ToLookup(productCategoryEntity => productCategoryEntity.ProductBarcode);
@@ -563,7 +563,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (!options.IsGetProductImages)
                 return null;
 
-            List<ProductImage> productImages = await _context.ProductImages
+            var productImages = await _context.ProductImages
                 .Where(productImageEntity => productBarcodes.Contains(productImageEntity.ProductBarcode))
                 .ToListAsync(cancellationToken);
             return productImages.ToLookup(productImageEntity => productImageEntity.ProductBarcode);
@@ -734,10 +734,10 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             Dictionary<string, ProductMeat>? productMeatsDict, Dictionary<string, ProductSnack>? productSnacksDict,
             Dictionary<string, ProductVegetable>? productVegetablesDict)
         {
-            if (products == null || !products.Any())
+            if (!products.Any())
                 return;
 
-            foreach (Product product in products)
+            foreach (var product in products)
             {
                 MapCountryToProduct(product, countriesDict);
                 MapSupplierToProduct(product, suppliersDict);
@@ -751,43 +751,43 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         private static void MapCountryToProduct(Product product, Dictionary<string, Country>? countriesDict)
         {
-            if (countriesDict != null && countriesDict.TryGetValue(product.ProductBarcode, out Country? country))
+            if (countriesDict != null && countriesDict.TryGetValue(product.ProductBarcode, out var country))
                 product.Country = country;
         }
 
         private static void MapSupplierToProduct(Product product, Dictionary<string, Supplier>? suppliersDict)
         {
-            if (suppliersDict != null && suppliersDict.TryGetValue(product.ProductBarcode, out Supplier? supplier))
+            if (suppliersDict != null && suppliersDict.TryGetValue(product.ProductBarcode, out var supplier))
                 product.Supplier = supplier;
         }
 
         private static void MapProductDrinkToProduct(Product product, Dictionary<string, ProductDrink>? productDrinksDict)
         {
-            if (productDrinksDict != null && productDrinksDict.TryGetValue(product.ProductBarcode, out ProductDrink? productDrink))
+            if (productDrinksDict != null && productDrinksDict.TryGetValue(product.ProductBarcode, out var productDrink))
                 product.ProductDrink = productDrink;
         }
 
         private static void MapProductFruitToProduct(Product product, Dictionary<string, ProductFruit>? productFruitsDict)
         {
-            if (productFruitsDict != null && productFruitsDict.TryGetValue(product.ProductBarcode, out ProductFruit? productFruit))
+            if (productFruitsDict != null && productFruitsDict.TryGetValue(product.ProductBarcode, out var productFruit))
                 product.ProductFruit = productFruit;
         }
 
         private static void MapProductMeatToProduct(Product product, Dictionary<string, ProductMeat>? productMeatsDict)
         {
-            if (productMeatsDict != null && productMeatsDict.TryGetValue(product.ProductBarcode, out ProductMeat? productMeat))
+            if (productMeatsDict != null && productMeatsDict.TryGetValue(product.ProductBarcode, out var productMeat))
                 product.ProductMeat = productMeat;
         }
 
         private static void MapProductSnackToProduct(Product product, Dictionary<string, ProductSnack>? productSnacksDict)
         {
-            if (productSnacksDict != null && productSnacksDict.TryGetValue(product.ProductBarcode, out ProductSnack? productSnack))
+            if (productSnacksDict != null && productSnacksDict.TryGetValue(product.ProductBarcode, out var productSnack))
                 product.ProductSnack = productSnack;
         }
 
         private static void MapProductVegetableToProduct(Product product, Dictionary<string, ProductVegetable>? productVegetablesDict)
         {
-            if (productVegetablesDict != null && productVegetablesDict.TryGetValue(product.ProductBarcode, out ProductVegetable? productVegetable))
+            if (productVegetablesDict != null && productVegetablesDict.TryGetValue(product.ProductBarcode, out var productVegetable))
                 product.ProductVegetable = productVegetable;
         }
 
@@ -804,7 +804,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (products == null || !products.Any())
                 return;
 
-            foreach (Product product in products)
+            foreach (var product in products)
             {
                 MapDetailCartsToProduct(product, detailCartsLookup);
                 MapDetailInventoriesToProduct(product, detailInventoriesLookup);

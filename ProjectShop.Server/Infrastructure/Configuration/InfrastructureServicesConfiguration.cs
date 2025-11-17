@@ -24,9 +24,9 @@ namespace ProjectShop.Server.Infrastructure.Configuration
             services.AddSingleton<IClock>(provider => new FakeClockService { UtcNow = new DateTime(2030, 12, 31) });
 
             // Database Configuration
-            string connectionString = GetConnectionString();
-            uint maxQueryRules = GetMaxQueryRules();
-            uint defaultPageSize = GetDefaultPageSize();
+            var connectionString = GetConnectionString();
+            var maxQueryRules = GetMaxQueryRules();
+            var defaultPageSize = GetDefaultPageSize();
 
             // Register Platform Rules as Singletons
             services.AddSingleton<IMaxReturnRecordsRule>(provider => new MaxReturnRecordsRuleService { MaxRecords = maxQueryRules });
@@ -118,7 +118,7 @@ namespace ProjectShop.Server.Infrastructure.Configuration
         private static uint GetMaxQueryRules()
         {
             // Default to a safe value
-            uint maxQueryRules = ReadConfigRulesJson.Get(EPlatformRules.MAX_GET_RECORDS);
+            var maxQueryRules = ReadConfigRulesJson.Get(EPlatformRules.MAX_GET_RECORDS);
             if (maxQueryRules == 0)
                 maxQueryRules = 200;
             return maxQueryRules;
@@ -127,7 +127,7 @@ namespace ProjectShop.Server.Infrastructure.Configuration
         private static uint GetDefaultPageSize()
         {
             // Default to a safe value
-            uint defaultPageSize = ReadConfigRulesJson.Get(EPlatformRules.DEFAULT_PAGE_SIZE);
+            var defaultPageSize = ReadConfigRulesJson.Get(EPlatformRules.DEFAULT_PAGE_SIZE);
             if (defaultPageSize == 0)
                 defaultPageSize = 10;
             return defaultPageSize;

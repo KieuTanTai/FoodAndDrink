@@ -1,4 +1,4 @@
-﻿namespace ProjectShop.Server.Core.ValueObjects
+﻿namespace ProjectShop.Server.Core.ValueObjects.Results.BatchResult
 {
     public class BatchObjectResult<TEntity> where TEntity : class
     {

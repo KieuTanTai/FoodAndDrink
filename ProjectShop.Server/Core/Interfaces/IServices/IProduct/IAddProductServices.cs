@@ -1,4 +1,5 @@
 ﻿using ProjectShop.Server.Core.ValueObjects;
+using ProjectShop.Server.Core.ValueObjects.Results.ServiceResult;
 
 namespace ProjectShop.Server.Core.Interfaces.IServices.IProduct
 {

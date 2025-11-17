@@ -69,7 +69,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<AccountRole?> GetNavigationByIdAsync(uint id, AccountRoleNavigationOptions options, CancellationToken cancellationToken)
         {
-            IQueryable<AccountRole> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query.FirstOrDefaultAsync(accountRole => accountRole.AccountRoleId == id, cancellationToken);
         }
@@ -80,7 +80,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
-            IQueryable<AccountRole> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query
                 .Where(accountRole => ids.Contains(accountRole.AccountRoleId) && accountRole.AccountRoleId > cursor)
@@ -136,13 +136,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             Dictionary<uint, Account> accountsDict = [];
             Dictionary<uint, Role> rolesDict = [];
 
-            if (accounts != null && accounts.Count > 0)
+            if (accounts is { Count: > 0 })
                 accountsDict = accounts.ToDictionary(account => account.AccountId);
-            if (roles != null && roles.Count > 0)
+            if (roles is { Count: > 0 })
                 rolesDict = roles.ToDictionary(role => role.RoleId);
 
             // mapping
-            foreach (AccountRole accountRole in accountRoles)
+            foreach (var accountRole in accountRoles)
             {
                 if (accountsDict.TryGetValue(accountRole.AccountId, out var account))
                     accountRole.Account = account ?? new();

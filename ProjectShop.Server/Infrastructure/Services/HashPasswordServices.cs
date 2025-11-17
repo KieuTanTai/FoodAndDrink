@@ -11,7 +11,7 @@ namespace ProjectShop.Server.Infrastructure.Services
 
         public async Task<bool> ComparePasswordsAsync(string hashedPassword, string password, CancellationToken cancellationToken = default)
         {
-            bool match = BCrypt.Net.BCrypt.Verify(password, hashedPassword);
+            var match = BCrypt.Net.BCrypt.Verify(password, hashedPassword);
             return match;
         }
 
@@ -22,12 +22,12 @@ namespace ProjectShop.Server.Infrastructure.Services
 
         public async Task<bool> IsPasswordValidAsync(string password, CancellationToken cancellationToken = default)
         {
-            bool isValid = !string.IsNullOrWhiteSpace(password)
-                && password.Length > 8
-                && password.Any(char.IsUpper)        // Có chữ hoa
-                && password.Any(char.IsLower)        // Có chữ thường
-                && password.Any(char.IsDigit)        // Có số
-                && password.Any(ch => !char.IsLetterOrDigit(ch)); // Có ký tự đặc biệt
+            var isValid = !string.IsNullOrWhiteSpace(password)
+                          && password.Length > 8
+                          && password.Any(char.IsUpper)        // Có chữ hoa
+                          && password.Any(char.IsLower)        // Có chữ thường
+                          && password.Any(char.IsDigit)        // Có số
+                          && password.Any(ch => !char.IsLetterOrDigit(ch)); // Có ký tự đặc biệt
             return isValid;
         }
     }

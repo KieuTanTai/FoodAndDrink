@@ -1,4 +1,5 @@
-﻿using ProjectShop.Server.Core.ValueObjects;
+﻿using ProjectShop.Server.Core.ValueObjects.Results.ServiceResult;
+using ProjectShop.Server.Core.ValueObjects;
 using System.Runtime.CompilerServices;
 
 namespace ProjectShop.Server.Core.Interfaces.IServices

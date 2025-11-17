@@ -16,7 +16,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<IEnumerable<ProductImage>> GetByProductBarcodeAsync(string productBarcode, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
-            uint cursor = fromRecord ?? 0;
+            var cursor = fromRecord ?? 0;
 
             return await _dbSet
                 .Where(productImageEntity => productImageEntity.ProductBarcode == productBarcode && productImageEntity.ProductImageId > cursor)
@@ -45,7 +45,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<ProductImage?> GetNavigationByIdAsync(uint id, ProductImageNavigationOptions options, CancellationToken cancellationToken)
         {
-            IQueryable<ProductImage> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query.FirstOrDefaultAsync(productImageEntity => productImageEntity.ProductImageId == id, cancellationToken);
         }
@@ -54,9 +54,9 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             uint? pageSize, CancellationToken cancellationToken)
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
-            uint cursor = fromRecord ?? 0;
+            var cursor = fromRecord ?? 0;
 
-            IQueryable<ProductImage> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query
                 .Where(productImageEntity => ids.Contains(productImageEntity.ProductImageId) && productImageEntity.ProductImageId > cursor)
@@ -75,7 +75,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<IEnumerable<ProductImage>> ExplicitLoadAsync(IEnumerable<ProductImage> entities, ProductImageNavigationOptions options, CancellationToken cancellationToken)
         {
             List<Product> products = [];
-            List<string> productBarcodes = entities.Select(productImageItem => productImageItem.ProductBarcode).Distinct().ToList();
+            var productBarcodes = entities.Select(productImageItem => productImageItem.ProductBarcode).Distinct().ToList();
 
             if (options.IsGetProductBarcodeNavigation)
                 products = await _context.Products.Where(productEntity => productBarcodes.Contains(productEntity.ProductBarcode)).ToListAsync(cancellationToken);
@@ -102,12 +102,12 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
             Dictionary<string, Product> productsDict = [];
 
-            if (products != null && products.Count > 0)
+            if (products is { Count: > 0 })
                 productsDict = products.ToDictionary(productEntity => productEntity.ProductBarcode);
 
-            foreach (ProductImage pi in productImages)
+            foreach (var pi in productImages)
             {
-                if (productsDict.TryGetValue(pi.ProductBarcode, out Product? product))
+                if (productsDict.TryGetValue(pi.ProductBarcode, out var product))
                     pi.ProductBarcodeNavigation = product ?? new();
             }
 

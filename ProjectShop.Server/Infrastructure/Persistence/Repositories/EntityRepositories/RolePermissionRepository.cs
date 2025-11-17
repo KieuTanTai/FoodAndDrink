@@ -53,7 +53,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<RolePermission?> GetNavigationByIdAsync(uint id, RolePermissionNavigationOptions options, CancellationToken cancellationToken)
         {
-            IQueryable<RolePermission> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query.FirstOrDefaultAsync(rp => rp.RolePermissionId == id, cancellationToken);
         }
@@ -64,7 +64,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
-            IQueryable<RolePermission> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query
                 .Where(rp => ids.Contains(rp.RolePermissionId) && rp.RolePermissionId > cursor)
@@ -120,12 +120,12 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             Dictionary<uint, Role> rolesDict = [];
             Dictionary<uint, Permission> permissionsDict = [];
 
-            if (roles != null && roles.Count > 0)
+            if (roles is { Count: > 0 })
                 rolesDict = roles.ToDictionary(role => role.RoleId);
-            if (permissions != null && permissions.Count > 0)
+            if (permissions is { Count: > 0 })
                 permissionsDict = permissions.ToDictionary(permission => permission.PermissionId);
 
-            foreach (RolePermission rp in rolePermissions)
+            foreach (var rp in rolePermissions)
             {
                 if (rolesDict.TryGetValue(rp.RoleId, out var role))
                     rp.Role = role ?? new();

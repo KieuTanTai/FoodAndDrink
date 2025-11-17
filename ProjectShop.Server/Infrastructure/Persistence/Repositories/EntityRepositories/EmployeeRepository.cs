@@ -81,7 +81,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<Employee?> GetNavigationByIdAsync(uint id, EmployeeNavigationOptions options, CancellationToken cancellationToken)
         {
-            IQueryable<Employee> query = _dbSet.AsNoTracking();
+            var query = _dbSet.AsNoTracking();
             query = ApplyNavigationOptions(query, options);
 
             return await query.FirstOrDefaultAsync(employee => employee.EmployeeId == id, cancellationToken);
@@ -92,7 +92,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
-            IQueryable<Employee> query = _dbSet.AsNoTracking();
+            var query = _dbSet.AsNoTracking();
             query = ApplyNavigationOptions(query, options);
 
             return await query
@@ -168,20 +168,20 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
             Dictionary<uint, Person> personsDict = [];
             Dictionary<uint, Location> workLocationsDict = [];
-            ILookup<uint, DisposeProduct> disposeProductsLookup = Enumerable.Empty<DisposeProduct>().ToLookup(key => default(uint));
-            ILookup<uint, Invoice> invoicesLookup = Enumerable.Empty<Invoice>().ToLookup(key => default(uint));
+            var disposeProductsLookup = Enumerable.Empty<DisposeProduct>().ToLookup(key => default(uint));
+            var invoicesLookup = Enumerable.Empty<Invoice>().ToLookup(key => default(uint));
 
-            if (persons != null && persons.Count > 0)
+            if (persons is { Count: > 0 })
                 personsDict = persons.ToDictionary(person => person.PersonId);
-            if (workLocations != null && workLocations.Count > 0)
+            if (workLocations is { Count: > 0 })
                 workLocationsDict = workLocations.ToDictionary(location => location.LocationId);
-            if (disposeProducts != null && disposeProducts.Count > 0)
+            if (disposeProducts is { Count: > 0 })
                 disposeProductsLookup = disposeProducts.ToLookup(dispose => dispose.DisposeByEmployeeId);
-            if (invoices != null && invoices.Count > 0)
+            if (invoices is { Count: > 0 })
                 invoicesLookup = invoices.ToLookup(invoice => invoice.EmployeeId);
 
             // mapping
-            foreach (Employee employee in employees)
+            foreach (var employee in employees)
             {
                 if (personsDict.TryGetValue(employee.PersonId, out var person))
                     employee.Person = person ?? new();

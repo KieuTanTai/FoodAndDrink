@@ -103,7 +103,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<Person?> GetNavigationByIdAsync(uint id, PersonNavigationOptions options, CancellationToken cancellationToken)
         {
-            IQueryable<Person> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query.FirstOrDefaultAsync(person => person.PersonId == id, cancellationToken);
         }
@@ -113,7 +113,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
-            IQueryable<Person> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query
                 .Where(person => ids.Contains(person.PersonId) && person.PersonId > cursor)
@@ -179,15 +179,15 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             Dictionary<uint, Customer> customersDict = [];
             Dictionary<uint, Employee> employeesDict = [];
 
-            if (accounts != null && accounts.Count > 0)
+            if (accounts is { Count: > 0 })
                 accountsDict = accounts.ToDictionary(account => account.AccountId);
-            if (customers != null && customers.Count > 0)
+            if (customers is { Count: > 0 })
                 customersDict = customers.ToDictionary(customer => customer.PersonId);
-            if (employees != null && employees.Count > 0)
+            if (employees is { Count: > 0 })
                 employeesDict = employees.ToDictionary(employee => employee.PersonId);
 
             // mapping
-            foreach (Person person in persons)
+            foreach (var person in persons)
             {
                 if (accountsDict.TryGetValue(person.AccountId, out var account))
                     person.Account = account ?? new();

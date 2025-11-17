@@ -1,6 +1,6 @@
 ﻿using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.ValueObjects;
-using ProjectShop.Server.Core.ValueObjects.FrontEndRequestsForAccount;
+using ProjectShop.Server.Core.ValueObjects.Requests.FrontEndRequestsForAccount;
 
 namespace ProjectShop.Server.Core.Interfaces.IServices.IAccount
 {

@@ -6,7 +6,7 @@ using ProjectShop.Server.Core.Interfaces.IServices;
 using ProjectShop.Server.Core.Interfaces.IServices._IBase;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
 using ProjectShop.Server.Core.Interfaces.IValidate;
-using ProjectShop.Server.Core.ValueObjects;
+using ProjectShop.Server.Core.ValueObjects.Results.ServiceResult;
 using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
 
 namespace ProjectShop.Server.Application.Services.AccountServices
@@ -53,7 +53,7 @@ namespace ProjectShop.Server.Application.Services.AccountServices
             ServiceResult<Account> result = new(true);
             try
             {
-                Account? account = await getFunc(cancellationToken);
+                var account = await getFunc(cancellationToken);
                 if (account == null)
                 {
                     result.IsSuccess = false;
@@ -96,7 +96,7 @@ namespace ProjectShop.Server.Application.Services.AccountServices
             ServiceResults<Account> results = new(true);
             try
             {
-                IEnumerable<Account> accounts = await getFunc(fromRecord, pageSize, cancellationToken);
+                var accounts = await getFunc(fromRecord, pageSize, cancellationToken);
                 if (!accounts.Any())
                 {
                     results.IsSuccess = false;

@@ -1,4 +1,4 @@
-﻿using ProjectShop.Server.Core.ValueObjects;
+﻿using ProjectShop.Server.Core.ValueObjects.Results.ServiceResult;
 using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;

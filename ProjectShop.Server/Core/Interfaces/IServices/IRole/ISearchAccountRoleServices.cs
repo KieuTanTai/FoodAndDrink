@@ -1,7 +1,8 @@
 ﻿using ProjectShop.Server.Core.Enums;
 using ProjectShop.Server.Core.ValueObjects;
+using ProjectShop.Server.Core.ValueObjects.Results.ServiceResult;
 
-namespace ProjectShop.Server.Core.Interfaces.IServices.Role
+namespace ProjectShop.Server.Core.Interfaces.IServices.IRole
 {
     public interface ISearchAccountRoleServices<TEntity, TOption, TKey> where TEntity : class where TOption : class where TKey : struct
     {

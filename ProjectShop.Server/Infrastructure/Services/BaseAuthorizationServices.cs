@@ -14,7 +14,7 @@ namespace ProjectShop.Server.Infrastructure.Services
         public static string GetCurrentUserName(HttpContext httpContext)
         {
             ArgumentNullException.ThrowIfNull(httpContext);
-            ClaimsPrincipal user = GetCurrentUser(httpContext);
+            var user = GetCurrentUser(httpContext);
             return user.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty;
         }
 

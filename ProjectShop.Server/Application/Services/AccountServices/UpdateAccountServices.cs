@@ -20,7 +20,7 @@ namespace ProjectShop.Server.Application.Services.AccountServices
             => await UpdateAccountStatusAsync(userName, status, _unit.Accounts.GetByUserNameAsync, cancellationToken);
 
         public async Task<IEnumerable<JsonLogEntry>> UpdateAccountStatusByUserNamesAsync(IEnumerable<string> userNames, bool status, HttpContext httpContext, CancellationToken cancellationToken)
-            => await UpdateAccountStatusAsync(userNames, status, (userNames, token) => _unit.Accounts.GetByUserNamesAsync(userNames, cancellationToken: token), cancellationToken);
+            => await UpdateAccountStatusAsync(userNames, status, (userNames, token) => _unit.Accounts.GetManyByUserNamesAsync(userNames, cancellationToken: token), cancellationToken);
 
         public async Task<IEnumerable<JsonLogEntry>> UpdateAccountStatusAsync(IEnumerable<uint> accountIds, bool status, HttpContext httpContext, CancellationToken cancellationToken)
             => await UpdateAccountStatusAsync(accountIds.Select(id => id), status, _unit.Accounts.GetByIdsAsync, cancellationToken);
@@ -32,7 +32,7 @@ namespace ProjectShop.Server.Application.Services.AccountServices
             await _unit.BeginTransactionAsync(cancellationToken);
             try
             {
-                Account? account = await getFunc(input, cancellationToken);
+                var account = await getFunc(input, cancellationToken);
                 if (account == null)
                 {
                     await _unit.RollbackTransactionAsync(cancellationToken);
@@ -45,7 +45,7 @@ namespace ProjectShop.Server.Application.Services.AccountServices
                 }
 
                 account.AccountStatus = status;
-                int affectedRows = await _unit.Accounts.UpdateAsync(account, cancellationToken);
+                var affectedRows = await _unit.Accounts.UpdateAsync(account, cancellationToken);
                 if (affectedRows == 0)
                 {
                     await _unit.RollbackTransactionAsync(cancellationToken);
@@ -69,7 +69,7 @@ namespace ProjectShop.Server.Application.Services.AccountServices
             await _unit.BeginTransactionAsync(cancellationToken);
             try
             {
-                IEnumerable<Account> accounts = await getFunc(inputs, cancellationToken);
+                var accounts = await getFunc(inputs, cancellationToken);
                 if (accounts == null || !accounts.Any())
                 {
                     await _unit.RollbackTransactionAsync(cancellationToken);
@@ -77,9 +77,9 @@ namespace ProjectShop.Server.Application.Services.AccountServices
                     return logEntries;
                 }
 
-                foreach (Account account in accounts)
+                foreach (var account in accounts)
                     account.AccountStatus = status;
-                int affectedRows = await _unit.Accounts.UpdateRangeAsync(accounts, cancellationToken);
+                var affectedRows = await _unit.Accounts.UpdateRangeAsync(accounts, cancellationToken);
                 if (affectedRows == 0)
                 {
                     await _unit.RollbackTransactionAsync(cancellationToken);

@@ -74,7 +74,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<Customer?> GetNavigationByIdAsync(uint id, CustomerNavigationOptions options, CancellationToken cancellationToken)
         {
-            IQueryable<Customer> query = _dbSet.AsNoTracking();
+            var query = _dbSet.AsNoTracking();
             query = ApplyNavigationOptions(query, options);
 
             return await query.FirstOrDefaultAsync(customer => customer.CustomerId == id, cancellationToken);
@@ -85,7 +85,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
-            IQueryable<Customer> query = _dbSet.AsNoTracking();
+            var query = _dbSet.AsNoTracking();
             query = ApplyNavigationOptions(query, options);
 
             return await query
@@ -188,23 +188,23 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
             Dictionary<uint, Person> personsDict = [];
             Dictionary<uint, Cart> cartsDict = [];
-            ILookup<uint, CustomerAddress> customerAddressesLookup = Enumerable.Empty<CustomerAddress>().ToLookup(key => default(uint));
-            ILookup<uint, Invoice> invoicesLookup = Enumerable.Empty<Invoice>().ToLookup(key => default(uint));
-            ILookup<uint, UserPaymentMethod> userPaymentMethodsLookup = Enumerable.Empty<UserPaymentMethod>().ToLookup(key => default(uint));
+            var customerAddressesLookup = Enumerable.Empty<CustomerAddress>().ToLookup(key => default(uint));
+            var invoicesLookup = Enumerable.Empty<Invoice>().ToLookup(key => default(uint));
+            var userPaymentMethodsLookup = Enumerable.Empty<UserPaymentMethod>().ToLookup(key => default(uint));
 
-            if (persons != null && persons.Count > 0)
+            if (persons is { Count: > 0 })
                 personsDict = persons.ToDictionary(person => person.PersonId);
-            if (carts != null && carts.Count > 0)
+            if (carts is { Count: > 0 })
                 cartsDict = carts.ToDictionary(cart => cart.CustomerId);
-            if (customerAddresses != null && customerAddresses.Count > 0)
+            if (customerAddresses is { Count: > 0 })
                 customerAddressesLookup = customerAddresses.ToLookup(address => address.CustomerId);
-            if (invoices != null && invoices.Count > 0)
+            if (invoices is { Count: > 0 })
                 invoicesLookup = invoices.ToLookup(invoice => invoice.CustomerId);
-            if (userPaymentMethods != null && userPaymentMethods.Count > 0)
+            if (userPaymentMethods is { Count: > 0 })
                 userPaymentMethodsLookup = userPaymentMethods.ToLookup(method => method.CustomerId);
 
             // mapping
-            foreach (Customer customer in customers)
+            foreach (var customer in customers)
             {
                 if (personsDict.TryGetValue(customer.PersonId, out var person))
                     customer.Person = person ?? new();

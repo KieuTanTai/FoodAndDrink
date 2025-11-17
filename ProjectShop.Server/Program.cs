@@ -24,7 +24,6 @@ catch (Exception ex)
 }
 
 var app = builder.Build();
-SqlTypeHandlerRegistration.Register();
 GetProviderService.SetServiceProvider(app.Services);
 app.UseCustomMiddlewares(app.Environment);
 

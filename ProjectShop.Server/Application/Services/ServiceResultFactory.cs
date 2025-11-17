@@ -2,6 +2,7 @@
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ValueObjects;
 using System.Runtime.CompilerServices;
+using  ProjectShop.Server.Core.ValueObjects.Results.ServiceResult;
 
 namespace ProjectShop.Server.Application.Services
 {

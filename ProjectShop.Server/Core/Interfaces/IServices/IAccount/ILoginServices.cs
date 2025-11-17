@@ -1,6 +1,5 @@
 ﻿using ProjectShop.Server.Core.Entities;
-using ProjectShop.Server.Core.ValueObjects;
-using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
+using ProjectShop.Server.Core.ValueObjects.Results.ServiceResult;
 
 namespace ProjectShop.Server.Core.Interfaces.IServices.IAccount
 {

@@ -16,7 +16,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<Account?> GetNavigationByIdAsync(uint id, bool isGetAuth, bool isGetPermission, CancellationToken cancellationToken)
         {
-            IQueryable<Account> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptionsForAuth(query, isGetAuth, isGetPermission);
             return await query.FirstOrDefaultAsync(account => account.AccountId == id, cancellationToken);
         }
@@ -128,7 +128,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<Account?> GetNavigationByIdAsync(uint accountId, AccountNavigationOptions options, CancellationToken cancellationToken)
         {
-            IQueryable<Account> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query.FirstOrDefaultAsync(account => account.AccountId == accountId, cancellationToken);
         }
@@ -137,7 +137,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
-            IQueryable<Account> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query
                 .Where(account => accountIds.Contains(account.AccountId) && account.AccountId > cursor)
@@ -228,18 +228,18 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (accounts == null || !accounts.Any())
                 return [];
             Dictionary<uint, Person> personsDict = [];
-            ILookup<uint, AccountAdditionalPermission> permissionsLookup = Enumerable.Empty<AccountAdditionalPermission>().ToLookup(key => default(uint));
-            ILookup<uint, AccountRole> rolesLookup = Enumerable.Empty<AccountRole>().ToLookup(key => default(uint));
-            if (persons != null && persons.Count > 0)
+            var permissionsLookup = Enumerable.Empty<AccountAdditionalPermission>().ToLookup(key => 0U);
+            var rolesLookup = Enumerable.Empty<AccountRole>().ToLookup(key => 0U);
+            if (persons is { Count: > 0 })
                 personsDict = persons.ToDictionary(person => person.AccountId);
-            if (accountAdditionalPermissions != null && accountAdditionalPermissions.Count > 0)
+            if (accountAdditionalPermissions is { Count: > 0 })
                 permissionsLookup = accountAdditionalPermissions.ToLookup(permission => permission.AccountId);
-            if (roles != null && roles.Count > 0)
+            if (roles is { Count: > 0 })
                 rolesLookup = roles.ToLookup(role => role.AccountId);
-            foreach (Account account in accounts)
+            foreach (var account in accounts)
             {
                 if (personsDict.TryGetValue(account.AccountId, out var person))
-                    account.Person = person ?? new();
+                    account.Person = person ?? new Person();
                 account.AccountAdditionalPermissions = [.. permissionsLookup[account.AccountId]];
                 account.AccountRoles = [.. rolesLookup[account.AccountId]];
             }

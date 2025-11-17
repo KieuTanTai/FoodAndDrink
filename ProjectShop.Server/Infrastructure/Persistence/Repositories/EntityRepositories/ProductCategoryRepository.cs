@@ -19,7 +19,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<IEnumerable<ProductCategory>> GetByProductBarcodeAsync(string productBarcode, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
-            uint cursor = fromRecord ?? 0;
+            var cursor = fromRecord ?? 0;
 
             return await _dbSet
                 .Where(productCategoryEntity => productCategoryEntity.ProductBarcode == productBarcode && productCategoryEntity.ProductCategoryId > cursor)
@@ -31,7 +31,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<IEnumerable<ProductCategory>> GetByCategoryIdAsync(uint categoryId, uint? fromRecord, uint? pageSize, CancellationToken cancellationToken)
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
-            uint cursor = fromRecord ?? 0;
+            var cursor = fromRecord ?? 0;
 
             return await _dbSet
                 .Where(productCategoryEntity => productCategoryEntity.CategoryId == categoryId && productCategoryEntity.ProductCategoryId > cursor)
@@ -46,7 +46,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<ProductCategory?> GetNavigationByIdAsync(uint id, ProductCategoryNavigationOptions options, CancellationToken cancellationToken)
         {
-            IQueryable<ProductCategory> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query.FirstOrDefaultAsync(productCategoryEntity => productCategoryEntity.ProductCategoryId == id, cancellationToken);
         }
@@ -55,9 +55,9 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             uint? pageSize, CancellationToken cancellationToken)
         {
             pageSize = ValidateAndNormalizePageSize(pageSize);
-            uint cursor = fromRecord ?? 0;
+            var cursor = fromRecord ?? 0;
 
-            IQueryable<ProductCategory> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query
                 .Where(productCategoryEntity => ids.Contains(productCategoryEntity.ProductCategoryId) && productCategoryEntity.ProductCategoryId > cursor)
@@ -79,8 +79,8 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         {
             List<Product> products = [];
             List<Category> categories = [];
-            List<string> productBarcodes = entities.Select(productCategoryItem => productCategoryItem.ProductBarcode).Distinct().ToList();
-            List<uint> categoryIds = entities.Select(productCategoryItem => productCategoryItem.CategoryId).Distinct().ToList();
+            var productBarcodes = entities.Select(productCategoryItem => productCategoryItem.ProductBarcode).Distinct().ToList();
+            var categoryIds = entities.Select(productCategoryItem => productCategoryItem.CategoryId).Distinct().ToList();
 
             if (options.IsGetProduct)
                 products = await _context.Products.Where(productEntity => productBarcodes.Contains(productEntity.ProductBarcode)).ToListAsync(cancellationToken);
@@ -113,16 +113,16 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             Dictionary<string, Product> productsDict = [];
             Dictionary<uint, Category> categoriesDict = [];
 
-            if (products != null && products.Count > 0)
+            if (products is { Count: > 0 })
                 productsDict = products.ToDictionary(productEntity => productEntity.ProductBarcode);
-            if (categories != null && categories.Count > 0)
+            if (categories is { Count: > 0 })
                 categoriesDict = categories.ToDictionary(categoryEntity => categoryEntity.CategoryId);
 
-            foreach (ProductCategory pc in productCategories)
+            foreach (var pc in productCategories)
             {
-                if (productsDict.TryGetValue(pc.ProductBarcode, out Product? product))
+                if (productsDict.TryGetValue(pc.ProductBarcode, out var product))
                     pc.ProductBarcodeNavigation = product ?? new();
-                if (categoriesDict.TryGetValue(pc.CategoryId, out Category? category))
+                if (categoriesDict.TryGetValue(pc.CategoryId, out var category))
                     pc.Category = category ?? new();
             }
 

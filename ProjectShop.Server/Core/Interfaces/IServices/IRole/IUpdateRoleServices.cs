@@ -1,6 +1,6 @@
 ﻿using ProjectShop.Server.Core.ValueObjects;
 
-namespace ProjectShop.Server.Core.Interfaces.IServices.Role
+namespace ProjectShop.Server.Core.Interfaces.IServices.IRole
 {
     public interface IUpdateRoleServices
     {

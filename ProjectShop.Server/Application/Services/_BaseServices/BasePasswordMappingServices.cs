@@ -19,8 +19,8 @@ namespace ProjectShop.Server.Application.Services._BaseServices
         {
             if (entities.Count != newPasswords.Count)
                 throw new ArgumentException("The number of accounts does not match the number of new passwords.");
-            int count = entities.Count;
-            for (int i = 0; i < count; i++)
+            var count = entities.Count;
+            for (var i = 0; i < count; i++)
             {
                 if (await _hashPassword.ComparePasswordsAsync(entities[i].Password, newPasswords[i], cancellationToken))
                     continue;

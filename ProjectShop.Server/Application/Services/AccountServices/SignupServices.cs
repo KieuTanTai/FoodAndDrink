@@ -7,6 +7,7 @@ using ProjectShop.Server.Core.Interfaces.IServices._IBase;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ValueObjects;
+using ProjectShop.Server.Core.ValueObjects.Results.ServiceResult;
 using ProjectShop.Server.Infrastructure.Services;
 
 namespace ProjectShop.Server.Application.Services.AccountServices
@@ -72,8 +73,8 @@ namespace ProjectShop.Server.Application.Services.AccountServices
             List<JsonLogEntry> logEntries = [];
             try
             {
-                IEnumerable<string> userNames = entities.Select(account => account.UserName);
-                if (await _helper.DoNoneOfIdsExistAsync(userNames, (userNames, token) => _unit.Accounts.GetByUserNamesAsync(userNames, cancellationToken: token), cancellationToken))
+                var userNames = entities.Select(account => account.UserName);
+                if (await _helper.DoNoneOfIdsExistAsync(userNames, (userNames, token) => _unit.Accounts.GetManyByUserNamesAsync(userNames, cancellationToken: token), cancellationToken))
                 {
                     logEntries.Add(_logger.JsonLogWarning<Account, SignupServices>("One or more accounts with the same usernames already exist."));
                     return _serviceResultFactory.CreateServiceResults<Account>([], logEntries, false);
@@ -113,7 +114,7 @@ namespace ProjectShop.Server.Application.Services.AccountServices
 
         private static bool IsHavePermissionAsync(HttpContext httpContext)
         {
-            ClaimsPrincipal principal = BaseAuthorizationService.GetCurrentUser(httpContext);
+            var principal = BaseAuthorizationService.GetCurrentUser(httpContext);
             if (principal == null)
                 return false;
             return principal.IsInRole("Admin");
@@ -121,7 +122,7 @@ namespace ProjectShop.Server.Application.Services.AccountServices
         
         private async Task<IEnumerable<Account>> HashPasswordAsync(IEnumerable<Account> entities)
         {
-            foreach (Account entity in entities)
+            foreach (var entity in entities)
             {
                 if (!await _hashPassword.IsPasswordValidAsync(entity.Password))
                     throw new ArgumentException(nameof(entity.Password), $"Password for user {entity.UserName} does not meet the required criteria.");

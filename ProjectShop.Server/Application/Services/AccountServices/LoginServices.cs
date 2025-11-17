@@ -1,14 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ProjectShop.Server.Core.Entities;
-using ProjectShop.Server.Core.Interfaces.IContext;
+﻿using ProjectShop.Server.Core.Entities;
 using ProjectShop.Server.Core.Interfaces.IRepositories;
 using ProjectShop.Server.Core.Interfaces.IServices;
-using ProjectShop.Server.Core.Interfaces.IServices._IBase;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
 using ProjectShop.Server.Core.Interfaces.IValidate;
-using ProjectShop.Server.Core.ValueObjects;
-using ProjectShop.Server.Core.ValueObjects.GetNavigationPropertyOptions;
-using System.Security.Claims;
+using ProjectShop.Server.Core.ValueObjects.Results.ServiceResult;
 
 namespace ProjectShop.Server.Application.Services.AccountServices
 {
@@ -34,14 +29,14 @@ namespace ProjectShop.Server.Application.Services.AccountServices
             ServiceResult<Account> result = new(true);
             try
             {
-                Account? account = await _unit.Accounts.GetByUserNameAsync(username, cancellationToken);
+                var account = await _unit.Accounts.GetByUserNameAsync(username, cancellationToken);
                 if (account == null)
                     return _serviceResultFactory.CreateServiceResult($"Account with username '{username}' not found.", new Account(), false);
                 // validate account status and password
                 if (!account.AccountStatus)
                     return _serviceResultFactory.CreateServiceResult($"Account is inactive.", new Account(), false);
 
-                string accountPassword = account.Password;
+                var accountPassword = account.Password;
                 if (!await _hashPassword.ComparePasswordsAsync(accountPassword, password, cancellationToken))
                     return _serviceResultFactory.CreateServiceResult($"Invalid password.", new Account(), false);
 

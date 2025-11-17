@@ -1,4 +1,4 @@
-﻿namespace ProjectShop.Server.Core.ValueObjects.FrontEndRequestsForAccount
+﻿namespace ProjectShop.Server.Core.ValueObjects.Requests.FrontEndRequestsForAccount
 {
     public class AccountUpdatePasswordRequest
     {

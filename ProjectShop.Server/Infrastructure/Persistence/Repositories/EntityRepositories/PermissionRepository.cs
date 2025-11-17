@@ -73,7 +73,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<Permission?> GetNavigationByIdAsync(uint id, PermissionNavigationOptions options, CancellationToken cancellationToken)
         {
-            IQueryable<Permission> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query.FirstOrDefaultAsync(permission => permission.PermissionId == id, cancellationToken);
         }
@@ -94,7 +94,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
-            IQueryable<Permission> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query
                 .Where(permission => ids.Contains(permission.PermissionId) && permission.PermissionId > cursor)
@@ -167,7 +167,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (permissions == null || !permissions.Any())
                 return [];
 
-            foreach (Permission permission in permissions)
+            foreach (var permission in permissions)
             {
                 if (accountAdditionalPermissionsLookup != null)
                     permission.AccountAdditionalPermissions = accountAdditionalPermissionsLookup[permission.PermissionId].ToList();

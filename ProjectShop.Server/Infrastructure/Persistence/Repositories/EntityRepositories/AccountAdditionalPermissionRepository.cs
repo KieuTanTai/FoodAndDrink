@@ -79,7 +79,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
         public async Task<AccountAdditionalPermission?> GetNavigationByIdAsync(uint id, AccountAdditionalPermissionNavigationOptions options,
             CancellationToken cancellationToken)
         {
-            IQueryable<AccountAdditionalPermission> queryable = _dbSet.AsQueryable();
+            var queryable = _dbSet.AsQueryable();
             queryable = ApplyNavigationOptions(queryable, options);
             return await queryable.FirstOrDefaultAsync(additional => additional.AccountAdditionalPermissionId == id, cancellationToken);
         }
@@ -90,7 +90,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
-            IQueryable<AccountAdditionalPermission> queryable = _dbSet.AsQueryable();
+            var queryable = _dbSet.AsQueryable();
             queryable = ApplyNavigationOptions(queryable, options);
             return await queryable
                 .Where(additional => ids.Contains(additional.AccountAdditionalPermissionId) && additional.AccountAdditionalPermissionId > cursor)
@@ -144,13 +144,13 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             Dictionary<uint, Permission> permissionsDict = [];
             Dictionary<uint, Account> accountsDict = [];
 
-            if (permissions != null && permissions.Count > 0)
+            if (permissions is { Count: > 0 })
                 permissionsDict = permissions.ToDictionary(permission => permission.PermissionId);
-            if (accounts != null && accounts.Count > 0)
+            if (accounts is { Count: > 0 })
                 accountsDict = accounts.ToDictionary(account => account.AccountId);
 
             // mapping
-            foreach (AccountAdditionalPermission additional in additionalPermissions)
+            foreach (var additional in additionalPermissions)
             {
                 if (permissionsDict.TryGetValue(additional.AccountId, out var permission))
                     additional.Permission = permission ?? new();

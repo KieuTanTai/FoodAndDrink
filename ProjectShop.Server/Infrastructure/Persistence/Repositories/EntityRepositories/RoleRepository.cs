@@ -70,7 +70,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
 
         public async Task<Role?> GetNavigationByIdAsync(uint id, RoleNavigationOptions options, CancellationToken cancellationToken)
         {
-            IQueryable<Role> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query.FirstOrDefaultAsync(role => role.RoleId == id, cancellationToken);
         }
@@ -81,7 +81,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             pageSize = ValidateAndNormalizePageSize(pageSize);
             var cursor = fromRecord ?? 0;
 
-            IQueryable<Role> query = _dbSet.AsQueryable();
+            var query = _dbSet.AsQueryable();
             query = ApplyNavigationOptions(query, options);
             return await query
                 .Where(role => ids.Contains(role.RoleId) && role.RoleId > cursor)
@@ -144,7 +144,7 @@ namespace ProjectShop.Server.Infrastructure.Persistence.Repositories.EntityRepos
             if (roles == null || !roles.Any())
                 return [];
 
-            foreach (Role role in roles)
+            foreach (var role in roles)
             {
                 if (accountRolesLookup != null)
                     role.AccountRoles = accountRolesLookup[role.RoleId].ToList();

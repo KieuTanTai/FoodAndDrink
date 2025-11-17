@@ -1,4 +1,4 @@
-﻿using ProjectShop.Server.Core.ValueObjects;
+﻿using ProjectShop.Server.Core.ValueObjects.Results.ServiceResult;
 using ProjectShop.Server.Core.Entities;
 
 namespace ProjectShop.Server.Core.Interfaces.IServices.IAccount

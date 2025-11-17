@@ -1,4 +1,4 @@
-﻿namespace ProjectShop.Server.Core.ValueObjects
+﻿namespace ProjectShop.Server.Core.ValueObjects.Results.ServiceResult
 {
     public class ServiceResults<TEntity> where TEntity : class
     {

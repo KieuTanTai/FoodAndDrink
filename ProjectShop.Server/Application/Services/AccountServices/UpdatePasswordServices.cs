@@ -7,7 +7,7 @@ using ProjectShop.Server.Core.Interfaces.IServices._IBase;
 using ProjectShop.Server.Core.Interfaces.IServices.IAccount;
 using ProjectShop.Server.Core.Interfaces.IValidate;
 using ProjectShop.Server.Core.ValueObjects;
-using ProjectShop.Server.Core.ValueObjects.FrontEndRequestsForAccount;
+using ProjectShop.Server.Core.ValueObjects.Requests.FrontEndRequestsForAccount;
 
 namespace ProjectShop.Server.Application.Services.AccountServices
 {
@@ -25,8 +25,8 @@ namespace ProjectShop.Server.Application.Services.AccountServices
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                Account account = await HelperUpdatePasswordForAccountAsync(userName, password, cancellationToken);
-                int affectedRows = await _unitOfWork.Accounts.UpdateAsync(account ,cancellationToken);
+                var account = await HelperUpdatePasswordForAccountAsync(userName, password, cancellationToken);
+                var affectedRows = await _unitOfWork.Accounts.UpdateAsync(account ,cancellationToken);
                 if (affectedRows == 0)
                 {
                     await _unitOfWork.RollbackTransactionAsync(cancellationToken);
@@ -64,8 +64,8 @@ namespace ProjectShop.Server.Application.Services.AccountServices
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                List<Account> accounts = await HelperUpdatePasswordForAccountsAsync(frontEndUpdatePasswordAccounts, cancellationToken);
-                int affectedRows = await _unitOfWork.Accounts.UpdateRangeAsync(accounts, cancellationToken);
+                var accounts = await HelperUpdatePasswordForAccountsAsync(frontEndUpdatePasswordAccounts, cancellationToken);
+                var affectedRows = await _unitOfWork.Accounts.UpdateRangeAsync(accounts, cancellationToken);
                 if (affectedRows == 0)
                 {
                     await _unitOfWork.RollbackTransactionAsync(cancellationToken);
@@ -106,7 +106,7 @@ namespace ProjectShop.Server.Application.Services.AccountServices
         #region Helper methods for main public methods (for isolate from main methods)
         private async Task<Account> HelperUpdatePasswordForAccountAsync(string userName, string password, CancellationToken cancellationToken = default)
         {
-            Account account = await HelperGetAccountByUserNameAsync(userName, cancellationToken);
+            var account = await HelperGetAccountByUserNameAsync(userName, cancellationToken);
             if (!await _hashPassword.IsPasswordHashedAsync(password, cancellationToken))
                 account.Password = await _hashPassword.HashPasswordAsync(password, cancellationToken);
             return account;
@@ -117,7 +117,7 @@ namespace ProjectShop.Server.Application.Services.AccountServices
         {
             List<string> userNames = [.. frontEndUpdatePasswordAccounts.Select(account => account.UserName)];
             List<string> newPasswords = [.. frontEndUpdatePasswordAccounts.Select(account => account.Password)];
-            List<Account> entities = await HelperGetAccountsByUserNamesAsync(userNames, cancellationToken);
+            var entities = await HelperGetAccountsByUserNamesAsync(userNames, cancellationToken);
             entities = await _basePasswordMappingServices.HelperPasswordMappingAsync(entities, newPasswords, cancellationToken);
             return entities;
         }
@@ -126,14 +126,14 @@ namespace ProjectShop.Server.Application.Services.AccountServices
         #region  Helper methods fetching accounts and password mapping (for isolate from main methods) 
         private async Task<Account> HelperGetAccountByUserNameAsync(string userName, CancellationToken cancellationToken)
         {
-            Account entity = await _unitOfWork.Accounts.GetByUserNameAsync(userName, cancellationToken)
-                ?? throw new SqlNullValueException("Account not found!");
+            var entity = await _unitOfWork.Accounts.GetByUserNameAsync(userName, cancellationToken)
+                         ?? throw new SqlNullValueException("Account not found!");
             return entity;
         }
 
         private async Task<List<Account>> HelperGetAccountsByUserNamesAsync(List<string> userNames, CancellationToken cancellationToken)
         {
-            IEnumerable<Account> entities = await _unitOfWork.Accounts.GetByUserNamesAsync(userNames, cancellationToken: cancellationToken);
+            var entities = await _unitOfWork.Accounts.GetManyByUserNamesAsync(userNames, cancellationToken: cancellationToken);
             if (entities == null || !entities.Any())
                 throw new SqlNullValueException("No accounts found for the provided userNames.");
             return [..entities];
