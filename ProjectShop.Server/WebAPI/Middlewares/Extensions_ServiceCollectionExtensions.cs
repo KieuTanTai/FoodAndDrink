@@ -11,7 +11,7 @@ public static class ServiceCollectionExtensions
         {
             options.AddPolicy("AllowLocalhostFrontend", policy =>
             {
-                policy.WithOrigins("https://localhost:58435")
+                policy.WithOrigins("http://localhost:3000")
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials();
@@ -29,7 +29,7 @@ public static class ServiceCollectionExtensions
                 options.LogoutPath = "/logout";
                 options.ExpireTimeSpan = TimeSpan.FromDays(7);
                 options.SlidingExpiration = true;
-                
+
                 // Cookie settings for CORS and HTTPS
                 options.Cookie.Name = ".AspNetCore.Cookies";
                 options.Cookie.HttpOnly = true;

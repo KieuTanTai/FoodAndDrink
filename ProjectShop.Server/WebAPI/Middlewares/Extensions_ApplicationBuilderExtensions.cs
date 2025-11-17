@@ -9,8 +9,7 @@ public static class ApplicationBuilderExtensions
     public static IApplicationBuilder UseCustomMiddlewares(this IApplicationBuilder app, IWebHostEnvironment env)
     {
         app.UseHttpsRedirection();
-        app.UseRouting(); // <--- THÊM DÒNG NÀY ĐẦU TIÊN
-
+        app.UseRouting();
         app.UseCors("AllowLocalhostFrontend");
         app.UseAuthentication();
         app.UseAuthorization();
