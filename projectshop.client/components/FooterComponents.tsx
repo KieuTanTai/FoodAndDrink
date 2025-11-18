@@ -18,7 +18,7 @@ const Footer = () => {
                                              height={48}
                                              width={160}
                                              className="h-12"
-                                             loading="lazy"
+                                             loading="eager"
                                         />
                                    </a>
                               </div>
@@ -88,8 +88,8 @@ const Footer = () => {
                               </p>
                               <div className="flex flex-col md:flex-row items-center mb-6">
                                    <div>
-                                        <Image src="/assets/images/icons/web_logo/bct_img.jpg" alt="bo cong thuong" className="mt-4 md:mt-0 mb-2" width={160} height={60}
-                                             style={{ height: 'auto' }} loading='lazy' />
+                                        <Image src="/assets/images/icons/web_logo/bct_img.jpg" alt="bo cong thuong"
+                                             className="mt-4 md:mt-0 mb-2" width={160} height={60} loading='eager' />
                                         <form method="post" className="flex-1 w-full md:mr-4" id='newsletter-form'>
                                              <div className="flex">
                                                   <input

@@ -6,10 +6,12 @@ import { InvalidValueError } from "@/value-objects/custom-error/invalidValueErro
 import { JsonLogEntry } from "@/value-objects/JsonLogEntry";
 import axios, { isAxiosError, type AxiosResponse } from "axios";
 
+const baseUrl = "https://localhost:5294/api/account";  
+
 export async function login(form: UILoginData): Promise<AccountModel> {
   try {
     const response = await axios.post(
-      "https://localhost:5294/api/account/login",
+      `${baseUrl}/login`,
       {
         Email: form.email,
         Password: form.password,
@@ -34,7 +36,7 @@ export async function signup(
   try {
     const sendData = { Email: form.email, Password: form.password };
     const response: AxiosResponse<AccountModel> = await axios.post(
-      "https://localhost:5294/api/account/register",
+      `${baseUrl}/register`,
       sendData
     );
     console.log("[signup] Kết quả trả về:", response.data);
@@ -60,7 +62,7 @@ export async function signup(
 export async function checkExistedByEmail(email: string): Promise<boolean> {
   try {
     const response = await axios.get(
-      "https://localhost:5294/api/account/by-username",
+      `${baseUrl}/by-username`,
       { params: { userName: email } }
     );
     if (response && response.status === 200) return true;
@@ -74,7 +76,7 @@ export async function checkExistedByEmail(email: string): Promise<boolean> {
 export async function logout() {
   try {
     const response = await axios.delete(
-      "https://localhost:5294/api/account/logout",
+      `${baseUrl}/logout`,
       { withCredentials: true }
     );
     return response.data as string;

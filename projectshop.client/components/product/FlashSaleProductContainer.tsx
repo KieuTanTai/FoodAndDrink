@@ -29,7 +29,7 @@ export default function FlashSaleContainer({
                         flex items-center gap-4
                         bg-white rounded-lg shadow-lg
                         px-6 py-3
-                        min-h-[56px]
+                        min-h-14
                         border border-gray-200
                         mx-0 mb-6
                     "

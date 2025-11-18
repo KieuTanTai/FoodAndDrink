@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --experimental-https",
     "build": "next build",
-    "start": "next start",
+    "start": "HTTPS=true next start",
     "lint": "next lint",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "swagger": "node ./swagger.js"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.0.0",
@@ -50,6 +51,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "jsdom": "^25.0.1",
     "postcss": "^8.5.6",
+    "swagger-autogen": "^2.23.7",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3",
     "vite": "^7.2.2",

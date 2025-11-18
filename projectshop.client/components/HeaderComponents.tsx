@@ -35,7 +35,8 @@ function Header() {
                               </div>
                               {/* Logo */}
                               <div>
-                                   <Image src="/assets/images/icons/web_logo/light-novel-world.png" alt="Light Novel World Logo" className="h-10" width={160} height={40} loading="eager" />
+                                   <Image src="/assets/images/icons/web_logo/light-novel-world.png" alt="Light Novel World Logo"
+                                        className="h-10" width={160} height={40} loading="eager" />
                               </div>
                               {/* Cart */}
                               <div className="relative cursor-pointer" onClick={handleAddToCart}>
@@ -50,7 +51,8 @@ function Header() {
                          <div className="hidden md:flex md:w-full lg:w-full items-center">
                               {/* Logo */}
                               <div className="w-auto px-2 lg:w-2/12">
-                                   <Image src="/assets/images/icons/web_logo/light-novel-world.png" alt="Light Novel World Logo" className="h-12" width={160} height={48} />
+                                   <Image src="/assets/images/icons/web_logo/light-novel-world.png" alt="Light Novel World Logo"
+                                        className="h-12" width={160} height={48} loading="eager" />
                               </div>
 
                               {/* Search Bar */}

@@ -8,21 +8,25 @@ import useFixedScrollbarCompensate from "@/hooks/useScrollbarCompensate";
 import { login, logout } from "@/app/api/auth-api";
 import LoginModal from "@/modal/components/account/LoginModal";
 import SignupModal from "@/modal/components/account/SignupModal";
+import { useRouter } from "next/navigation";
 // import ForgotPasswordModal from "@/modal/components/account/ForgotPasswordModal";
 
 
 function HeaderAccount() {
   const [currentAccount, setCurrentAccount] = useState<AccountModel | null>(null);
   const { showMessage } = useMessageModalProvider();
+  const [openModal, setOpenModal] = useState<"" | "login" | "signup" | "forgot-password">("");
+
+  // Handler mở trang tài khoản
+  const router = useRouter();
+  const openAccountPage = () => router.push('/account');
 
   // Handler mở đóng modal
-  const [openModal, setOpenModal] = useState<"" | "login" | "signup" | "forgot-password">("");
   const openLogin = () => setOpenModal("login");
   const openSignup = () => setOpenModal("signup");
   const openForgotPassword = () => setOpenModal("forgot-password");
   const closeModal = () => setOpenModal("");
   useFixedScrollbarCompensate(openModal !== "");
-
   useEffect(() => {
     async function fetchAccount() {
       try {
@@ -79,7 +83,7 @@ function HeaderAccount() {
   return (
     <div className="relative group pb-1 account-hover-area rounded-md h-full">
       {/* Icon và text */}
-      <div className="flex items-center pl-3 cursor-pointer" id="account-menu-button">
+      <div className="flex items-center pl-3 cursor-pointer" id="account-menu-button" onClick={openAccountPage}>
         <FontAwesomeIcon icon={faCircleUser} className="main-color w-5 h-5" />
         <div className="pl-2 text-nowrap max-w-26 text-ellipsis overflow-hidden">{showAccountName()}</div>
       </div>

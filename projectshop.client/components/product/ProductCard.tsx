@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBagShopping, faBasketShopping } from "@fortawesome/free-solid-svg-icons";
+import Image from "next/image";
 
 interface ProductCardProps {
      id: string;
@@ -30,7 +31,7 @@ export default function ProductCard({
                id={`product-${id}`}
           >
                <div className="relative">
-                    <img src={imageSrc} alt={altText} className="w-full aspect-[4/5] object-cover" />
+                    <Image src={imageSrc} alt={altText ?? title} className="w-full aspect-4/5 object-cover" width={240} height={300}/>
                     {salePercentage && (
                          <div className="absolute top-2 right-2 bg-red-500 text-xs font-bold px-2 py-1 rounded-sm text-white">
                               {salePercentage}
